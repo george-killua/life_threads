@@ -66,14 +66,12 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, _) => _WallError(message: error.toString()),
             data: (state) {
-              final wallItems = state.wallItems
-                  .map(_withPendingWallItem)
-                  .toList();
               final filteredEvents = state.events
                   .where((event) => _filter.matches(event.category))
                   .map(_withPendingMemory)
                   .toList();
-              final anchors = _buildAnchors(filteredEvents, wallItems);
+              final displayWallItems = _displayWallItems(state, filteredEvents);
+              final anchors = _buildAnchors(filteredEvents, displayWallItems);
               final visibleConnections = state.connections
                   .where(
                     (connection) =>
@@ -85,7 +83,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                   state.events.isNotEmpty || state.wallItems.isNotEmpty;
 
               if (_mode == _WallViewMode.wall) {
-                _setInitialViewport(context, filteredEvents, wallItems);
+                _setInitialViewport(context, filteredEvents, displayWallItems);
               }
 
               return Stack(
@@ -122,21 +120,35 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                       ),
                                     ),
                                   ),
-                                  for (final item in wallItems)
+                                  for (final item in displayWallItems)
                                     switch (item.type) {
                                       WallItemType.text => WallTextNoteWidget(
                                         item: item,
                                         windValue: _windController.value,
                                         isDragging: _draggingNodeId == item.id,
+                                        isAttached:
+                                            _attachedMemoryId(item, state) !=
+                                            null,
                                         onLongPress: () =>
-                                            _showTextMenu(context, item),
+                                            _showTextMenu(context, state, item),
+                                        onEdit: () => _editTextNote(
+                                          context,
+                                          repository,
+                                          item,
+                                        ),
+                                        onAttach: () => _showTextAttachments(
+                                          context,
+                                          state,
+                                          item,
+                                        ),
                                         onDragStart: () => _startDrag(
                                           item.id,
                                           item.wallPosition,
                                           _DragTargetKind.wallItem,
                                         ),
                                         onDragUpdate: _updateDrag,
-                                        onDragEnd: () => _endDrag(repository),
+                                        onDragEnd: () =>
+                                            _endDrag(repository, state),
                                       ),
                                       WallItemType.nail => WallNailWidget(
                                         item: item,
@@ -149,7 +161,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                           _DragTargetKind.wallItem,
                                         ),
                                         onDragUpdate: _updateDrag,
-                                        onDragEnd: () => _endDrag(repository),
+                                        onDragEnd: () =>
+                                            _endDrag(repository, state),
                                       ),
                                     },
                                   for (final event in filteredEvents)
@@ -161,13 +174,20 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                           context.push('/memories/${event.id}'),
                                       onLongPress: () =>
                                           _showMemoryMenu(context, event.id),
+                                      onEdit: () => context.push(
+                                        '/memories/${event.id}/edit',
+                                      ),
+                                      onConnect: () => context.push(
+                                        '/memories/${event.id}/connections',
+                                      ),
                                       onDragStart: () => _startDrag(
                                         event.id,
                                         event.wallPosition,
                                         _DragTargetKind.memory,
                                       ),
                                       onDragUpdate: _updateDrag,
-                                      onDragEnd: () => _endDrag(repository),
+                                      onDragEnd: () =>
+                                          _endDrag(repository, state),
                                     ),
                                   if (filteredEvents.isEmpty &&
                                       state.events.isNotEmpty)
@@ -246,6 +266,150 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     return item;
   }
 
+  List<WallItem> _displayWallItems(
+    MemoryState state,
+    List<MemoryEvent> visibleEvents,
+  ) {
+    final visibleEventById = {
+      for (final event in visibleEvents) event.id: event,
+    };
+    final attachmentCounts = <String, int>{};
+    final displayItems = <WallItem>[];
+
+    for (final item in state.wallItems) {
+      final attachedMemoryId = _attachedMemoryId(item, state);
+      final isDraggingItem =
+          _draggingKind == _DragTargetKind.wallItem &&
+          _draggingNodeId == item.id &&
+          _pendingDragPosition != null;
+      if (item.type != WallItemType.text || attachedMemoryId == null) {
+        displayItems.add(_withPendingWallItem(item));
+        continue;
+      }
+
+      final event = visibleEventById[attachedMemoryId];
+      if (event == null) continue;
+
+      if (isDraggingItem) {
+        displayItems.add(item.copyWith(wallPosition: _pendingDragPosition));
+        continue;
+      }
+
+      final index = attachmentCounts.update(
+        attachedMemoryId,
+        (value) => value + 1,
+        ifAbsent: () => 0,
+      );
+      displayItems.add(
+        item.copyWith(
+          wallPosition: _attachedTextPosition(
+            item: item,
+            event: event,
+            index: index,
+          ),
+        ),
+      );
+    }
+
+    return displayItems;
+  }
+
+  Offset _attachedTextPosition({
+    required WallItem item,
+    required MemoryEvent event,
+    required int index,
+  }) {
+    final offset = _attachmentOffset(item, event, index);
+    final position = event.wallPosition + offset;
+    return Offset(
+      _clampDouble(position.dx, 36, _canvasSize.width - 235),
+      _clampDouble(position.dy, 88, _canvasSize.height - 180),
+    );
+  }
+
+  Offset _attachmentOffset(WallItem item, MemoryEvent event, int index) {
+    final stored = item.wallPosition;
+    if (_looksLikeNoteOffset(stored)) return stored;
+
+    final oldAbsoluteOffset = stored - event.wallPosition;
+    if (_looksLikeNoteOffset(oldAbsoluteOffset)) return oldAbsoluteOffset;
+
+    return _defaultAttachmentOffset(index);
+  }
+
+  Offset _defaultAttachmentOffset(int index) => Offset(112, -46 + index * 48);
+
+  bool _looksLikeNoteOffset(Offset offset) {
+    return offset.dx.abs() <= 360 && offset.dy.abs() <= 280;
+  }
+
+  Offset _absoluteTextPosition(WallItem item, MemoryState state) {
+    final attachedMemoryId = _attachedMemoryId(item, state);
+    final attachedMemory = attachedMemoryId == null
+        ? null
+        : state.findEvent(attachedMemoryId);
+    if (attachedMemory == null) return item.wallPosition;
+
+    final index = state.wallItems
+        .where(
+          (other) =>
+              other.type == WallItemType.text &&
+              _attachedMemoryId(other, state) == attachedMemoryId,
+        )
+        .toList()
+        .indexWhere((other) => other.id == item.id);
+    return _attachedTextPosition(
+      item: item,
+      event: attachedMemory,
+      index: index < 0 ? 0 : index,
+    );
+  }
+
+  Offset _nextAttachmentOffset({
+    required MemoryState state,
+    required MemoryEvent event,
+    required WallItem item,
+  }) {
+    final currentAttachedId = _attachedMemoryId(item, state);
+    if (currentAttachedId == event.id) {
+      return _clampAttachmentOffset(item.wallPosition);
+    }
+
+    final existingCount = state.wallItems
+        .where(
+          (other) =>
+              other.id != item.id &&
+              other.type == WallItemType.text &&
+              _attachedMemoryId(other, state) == event.id,
+        )
+        .length;
+    return _defaultAttachmentOffset(existingCount);
+  }
+
+  String? _attachedMemoryId(WallItem item, MemoryState state) {
+    if (item.type != WallItemType.text) return null;
+    final eventIds = {for (final event in state.events) event.id};
+
+    for (final connection in state.connections) {
+      if (connection.fromEventId == item.id &&
+          eventIds.contains(connection.toEventId)) {
+        return connection.toEventId;
+      }
+      if (connection.toEventId == item.id &&
+          eventIds.contains(connection.fromEventId)) {
+        return connection.fromEventId;
+      }
+    }
+    return null;
+  }
+
+  WallItem _sourceWallItem(WallItem item, MemoryState state) {
+    for (final source in state.wallItems) {
+      if (source.id == item.id) return source;
+    }
+    return item;
+  }
+
   Map<String, Offset> _buildAnchors(
     List<MemoryEvent> events,
     List<WallItem> wallItems,
@@ -275,7 +439,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     setState(() => _pendingDragPosition = current + delta / scale);
   }
 
-  Future<void> _endDrag(MemoryRepository repository) async {
+  Future<void> _endDrag(MemoryRepository repository, MemoryState state) async {
     final nodeId = _draggingNodeId;
     final position = _pendingDragPosition;
     final kind = _draggingKind;
@@ -290,8 +454,29 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       case _DragTargetKind.memory:
         await repository.moveMemory(nodeId, position);
       case _DragTargetKind.wallItem:
-        await repository.moveWallItem(nodeId, position);
+        final item = state.wallItems
+            .where((item) => item.id == nodeId)
+            .firstOrNull;
+        final attachedMemoryId = item == null
+            ? null
+            : _attachedMemoryId(item, state);
+        final attachedMemory = attachedMemoryId == null
+            ? null
+            : state.findEvent(attachedMemoryId);
+        await repository.moveWallItem(
+          nodeId,
+          attachedMemory == null
+              ? position
+              : _clampAttachmentOffset(position - attachedMemory.wallPosition),
+        );
     }
+  }
+
+  Offset _clampAttachmentOffset(Offset offset) {
+    return Offset(
+      _clampDouble(offset.dx, -190, 270),
+      _clampDouble(offset.dy, -150, 190),
+    );
   }
 
   Offset _defaultDropPosition(BuildContext context) {
@@ -313,33 +498,14 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     BuildContext context,
     MemoryRepository repository,
   ) async {
-    final controller = TextEditingController();
     final text = await showDialog<String>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Add text to wall'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          minLines: 3,
-          maxLines: 5,
-          decoration: const InputDecoration(
-            hintText: 'Write a small memory, quote, or note...',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(controller.text),
-            child: const Text('Add Text'),
-          ),
-        ],
+      builder: (_) => const _TextNoteDialog(
+        title: 'Add text to wall',
+        actionLabel: 'Add Text',
+        hintText: 'Write a small memory, quote, or note...',
       ),
     );
-    controller.dispose();
 
     final trimmed = text?.trim();
     if (!context.mounted || trimmed == null || trimmed.isEmpty) return;
@@ -385,7 +551,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
           .reduce((a, b) => a < b ? a : b);
       final contentWidth = maxX - minX;
       final scale = (size.width / (contentWidth + 140)).clamp(0.46, 0.86);
-      final headerSpace = size.height < 720 ? 170.0 : 210.0;
+      final headerSpace = size.height < 720 ? 205.0 : 235.0;
       final translateX =
           ((size.width - contentWidth * scale) / 2) - minX * scale;
       final translateY = headerSpace - minY * scale;
@@ -469,8 +635,17 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     }
   }
 
-  Future<void> _showTextMenu(BuildContext context, WallItem item) async {
+  Future<void> _showTextMenu(
+    BuildContext context,
+    MemoryState state,
+    WallItem item,
+  ) async {
     final repository = ref.read(memoryRepositoryProvider.notifier);
+    final sourceItem = _sourceWallItem(item, state);
+    final attachedMemoryId = _attachedMemoryId(sourceItem, state);
+    final attachedMemory = attachedMemoryId == null
+        ? null
+        : state.findEvent(attachedMemoryId);
     final action = await showModalBottomSheet<_TextAction>(
       context: context,
       showDragHandle: true,
@@ -482,6 +657,20 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
               leading: const Icon(Icons.edit_note_rounded),
               title: const Text('Edit Text'),
               onTap: () => Navigator.of(context).pop(_TextAction.edit),
+            ),
+            ListTile(
+              leading: const Icon(Icons.link_rounded),
+              title: Text(
+                attachedMemory == null
+                    ? 'Attach to memory'
+                    : 'Change attachment',
+              ),
+              subtitle: Text(
+                attachedMemory == null
+                    ? 'Keep this note stuck to one memory card.'
+                    : 'Currently attached to ${attachedMemory.title}.',
+              ),
+              onTap: () => Navigator.of(context).pop(_TextAction.attach),
             ),
             ListTile(
               leading: const Icon(
@@ -503,10 +692,87 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
     switch (action) {
       case _TextAction.edit:
-        await _editTextNote(context, repository, item);
+        await _editTextNote(context, repository, sourceItem);
+      case _TextAction.attach:
+        await _showTextAttachments(context, state, sourceItem);
       case _TextAction.delete:
-        await repository.deleteWallItem(item.id);
+        await repository.deleteWallItem(sourceItem.id);
     }
+  }
+
+  Future<void> _showTextAttachments(
+    BuildContext context,
+    MemoryState state,
+    WallItem item,
+  ) async {
+    final repository = ref.read(memoryRepositoryProvider.notifier);
+    final sourceItem = _sourceWallItem(item, state);
+    var selectedId = _attachedMemoryId(sourceItem, state);
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setModalState) => SafeArea(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              const ListTile(
+                title: Text('Attach text to a memory'),
+                subtitle: Text(
+                  'The note will stay pinned to that memory and move with it.',
+                ),
+              ),
+              ListTile(
+                selected: selectedId == null,
+                leading: Icon(
+                  selectedId == null
+                      ? Icons.radio_button_checked_rounded
+                      : Icons.radio_button_unchecked_rounded,
+                ),
+                title: const Text('Free note'),
+                subtitle: const Text('Keep it independent on the wall.'),
+                onTap: () {
+                  setModalState(() => selectedId = null);
+                  final position = _absoluteTextPosition(sourceItem, state);
+                  repository.attachTextNoteToMemory(
+                    textNoteId: sourceItem.id,
+                    memoryId: null,
+                    position: position,
+                  );
+                },
+              ),
+              for (final event in state.events)
+                ListTile(
+                  selected: selectedId == event.id,
+                  leading: Icon(
+                    selectedId == event.id
+                        ? Icons.radio_button_checked_rounded
+                        : Icons.radio_button_unchecked_rounded,
+                  ),
+                  title: Text(event.title),
+                  subtitle: Text(
+                    '${event.category.label} • ${event.locationLabel}',
+                  ),
+                  onTap: () {
+                    setModalState(() => selectedId = event.id);
+                    final offset = _nextAttachmentOffset(
+                      state: state,
+                      event: event,
+                      item: sourceItem,
+                    );
+                    repository.attachTextNoteToMemory(
+                      textNoteId: sourceItem.id,
+                      memoryId: event.id,
+                      position: offset,
+                    );
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _editTextNote(
@@ -514,30 +780,14 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     MemoryRepository repository,
     WallItem item,
   ) async {
-    final controller = TextEditingController(text: item.content);
     final text = await showDialog<String>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Edit text'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          minLines: 3,
-          maxLines: 5,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(controller.text),
-            child: const Text('Save'),
-          ),
-        ],
+      builder: (_) => _TextNoteDialog(
+        title: 'Edit text',
+        actionLabel: 'Save',
+        initialText: item.content,
       ),
     );
-    controller.dispose();
 
     final trimmed = text?.trim();
     if (trimmed == null || trimmed.isEmpty) return;
@@ -1091,7 +1341,7 @@ class _WallHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -1115,7 +1365,11 @@ class _WallHeader extends StatelessWidget {
         children: [
           const Row(
             children: [
-              Icon(Icons.auto_awesome_rounded, color: AppColors.amber),
+              Icon(
+                Icons.auto_awesome_rounded,
+                color: AppColors.amber,
+                size: 24,
+              ),
               SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -1125,7 +1379,7 @@ class _WallHeader extends StatelessWidget {
                     Text(
                       'LifeThreads',
                       style: TextStyle(
-                        fontSize: 23,
+                        fontSize: 22,
                         fontWeight: FontWeight.w900,
                         letterSpacing: -0.5,
                       ),
@@ -1135,6 +1389,7 @@ class _WallHeader extends StatelessWidget {
                       'Your memories, hanging together.',
                       style: TextStyle(
                         color: AppColors.muted,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -1149,11 +1404,11 @@ class _WallHeader extends StatelessWidget {
             child: Row(
               children: [
                 for (final mode in _WallViewMode.values) ...[
-                  ChoiceChip(
+                  _WallHeaderPill(
                     selected: selectedMode == mode,
-                    avatar: Icon(mode.icon, size: 18),
-                    label: Text(mode.label),
-                    onSelected: (_) => onModeChanged(mode),
+                    icon: mode.icon,
+                    label: mode.label,
+                    onTap: () => onModeChanged(mode),
                   ),
                   const SizedBox(width: 8),
                 ],
@@ -1166,10 +1421,11 @@ class _WallHeader extends StatelessWidget {
             child: Row(
               children: [
                 for (final filter in WallFilter.values) ...[
-                  ChoiceChip(
+                  _WallHeaderPill(
                     selected: selectedFilter == filter,
-                    label: Text(filter.label),
-                    onSelected: (_) => onFilterChanged(filter),
+                    icon: selectedFilter == filter ? Icons.check_rounded : null,
+                    label: filter.label,
+                    onTap: () => onFilterChanged(filter),
                   ),
                   const SizedBox(width: 8),
                 ],
@@ -1177,6 +1433,72 @@ class _WallHeader extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _WallHeaderPill extends StatelessWidget {
+  const _WallHeaderPill({
+    required this.selected,
+    required this.label,
+    required this.onTap,
+    this.icon,
+  });
+
+  final bool selected;
+  final String label;
+  final VoidCallback onTap;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final foreground = selected ? AppColors.card : AppColors.muted;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        height: 39,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: selected
+              ? AppColors.gold.withValues(alpha: 0.92)
+              : AppColors.panelWarm.withValues(alpha: 0.56),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: selected
+                ? AppColors.amber.withValues(alpha: 0.72)
+                : AppColors.gold.withValues(alpha: 0.13),
+          ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: AppColors.gold.withValues(alpha: 0.16),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 17, color: foreground),
+              const SizedBox(width: 8),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                color: foreground,
+                fontSize: 14,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.1,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1198,6 +1520,63 @@ class _WallError extends StatelessWidget {
   }
 }
 
+class _TextNoteDialog extends StatefulWidget {
+  const _TextNoteDialog({
+    required this.title,
+    required this.actionLabel,
+    this.initialText = '',
+    this.hintText,
+  });
+
+  final String title;
+  final String actionLabel;
+  final String initialText;
+  final String? hintText;
+
+  @override
+  State<_TextNoteDialog> createState() => _TextNoteDialogState();
+}
+
+class _TextNoteDialogState extends State<_TextNoteDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialText);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.title),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        minLines: 3,
+        maxLines: 5,
+        decoration: InputDecoration(hintText: widget.hintText),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(_controller.text),
+          child: Text(widget.actionLabel),
+        ),
+      ],
+    );
+  }
+}
+
 enum _WallViewMode {
   wall('Wall', Icons.dashboard_customize_rounded),
   timeline('Timeline', Icons.timeline_rounded),
@@ -1213,7 +1592,7 @@ enum _DragTargetKind { memory, wallItem }
 
 enum _MemoryAction { open, edit, connect, delete }
 
-enum _TextAction { edit, delete }
+enum _TextAction { edit, attach, delete }
 
 enum _NailAction { connect, delete }
 

@@ -247,17 +247,54 @@ Future<String?> _askConnectionReason(
   required String connectedTitle,
   String? initialReason,
 }) async {
-  final controller = TextEditingController(text: initialReason ?? '');
-  final result = await showDialog<String>(
+  return showDialog<String>(
     context: context,
-    builder: (_) => AlertDialog(
+    builder: (_) => _ConnectionReasonDialog(
+      connectedTitle: connectedTitle,
+      initialReason: initialReason ?? '',
+    ),
+  );
+}
+
+class _ConnectionReasonDialog extends StatefulWidget {
+  const _ConnectionReasonDialog({
+    required this.connectedTitle,
+    required this.initialReason,
+  });
+
+  final String connectedTitle;
+  final String initialReason;
+
+  @override
+  State<_ConnectionReasonDialog> createState() =>
+      _ConnectionReasonDialogState();
+}
+
+class _ConnectionReasonDialogState extends State<_ConnectionReasonDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialReason);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
       title: const Text('Why are they connected?'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            connectedTitle,
+            widget.connectedTitle,
             style: const TextStyle(
               color: AppColors.muted,
               fontWeight: FontWeight.w800,
@@ -265,7 +302,7 @@ Future<String?> _askConnectionReason(
           ),
           const SizedBox(height: 14),
           TextField(
-            controller: controller,
+            controller: _controller,
             autofocus: true,
             minLines: 3,
             maxLines: 5,
@@ -281,12 +318,10 @@ Future<String?> _askConnectionReason(
           child: const Text('Cancel'),
         ),
         FilledButton(
-          onPressed: () => Navigator.of(context).pop(controller.text),
+          onPressed: () => Navigator.of(context).pop(_controller.text),
           child: const Text('Save Reason'),
         ),
       ],
-    ),
-  );
-  controller.dispose();
-  return result;
+    );
+  }
 }

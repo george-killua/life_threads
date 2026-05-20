@@ -15,6 +15,8 @@ class MemoryCard extends StatelessWidget {
     required this.isDragging,
     required this.onTap,
     required this.onLongPress,
+    required this.onEdit,
+    required this.onConnect,
     required this.onDragStart,
     required this.onDragUpdate,
     required this.onDragEnd,
@@ -25,6 +27,8 @@ class MemoryCard extends StatelessWidget {
   final bool isDragging;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
+  final VoidCallback onEdit;
+  final VoidCallback onConnect;
   final VoidCallback onDragStart;
   final ValueChanged<Offset> onDragUpdate;
   final VoidCallback onDragEnd;
@@ -66,12 +70,71 @@ class MemoryCard extends StatelessWidget {
                       _PhotoPaper(event: event, isDragging: isDragging),
                       _Tape(isDragging: isDragging),
                       _Pin(isDragging: isDragging),
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Row(
+                          children: [
+                            _CardActionButton(
+                              icon: Icons.edit_rounded,
+                              onTap: onEdit,
+                              tooltip: 'Edit memory',
+                            ),
+                            const SizedBox(width: 7),
+                            _CardActionButton(
+                              icon: Icons.hub_rounded,
+                              onTap: onConnect,
+                              tooltip: 'Connect memory',
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ],
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CardActionButton extends StatelessWidget {
+  const _CardActionButton({
+    required this.icon,
+    required this.onTap,
+    required this.tooltip,
+  });
+
+  final IconData icon;
+  final VoidCallback onTap;
+  final String tooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.wallInk.withValues(alpha: 0.8),
+            border: Border.all(color: AppColors.gold.withValues(alpha: 0.52)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.28),
+                blurRadius: 12,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Icon(icon, size: 17, color: AppColors.amber),
         ),
       ),
     );

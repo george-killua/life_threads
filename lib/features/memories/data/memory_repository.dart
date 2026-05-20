@@ -370,6 +370,44 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     state = await AsyncValue.guard(_loadState);
   }
 
+  Future<void> attachTextNoteToMemory({
+    required String textNoteId,
+    required String? memoryId,
+    required Offset position,
+  }) async {
+    await _database.transaction(() async {
+      await (_database.delete(_database.memoryConnections)..where(
+            (row) =>
+                row.fromEventId.equals(textNoteId) |
+                row.toEventId.equals(textNoteId),
+          ))
+          .go();
+
+      await (_database.update(
+        _database.wallItems,
+      )..where((row) => row.id.equals(textNoteId))).write(
+        db.WallItemsCompanion(
+          wallX: Value(position.dx),
+          wallY: Value(position.dy),
+        ),
+      );
+
+      if (memoryId != null) {
+        await _database
+            .into(_database.memoryConnections)
+            .insert(
+              db.MemoryConnectionsCompanion.insert(
+                id: _uuid.v4(),
+                fromEventId: textNoteId,
+                toEventId: memoryId,
+                label: 'sticky note',
+              ),
+            );
+      }
+    });
+    state = await AsyncValue.guard(_loadState);
+  }
+
   Future<void> deleteWallItem(String id) async {
     await _database.transaction(() async {
       await (_database.delete(_database.memoryConnections)..where(

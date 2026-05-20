@@ -12,7 +12,10 @@ class WallTextNoteWidget extends StatelessWidget {
     required this.item,
     required this.windValue,
     required this.isDragging,
+    required this.isAttached,
     required this.onLongPress,
+    required this.onEdit,
+    required this.onAttach,
     required this.onDragStart,
     required this.onDragUpdate,
     required this.onDragEnd,
@@ -21,7 +24,10 @@ class WallTextNoteWidget extends StatelessWidget {
   final WallItem item;
   final double windValue;
   final bool isDragging;
+  final bool isAttached;
   final VoidCallback onLongPress;
+  final VoidCallback onEdit;
+  final VoidCallback onAttach;
   final VoidCallback onDragStart;
   final ValueChanged<Offset> onDragUpdate;
   final VoidCallback onDragEnd;
@@ -132,11 +138,102 @@ class WallTextNoteWidget extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (isAttached)
+                      Positioned(
+                        top: -8,
+                        right: -8,
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.wallInk.withValues(alpha: 0.82),
+                            border: Border.all(
+                              color: AppColors.gold.withValues(alpha: 0.72),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.28),
+                                blurRadius: 12,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.link_rounded,
+                            color: AppColors.amber,
+                            size: 17,
+                          ),
+                        ),
+                      ),
+                    Positioned(
+                      right: -9,
+                      bottom: -9,
+                      child: Row(
+                        children: [
+                          _NoteActionButton(
+                            icon: Icons.edit_rounded,
+                            onTap: onEdit,
+                            tooltip: 'Edit text',
+                          ),
+                          const SizedBox(width: 7),
+                          _NoteActionButton(
+                            icon: isAttached
+                                ? Icons.link_off_rounded
+                                : Icons.link_rounded,
+                            onTap: onAttach,
+                            tooltip: isAttached
+                                ? 'Change attachment'
+                                : 'Attach to memory',
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NoteActionButton extends StatelessWidget {
+  const _NoteActionButton({
+    required this.icon,
+    required this.onTap,
+    required this.tooltip,
+  });
+
+  final IconData icon;
+  final VoidCallback onTap;
+  final String tooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          width: 30,
+          height: 30,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.wallInk.withValues(alpha: 0.82),
+            border: Border.all(color: AppColors.gold.withValues(alpha: 0.5)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.28),
+                blurRadius: 12,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Icon(icon, size: 16, color: AppColors.amber),
         ),
       ),
     );

@@ -30,16 +30,18 @@ class RopePainter extends CustomPainter {
           activeNodeId == connection.toEventId;
       final distance = (end - start).distance;
       final wind = math.sin(windValue * math.pi * 2 + distance * 0.013);
-      final sag = (distance * 0.16).clamp(38.0, 120.0);
-      final lift = isActive ? -30.0 : 0.0;
+      final sag = isActive
+          ? (distance * 0.045).clamp(10.0, 42.0)
+          : (distance * 0.16).clamp(38.0, 120.0);
       final mid = Offset((start.dx + end.dx) / 2, math.max(start.dy, end.dy));
-      final control = mid + Offset(wind * 14, sag + lift);
+      final control = mid + Offset(wind * (isActive ? 5 : 14), sag);
       final path = Path()
         ..moveTo(start.dx, start.dy)
         ..quadraticBezierTo(control.dx, control.dy, end.dx, end.dy);
 
       _drawRopeShadow(canvas, path, isActive);
       _drawRopeBody(canvas, path, isActive);
+      if (isActive) _drawTensionLine(canvas, start, end);
       _drawTwist(canvas, path, isActive);
       _drawAnchor(canvas, start, isActive);
       _drawAnchor(canvas, end, isActive);
@@ -84,6 +86,24 @@ class RopePainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round,
     );
+  }
+
+  void _drawTensionLine(Canvas canvas, Offset start, Offset end) {
+    final dashPaint = Paint()
+      ..color = AppColors.amber.withValues(alpha: 0.2)
+      ..strokeWidth = 1.4
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    final vector = end - start;
+    final distance = vector.distance;
+    if (distance == 0) return;
+
+    final direction = vector / distance;
+    for (double offset = 0; offset < distance; offset += 18) {
+      final segmentStart = start + direction * offset;
+      final segmentEnd = start + direction * (offset + 8).clamp(0, distance);
+      canvas.drawLine(segmentStart, segmentEnd, dashPaint);
+    }
   }
 
   void _drawTwist(Canvas canvas, Path path, bool isActive) {
