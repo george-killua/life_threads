@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#09080d"/>
+        <stop offset="0.45" stop-color="#13090e"/>
+        <stop offset="1" stop-color="#25170f"/>
+      </linearGradient>
+      <radialGradient id="warm" cx="72%" cy="20%" r="72%">
+        <stop offset="0" stop-color="#654516" stop-opacity="0.50"/>
+        <stop offset="0.42" stop-color="#33200e" stop-opacity="0.25"/>
+        <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="cardGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#e0a745"/>
+        <stop offset="1" stop-color="#b8c5b3"/>
+      </linearGradient>
+      <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#000" flood-opacity="0.42"/>
+      </filter>
+      <pattern id="grid" width="118" height="118" patternUnits="userSpaceOnUse">
+        <path d="M118 0H0V118" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="2"/>
+      </pattern>
+      <pattern id="paper" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="7" stroke="#7a5a29" stroke-opacity="0.10" stroke-width="1"/>
+      </pattern>
+      <linearGradient id="photoGold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#e9b34e"/>
+        <stop offset="1" stop-color="#cab28d"/>
+      </linearGradient>
+      <linearGradient id="photoBlue" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#9ab9d3"/>
+        <stop offset="1" stop-color="#d0bb8b"/>
+      </linearGradient>
+      <linearGradient id="photoRose" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#dc9684"/>
+        <stop offset="1" stop-color="#b8c69a"/>
+      </linearGradient>
+    </defs>
+
+    <rect width="1920" height="1080" fill="url(#bg)"/>
+    <rect width="1920" height="1080" fill="url(#warm)"/>
+    <rect width="1920" height="1080" fill="url(#grid)"/>
+    <text x="88" y="150" font-family="Inter, Arial, sans-serif" font-size="74" font-weight="950" fill="#fff5df" letter-spacing="-2">Revisit by time</text>
+    <text x="92" y="224" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="800" fill="#f0ca6f">Switch from wall to timeline instantly.</text>
+    <rect x="88" y="330" width="600" height="86" rx="38" fill="#d9aa43"/>
+    <text x="136" y="386" font-family="Inter, Arial, sans-serif" font-size="31" font-weight="950" fill="#20150e">Private, local-first memory wall</text>
+    <rect x="760" y="78" width="1068" height="924" rx="62" fill="#21131a" fill-opacity="0.76" stroke="#4a3425" stroke-width="2" filter="url(#shadow)"/>
+    <g transform="translate(750 -170) scale(.98)">
+
+    <text x="118" y="370" font-family="Inter, Arial, sans-serif" font-size="43" font-weight="900" fill="#fff5df">LifeThreads</text>
+    <text x="118" y="414" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="700" fill="#d8cbbb">Your memories, hanging together.</text>
+    <rect x="118" y="456" width="186" height="70" rx="35" fill="#d9aa43"/>
+    <text x="178" y="502" font-family="Inter, Arial, sans-serif" font-size="27" font-weight="900" fill="#1d150b">Wall</text>
+    <rect x="330" y="456" width="238" height="70" rx="35" fill="#2a1a20" stroke="#56372a" stroke-width="2"/>
+    <text x="390" y="502" font-family="Inter, Arial, sans-serif" font-size="27" font-weight="850" fill="#d8cbbb">Timeline</text>
+    <rect x="590" y="456" width="174" height="70" rx="35" fill="#2a1a20" stroke="#56372a" stroke-width="2"/>
+    <text x="655" y="502" font-family="Inter, Arial, sans-serif" font-size="27" font-weight="850" fill="#d8cbbb">Map</text>
+
+    <line x1="250" y1="640" x2="250" y2="1510" stroke="#8f6433" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="250" cy="735" r="18" fill="#f0ca6f" stroke="#fff5df" stroke-width="6"/>
+    <circle cx="250" cy="1015" r="18" fill="#f0ca6f" stroke="#fff5df" stroke-width="6"/>
+    <circle cx="250" cy="1290" r="18" fill="#f0ca6f" stroke="#fff5df" stroke-width="6"/>
+    <rect x="310" y="665" width="560" height="150" rx="34" fill="#fff4d6" filter="url(#shadow)"/>
+    <text x="352" y="730" font-family="Inter, Arial, sans-serif" font-size="29" font-weight="950" fill="#20150e">Friday evening walk</text>
+    <text x="352" y="774" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800" fill="#79654e">17 May · Vienna</text>
+    <rect x="310" y="945" width="560" height="150" rx="34" fill="#fff4d6" filter="url(#shadow)"/>
+    <text x="352" y="1010" font-family="Inter, Arial, sans-serif" font-size="29" font-weight="950" fill="#20150e">Coffee after rain</text>
+    <text x="352" y="1054" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800" fill="#79654e">18 May · Linz</text>
+    <rect x="310" y="1220" width="560" height="150" rx="34" fill="#fff4d6" filter="url(#shadow)"/>
+    <text x="352" y="1285" font-family="Inter, Arial, sans-serif" font-size="29" font-weight="950" fill="#20150e">Family table</text>
+    <text x="352" y="1329" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800" fill="#79654e">20 May · Home</text>
+    </g>
+    </svg>

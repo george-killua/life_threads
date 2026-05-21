@@ -1,0 +1,43 @@
+<svg width="1440" height="1920" viewBox="0 0 1440 1920" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d9a24a"/><stop offset="0.55" stop-color="#19151b"/><stop offset="1" stop-color="#0b080b"/></linearGradient>
+    <radialGradient id="glow" cx="0.72" cy="0.18" r="0.55"><stop stop-color="#26324a" stop-opacity="0.65"/><stop offset="1" stop-color="#26324a" stop-opacity="0"/></radialGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="shadow"><feDropShadow dx="0" dy="30" stdDeviation="28" flood-color="#000" flood-opacity="0.48"/></filter>
+  </defs>
+  <rect width="1440" height="1920" fill="url(#sky)"/>
+  <rect width="1440" height="1920" fill="url(#glow)"/>
+  <circle cx="1050" cy="280" r="150" fill="#26324a" opacity="0.28" filter="url(#blur)"/>
+  <circle cx="1090" cy="250" r="70" fill="#f7e5b6" opacity="0.85"/>
+  <path d="M0 1180 C240 1100 420 1250 720 1155 C980 1072 1170 1140 1440 1050 L1440 1920 L0 1920 Z" fill="#121017" opacity="0.88"/>
+  <path d="M0 1315 C250 1240 445 1380 750 1290 C1030 1208 1190 1270 1440 1195" stroke="#26324a" stroke-width="10" opacity="0.35"/>
+  <g opacity="0.42">
+    <rect x="120" y="720" width="210" height="520" rx="20" fill="#211a20"/>
+    <rect x="385" y="650" width="180" height="610" rx="22" fill="#17141b"/>
+    <rect x="910" y="690" width="250" height="560" rx="24" fill="#1e1720"/>
+    <rect x="1185" y="610" width="160" height="650" rx="22" fill="#15131a"/>
+    <g stroke="#26324a" stroke-width="6" opacity="0.34">
+      <path d="M190 830h80M190 930h80M190 1030h80M450 780h60M450 900h60M450 1020h60M980 820h100M980 950h100M1240 760h58M1240 900h58"/>
+    </g>
+  </g>
+  <g filter="url(#shadow)">
+    <ellipse cx="675" cy="1450" rx="420" ry="95" fill="#000" opacity="0.35"/>
+    <g transform="translate(510 990)">
+      <circle cx="85" cy="96" r="56" fill="#7a4a35"/>
+      <path d="M36 162c50-35 98-35 148 0l40 338H-4z" fill="#2d3749"/>
+      <rect x="18" y="205" width="150" height="340" rx="58" fill="#dfb47a" opacity="0.23"/>
+    </g>
+    <g transform="translate(735 1018)">
+      <circle cx="90" cy="83" r="52" fill="#94684b"/>
+      <path d="M26 150c46-34 100-36 154 0l64 330H-28z" fill="#6a4a39"/>
+      <rect x="10" y="188" width="165" height="320" rx="60" fill="#26324a" opacity="0.28"/>
+    </g>
+  </g>
+  <g opacity="0.82">
+    <rect x="90" y="90" width="1260" height="280" rx="52" fill="#0e0b10" opacity="0.28"/>
+    <text x="150" y="190" font-family="Avenir Next, Arial" font-size="62" font-weight="900" fill="#fff8ea">Last night</text>
+    <text x="154" y="260" font-family="Avenir Next, Arial" font-size="36" font-weight="700" fill="#d8c7aa">city lights</text>
+    <text x="154" y="315" font-family="Avenir Next, Arial" font-size="30" font-weight="800" fill="#26324a">fictional demo trip memory</text>
+  </g>
+  <rect x="34" y="34" width="1372" height="1852" rx="66" fill="none" stroke="#fff8ea" stroke-opacity="0.12" stroke-width="8"/>
+</svg>

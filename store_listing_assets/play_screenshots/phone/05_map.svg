@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#09080d"/>
+        <stop offset="0.45" stop-color="#13090e"/>
+        <stop offset="1" stop-color="#25170f"/>
+      </linearGradient>
+      <radialGradient id="warm" cx="72%" cy="20%" r="72%">
+        <stop offset="0" stop-color="#654516" stop-opacity="0.50"/>
+        <stop offset="0.42" stop-color="#33200e" stop-opacity="0.25"/>
+        <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="cardGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#e0a745"/>
+        <stop offset="1" stop-color="#b8c5b3"/>
+      </linearGradient>
+      <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#000" flood-opacity="0.42"/>
+      </filter>
+      <pattern id="grid" width="118" height="118" patternUnits="userSpaceOnUse">
+        <path d="M118 0H0V118" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="2"/>
+      </pattern>
+      <pattern id="paper" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="7" stroke="#7a5a29" stroke-opacity="0.10" stroke-width="1"/>
+      </pattern>
+      <linearGradient id="photoGold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#e9b34e"/>
+        <stop offset="1" stop-color="#cab28d"/>
+      </linearGradient>
+      <linearGradient id="photoBlue" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#9ab9d3"/>
+        <stop offset="1" stop-color="#d0bb8b"/>
+      </linearGradient>
+      <linearGradient id="photoRose" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#dc9684"/>
+        <stop offset="1" stop-color="#b8c69a"/>
+      </linearGradient>
+    </defs>
+
+
+    <rect width="1080" height="1920" fill="url(#bg)"/>
+    <rect width="1080" height="1920" fill="url(#warm)"/>
+    <rect width="1080" height="1920" fill="url(#grid)"/>
+    <path d="M-40 1680C180 1530 320 1640 520 1490C735 1328 850 1398 1130 1180" fill="none" stroke="#d9aa43" stroke-opacity="0.10" stroke-width="90"/>
+
+
+    <text x="72" y="112" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="900" fill="#fff5df" letter-spacing="-2">See where life happened</text>
+    <text x="72" y="170" font-family="Inter, Arial, sans-serif" font-size="31" font-weight="800" fill="#f0ca6f">Map memories without background tracking.</text>
+    <text x="72" y="218" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="700" fill="#d8cbbb">Private, local-first, and personal.</text>
+
+
+    <rect x="54" y="280" width="972" height="1470" rx="58" fill="#21131a" fill-opacity="0.74" stroke="#4a3425" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="78" y="308" width="924" height="1414" rx="42" fill="#0d1019" fill-opacity="0.42"/>
+    <rect x="78" y="308" width="924" height="1414" rx="42" fill="url(#grid)" opacity="0.6"/>
+
+
+
+    <text x="118" y="370" font-family="Inter, Arial, sans-serif" font-size="43" font-weight="900" fill="#fff5df">LifeThreads</text>
+    <text x="118" y="414" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="700" fill="#d8cbbb">Your memories, hanging together.</text>
+    <rect x="118" y="456" width="186" height="70" rx="35" fill="#d9aa43"/>
+    <text x="178" y="502" font-family="Inter, Arial, sans-serif" font-size="27" font-weight="900" fill="#1d150b">Wall</text>
+    <rect x="330" y="456" width="238" height="70" rx="35" fill="#2a1a20" stroke="#56372a" stroke-width="2"/>
+    <text x="390" y="502" font-family="Inter, Arial, sans-serif" font-size="27" font-weight="850" fill="#d8cbbb">Timeline</text>
+    <rect x="590" y="456" width="174" height="70" rx="35" fill="#2a1a20" stroke="#56372a" stroke-width="2"/>
+    <text x="655" y="502" font-family="Inter, Arial, sans-serif" font-size="27" font-weight="850" fill="#d8cbbb">Map</text>
+
+    <rect x="118" y="620" width="844" height="820" rx="46" fill="#e8d49b" filter="url(#shadow)"/>
+    <path d="M150 780 C305 715 390 830 520 760 C665 680 820 750 930 670" fill="none" stroke="#6e8059" stroke-width="18" opacity="0.48"/>
+    <path d="M190 1160 C340 1050 468 1125 610 1030 C742 942 825 982 928 910" fill="none" stroke="#5a7d8f" stroke-width="20" opacity="0.5"/>
+    <path d="M160 920 L935 1180" stroke="#b18445" stroke-width="12" opacity="0.35"/>
+    <circle cx="352" cy="822" r="28" fill="#d9aa43" stroke="#fff5df" stroke-width="8"/>
+    <circle cx="676" cy="1038" r="28" fill="#d9aa43" stroke="#fff5df" stroke-width="8"/>
+    <circle cx="560" cy="1240" r="28" fill="#d9aa43" stroke="#fff5df" stroke-width="8"/>
+    <rect x="176" y="1486" width="728" height="86" rx="36" fill="#d9aa43"/>
+    <text x="222" y="1542" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="950" fill="#20150e">Memories grouped by real places</text>
+
+    </svg>

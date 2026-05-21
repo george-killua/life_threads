@@ -98,4 +98,8 @@ class MemorySeedData {
       label: 'why it matters',
     ),
   ];
+
+  static final eventIds = events.map((event) => event.id).toSet();
+
+  static bool isDemoEventId(String id) => eventIds.contains(id);
 }

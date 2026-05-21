@@ -54,6 +54,18 @@ class MemoryConnections extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+class MemoryPeople extends Table {
+  TextColumn get id => text()();
+  TextColumn get eventId => text()();
+  TextColumn get name => text()();
+  TextColumn get relationship => text()();
+  TextColumn get phone => text().nullable()();
+  TextColumn get email => text().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 class WallItems extends Table {
   TextColumn get id => text()();
   TextColumn get type => text()();
@@ -68,13 +80,19 @@ class WallItems extends Table {
 }
 
 @DriftDatabase(
-  tables: [MemoryEvents, MemoryPhotos, MemoryConnections, WallItems],
+  tables: [
+    MemoryEvents,
+    MemoryPhotos,
+    MemoryConnections,
+    MemoryPeople,
+    WallItems,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -88,6 +106,9 @@ class AppDatabase extends _$AppDatabase {
       if (from < 4) {
         await migrator.addColumn(memoryEvents, memoryEvents.memoryType);
         await migrator.addColumn(memoryEvents, memoryEvents.feeling);
+      }
+      if (from < 5) {
+        await migrator.createTable(memoryPeople);
       }
     },
   );

@@ -6,11 +6,13 @@ class ExpandableAddButton extends StatefulWidget {
   const ExpandableAddButton({
     super.key,
     required this.onAddEvent,
+    required this.onAddQuickPhoto,
     required this.onAddText,
     required this.onAddNail,
   });
 
   final VoidCallback onAddEvent;
+  final VoidCallback onAddQuickPhoto;
   final VoidCallback onAddText;
   final VoidCallback onAddNail;
 
@@ -38,17 +40,26 @@ class _ExpandableAddButtonState extends State<ExpandableAddButton> {
                   children: [
                     _ActionChipButton(
                       icon: Icons.auto_stories_rounded,
-                      label: 'Memory event',
+                      label: 'Memory',
+                      subtitle: 'Full guided story',
                       onTap: () => _run(widget.onAddEvent),
                     ),
                     _ActionChipButton(
+                      icon: Icons.add_photo_alternate_rounded,
+                      label: 'Quick photo memory',
+                      subtitle: 'Pick photo and hang it',
+                      onTap: () => _run(widget.onAddQuickPhoto),
+                    ),
+                    _ActionChipButton(
                       icon: Icons.sticky_note_2_rounded,
-                      label: 'Wall note',
+                      label: 'Text note',
+                      subtitle: 'Small thought on wall',
                       onTap: () => _run(widget.onAddText),
                     ),
                     _ActionChipButton(
                       icon: Icons.push_pin_rounded,
-                      label: 'Rope nail',
+                      label: 'Nail / rope anchor',
+                      subtitle: 'Manual rope point',
                       onTap: () => _run(widget.onAddNail),
                     ),
                     const SizedBox(height: 10),
@@ -97,11 +108,13 @@ class _ActionChipButton extends StatelessWidget {
   const _ActionChipButton({
     required this.icon,
     required this.label,
+    required this.subtitle,
     required this.onTap,
   });
 
   final IconData icon;
   final String label;
+  final String subtitle;
   final VoidCallback onTap;
 
   @override
@@ -138,12 +151,26 @@ class _ActionChipButton extends StatelessWidget {
               children: [
                 Icon(icon, color: AppColors.amber, size: 18),
                 const SizedBox(width: 9),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: AppColors.text,
-                    fontWeight: FontWeight.w900,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: AppColors.text,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: AppColors.muted,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

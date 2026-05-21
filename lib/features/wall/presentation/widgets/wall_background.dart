@@ -1,35 +1,55 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../premium/data/premium_entitlement_controller.dart';
+import '../../data/wall_theme_controller.dart';
+import '../../domain/wall_theme.dart';
 
-class WallBackground extends StatelessWidget {
+class WallBackground extends ConsumerWidget {
   const WallBackground({super.key, required this.child});
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedTheme =
+        ref.watch(wallThemeProvider).asData?.value ??
+        WallThemePreset.warmMemoryRoom;
+    final isPremium =
+        ref.watch(premiumEntitlementProvider).asData?.value.isPremium ?? false;
+    final theme = selectedTheme.isPremium && !isPremium
+        ? WallThemePreset.warmMemoryRoom
+        : selectedTheme;
+
     return DecoratedBox(
-      decoration: const BoxDecoration(color: AppColors.wallInk),
-      child: CustomPaint(painter: _MemoryRoomPainter(), child: child),
+      decoration: BoxDecoration(color: theme.background),
+      child: CustomPaint(
+        painter: _MemoryRoomPainter(theme: theme),
+        child: child,
+      ),
     );
   }
 }
 
 class _MemoryRoomPainter extends CustomPainter {
+  const _MemoryRoomPainter({required this.theme});
+
+  final WallThemePreset theme;
+
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
     canvas.drawRect(
       rect,
       Paint()
-        ..shader = const LinearGradient(
+        ..shader = LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.wallInk, AppColors.wallDeep, AppColors.wallPlum],
-          stops: [0, 0.52, 1],
+          colors: [theme.background, theme.depth, theme.surface],
+          stops: const [0, 0.52, 1],
         ).createShader(rect),
     );
 
@@ -37,19 +57,19 @@ class _MemoryRoomPainter extends CustomPainter {
       canvas,
       center: Offset(size.width * 0.2, size.height * 0.12),
       radius: size.shortestSide * 0.9,
-      color: AppColors.rose.withValues(alpha: 0.16),
+      color: theme.secondaryGlow.withValues(alpha: 0.16),
     );
     _paintGlow(
       canvas,
       center: Offset(size.width * 0.92, size.height * 0.78),
       radius: size.shortestSide * 0.86,
-      color: AppColors.gold.withValues(alpha: 0.12),
+      color: theme.accent.withValues(alpha: 0.12),
     );
     _paintGlow(
       canvas,
       center: Offset(size.width * 0.48, size.height * 0.5),
       radius: size.shortestSide * 0.74,
-      color: AppColors.sage.withValues(alpha: 0.035),
+      color: theme.surface.withValues(alpha: 0.04),
     );
 
     _paintRoomTexture(canvas, size);
@@ -59,10 +79,10 @@ class _MemoryRoomPainter extends CustomPainter {
 
   void _paintRoomTexture(Canvas canvas, Size size) {
     final warmFiber = Paint()
-      ..color = const Color(0xFFFFD7A2).withValues(alpha: 0.018)
+      ..color = theme.accent.withValues(alpha: 0.02)
       ..strokeWidth = 1;
     final coolFiber = Paint()
-      ..color = const Color(0xFF3B556F).withValues(alpha: 0.014)
+      ..color = theme.secondaryGlow.withValues(alpha: 0.014)
       ..strokeWidth = 1;
 
     for (double y = 10; y < size.height; y += 13) {
@@ -74,7 +94,10 @@ class _MemoryRoomPainter extends CustomPainter {
       );
     }
 
-    final speck = Paint()..color = Colors.white.withValues(alpha: 0.018);
+    final speck = Paint()
+      ..color = (theme.id == WallThemeId.softPaperWall
+          ? AppColors.paperInk.withValues(alpha: 0.045)
+          : Colors.white.withValues(alpha: 0.018));
     for (var i = 0; i < 150; i++) {
       final x = (i * 47) % size.width;
       final y = (i * 83) % size.height;
@@ -85,13 +108,17 @@ class _MemoryRoomPainter extends CustomPainter {
 
   void _paintSubtleBoardGrid(Canvas canvas, Size size) {
     final line = Paint()
-      ..color = AppColors.line.withValues(alpha: 0.14)
+      ..color = theme.line.withValues(alpha: 0.16)
       ..strokeWidth = 1;
     final major = Paint()
-      ..color = AppColors.gold.withValues(alpha: 0.05)
+      ..color = theme.accent.withValues(alpha: 0.06)
       ..strokeWidth = 1.2;
 
-    const spacing = 118.0;
+    final spacing = switch (theme.id) {
+      WallThemeId.travelCorkboard => 92.0,
+      WallThemeId.softPaperWall => 132.0,
+      _ => 118.0,
+    };
     for (double x = 0; x < size.width; x += spacing) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), line);
     }
@@ -134,5 +161,7 @@ class _MemoryRoomPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _MemoryRoomPainter oldDelegate) {
+    return oldDelegate.theme.id != theme.id;
+  }
 }

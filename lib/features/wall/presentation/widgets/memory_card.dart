@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../memories/domain/memory_event.dart';
+import 'wall_drag_listener.dart';
 
 class MemoryCard extends StatelessWidget {
   const MemoryCard({
@@ -17,6 +17,8 @@ class MemoryCard extends StatelessWidget {
     required this.onLongPress,
     required this.onEdit,
     required this.onConnect,
+    required this.onPointerDown,
+    required this.onPointerUp,
     required this.onDragStart,
     required this.onDragUpdate,
     required this.onDragEnd,
@@ -29,9 +31,14 @@ class MemoryCard extends StatelessWidget {
   final VoidCallback onLongPress;
   final VoidCallback onEdit;
   final VoidCallback onConnect;
+  final VoidCallback onPointerDown;
+  final VoidCallback onPointerUp;
   final VoidCallback onDragStart;
   final ValueChanged<Offset> onDragUpdate;
   final VoidCallback onDragEnd;
+
+  static const Size visualSize = Size(190, 236);
+  static const Offset pinHeadOffset = Offset(89.5, 1.5);
 
   @override
   Widget build(BuildContext context) {
@@ -43,55 +50,57 @@ class MemoryCard extends StatelessWidget {
     return Positioned(
       left: event.wallPosition.dx,
       top: event.wallPosition.dy,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        dragStartBehavior: DragStartBehavior.down,
-        onTap: onTap,
-        onLongPress: onLongPress,
-        onPanStart: (_) => onDragStart(),
-        onPanUpdate: (details) => onDragUpdate(details.delta),
-        onPanEnd: (_) => onDragEnd(),
-        onPanCancel: onDragEnd,
-        child: AnimatedScale(
-          scale: scale,
-          duration: const Duration(milliseconds: 120),
-          curve: Curves.easeOutCubic,
-          child: Transform.translate(
-            offset: Offset(0, bob),
-            child: Transform.rotate(
-              angle: event.rotation + sway,
-              alignment: Alignment.topCenter,
-              child: Column(
-                children: [
-                  _HangingThread(isDragging: isDragging),
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      _PhotoPaper(event: event, isDragging: isDragging),
-                      _Tape(isDragging: isDragging),
-                      _Pin(isDragging: isDragging),
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: Row(
-                          children: [
-                            _CardActionButton(
-                              icon: Icons.edit_rounded,
-                              onTap: onEdit,
-                              tooltip: 'Edit memory',
-                            ),
-                            const SizedBox(width: 7),
-                            _CardActionButton(
-                              icon: Icons.hub_rounded,
-                              onTap: onConnect,
-                              tooltip: 'Connect memory',
-                            ),
-                          ],
+      child: WallDragListener(
+        onDragStart: onDragStart,
+        onDragUpdate: onDragUpdate,
+        onDragEnd: onDragEnd,
+        onPointerDown: onPointerDown,
+        onPointerUp: onPointerUp,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          onLongPress: onLongPress,
+          child: AnimatedScale(
+            scale: scale,
+            duration: const Duration(milliseconds: 120),
+            curve: Curves.easeOutCubic,
+            child: Transform.translate(
+              offset: Offset(0, bob),
+              child: Transform.rotate(
+                angle: event.rotation + sway,
+                alignment: Alignment.topCenter,
+                child: Column(
+                  children: [
+                    _HangingThread(isDragging: isDragging),
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        _PhotoPaper(event: event, isDragging: isDragging),
+                        _Tape(isDragging: isDragging),
+                        _Pin(isDragging: isDragging),
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: Row(
+                            children: [
+                              _CardActionButton(
+                                icon: Icons.edit_rounded,
+                                onTap: onEdit,
+                                tooltip: 'Edit memory',
+                              ),
+                              const SizedBox(width: 7),
+                              _CardActionButton(
+                                icon: Icons.hub_rounded,
+                                onTap: onConnect,
+                                tooltip: 'Connect memory',
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -181,7 +190,7 @@ class _PhotoPaper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 180,
+      width: 190,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -218,7 +227,7 @@ class _PhotoPaper extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(13),
               child: SizedBox(
-                height: 120,
+                height: 128,
                 width: double.infinity,
                 child: _CardImage(event: event),
               ),
@@ -231,7 +240,7 @@ class _PhotoPaper extends StatelessWidget {
               style: const TextStyle(
                 color: AppColors.paperInk,
                 fontWeight: FontWeight.w900,
-                fontSize: 16,
+                fontSize: 17,
                 letterSpacing: -0.25,
               ),
             ),
@@ -243,7 +252,7 @@ class _PhotoPaper extends StatelessWidget {
               style: TextStyle(
                 color: AppColors.paperInk.withValues(alpha: 0.58),
                 fontWeight: FontWeight.w700,
-                fontSize: 12,
+                fontSize: 12.5,
               ),
             ),
           ],

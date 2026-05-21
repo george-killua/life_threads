@@ -1,4 +1,4 @@
-package dev.gkcoding.life_threads
+package dev.gkcoding.lifethreads
 
 import io.flutter.embedding.android.FlutterActivity
 

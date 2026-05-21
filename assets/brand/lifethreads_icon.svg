@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="34%" cy="20%" r="90%">
+      <stop offset="0" stop-color="#3A2523"/>
+      <stop offset="0.52" stop-color="#171018"/>
+      <stop offset="1" stop-color="#080609"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F2C86B"/>
+      <stop offset="1" stop-color="#B47A2F"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF1D8"/>
+      <stop offset="1" stop-color="#E2C18A"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="34" stdDeviation="32" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+  <circle cx="242" cy="174" r="280" fill="#E59A8D" opacity="0.16"/>
+  <circle cx="835" cy="782" r="330" fill="#D2A24A" opacity="0.16"/>
+  <path d="M512 154 C512 238 430 272 340 330 C250 388 226 501 298 590 C366 674 488 650 560 590 C650 515 769 536 803 641" fill="none" stroke="url(#gold)" stroke-width="34" stroke-linecap="round" opacity="0.9"/>
+  <g filter="url(#shadow)">
+    <g transform="translate(255 332) rotate(-8 220 230)">
+      <rect x="0" y="0" width="430" height="500" rx="54" fill="url(#paper)"/>
+      <rect x="42" y="52" width="346" height="292" rx="32" fill="#D2A24A" opacity="0.82"/>
+      <path d="M142 240 L202 178 L250 226 L286 190 L340 250 L142 250 Z" fill="#FFF8EA" opacity="0.88"/>
+      <circle cx="172" cy="146" r="24" fill="#FFF8EA" opacity="0.9"/>
+      <rect x="62" y="380" width="240" height="30" rx="15" fill="#261C17" opacity="0.88"/>
+      <rect x="62" y="426" width="300" height="22" rx="11" fill="#261C17" opacity="0.42"/>
+    </g>
+  </g>
+  <circle cx="512" cy="154" r="42" fill="url(#gold)" stroke="#FFF1D8" stroke-width="8"/>
+  <circle cx="803" cy="641" r="38" fill="url(#gold)" stroke="#FFF1D8" stroke-width="7"/>
+  <path d="M728 206 L760 286 L846 294 L782 350 L802 434 L728 390 L654 434 L674 350 L610 294 L696 286 Z" fill="url(#gold)" opacity="0.95"/>
+</svg>

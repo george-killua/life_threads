@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../memories/domain/memory_event.dart';
+import 'lifethreads_map_provider.dart';
 
 class MemoryMapPreview extends StatelessWidget {
   const MemoryMapPreview({super.key, required this.event});
@@ -39,6 +40,10 @@ class MemoryMapPreview extends StatelessWidget {
 
     final point = LatLng(event.latitude!, event.longitude!);
 
+    if (!LifeThreadsMapProvider.current.hasTiles) {
+      return const _MapShell(child: LifeThreadsMapUnavailablePanel());
+    }
+
     return _MapShell(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
@@ -51,10 +56,7 @@ class MemoryMapPreview extends StatelessWidget {
             ),
           ),
           children: [
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'dev.gkcoding.lifethreads',
-            ),
+            const LifeThreadsMapTileLayer(),
             MarkerLayer(
               markers: [
                 Marker(
@@ -69,6 +71,7 @@ class MemoryMapPreview extends StatelessWidget {
                 ),
               ],
             ),
+            const LifeThreadsMapAttribution(),
           ],
         ),
       ),

@@ -1,0 +1,49 @@
+name: Play Closed Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      play_track:
+        description: "Google Play track"
+        required: true
+        default: "alpha"
+      release_status:
+        description: "draft or completed"
+        required: true
+        default: "draft"
+
+jobs:
+  closed-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Restore Android release signing
+        run: |
+          mkdir -p android/release
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/release/lifethreads-release-key.jks
+          cat > android/key.properties <<EOF
+          storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          storeFile=../release/lifethreads-release-key.jks
+          EOF
+          chmod 600 android/key.properties android/release/lifethreads-release-key.jks
+
+      - name: Upload to closed testing
+        env:
+          MAPTILER_KEY: ${{ secrets.MAPTILER_KEY }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 }}
+          PLAY_TRACK: ${{ inputs.play_track }}
+          PLAY_RELEASE_STATUS: ${{ inputs.release_status }}
+        run: bundle exec fastlane android closed_test

@@ -1,0 +1,57 @@
+require "base64"
+require "tmpdir"
+
+default_platform(:android)
+
+def project_root
+  File.expand_path("../..", __dir__)
+end
+
+def required_env(name)
+  value = ENV[name].to_s.strip
+  UI.user_error!("Missing #{name}") if value.empty?
+  value
+end
+
+def google_play_json_key_path
+  path = ENV["GOOGLE_PLAY_JSON_KEY_PATH"].to_s.strip
+  return path if !path.empty? && File.exist?(path)
+
+  json_base64 = ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64"].to_s.strip
+  UI.user_error!("Set GOOGLE_PLAY_JSON_KEY_PATH or GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64") if json_base64.empty?
+
+  temp_path = File.join(Dir.tmpdir, "lifethreads-google-play-service-account.json")
+  File.write(temp_path, Base64.decode64(json_base64), mode: "w", perm: 0o600)
+  temp_path
+end
+
+platform :android do
+  desc "Verify and build the signed release app bundle"
+  lane :build_release do
+    maptiler_key = required_env("MAPTILER_KEY")
+
+    Dir.chdir(project_root) do
+      sh("flutter", "pub", "get")
+      sh("flutter", "analyze")
+      sh("flutter", "test")
+      sh("flutter", "build", "appbundle", "--release", "--dart-define=MAPTILER_KEY=#{maptiler_key}")
+    end
+  end
+
+  desc "Upload the current release candidate to Google Play closed testing"
+  lane :closed_test do
+    build_release
+
+    upload_to_play_store(
+      package_name: ENV.fetch("PLAY_PACKAGE_NAME", "dev.gkcoding.lifethreads"),
+      track: ENV.fetch("PLAY_TRACK", "alpha"),
+      release_status: ENV.fetch("PLAY_RELEASE_STATUS", "draft"),
+      json_key: google_play_json_key_path,
+      aab: File.join(project_root, "build/app/outputs/bundle/release/app-release.aab"),
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end

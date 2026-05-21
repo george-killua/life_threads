@@ -1,14 +1,30 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:photo_manager/photo_manager.dart' hide LatLng;
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../backup/data/backup_service.dart';
+import '../../../backup/domain/backup_models.dart';
+import '../../../backup/presentation/widgets/archive_feedback.dart';
+import '../../../backup/presentation/widgets/archive_password_dialog.dart';
+import '../../../map/presentation/widgets/lifethreads_map_provider.dart';
+import '../../../media/data/photo_library_service.dart';
 import '../../../memories/data/memory_repository.dart';
+import '../../../memories/domain/memory_category.dart';
 import '../../../memories/domain/memory_event.dart';
+import '../../../memories/domain/memory_feeling.dart';
+import '../../../memories/domain/memory_type.dart';
+import '../../../premium/data/premium_entitlement_controller.dart';
+import '../../../premium/domain/premium_entitlement.dart';
+import '../../domain/wall_attachment_layout.dart';
 import '../../domain/wall_item.dart';
+import '../../domain/wall_layout.dart';
 import '../widgets/expandable_add_button.dart';
 import '../widgets/memory_card.dart';
 import '../widgets/rope_painter.dart';
@@ -32,11 +48,16 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   late final AnimationController _windController;
   final TransformationController _wallController = TransformationController();
   bool _didSetInitialViewport = false;
+  bool _isRouteTransitioning = false;
+  bool _controlsExpanded = false;
   WallFilter _filter = WallFilter.all;
   _WallViewMode _mode = _WallViewMode.wall;
+  WallLayoutMode _layoutMode = WallLayoutMode.freeform;
+  final Map<String, Offset> _manualLayoutOverrides = {};
   String? _draggingNodeId;
   _DragTargetKind? _draggingKind;
   Offset? _pendingDragPosition;
+  var _nodePointerIsDown = false;
 
   @override
   void initState() {
@@ -57,6 +78,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   @override
   Widget build(BuildContext context) {
     final memoryState = ref.watch(memoryRepositoryProvider);
+    final entitlement = ref.watch(premiumEntitlementProvider).asData?.value;
     final repository = ref.read(memoryRepositoryProvider.notifier);
 
     return Scaffold(
@@ -66,10 +88,13 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, _) => _WallError(message: error.toString()),
             data: (state) {
-              final filteredEvents = state.events
-                  .where((event) => _filter.matches(event.category))
-                  .map(_withPendingMemory)
-                  .toList();
+              final filteredEvents = WallLayoutEngine.apply(
+                events: state.events
+                    .where((event) => _filter.matches(event.category))
+                    .toList(),
+                mode: _layoutMode,
+                manualOverrides: _manualLayoutOverrides,
+              ).map(_withPendingMemory).toList();
               final displayWallItems = _displayWallItems(state, filteredEvents);
               final anchors = _buildAnchors(filteredEvents, displayWallItems);
               final visibleConnections = state.connections
@@ -81,165 +106,281 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                   .toList();
               final hasWallContent =
                   state.events.isNotEmpty || state.wallItems.isNotEmpty;
+              final canCreateMemory =
+                  entitlement?.canCreateMemory(state.events.length) ??
+                  state.events.length < PremiumEntitlement.freeMemoryLimit;
 
               if (_mode == _WallViewMode.wall) {
-                _setInitialViewport(context, filteredEvents, displayWallItems);
+                _setInitialViewport(
+                  context,
+                  filteredEvents,
+                  displayWallItems,
+                  controlsExpanded: _controlsExpanded,
+                );
               }
 
-              return Stack(
-                children: [
-                  if (!hasWallContent)
-                    WallEmptyState(
-                      onAdd: () => context.push(RouteNames.addMemory),
-                    )
-                  else if (_mode == _WallViewMode.wall)
-                    Positioned.fill(
-                      child: InteractiveViewer(
-                        transformationController: _wallController,
-                        constrained: false,
-                        clipBehavior: Clip.none,
-                        minScale: 0.42,
-                        maxScale: 2.1,
-                        boundaryMargin: const EdgeInsets.all(1400),
-                        child: SizedBox(
-                          width: _canvasSize.width,
-                          height: _canvasSize.height,
-                          child: AnimatedBuilder(
-                            animation: _windController,
-                            builder: (context, _) {
-                              return Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  Positioned.fill(
-                                    child: CustomPaint(
-                                      painter: RopePainter(
-                                        anchors: anchors,
-                                        connections: visibleConnections,
-                                        windValue: _windController.value,
-                                        activeNodeId: _draggingNodeId,
+              return PopScope(
+                canPop: _draggingNodeId == null,
+                onPopInvokedWithResult: (didPop, _) {
+                  if (!didPop) _cancelDrag();
+                },
+                child: Stack(
+                  children: [
+                    if (!hasWallContent)
+                      WallEmptyState(
+                        onAdd: () => _pushRoute(RouteNames.addMemory),
+                      )
+                    else if (_mode == _WallViewMode.wall)
+                      Positioned.fill(
+                        child: InteractiveViewer(
+                          transformationController: _wallController,
+                          constrained: false,
+                          clipBehavior: Clip.none,
+                          minScale: 0.5,
+                          maxScale: 2.1,
+                          panEnabled:
+                              _draggingNodeId == null && !_nodePointerIsDown,
+                          scaleEnabled:
+                              _draggingNodeId == null && !_nodePointerIsDown,
+                          boundaryMargin: const EdgeInsets.all(1400),
+                          child: SizedBox(
+                            width: _canvasSize.width,
+                            height: _canvasSize.height,
+                            child: AnimatedBuilder(
+                              animation: _windController,
+                              builder: (context, _) {
+                                return Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    Positioned.fill(
+                                      child: CustomPaint(
+                                        painter: RopePainter(
+                                          anchors: anchors,
+                                          connections: visibleConnections,
+                                          windValue: _windController.value,
+                                          activeNodeId: _draggingNodeId,
+                                          paintAnchors: false,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  for (final item in displayWallItems)
-                                    switch (item.type) {
-                                      WallItemType.text => WallTextNoteWidget(
-                                        item: item,
+                                    for (final item in displayWallItems)
+                                      switch (item.type) {
+                                        WallItemType.text => WallTextNoteWidget(
+                                          item: item,
+                                          windValue: _windController.value,
+                                          isDragging:
+                                              _draggingNodeId == item.id,
+                                          isAttached:
+                                              _attachedMemoryId(item, state) !=
+                                              null,
+                                          onLongPress: () => _showTextMenu(
+                                            context,
+                                            state,
+                                            item,
+                                          ),
+                                          onEdit: () => _editTextNote(
+                                            context,
+                                            repository,
+                                            item,
+                                          ),
+                                          onAttach: () => _showTextAttachments(
+                                            context,
+                                            state,
+                                            item,
+                                          ),
+                                          onPointerDown: _lockWallGestures,
+                                          onPointerUp: _unlockWallGestures,
+                                          onDragStart: () => _startDrag(
+                                            item.id,
+                                            item.wallPosition,
+                                            _DragTargetKind.wallItem,
+                                          ),
+                                          onDragUpdate: _updateDrag,
+                                          onDragEnd: () =>
+                                              _endDrag(repository, state),
+                                        ),
+                                        WallItemType.nail => WallNailWidget(
+                                          item: item,
+                                          isDragging:
+                                              _draggingNodeId == item.id,
+                                          onLongPress: () => _showNailMenu(
+                                            context,
+                                            state,
+                                            item,
+                                          ),
+                                          onPointerDown: _lockWallGestures,
+                                          onPointerUp: _unlockWallGestures,
+                                          onDragStart: () => _startDrag(
+                                            item.id,
+                                            item.wallPosition,
+                                            _DragTargetKind.wallItem,
+                                          ),
+                                          onDragUpdate: _updateDrag,
+                                          onDragEnd: () =>
+                                              _endDrag(repository, state),
+                                        ),
+                                      },
+                                    for (final event in filteredEvents)
+                                      MemoryCard(
+                                        event: event,
                                         windValue: _windController.value,
-                                        isDragging: _draggingNodeId == item.id,
-                                        isAttached:
-                                            _attachedMemoryId(item, state) !=
-                                            null,
+                                        isDragging: _draggingNodeId == event.id,
+                                        onTap: () =>
+                                            _pushRoute('/memories/${event.id}'),
                                         onLongPress: () =>
-                                            _showTextMenu(context, state, item),
-                                        onEdit: () => _editTextNote(
-                                          context,
-                                          repository,
-                                          item,
+                                            _showMemoryMenu(context, event.id),
+                                        onEdit: () => _pushRoute(
+                                          '/memories/${event.id}/edit',
                                         ),
-                                        onAttach: () => _showTextAttachments(
-                                          context,
-                                          state,
-                                          item,
+                                        onConnect: () => _pushRoute(
+                                          '/memories/${event.id}/connections',
                                         ),
+                                        onPointerDown: _lockWallGestures,
+                                        onPointerUp: _unlockWallGestures,
                                         onDragStart: () => _startDrag(
-                                          item.id,
-                                          item.wallPosition,
-                                          _DragTargetKind.wallItem,
+                                          event.id,
+                                          event.wallPosition,
+                                          _DragTargetKind.memory,
                                         ),
                                         onDragUpdate: _updateDrag,
                                         onDragEnd: () =>
                                             _endDrag(repository, state),
                                       ),
-                                      WallItemType.nail => WallNailWidget(
-                                        item: item,
-                                        isDragging: _draggingNodeId == item.id,
-                                        onLongPress: () =>
-                                            _showNailMenu(context, state, item),
-                                        onDragStart: () => _startDrag(
-                                          item.id,
-                                          item.wallPosition,
-                                          _DragTargetKind.wallItem,
+                                    if (filteredEvents.isEmpty &&
+                                        state.events.isNotEmpty)
+                                      Center(
+                                        child: Text(
+                                          'No ${_filter.label.toLowerCase()} memories yet.',
+                                          style: const TextStyle(
+                                            color: AppColors.muted,
+                                            fontWeight: FontWeight.w700,
+                                          ),
                                         ),
-                                        onDragUpdate: _updateDrag,
-                                        onDragEnd: () =>
-                                            _endDrag(repository, state),
                                       ),
-                                    },
-                                  for (final event in filteredEvents)
-                                    MemoryCard(
-                                      event: event,
-                                      windValue: _windController.value,
-                                      isDragging: _draggingNodeId == event.id,
-                                      onTap: () =>
-                                          context.push('/memories/${event.id}'),
-                                      onLongPress: () =>
-                                          _showMemoryMenu(context, event.id),
-                                      onEdit: () => context.push(
-                                        '/memories/${event.id}/edit',
-                                      ),
-                                      onConnect: () => context.push(
-                                        '/memories/${event.id}/connections',
-                                      ),
-                                      onDragStart: () => _startDrag(
-                                        event.id,
-                                        event.wallPosition,
-                                        _DragTargetKind.memory,
-                                      ),
-                                      onDragUpdate: _updateDrag,
-                                      onDragEnd: () =>
-                                          _endDrag(repository, state),
-                                    ),
-                                  if (filteredEvents.isEmpty &&
-                                      state.events.isNotEmpty)
-                                    Center(
-                                      child: Text(
-                                        'No ${_filter.label.toLowerCase()} memories yet.',
-                                        style: const TextStyle(
-                                          color: AppColors.muted,
-                                          fontWeight: FontWeight.w700,
+                                    Positioned.fill(
+                                      child: IgnorePointer(
+                                        child: CustomPaint(
+                                          painter: RopePainter(
+                                            anchors: anchors,
+                                            connections: visibleConnections,
+                                            windValue: _windController.value,
+                                            activeNodeId: _draggingNodeId,
+                                            paintAnchors: true,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                ],
-                              );
-                            },
+                                  ],
+                                );
+                              },
+                            ),
                           ),
                         ),
+                      )
+                    else if (_mode == _WallViewMode.timeline)
+                      Positioned.fill(
+                        child: _TimelineView(
+                          events: filteredEvents,
+                          topPadding: _controlsExpanded ? 206 : 92,
+                        ),
+                      )
+                    else
+                      Positioned.fill(
+                        child: _MapView(
+                          events: filteredEvents,
+                          topPadding: _controlsExpanded ? 206 : 92,
+                        ),
                       ),
-                    )
-                  else if (_mode == _WallViewMode.timeline)
-                    Positioned.fill(
-                      child: _TimelineView(
-                        events: filteredEvents,
-                        topPadding: 230,
+                    Positioned(
+                      left: 20,
+                      right: 20,
+                      top: 18,
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 260),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        transitionBuilder: (child, animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SizeTransition(
+                              sizeFactor: animation,
+                              axisAlignment: -1,
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: _controlsExpanded
+                            ? _WallHeader(
+                                key: const ValueKey('expanded-wall-controls'),
+                                selectedFilter: _filter,
+                                selectedMode: _mode,
+                                selectedLayout: _layoutMode,
+                                onFilterChanged: (filter) =>
+                                    setState(() => _filter = filter),
+                                onModeChanged: (mode) =>
+                                    setState(() => _mode = mode),
+                                onLayoutChanged: (layout) =>
+                                    setState(() => _layoutMode = layout),
+                                onExportBackup: () =>
+                                    _exportBackup(context, state),
+                                onImportBackup: () =>
+                                    _importBackup(context, repository),
+                                onOpenSettings: () =>
+                                    _pushRoute(RouteNames.settings),
+                                onCollapse: () =>
+                                    setState(() => _controlsExpanded = false),
+                              )
+                            : Align(
+                                alignment: Alignment.centerLeft,
+                                child: _CollapsedWallControlsButton(
+                                  key: const ValueKey(
+                                    'collapsed-wall-controls',
+                                  ),
+                                  selectedMode: _mode,
+                                  onTap: () =>
+                                      setState(() => _controlsExpanded = true),
+                                ),
+                              ),
                       ),
-                    )
-                  else
-                    Positioned.fill(
-                      child: _MapView(events: filteredEvents, topPadding: 230),
                     ),
-                  Positioned(
-                    left: 20,
-                    right: 20,
-                    top: 18,
-                    child: _WallHeader(
-                      selectedFilter: _filter,
-                      selectedMode: _mode,
-                      onFilterChanged: (filter) =>
-                          setState(() => _filter = filter),
-                      onModeChanged: (mode) => setState(() => _mode = mode),
+                    if (hasWallContent &&
+                        _mode == _WallViewMode.wall &&
+                        !_controlsExpanded)
+                      const Positioned(
+                        left: 20,
+                        right: 20,
+                        top: 78,
+                        child: _WallInteractionHint(),
+                      ),
+                    if (state.isDemoOnly)
+                      Positioned(
+                        left: 20,
+                        right: 20,
+                        top: _controlsExpanded
+                            ? (_mode == _WallViewMode.wall ? 226 : 190)
+                            : 120,
+                        child: _DemoWallBanner(
+                          onClear: () => _clearDemoWall(context, repository),
+                        ),
+                      ),
+                    Positioned(
+                      right: 20,
+                      bottom: 24,
+                      child: ExpandableAddButton(
+                        onAddEvent: () => _guardMemoryCreation(
+                          canCreateMemory,
+                          () => _pushRoute(RouteNames.addMemory),
+                        ),
+                        onAddQuickPhoto: () => _guardMemoryCreation(
+                          canCreateMemory,
+                          () => _createQuickPhotoMemory(context, repository),
+                        ),
+                        onAddText: () => _createTextNote(context, repository),
+                        onAddNail: () => _createNail(context, repository),
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    right: 20,
-                    bottom: 24,
-                    child: ExpandableAddButton(
-                      onAddEvent: () => context.push(RouteNames.addMemory),
-                      onAddText: () => _createTextNote(context, repository),
-                      onAddNail: () => _createNail(context, repository),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               );
             },
           ),
@@ -257,111 +398,28 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     return event;
   }
 
-  WallItem _withPendingWallItem(WallItem item) {
-    if (_draggingKind == _DragTargetKind.wallItem &&
-        _draggingNodeId == item.id &&
-        _pendingDragPosition != null) {
-      return item.copyWith(wallPosition: _pendingDragPosition);
-    }
-    return item;
-  }
-
   List<WallItem> _displayWallItems(
     MemoryState state,
     List<MemoryEvent> visibleEvents,
   ) {
-    final visibleEventById = {
-      for (final event in visibleEvents) event.id: event,
-    };
-    final attachmentCounts = <String, int>{};
-    final displayItems = <WallItem>[];
-
-    for (final item in state.wallItems) {
-      final attachedMemoryId = _attachedMemoryId(item, state);
-      final isDraggingItem =
-          _draggingKind == _DragTargetKind.wallItem &&
-          _draggingNodeId == item.id &&
-          _pendingDragPosition != null;
-      if (item.type != WallItemType.text || attachedMemoryId == null) {
-        displayItems.add(_withPendingWallItem(item));
-        continue;
-      }
-
-      final event = visibleEventById[attachedMemoryId];
-      if (event == null) continue;
-
-      if (isDraggingItem) {
-        displayItems.add(item.copyWith(wallPosition: _pendingDragPosition));
-        continue;
-      }
-
-      final index = attachmentCounts.update(
-        attachedMemoryId,
-        (value) => value + 1,
-        ifAbsent: () => 0,
-      );
-      displayItems.add(
-        item.copyWith(
-          wallPosition: _attachedTextPosition(
-            item: item,
-            event: event,
-            index: index,
-          ),
-        ),
-      );
-    }
-
-    return displayItems;
-  }
-
-  Offset _attachedTextPosition({
-    required WallItem item,
-    required MemoryEvent event,
-    required int index,
-  }) {
-    final offset = _attachmentOffset(item, event, index);
-    final position = event.wallPosition + offset;
-    return Offset(
-      _clampDouble(position.dx, 36, _canvasSize.width - 235),
-      _clampDouble(position.dy, 88, _canvasSize.height - 180),
+    return WallAttachmentLayout.displayWallItems(
+      wallItems: state.wallItems,
+      visibleEvents: visibleEvents,
+      allEvents: state.events,
+      connections: state.connections,
+      draggingWallItemId: _draggingKind == _DragTargetKind.wallItem
+          ? _draggingNodeId
+          : null,
+      pendingDragPosition: _pendingDragPosition,
     );
   }
 
-  Offset _attachmentOffset(WallItem item, MemoryEvent event, int index) {
-    final stored = item.wallPosition;
-    if (_looksLikeNoteOffset(stored)) return stored;
-
-    final oldAbsoluteOffset = stored - event.wallPosition;
-    if (_looksLikeNoteOffset(oldAbsoluteOffset)) return oldAbsoluteOffset;
-
-    return _defaultAttachmentOffset(index);
-  }
-
-  Offset _defaultAttachmentOffset(int index) => Offset(112, -46 + index * 48);
-
-  bool _looksLikeNoteOffset(Offset offset) {
-    return offset.dx.abs() <= 360 && offset.dy.abs() <= 280;
-  }
-
   Offset _absoluteTextPosition(WallItem item, MemoryState state) {
-    final attachedMemoryId = _attachedMemoryId(item, state);
-    final attachedMemory = attachedMemoryId == null
-        ? null
-        : state.findEvent(attachedMemoryId);
-    if (attachedMemory == null) return item.wallPosition;
-
-    final index = state.wallItems
-        .where(
-          (other) =>
-              other.type == WallItemType.text &&
-              _attachedMemoryId(other, state) == attachedMemoryId,
-        )
-        .toList()
-        .indexWhere((other) => other.id == item.id);
-    return _attachedTextPosition(
+    return WallAttachmentLayout.absoluteTextPosition(
       item: item,
-      event: attachedMemory,
-      index: index < 0 ? 0 : index,
+      wallItems: state.wallItems,
+      events: state.events,
+      connections: state.connections,
     );
   }
 
@@ -370,37 +428,21 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     required MemoryEvent event,
     required WallItem item,
   }) {
-    final currentAttachedId = _attachedMemoryId(item, state);
-    if (currentAttachedId == event.id) {
-      return _clampAttachmentOffset(item.wallPosition);
-    }
-
-    final existingCount = state.wallItems
-        .where(
-          (other) =>
-              other.id != item.id &&
-              other.type == WallItemType.text &&
-              _attachedMemoryId(other, state) == event.id,
-        )
-        .length;
-    return _defaultAttachmentOffset(existingCount);
+    return WallAttachmentLayout.nextAttachmentOffset(
+      wallItems: state.wallItems,
+      events: state.events,
+      connections: state.connections,
+      event: event,
+      item: item,
+    );
   }
 
   String? _attachedMemoryId(WallItem item, MemoryState state) {
-    if (item.type != WallItemType.text) return null;
-    final eventIds = {for (final event in state.events) event.id};
-
-    for (final connection in state.connections) {
-      if (connection.fromEventId == item.id &&
-          eventIds.contains(connection.toEventId)) {
-        return connection.toEventId;
-      }
-      if (connection.toEventId == item.id &&
-          eventIds.contains(connection.fromEventId)) {
-        return connection.fromEventId;
-      }
-    }
-    return null;
+    return WallAttachmentLayout.attachedMemoryIdFor(
+      item: item,
+      events: state.events,
+      connections: state.connections,
+    );
   }
 
   WallItem _sourceWallItem(WallItem item, MemoryState state) {
@@ -410,21 +452,35 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     return item;
   }
 
-  Map<String, Offset> _buildAnchors(
+  Map<String, RopeAnchor> _buildAnchors(
     List<MemoryEvent> events,
     List<WallItem> wallItems,
   ) {
     return {
       for (final event in events)
-        event.id: event.wallPosition + const Offset(88, 44),
+        event.id: RopeAnchor(
+          point: event.wallPosition + MemoryCard.pinHeadOffset,
+          kind: RopeAnchorKind.memory,
+          direction: const Offset(0, -1),
+        ),
       for (final item in wallItems)
-        item.id: item.type == WallItemType.nail
-            ? item.wallPosition + const Offset(22, 12)
-            : item.wallPosition + const Offset(97, 12),
+        item.id: switch (item.type) {
+          WallItemType.nail => RopeAnchor(
+            point: item.wallPosition + const Offset(24, 13),
+            kind: RopeAnchorKind.nail,
+            direction: const Offset(0, -1),
+          ),
+          WallItemType.text => RopeAnchor(
+            point: item.wallPosition + const Offset(88, -41),
+            kind: RopeAnchorKind.note,
+            direction: const Offset(0, -1),
+          ),
+        },
     };
   }
 
   void _startDrag(String nodeId, Offset startPosition, _DragTargetKind kind) {
+    if (!mounted || _isRouteTransitioning) return;
     setState(() {
       _draggingNodeId = nodeId;
       _draggingKind = kind;
@@ -432,9 +488,19 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     });
   }
 
+  void _lockWallGestures() {
+    if (!mounted || _nodePointerIsDown) return;
+    setState(() => _nodePointerIsDown = true);
+  }
+
+  void _unlockWallGestures() {
+    if (!mounted || !_nodePointerIsDown) return;
+    setState(() => _nodePointerIsDown = false);
+  }
+
   void _updateDrag(Offset delta) {
     final current = _pendingDragPosition;
-    if (current == null) return;
+    if (!mounted || current == null) return;
     final scale = _wallController.value.getMaxScaleOnAxis();
     setState(() => _pendingDragPosition = current + delta / scale);
   }
@@ -452,6 +518,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     if (nodeId == null || position == null || kind == null) return;
     switch (kind) {
       case _DragTargetKind.memory:
+        _manualLayoutOverrides[nodeId] = position;
         await repository.moveMemory(nodeId, position);
       case _DragTargetKind.wallItem:
         final item = state.wallItems
@@ -473,10 +540,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   }
 
   Offset _clampAttachmentOffset(Offset offset) {
-    return Offset(
-      _clampDouble(offset.dx, -190, 270),
-      _clampDouble(offset.dy, -150, 190),
-    );
+    return WallAttachmentLayout.clampAttachmentOffset(offset);
   }
 
   Offset _defaultDropPosition(BuildContext context) {
@@ -488,6 +552,50 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       _clampDouble(scene.dx - 90, 70, _canvasSize.width - 230),
       _clampDouble(scene.dy - 70, 120, _canvasSize.height - 180),
     );
+  }
+
+  Future<void> _pushRoute(String location) async {
+    if (!mounted || _isRouteTransitioning || !_isCurrentRoute(context)) return;
+    _cancelDrag();
+    _isRouteTransitioning = true;
+    try {
+      await context.push(location);
+    } finally {
+      if (mounted) _isRouteTransitioning = false;
+    }
+  }
+
+  void _guardMemoryCreation(bool canCreateMemory, VoidCallback action) {
+    if (canCreateMemory) {
+      action();
+      return;
+    }
+    _pushRoute(RouteNames.upgrade);
+  }
+
+  void _cancelDrag() {
+    if (_draggingNodeId == null &&
+        _draggingKind == null &&
+        _pendingDragPosition == null) {
+      return;
+    }
+    if (mounted) {
+      setState(() {
+        _draggingNodeId = null;
+        _draggingKind = null;
+        _pendingDragPosition = null;
+        _nodePointerIsDown = false;
+      });
+    } else {
+      _draggingNodeId = null;
+      _draggingKind = null;
+      _pendingDragPosition = null;
+      _nodePointerIsDown = false;
+    }
+  }
+
+  bool _isCurrentRoute(BuildContext context) {
+    return ModalRoute.of(context)?.isCurrent ?? true;
   }
 
   double _clampDouble(double value, double min, double max) {
@@ -509,24 +617,242 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
     final trimmed = text?.trim();
     if (!context.mounted || trimmed == null || trimmed.isEmpty) return;
-    await repository.addTextNote(
-      text: trimmed,
-      position: _defaultDropPosition(context),
+    final position = await _previewPlacement(
+      context,
+      title: 'Place text note',
+      subtitle: trimmed,
+      icon: Icons.sticky_note_2_rounded,
+      color: AppColors.cardDark,
+      initialPosition: _defaultDropPosition(context),
     );
+    if (!context.mounted || position == null) return;
+    await repository.addTextNote(text: trimmed, position: position);
   }
 
   Future<void> _createNail(
     BuildContext context,
     MemoryRepository repository,
   ) async {
-    await repository.addNail(position: _defaultDropPosition(context));
+    final position = await _previewPlacement(
+      context,
+      title: 'Place rope anchor',
+      subtitle: 'A nail can connect ropes manually between memories.',
+      icon: Icons.push_pin_rounded,
+      color: AppColors.gold,
+      initialPosition: _defaultDropPosition(context),
+    );
+    if (!context.mounted || position == null) return;
+    await repository.addNail(position: position);
+  }
+
+  Future<void> _createQuickPhotoMemory(
+    BuildContext context,
+    MemoryRepository repository,
+  ) async {
+    final service = ref.read(photoLibraryServiceProvider);
+    var permission = await service.currentPermission();
+    if (!permission.hasAccess) permission = await service.requestPermission();
+    if (!context.mounted) return;
+
+    if (!permission.hasAccess) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Photo access is needed first.')),
+      );
+      await service.openSettings();
+      return;
+    }
+
+    final assets = await service.recentPhotos(limit: 90);
+    if (!context.mounted) return;
+    final asset = await showModalBottomSheet<AssetEntity>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => _QuickPhotoPickerSheet(assets: assets),
+    );
+    if (!context.mounted || asset == null) return;
+
+    final picked = await service.copyAssetToAppStorage(asset);
+    if (!context.mounted || picked == null) return;
+
+    final title = _cleanPhotoTitle(picked.title) ?? 'Quick photo memory';
+    final locationLabel = picked.hasLocation
+        ? '${picked.latitude!.toStringAsFixed(5)}, ${picked.longitude!.toStringAsFixed(5)}'
+        : 'Unknown place';
+    final position = await _previewPlacement(
+      context,
+      title: 'Hang quick photo',
+      subtitle: title,
+      icon: Icons.add_photo_alternate_rounded,
+      color: AppColors.gold,
+      initialPosition: _defaultDropPosition(context),
+    );
+    if (!context.mounted || position == null) return;
+
+    await repository.addMemory(
+      NewMemoryDraft(
+        title: title,
+        description:
+            'A quick photo memory added from the wall. Edit it later to add the full story.',
+        category: MemoryCategory.personal,
+        memoryType: MemoryType.moment,
+        feeling: MemoryFeeling.warm,
+        occurredAt: picked.capturedAt,
+        locationLabel: locationLabel,
+        latitude: picked.latitude,
+        longitude: picked.longitude,
+        coverPhotoPath: picked.localPath,
+        wallPosition: position,
+        photos: [
+          MemoryPhotoDraft(
+            localPath: picked.localPath,
+            originalAssetId: picked.originalAssetId,
+            capturedAt: picked.capturedAt,
+            latitude: picked.latitude,
+            longitude: picked.longitude,
+            width: picked.width,
+            height: picked.height,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _clearDemoWall(
+    BuildContext context,
+    MemoryRepository repository,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Clear demo wall?'),
+        content: const Text(
+          'This removes the sample memories so you can start with an empty private wall.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Start fresh'),
+          ),
+        ],
+      ),
+    );
+    if (!context.mounted || confirmed != true) return;
+    await repository.clearDemoWall();
+  }
+
+  Future<void> _exportBackup(BuildContext context, MemoryState state) async {
+    final isPremium =
+        ref.read(premiumEntitlementProvider).asData?.value.isPremium ?? false;
+    if (!isPremium) {
+      await context.push(RouteNames.upgrade);
+      return;
+    }
+
+    final password = await showArchivePasswordDialog(
+      context,
+      purpose: ArchivePasswordPurpose.export,
+    );
+    if (!context.mounted || password == null) return;
+
+    try {
+      final result = await ref
+          .read(backupServiceProvider)
+          .exportBackup(state, password: password);
+      if (!context.mounted) return;
+      await shareExportedArchive(context, result);
+    } catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Export failed: $error')));
+    }
+  }
+
+  Future<void> _importBackup(
+    BuildContext context,
+    MemoryRepository repository,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Import backup?'),
+        content: const Text(
+          'This restores memories from a LifeThreads archive and keeps your current wall.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Choose Backup'),
+          ),
+        ],
+      ),
+    );
+    if (!context.mounted || confirmed != true) return;
+
+    final password = await showArchivePasswordDialog(
+      context,
+      purpose: ArchivePasswordPurpose.import,
+    );
+    if (!context.mounted || password == null) return;
+
+    try {
+      final backup = await ref
+          .read(backupServiceProvider)
+          .pickAndPrepareImport(password: password);
+      if (!context.mounted || backup == null) return;
+      final result = await repository.importBackup(backup);
+      if (!context.mounted) return;
+      await showArchiveImportSummary(context, result);
+    } on BackupValidationException catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Import rejected: ${error.message}')),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Import failed: $error')));
+    }
+  }
+
+  Future<Offset?> _previewPlacement(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required Offset initialPosition,
+  }) {
+    return showModalBottomSheet<Offset>(
+      context: context,
+      showDragHandle: true,
+      builder: (_) => _PlacementPreviewSheet(
+        title: title,
+        subtitle: subtitle,
+        icon: icon,
+        color: color,
+        canvasSize: _canvasSize,
+        initialPosition: initialPosition,
+      ),
+    );
   }
 
   void _setInitialViewport(
     BuildContext context,
     List<MemoryEvent> events,
-    List<WallItem> wallItems,
-  ) {
+    List<WallItem> wallItems, {
+    required bool controlsExpanded,
+  }) {
     if (_didSetInitialViewport || (events.isEmpty && wallItems.isEmpty)) return;
     _didSetInitialViewport = true;
 
@@ -545,13 +871,20 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
           positions
               .map((position) => position.dx)
               .reduce((a, b) => a > b ? a : b) +
-          230;
+          MemoryCard.visualSize.width +
+          40;
       final minY = positions
           .map((position) => position.dy)
           .reduce((a, b) => a < b ? a : b);
       final contentWidth = maxX - minX;
-      final scale = (size.width / (contentWidth + 140)).clamp(0.46, 0.86);
-      final headerSpace = size.height < 720 ? 205.0 : 235.0;
+      final fitScale = size.width / (contentWidth + 120);
+      final mobile = size.width < 520;
+      final scale = mobile
+          ? fitScale.clamp(0.62, 0.9)
+          : fitScale.clamp(0.5, 0.9);
+      final headerSpace = controlsExpanded
+          ? (mobile ? 218.0 : 244.0)
+          : (mobile ? 116.0 : 132.0);
       final translateX =
           ((size.width - contentWidth * scale) / 2) - minX * scale;
       final translateY = headerSpace - minY * scale;
@@ -602,15 +935,15 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       ),
     );
 
-    if (!context.mounted || action == null) return;
+    if (!context.mounted || action == null || !_isCurrentRoute(context)) return;
 
     switch (action) {
       case _MemoryAction.open:
-        context.push('/memories/$memoryId');
+        await _pushRoute('/memories/$memoryId');
       case _MemoryAction.edit:
-        context.push('/memories/$memoryId/edit');
+        await _pushRoute('/memories/$memoryId/edit');
       case _MemoryAction.connect:
-        context.push('/memories/$memoryId/connections');
+        await _pushRoute('/memories/$memoryId/connections');
       case _MemoryAction.delete:
         final confirmed = await showDialog<bool>(
           context: context,
@@ -631,6 +964,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
             ],
           ),
         );
+        if (!context.mounted || !_isCurrentRoute(context)) return;
         if (confirmed == true) await repository.deleteMemory(memoryId);
     }
   }
@@ -688,7 +1022,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       ),
     );
 
-    if (!context.mounted || action == null) return;
+    if (!context.mounted || action == null || !_isCurrentRoute(context)) return;
 
     switch (action) {
       case _TextAction.edit:
@@ -790,7 +1124,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     );
 
     final trimmed = text?.trim();
-    if (trimmed == null || trimmed.isEmpty) return;
+    if (!context.mounted || trimmed == null || trimmed.isEmpty) return;
     await repository.updateTextNote(id: item.id, text: trimmed);
   }
 
@@ -829,7 +1163,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       ),
     );
 
-    if (!context.mounted || action == null) return;
+    if (!context.mounted || action == null || !_isCurrentRoute(context)) return;
 
     switch (action) {
       case _NailAction.connect:
@@ -936,7 +1270,7 @@ class _TimelineMemoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => context.push('/memories/${event.id}'),
+      onTap: () => _pushIfCurrent(context, '/memories/${event.id}'),
       borderRadius: BorderRadius.circular(26),
       child: IntrinsicHeight(
         child: Row(
@@ -1106,6 +1440,10 @@ class _MemoryMap extends StatelessWidget {
     final first = events.first;
     final center = LatLng(first.latitude!, first.longitude!);
 
+    if (!LifeThreadsMapProvider.current.hasTiles) {
+      return const LifeThreadsMapUnavailablePanel();
+    }
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
       child: Stack(
@@ -1113,10 +1451,7 @@ class _MemoryMap extends StatelessWidget {
           FlutterMap(
             options: MapOptions(initialCenter: center, initialZoom: 5),
             children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'dev.gkcoding.lifethreads',
-              ),
+              const LifeThreadsMapTileLayer(),
               MarkerLayer(
                 markers: [
                   for (final event in events)
@@ -1125,7 +1460,8 @@ class _MemoryMap extends StatelessWidget {
                       width: 58,
                       height: 58,
                       child: GestureDetector(
-                        onTap: () => context.push('/memories/${event.id}'),
+                        onTap: () =>
+                            _pushIfCurrent(context, '/memories/${event.id}'),
                         child: DecoratedBox(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
@@ -1151,6 +1487,7 @@ class _MemoryMap extends StatelessWidget {
                     ),
                 ],
               ),
+              const LifeThreadsMapAttribution(),
             ],
           ),
           Positioned(
@@ -1184,7 +1521,7 @@ class _MapMemoryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => context.push('/memories/${event.id}'),
+      onTap: () => _pushIfCurrent(context, '/memories/${event.id}'),
       borderRadius: BorderRadius.circular(22),
       child: Container(
         width: 210,
@@ -1327,112 +1664,331 @@ class _EmptyModePanel extends StatelessWidget {
 
 class _WallHeader extends StatelessWidget {
   const _WallHeader({
+    super.key,
     required this.selectedFilter,
     required this.selectedMode,
+    required this.selectedLayout,
     required this.onFilterChanged,
     required this.onModeChanged,
+    required this.onLayoutChanged,
+    required this.onExportBackup,
+    required this.onImportBackup,
+    required this.onOpenSettings,
+    required this.onCollapse,
   });
 
   final WallFilter selectedFilter;
   final _WallViewMode selectedMode;
+  final WallLayoutMode selectedLayout;
   final ValueChanged<WallFilter> onFilterChanged;
   final ValueChanged<_WallViewMode> onModeChanged;
+  final ValueChanged<WallLayoutMode> onLayoutChanged;
+  final VoidCallback onExportBackup;
+  final VoidCallback onImportBackup;
+  final VoidCallback onOpenSettings;
+  final VoidCallback onCollapse;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.panelWarm.withValues(alpha: 0.82),
-            AppColors.wallInk.withValues(alpha: 0.76),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: AppColors.gold.withValues(alpha: 0.16)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.34),
-            blurRadius: 34,
-            offset: const Offset(0, 18),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            children: [
-              Icon(
-                Icons.auto_awesome_rounded,
-                color: AppColors.amber,
-                size: 24,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 390;
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: compact ? 12 : 14,
+              vertical: compact ? 11 : 12,
+            ),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.panelWarm.withValues(alpha: 0.82),
+                  AppColors.wallInk.withValues(alpha: 0.76),
+                ],
               ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(color: AppColors.gold.withValues(alpha: 0.16)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.34),
+                  blurRadius: 28,
+                  offset: const Offset(0, 14),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Text(
-                      'LifeThreads',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.5,
+                    Icon(
+                      Icons.auto_awesome_rounded,
+                      color: AppColors.amber,
+                      size: compact ? 22 : 24,
+                    ),
+                    const SizedBox(width: 9),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'LifeThreads',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: compact ? 21 : 22,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 1),
+                          Text(
+                            'Your memories, hanging together.',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.muted,
+                              fontSize: compact ? 12 : 12.5,
+                              height: 1.25,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 2),
-                    Text(
-                      'Your memories, hanging together.',
-                      style: TextStyle(
-                        color: AppColors.muted,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    _HeaderIconButton(
+                      tooltip: 'Import backup',
+                      onPressed: onImportBackup,
+                      icon: Icons.restore_rounded,
+                      color: AppColors.muted,
+                    ),
+                    _HeaderIconButton(
+                      tooltip: 'Export backup',
+                      onPressed: onExportBackup,
+                      icon: Icons.ios_share_rounded,
+                      color: AppColors.gold,
+                    ),
+                    _HeaderIconButton(
+                      tooltip: 'Settings',
+                      onPressed: onOpenSettings,
+                      icon: Icons.settings_rounded,
+                      color: AppColors.muted,
+                    ),
+                    _HeaderIconButton(
+                      tooltip: 'Hide controls',
+                      onPressed: onCollapse,
+                      icon: Icons.keyboard_arrow_up_rounded,
+                      color: AppColors.amber,
                     ),
                   ],
                 ),
+                const SizedBox(height: 9),
+                _HeaderScrollRow(
+                  children: [
+                    for (final mode in _WallViewMode.values)
+                      _WallHeaderPill(
+                        selected: selectedMode == mode,
+                        icon: mode.icon,
+                        label: mode.label,
+                        onTap: () => onModeChanged(mode),
+                      ),
+                  ],
+                ),
+                if (selectedMode == _WallViewMode.wall) ...[
+                  const SizedBox(height: 8),
+                  _HeaderScrollRow(
+                    children: [
+                      for (final layout in WallLayoutMode.values)
+                        _WallHeaderPill(
+                          selected: selectedLayout == layout,
+                          icon: layout.icon,
+                          label: _layoutPillLabel(layout),
+                          onTap: () => onLayoutChanged(layout),
+                        ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 8),
+                _HeaderScrollRow(
+                  children: [
+                    for (final filter in WallFilter.values)
+                      _WallHeaderPill(
+                        selected: selectedFilter == filter,
+                        icon: selectedFilter == filter
+                            ? Icons.check_rounded
+                            : null,
+                        label: filter.label,
+                        onTap: () => onFilterChanged(filter),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _layoutPillLabel(WallLayoutMode layout) {
+    return switch (layout) {
+      WallLayoutMode.freeform => 'Freeform',
+      WallLayoutMode.timeline => 'Timeline',
+      WallLayoutMode.categoryCluster => 'Category',
+      WallLayoutMode.locationCluster => 'Location',
+    };
+  }
+}
+
+class _HeaderIconButton extends StatelessWidget {
+  const _HeaderIconButton({
+    required this.tooltip,
+    required this.onPressed,
+    required this.icon,
+    required this.color,
+  });
+
+  final String tooltip;
+  final VoidCallback onPressed;
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: tooltip,
+      onPressed: onPressed,
+      icon: Icon(icon),
+      color: color,
+      iconSize: 23,
+      visualDensity: VisualDensity.compact,
+      constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+      padding: EdgeInsets.zero,
+    );
+  }
+}
+
+class _CollapsedWallControlsButton extends StatelessWidget {
+  const _CollapsedWallControlsButton({
+    super.key,
+    required this.selectedMode,
+    required this.onTap,
+  });
+
+  final _WallViewMode selectedMode;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.panelWarm.withValues(alpha: 0.9),
+              AppColors.wallInk.withValues(alpha: 0.82),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: AppColors.gold.withValues(alpha: 0.22)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.34),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
+            ),
+            BoxShadow(
+              color: AppColors.gold.withValues(alpha: 0.1),
+              blurRadius: 22,
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(13, 10, 11, 10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(selectedMode.icon, color: AppColors.amber, size: 18),
+              const SizedBox(width: 8),
+              const Text(
+                'Wall Controls',
+                style: TextStyle(
+                  color: AppColors.card,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.1,
+                ),
+              ),
+              const SizedBox(width: 6),
+              const Icon(
+                Icons.keyboard_arrow_down_rounded,
+                color: AppColors.muted,
+                size: 20,
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                for (final mode in _WallViewMode.values) ...[
-                  _WallHeaderPill(
-                    selected: selectedMode == mode,
-                    icon: mode.icon,
-                    label: mode.label,
-                    onTap: () => onModeChanged(mode),
-                  ),
-                  const SizedBox(width: 8),
-                ],
-              ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WallInteractionHint extends StatelessWidget {
+  const _WallInteractionHint();
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.wallInk.withValues(alpha: 0.52),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: AppColors.gold.withValues(alpha: 0.12)),
+          ),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Text(
+              'Tap to open • drag to move',
+              style: TextStyle(
+                color: AppColors.muted,
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
-          const SizedBox(height: 10),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                for (final filter in WallFilter.values) ...[
-                  _WallHeaderPill(
-                    selected: selectedFilter == filter,
-                    icon: selectedFilter == filter ? Icons.check_rounded : null,
-                    label: filter.label,
-                    onTap: () => onFilterChanged(filter),
-                  ),
-                  const SizedBox(width: 8),
-                ],
-              ],
-            ),
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeaderScrollRow extends StatelessWidget {
+  const _HeaderScrollRow({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 36,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.hardEdge,
+        physics: const BouncingScrollPhysics(),
+        child: Row(
+          children: [
+            for (var index = 0; index < children.length; index++) ...[
+              if (index > 0) const SizedBox(width: 8),
+              children[index],
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -1459,8 +2015,8 @@ class _WallHeaderPill extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
-        height: 39,
-        padding: const EdgeInsets.symmetric(horizontal: 14),
+        height: 36,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: selected
               ? AppColors.gold.withValues(alpha: 0.92)
@@ -1486,19 +2042,61 @@ class _WallHeaderPill extends StatelessWidget {
           children: [
             if (icon != null) ...[
               Icon(icon, size: 17, color: foreground),
-              const SizedBox(width: 8),
+              const SizedBox(width: 7),
             ],
             Text(
               label,
               style: TextStyle(
                 color: foreground,
-                fontSize: 14,
+                fontSize: 13.5,
                 fontWeight: FontWeight.w900,
                 letterSpacing: -0.1,
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _DemoWallBanner extends StatelessWidget {
+  const _DemoWallBanner({required this.onClear});
+
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+      decoration: BoxDecoration(
+        color: AppColors.wallInk.withValues(alpha: 0.84),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.gold.withValues(alpha: 0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.28),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.preview_rounded, color: AppColors.gold, size: 20),
+          const SizedBox(width: 10),
+          const Expanded(
+            child: Text(
+              'Demo wall preview. Clear it when you are ready to start fresh.',
+              style: TextStyle(
+                color: AppColors.muted,
+                fontWeight: FontWeight.w800,
+                height: 1.25,
+              ),
+            ),
+          ),
+          TextButton(onPressed: onClear, child: const Text('Clear demo')),
+        ],
       ),
     );
   }
@@ -1516,6 +2114,373 @@ class _WallError extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Text(message, textAlign: TextAlign.center),
       ),
+    );
+  }
+}
+
+class _PlacementPreviewSheet extends StatefulWidget {
+  const _PlacementPreviewSheet({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.canvasSize,
+    required this.initialPosition,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final Size canvasSize;
+  final Offset initialPosition;
+
+  @override
+  State<_PlacementPreviewSheet> createState() => _PlacementPreviewSheetState();
+}
+
+class _PlacementPreviewSheetState extends State<_PlacementPreviewSheet> {
+  late Offset _position;
+
+  @override
+  void initState() {
+    super.initState();
+    _position = widget.initialPosition;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: widget.color.withValues(alpha: 0.18),
+                    border: Border.all(
+                      color: widget.color.withValues(alpha: 0.42),
+                    ),
+                  ),
+                  child: Icon(widget.icon, color: widget.color),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.title,
+                        style: const TextStyle(
+                          fontSize: 21,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        widget.subtitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.muted,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            _PlacementMiniWall(
+              position: _position,
+              canvasSize: widget.canvasSize,
+              color: widget.color,
+              icon: widget.icon,
+            ),
+            const SizedBox(height: 14),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final controls = _PlacementControls(
+                  onMove: _move,
+                  onCancel: () => Navigator.of(context).pop(),
+                  onPlace: () => Navigator.of(context).pop(_position),
+                );
+
+                if (constraints.maxWidth < 520) {
+                  return controls.compact();
+                }
+                return controls.wide();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _move(Offset delta) {
+    setState(() {
+      _position = Offset(
+        (_position.dx + delta.dx).clamp(50, widget.canvasSize.width - 240),
+        (_position.dy + delta.dy).clamp(110, widget.canvasSize.height - 190),
+      );
+    });
+  }
+}
+
+class _PlacementMiniWall extends StatelessWidget {
+  const _PlacementMiniWall({
+    required this.position,
+    required this.canvasSize,
+    required this.color,
+    required this.icon,
+  });
+
+  final Offset position;
+  final Size canvasSize;
+  final Color color;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        const height = 150.0;
+        final x = (position.dx / canvasSize.width * width).clamp(
+          12.0,
+          width - 52,
+        );
+        final y = (position.dy / canvasSize.height * height).clamp(
+          12.0,
+          height - 52,
+        );
+
+        return Container(
+          height: height,
+          decoration: BoxDecoration(
+            color: AppColors.wallInk.withValues(alpha: 0.72),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.gold.withValues(alpha: 0.16)),
+          ),
+          child: Stack(
+            children: [
+              Positioned.fill(child: CustomPaint(painter: _MiniGridPainter())),
+              Positioned(
+                left: x,
+                top: y,
+                child: Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.92),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.22),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Icon(icon, color: AppColors.paperInk, size: 22),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _PlacementControls {
+  const _PlacementControls({
+    required this.onMove,
+    required this.onCancel,
+    required this.onPlace,
+  });
+
+  final ValueChanged<Offset> onMove;
+  final VoidCallback onCancel;
+  final VoidCallback onPlace;
+
+  Widget compact() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: _moveRow(),
+        ),
+        const SizedBox(height: 10),
+        Align(alignment: Alignment.centerRight, child: _actionRow()),
+      ],
+    );
+  }
+
+  Widget wide() {
+    return Row(children: [_moveRow(), const Spacer(), _actionRow()]);
+  }
+
+  Widget _moveRow() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _MoveButton(
+          icon: Icons.keyboard_arrow_left_rounded,
+          onTap: () => onMove(const Offset(-80, 0)),
+        ),
+        _MoveButton(
+          icon: Icons.keyboard_arrow_up_rounded,
+          onTap: () => onMove(const Offset(0, -80)),
+        ),
+        _MoveButton(
+          icon: Icons.keyboard_arrow_down_rounded,
+          onTap: () => onMove(const Offset(0, 80)),
+        ),
+        _MoveButton(
+          icon: Icons.keyboard_arrow_right_rounded,
+          onTap: () => onMove(const Offset(80, 0)),
+        ),
+      ],
+    );
+  }
+
+  Widget _actionRow() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextButton(onPressed: onCancel, child: const Text('Cancel')),
+        const SizedBox(width: 8),
+        FilledButton.icon(
+          onPressed: onPlace,
+          icon: const Icon(Icons.check_rounded),
+          label: const Text('Place here'),
+        ),
+      ],
+    );
+  }
+}
+
+class _MiniGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = AppColors.gold.withValues(alpha: 0.07)
+      ..strokeWidth = 1;
+    for (double x = 0; x < size.width; x += 38) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (double y = 0; y < size.height; y += 38) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _MoveButton extends StatelessWidget {
+  const _MoveButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: IconButton.filledTonal(onPressed: onTap, icon: Icon(icon)),
+    );
+  }
+}
+
+class _QuickPhotoPickerSheet extends StatelessWidget {
+  const _QuickPhotoPickerSheet({required this.assets});
+
+  final List<AssetEntity> assets;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height * 0.78,
+      child: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(18, 0, 18, 12),
+            child: Row(
+              children: [
+                Icon(Icons.add_photo_alternate_rounded, color: AppColors.gold),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Choose quick photo',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: assets.isEmpty
+                ? const Center(child: Text('No photos found.'))
+                : GridView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                        ),
+                    itemCount: assets.length,
+                    itemBuilder: (context, index) {
+                      final asset = assets[index];
+                      return GestureDetector(
+                        onTap: () => Navigator.of(context).pop(asset),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: _AssetThumbnail(asset: asset),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AssetThumbnail extends StatelessWidget {
+  const _AssetThumbnail({required this.asset});
+
+  final AssetEntity asset;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Uint8List?>(
+      future: asset.thumbnailDataWithSize(const ThumbnailSize.square(320)),
+      builder: (context, snapshot) {
+        final bytes = snapshot.data;
+        if (bytes == null) {
+          return Container(
+            color: AppColors.wallDeep,
+            child: const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          );
+        }
+        return Image.memory(bytes, fit: BoxFit.cover);
+      },
     );
   }
 }
@@ -1612,4 +2577,18 @@ String _formatTimelineDate(DateTime date) {
     'Dec',
   ];
   return '${months[date.month - 1]} ${date.day}, ${date.year}';
+}
+
+void _pushIfCurrent(BuildContext context, String location) {
+  if (!(ModalRoute.of(context)?.isCurrent ?? true)) return;
+  context.push(location);
+}
+
+String? _cleanPhotoTitle(String? title) {
+  final value = title?.trim();
+  if (value == null || value.isEmpty) return null;
+  final dotIndex = value.lastIndexOf('.');
+  final withoutExtension = dotIndex > 0 ? value.substring(0, dotIndex) : value;
+  final cleaned = withoutExtension.replaceAll(RegExp(r'[_-]+'), ' ').trim();
+  return cleaned.isEmpty ? null : cleaned;
 }

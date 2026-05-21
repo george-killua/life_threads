@@ -1798,6 +1798,418 @@ class MemoryConnectionsCompanion extends UpdateCompanion<MemoryConnection> {
   }
 }
 
+class $MemoryPeopleTable extends MemoryPeople
+    with TableInfo<$MemoryPeopleTable, MemoryPeopleData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MemoryPeopleTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventIdMeta = const VerificationMeta(
+    'eventId',
+  );
+  @override
+  late final GeneratedColumn<String> eventId = GeneratedColumn<String>(
+    'event_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _relationshipMeta = const VerificationMeta(
+    'relationship',
+  );
+  @override
+  late final GeneratedColumn<String> relationship = GeneratedColumn<String>(
+    'relationship',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
+  @override
+  late final GeneratedColumn<String> phone = GeneratedColumn<String>(
+    'phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+    'email',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    eventId,
+    name,
+    relationship,
+    phone,
+    email,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'memory_people';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MemoryPeopleData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('event_id')) {
+      context.handle(
+        _eventIdMeta,
+        eventId.isAcceptableOrUnknown(data['event_id']!, _eventIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_eventIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('relationship')) {
+      context.handle(
+        _relationshipMeta,
+        relationship.isAcceptableOrUnknown(
+          data['relationship']!,
+          _relationshipMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_relationshipMeta);
+    }
+    if (data.containsKey('phone')) {
+      context.handle(
+        _phoneMeta,
+        phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta),
+      );
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+        _emailMeta,
+        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MemoryPeopleData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MemoryPeopleData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      eventId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      relationship: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}relationship'],
+      )!,
+      phone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}phone'],
+      ),
+      email: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}email'],
+      ),
+    );
+  }
+
+  @override
+  $MemoryPeopleTable createAlias(String alias) {
+    return $MemoryPeopleTable(attachedDatabase, alias);
+  }
+}
+
+class MemoryPeopleData extends DataClass
+    implements Insertable<MemoryPeopleData> {
+  final String id;
+  final String eventId;
+  final String name;
+  final String relationship;
+  final String? phone;
+  final String? email;
+  const MemoryPeopleData({
+    required this.id,
+    required this.eventId,
+    required this.name,
+    required this.relationship,
+    this.phone,
+    this.email,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['event_id'] = Variable<String>(eventId);
+    map['name'] = Variable<String>(name);
+    map['relationship'] = Variable<String>(relationship);
+    if (!nullToAbsent || phone != null) {
+      map['phone'] = Variable<String>(phone);
+    }
+    if (!nullToAbsent || email != null) {
+      map['email'] = Variable<String>(email);
+    }
+    return map;
+  }
+
+  MemoryPeopleCompanion toCompanion(bool nullToAbsent) {
+    return MemoryPeopleCompanion(
+      id: Value(id),
+      eventId: Value(eventId),
+      name: Value(name),
+      relationship: Value(relationship),
+      phone: phone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(phone),
+      email: email == null && nullToAbsent
+          ? const Value.absent()
+          : Value(email),
+    );
+  }
+
+  factory MemoryPeopleData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MemoryPeopleData(
+      id: serializer.fromJson<String>(json['id']),
+      eventId: serializer.fromJson<String>(json['eventId']),
+      name: serializer.fromJson<String>(json['name']),
+      relationship: serializer.fromJson<String>(json['relationship']),
+      phone: serializer.fromJson<String?>(json['phone']),
+      email: serializer.fromJson<String?>(json['email']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'eventId': serializer.toJson<String>(eventId),
+      'name': serializer.toJson<String>(name),
+      'relationship': serializer.toJson<String>(relationship),
+      'phone': serializer.toJson<String?>(phone),
+      'email': serializer.toJson<String?>(email),
+    };
+  }
+
+  MemoryPeopleData copyWith({
+    String? id,
+    String? eventId,
+    String? name,
+    String? relationship,
+    Value<String?> phone = const Value.absent(),
+    Value<String?> email = const Value.absent(),
+  }) => MemoryPeopleData(
+    id: id ?? this.id,
+    eventId: eventId ?? this.eventId,
+    name: name ?? this.name,
+    relationship: relationship ?? this.relationship,
+    phone: phone.present ? phone.value : this.phone,
+    email: email.present ? email.value : this.email,
+  );
+  MemoryPeopleData copyWithCompanion(MemoryPeopleCompanion data) {
+    return MemoryPeopleData(
+      id: data.id.present ? data.id.value : this.id,
+      eventId: data.eventId.present ? data.eventId.value : this.eventId,
+      name: data.name.present ? data.name.value : this.name,
+      relationship: data.relationship.present
+          ? data.relationship.value
+          : this.relationship,
+      phone: data.phone.present ? data.phone.value : this.phone,
+      email: data.email.present ? data.email.value : this.email,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MemoryPeopleData(')
+          ..write('id: $id, ')
+          ..write('eventId: $eventId, ')
+          ..write('name: $name, ')
+          ..write('relationship: $relationship, ')
+          ..write('phone: $phone, ')
+          ..write('email: $email')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, eventId, name, relationship, phone, email);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MemoryPeopleData &&
+          other.id == this.id &&
+          other.eventId == this.eventId &&
+          other.name == this.name &&
+          other.relationship == this.relationship &&
+          other.phone == this.phone &&
+          other.email == this.email);
+}
+
+class MemoryPeopleCompanion extends UpdateCompanion<MemoryPeopleData> {
+  final Value<String> id;
+  final Value<String> eventId;
+  final Value<String> name;
+  final Value<String> relationship;
+  final Value<String?> phone;
+  final Value<String?> email;
+  final Value<int> rowid;
+  const MemoryPeopleCompanion({
+    this.id = const Value.absent(),
+    this.eventId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.relationship = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.email = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MemoryPeopleCompanion.insert({
+    required String id,
+    required String eventId,
+    required String name,
+    required String relationship,
+    this.phone = const Value.absent(),
+    this.email = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       eventId = Value(eventId),
+       name = Value(name),
+       relationship = Value(relationship);
+  static Insertable<MemoryPeopleData> custom({
+    Expression<String>? id,
+    Expression<String>? eventId,
+    Expression<String>? name,
+    Expression<String>? relationship,
+    Expression<String>? phone,
+    Expression<String>? email,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (eventId != null) 'event_id': eventId,
+      if (name != null) 'name': name,
+      if (relationship != null) 'relationship': relationship,
+      if (phone != null) 'phone': phone,
+      if (email != null) 'email': email,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MemoryPeopleCompanion copyWith({
+    Value<String>? id,
+    Value<String>? eventId,
+    Value<String>? name,
+    Value<String>? relationship,
+    Value<String?>? phone,
+    Value<String?>? email,
+    Value<int>? rowid,
+  }) {
+    return MemoryPeopleCompanion(
+      id: id ?? this.id,
+      eventId: eventId ?? this.eventId,
+      name: name ?? this.name,
+      relationship: relationship ?? this.relationship,
+      phone: phone ?? this.phone,
+      email: email ?? this.email,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (eventId.present) {
+      map['event_id'] = Variable<String>(eventId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (relationship.present) {
+      map['relationship'] = Variable<String>(relationship.value);
+    }
+    if (phone.present) {
+      map['phone'] = Variable<String>(phone.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MemoryPeopleCompanion(')
+          ..write('id: $id, ')
+          ..write('eventId: $eventId, ')
+          ..write('name: $name, ')
+          ..write('relationship: $relationship, ')
+          ..write('phone: $phone, ')
+          ..write('email: $email, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $WallItemsTable extends WallItems
     with TableInfo<$WallItemsTable, WallItem> {
   @override
@@ -2258,6 +2670,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MemoryPhotosTable memoryPhotos = $MemoryPhotosTable(this);
   late final $MemoryConnectionsTable memoryConnections =
       $MemoryConnectionsTable(this);
+  late final $MemoryPeopleTable memoryPeople = $MemoryPeopleTable(this);
   late final $WallItemsTable wallItems = $WallItemsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -2267,6 +2680,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     memoryEvents,
     memoryPhotos,
     memoryConnections,
+    memoryPeople,
     wallItems,
   ];
 }
@@ -3168,6 +3582,227 @@ typedef $$MemoryConnectionsTableProcessedTableManager =
       MemoryConnection,
       PrefetchHooks Function()
     >;
+typedef $$MemoryPeopleTableCreateCompanionBuilder =
+    MemoryPeopleCompanion Function({
+      required String id,
+      required String eventId,
+      required String name,
+      required String relationship,
+      Value<String?> phone,
+      Value<String?> email,
+      Value<int> rowid,
+    });
+typedef $$MemoryPeopleTableUpdateCompanionBuilder =
+    MemoryPeopleCompanion Function({
+      Value<String> id,
+      Value<String> eventId,
+      Value<String> name,
+      Value<String> relationship,
+      Value<String?> phone,
+      Value<String?> email,
+      Value<int> rowid,
+    });
+
+class $$MemoryPeopleTableFilterComposer
+    extends Composer<_$AppDatabase, $MemoryPeopleTable> {
+  $$MemoryPeopleTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventId => $composableBuilder(
+    column: $table.eventId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get relationship => $composableBuilder(
+    column: $table.relationship,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MemoryPeopleTableOrderingComposer
+    extends Composer<_$AppDatabase, $MemoryPeopleTable> {
+  $$MemoryPeopleTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get eventId => $composableBuilder(
+    column: $table.eventId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get relationship => $composableBuilder(
+    column: $table.relationship,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MemoryPeopleTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MemoryPeopleTable> {
+  $$MemoryPeopleTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get eventId =>
+      $composableBuilder(column: $table.eventId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get relationship => $composableBuilder(
+    column: $table.relationship,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get phone =>
+      $composableBuilder(column: $table.phone, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+}
+
+class $$MemoryPeopleTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MemoryPeopleTable,
+          MemoryPeopleData,
+          $$MemoryPeopleTableFilterComposer,
+          $$MemoryPeopleTableOrderingComposer,
+          $$MemoryPeopleTableAnnotationComposer,
+          $$MemoryPeopleTableCreateCompanionBuilder,
+          $$MemoryPeopleTableUpdateCompanionBuilder,
+          (
+            MemoryPeopleData,
+            BaseReferences<_$AppDatabase, $MemoryPeopleTable, MemoryPeopleData>,
+          ),
+          MemoryPeopleData,
+          PrefetchHooks Function()
+        > {
+  $$MemoryPeopleTableTableManager(_$AppDatabase db, $MemoryPeopleTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MemoryPeopleTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MemoryPeopleTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MemoryPeopleTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> eventId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> relationship = const Value.absent(),
+                Value<String?> phone = const Value.absent(),
+                Value<String?> email = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MemoryPeopleCompanion(
+                id: id,
+                eventId: eventId,
+                name: name,
+                relationship: relationship,
+                phone: phone,
+                email: email,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String eventId,
+                required String name,
+                required String relationship,
+                Value<String?> phone = const Value.absent(),
+                Value<String?> email = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MemoryPeopleCompanion.insert(
+                id: id,
+                eventId: eventId,
+                name: name,
+                relationship: relationship,
+                phone: phone,
+                email: email,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MemoryPeopleTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MemoryPeopleTable,
+      MemoryPeopleData,
+      $$MemoryPeopleTableFilterComposer,
+      $$MemoryPeopleTableOrderingComposer,
+      $$MemoryPeopleTableAnnotationComposer,
+      $$MemoryPeopleTableCreateCompanionBuilder,
+      $$MemoryPeopleTableUpdateCompanionBuilder,
+      (
+        MemoryPeopleData,
+        BaseReferences<_$AppDatabase, $MemoryPeopleTable, MemoryPeopleData>,
+      ),
+      MemoryPeopleData,
+      PrefetchHooks Function()
+    >;
 typedef $$WallItemsTableCreateCompanionBuilder =
     WallItemsCompanion Function({
       required String id,
@@ -3412,6 +4047,8 @@ class $AppDatabaseManager {
       $$MemoryPhotosTableTableManager(_db, _db.memoryPhotos);
   $$MemoryConnectionsTableTableManager get memoryConnections =>
       $$MemoryConnectionsTableTableManager(_db, _db.memoryConnections);
+  $$MemoryPeopleTableTableManager get memoryPeople =>
+      $$MemoryPeopleTableTableManager(_db, _db.memoryPeople);
   $$WallItemsTableTableManager get wallItems =>
       $$WallItemsTableTableManager(_db, _db.wallItems);
 }
