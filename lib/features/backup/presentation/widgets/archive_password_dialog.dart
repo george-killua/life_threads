@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 
 enum ArchivePasswordPurpose { export, import }
 
@@ -15,18 +16,19 @@ Future<String?> showArchivePasswordDialog(
     context: context,
     builder: (context) => StatefulBuilder(
       builder: (context, setState) {
+        final l10n = context.l10n;
         final isExport = purpose == ArchivePasswordPurpose.export;
         return AlertDialog(
-          title: Text(isExport ? 'Export Premium Archive' : 'Import Archive'),
+          title: Text(
+            isExport ? l10n.exportPremiumArchiveTitle : l10n.importArchiveTitle,
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isExport
-                      ? 'Add a password to encrypt the archive. Leave empty for a normal local zip.'
-                      : 'If this archive is encrypted, enter its password. Leave empty for older or unprotected backups.',
+                  isExport ? l10n.archiveExportBody : l10n.archiveImportBody,
                 ),
                 const SizedBox(height: 14),
                 TextField(
@@ -34,8 +36,8 @@ Future<String?> showArchivePasswordDialog(
                   obscureText: obscure,
                   decoration: InputDecoration(
                     labelText: isExport
-                        ? 'Archive password (optional)'
-                        : 'Archive password',
+                        ? l10n.archivePasswordOptional
+                        : l10n.archivePasswordLabel,
                     suffixIcon: IconButton(
                       onPressed: () => setState(() => obscure = !obscure),
                       icon: Icon(
@@ -48,9 +50,9 @@ Future<String?> showArchivePasswordDialog(
                 ),
                 if (isExport) ...[
                   const SizedBox(height: 10),
-                  const Text(
-                    'Keep the password somewhere safe. It cannot be recovered if you lose it.',
-                    style: TextStyle(
+                  Text(
+                    l10n.archivePasswordWarning,
+                    style: const TextStyle(
                       color: AppColors.muted,
                       fontSize: 12,
                       height: 1.35,
@@ -64,7 +66,7 @@ Future<String?> showArchivePasswordDialog(
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             FilledButton.icon(
               onPressed: () => Navigator.of(context).pop(controller.text),
@@ -73,7 +75,7 @@ Future<String?> showArchivePasswordDialog(
                     ? Icons.enhanced_encryption_rounded
                     : Icons.restore_rounded,
               ),
-              label: Text(isExport ? 'Export' : 'Choose Archive'),
+              label: Text(isExport ? l10n.exportAction : l10n.chooseArchive),
             ),
           ],
         );

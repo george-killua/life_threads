@@ -16,6 +16,12 @@ void main() {
         isTrue,
       );
       expect(
+        service.isShareLink(
+          Uri.parse('https://lifethreads.gkcoding.dev/share/share-id'),
+        ),
+        isTrue,
+      );
+      expect(
         service.isShareLink(Uri.parse('https://gkcoding.dev/contact')),
         isFalse,
       );
@@ -29,6 +35,14 @@ void main() {
             )
             .toString(),
         'https://gkcoding.dev/api/lifethreads/share/share-id/download',
+      );
+      expect(
+        service
+            .downloadUriFor(
+              Uri.parse('https://lifethreads.gkcoding.dev/share/share-id'),
+            )
+            .toString(),
+        'https://lifethreads.gkcoding.dev/api/share/share-id/download',
       );
     });
 

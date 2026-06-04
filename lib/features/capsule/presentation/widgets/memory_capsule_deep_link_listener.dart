@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/router/app_router.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../features/backup/domain/backup_models.dart';
 import '../../../../features/backup/presentation/widgets/archive_feedback.dart';
 import '../../../../features/capsule/data/memory_capsule_service.dart';
@@ -170,18 +171,18 @@ class _SharedMemoryProgressDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      content: const Row(
+      content: Row(
         children: [
-          SizedBox(
+          const SizedBox(
             width: 24,
             height: 24,
             child: CircularProgressIndicator(strokeWidth: 3),
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             child: Text(
-              'Opening shared memory...',
-              style: TextStyle(
+              context.l10n.openingSharedMemory,
+              style: const TextStyle(
                 color: AppColors.text,
                 fontWeight: FontWeight.w800,
               ),

@@ -9,17 +9,22 @@ import 'package:photo_manager/photo_manager.dart' hide LatLng;
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 import '../../../backup/data/backup_service.dart';
 import '../../../backup/domain/backup_models.dart';
 import '../../../backup/presentation/widgets/archive_feedback.dart';
 import '../../../backup/presentation/widgets/archive_password_dialog.dart';
+import '../../../display/data/wall_display_service.dart';
+import '../../../display/presentation/pages/wall_display_scanner_page.dart';
 import '../../../map/presentation/widgets/lifethreads_map_provider.dart';
 import '../../../media/data/photo_library_service.dart';
 import '../../../memories/data/memory_repository.dart';
+import '../../../memories/presentation/memory_l10n.dart';
 import '../../../memories/domain/memory_category.dart';
 import '../../../memories/domain/memory_event.dart';
 import '../../../memories/domain/memory_feeling.dart';
 import '../../../memories/domain/memory_type.dart';
+import '../../../onboarding/presentation/widgets/lifethreads_tutorial.dart';
 import '../../../premium/data/premium_entitlement_controller.dart';
 import '../../../premium/domain/premium_entitlement.dart';
 import '../../domain/wall_attachment_layout.dart';
@@ -97,13 +102,25 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
               ).map(_withPendingMemory).toList();
               final displayWallItems = _displayWallItems(state, filteredEvents);
               final anchors = _buildAnchors(filteredEvents, displayWallItems);
+              final textNoteIds = {
+                for (final item in displayWallItems)
+                  if (item.type == WallItemType.text) item.id,
+              };
               final visibleConnections = state.connections
                   .where(
                     (connection) =>
                         anchors.containsKey(connection.fromEventId) &&
-                        anchors.containsKey(connection.toEventId),
+                        anchors.containsKey(connection.toEventId) &&
+                        !textNoteIds.contains(connection.fromEventId) &&
+                        !textNoteIds.contains(connection.toEventId),
                   )
                   .toList();
+              final connectedMemoryIds = {
+                for (final connection in visibleConnections) ...[
+                  connection.fromEventId,
+                  connection.toEventId,
+                ],
+              };
               final hasWallContent =
                   state.events.isNotEmpty || state.wallItems.isNotEmpty;
               final canCreateMemory =
@@ -129,6 +146,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                     if (!hasWallContent)
                       WallEmptyState(
                         onAdd: () => _pushRoute(RouteNames.addMemory),
+                        onQuickPhoto: () => _guardMemoryCreation(
+                          canCreateMemory,
+                          () => _createQuickPhotoMemory(context, repository),
+                        ),
                       )
                     else if (_mode == _WallViewMode.wall)
                       Positioned.fill(
@@ -170,9 +191,6 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                           windValue: _windController.value,
                                           isDragging:
                                               _draggingNodeId == item.id,
-                                          isAttached:
-                                              _attachedMemoryId(item, state) !=
-                                              null,
                                           onLongPress: () => _showTextMenu(
                                             context,
                                             state,
@@ -183,11 +201,6 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                             repository,
                                             item,
                                           ),
-                                          onAttach: () => _showTextAttachments(
-                                            context,
-                                            state,
-                                            item,
-                                          ),
                                           onPointerDown: _lockWallGestures,
                                           onPointerUp: _unlockWallGestures,
                                           onDragStart: () => _startDrag(
@@ -196,8 +209,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                             _DragTargetKind.wallItem,
                                           ),
                                           onDragUpdate: _updateDrag,
-                                          onDragEnd: () =>
-                                              _endDrag(repository, state),
+                                          onDragEnd: () => _endDrag(repository),
                                         ),
                                         WallItemType.nail => WallNailWidget(
                                           item: item,
@@ -216,8 +228,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                             _DragTargetKind.wallItem,
                                           ),
                                           onDragUpdate: _updateDrag,
-                                          onDragEnd: () =>
-                                              _endDrag(repository, state),
+                                          onDragEnd: () => _endDrag(repository),
                                         ),
                                       },
                                     for (final event in filteredEvents)
@@ -225,6 +236,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                         event: event,
                                         windValue: _windController.value,
                                         isDragging: _draggingNodeId == event.id,
+                                        hasConnection: connectedMemoryIds
+                                            .contains(event.id),
                                         onTap: () =>
                                             _pushRoute('/memories/${event.id}'),
                                         onLongPress: () =>
@@ -243,33 +256,19 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                           _DragTargetKind.memory,
                                         ),
                                         onDragUpdate: _updateDrag,
-                                        onDragEnd: () =>
-                                            _endDrag(repository, state),
+                                        onDragEnd: () => _endDrag(repository),
                                       ),
                                     if (filteredEvents.isEmpty &&
                                         state.events.isNotEmpty)
                                       Center(
                                         child: Text(
-                                          'No ${_filter.label.toLowerCase()} memories yet.',
+                                          context.l10n.noMemoriesFilter,
                                           style: const TextStyle(
                                             color: AppColors.muted,
                                             fontWeight: FontWeight.w700,
                                           ),
                                         ),
                                       ),
-                                    Positioned.fill(
-                                      child: IgnorePointer(
-                                        child: CustomPaint(
-                                          painter: RopePainter(
-                                            anchors: anchors,
-                                            connections: visibleConnections,
-                                            windValue: _windController.value,
-                                            activeNodeId: _draggingNodeId,
-                                            paintAnchors: true,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
                                   ],
                                 );
                               },
@@ -325,6 +324,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                     _exportBackup(context, state),
                                 onImportBackup: () =>
                                     _importBackup(context, repository),
+                                onDisplayWall: () =>
+                                    _displayWall(context, state),
+                                onShowTutorial: () =>
+                                    showLifeThreadsTutorialSheet(context),
                                 onOpenSettings: () =>
                                     _pushRoute(RouteNames.settings),
                                 onCollapse: () =>
@@ -363,22 +366,62 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                           onClear: () => _clearDemoWall(context, repository),
                         ),
                       ),
-                    Positioned(
-                      right: 20,
-                      bottom: 24,
-                      child: ExpandableAddButton(
-                        onAddEvent: () => _guardMemoryCreation(
-                          canCreateMemory,
-                          () => _pushRoute(RouteNames.addMemory),
+                    if (hasWallContent && !_controlsExpanded)
+                      Positioned(
+                        left: 20,
+                        right: 20,
+                        bottom: 24,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Expanded(
+                              child: _MemoryRitualCard(
+                                event: _memoryToRevisit(state.events),
+                                onSave: () => _guardMemoryCreation(
+                                  canCreateMemory,
+                                  () => _pushRoute(RouteNames.addMemory),
+                                ),
+                                onOpen: (event) =>
+                                    _pushRoute('/memories/${event.id}'),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            ExpandableAddButton(
+                              onAddEvent: () => _guardMemoryCreation(
+                                canCreateMemory,
+                                () => _pushRoute(RouteNames.addMemory),
+                              ),
+                              onAddQuickPhoto: () => _guardMemoryCreation(
+                                canCreateMemory,
+                                () => _createQuickPhotoMemory(
+                                  context,
+                                  repository,
+                                ),
+                              ),
+                              onAddText: () =>
+                                  _createTextNote(context, repository),
+                              onAddNail: () => _createNail(context, repository),
+                            ),
+                          ],
                         ),
-                        onAddQuickPhoto: () => _guardMemoryCreation(
-                          canCreateMemory,
-                          () => _createQuickPhotoMemory(context, repository),
+                      )
+                    else
+                      Positioned(
+                        right: 20,
+                        bottom: 24,
+                        child: ExpandableAddButton(
+                          onAddEvent: () => _guardMemoryCreation(
+                            canCreateMemory,
+                            () => _pushRoute(RouteNames.addMemory),
+                          ),
+                          onAddQuickPhoto: () => _guardMemoryCreation(
+                            canCreateMemory,
+                            () => _createQuickPhotoMemory(context, repository),
+                          ),
+                          onAddText: () => _createTextNote(context, repository),
+                          onAddNail: () => _createNail(context, repository),
                         ),
-                        onAddText: () => _createTextNote(context, repository),
-                        onAddNail: () => _createNail(context, repository),
                       ),
-                    ),
                   ],
                 ),
               );
@@ -414,35 +457,21 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     );
   }
 
-  Offset _absoluteTextPosition(WallItem item, MemoryState state) {
-    return WallAttachmentLayout.absoluteTextPosition(
-      item: item,
-      wallItems: state.wallItems,
-      events: state.events,
-      connections: state.connections,
-    );
+  MemoryEvent? _memoryToRevisit(List<MemoryEvent> events) {
+    if (events.isEmpty) return null;
+    final sorted = [...events]
+      ..sort((first, second) => first.occurredAt.compareTo(second.occurredAt));
+    final today = DateTime.now();
+    for (final event in sorted) {
+      if (!_sameDate(event.occurredAt, today)) return event;
+    }
+    return sorted.first;
   }
 
-  Offset _nextAttachmentOffset({
-    required MemoryState state,
-    required MemoryEvent event,
-    required WallItem item,
-  }) {
-    return WallAttachmentLayout.nextAttachmentOffset(
-      wallItems: state.wallItems,
-      events: state.events,
-      connections: state.connections,
-      event: event,
-      item: item,
-    );
-  }
-
-  String? _attachedMemoryId(WallItem item, MemoryState state) {
-    return WallAttachmentLayout.attachedMemoryIdFor(
-      item: item,
-      events: state.events,
-      connections: state.connections,
-    );
+  bool _sameDate(DateTime first, DateTime second) {
+    return first.year == second.year &&
+        first.month == second.month &&
+        first.day == second.day;
   }
 
   WallItem _sourceWallItem(WallItem item, MemoryState state) {
@@ -505,7 +534,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     setState(() => _pendingDragPosition = current + delta / scale);
   }
 
-  Future<void> _endDrag(MemoryRepository repository, MemoryState state) async {
+  Future<void> _endDrag(MemoryRepository repository) async {
     final nodeId = _draggingNodeId;
     final position = _pendingDragPosition;
     final kind = _draggingKind;
@@ -521,26 +550,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
         _manualLayoutOverrides[nodeId] = position;
         await repository.moveMemory(nodeId, position);
       case _DragTargetKind.wallItem:
-        final item = state.wallItems
-            .where((item) => item.id == nodeId)
-            .firstOrNull;
-        final attachedMemoryId = item == null
-            ? null
-            : _attachedMemoryId(item, state);
-        final attachedMemory = attachedMemoryId == null
-            ? null
-            : state.findEvent(attachedMemoryId);
-        await repository.moveWallItem(
-          nodeId,
-          attachedMemory == null
-              ? position
-              : _clampAttachmentOffset(position - attachedMemory.wallPosition),
-        );
+        await repository.moveWallItem(nodeId, position);
     }
-  }
-
-  Offset _clampAttachmentOffset(Offset offset) {
-    return WallAttachmentLayout.clampAttachmentOffset(offset);
   }
 
   Offset _defaultDropPosition(BuildContext context) {
@@ -608,10 +619,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   ) async {
     final text = await showDialog<String>(
       context: context,
-      builder: (_) => const _TextNoteDialog(
-        title: 'Add text to wall',
-        actionLabel: 'Add Text',
-        hintText: 'Write a small memory, quote, or note...',
+      builder: (_) => _TextNoteDialog(
+        title: context.l10n.addTextToWall,
+        actionLabel: context.l10n.addTextAction,
+        hintText: context.l10n.textNoteHint,
       ),
     );
 
@@ -619,7 +630,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     if (!context.mounted || trimmed == null || trimmed.isEmpty) return;
     final position = await _previewPlacement(
       context,
-      title: 'Place text note',
+      title: context.l10n.placeTextNote,
       subtitle: trimmed,
       icon: Icons.sticky_note_2_rounded,
       color: AppColors.cardDark,
@@ -635,8 +646,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   ) async {
     final position = await _previewPlacement(
       context,
-      title: 'Place rope anchor',
-      subtitle: 'A nail can connect ropes manually between memories.',
+      title: context.l10n.placeRopeAnchor,
+      subtitle: context.l10n.nailSubtitle,
       icon: Icons.push_pin_rounded,
       color: AppColors.gold,
       initialPosition: _defaultDropPosition(context),
@@ -655,9 +666,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     if (!context.mounted) return;
 
     if (!permission.hasAccess) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Photo access is needed first.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.photoAccessNeeded)));
       await service.openSettings();
       return;
     }
@@ -675,13 +686,14 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     final picked = await service.copyAssetToAppStorage(asset);
     if (!context.mounted || picked == null) return;
 
-    final title = _cleanPhotoTitle(picked.title) ?? 'Quick photo memory';
+    final title =
+        _cleanPhotoTitle(picked.title) ?? context.l10n.quickPhotoMemory;
     final locationLabel = picked.hasLocation
         ? '${picked.latitude!.toStringAsFixed(5)}, ${picked.longitude!.toStringAsFixed(5)}'
-        : 'Unknown place';
+        : '';
     final position = await _previewPlacement(
       context,
-      title: 'Hang quick photo',
+      title: context.l10n.hangQuickPhoto,
       subtitle: title,
       icon: Icons.add_photo_alternate_rounded,
       color: AppColors.gold,
@@ -692,8 +704,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     await repository.addMemory(
       NewMemoryDraft(
         title: title,
-        description:
-            'A quick photo memory added from the wall. Edit it later to add the full story.',
+        description: context.l10n.quickPhotoDescription,
         category: MemoryCategory.personal,
         memoryType: MemoryType.moment,
         feeling: MemoryFeeling.warm,
@@ -725,18 +736,16 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Clear demo wall?'),
-        content: const Text(
-          'This removes the sample memories so you can start with an empty private wall.',
-        ),
+        title: Text(context.l10n.clearDemoWallQuestion),
+        content: Text(context.l10n.clearDemoWallBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Start fresh'),
+            child: Text(context.l10n.startFresh),
           ),
         ],
       ),
@@ -767,9 +776,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       await shareExportedArchive(context, result);
     } catch (error) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Export failed: $error')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.exportFailed('$error'))),
+      );
     }
   }
 
@@ -780,18 +789,16 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Import backup?'),
-        content: const Text(
-          'This restores memories from a LifeThreads archive and keeps your current wall.',
-        ),
+        title: Text(context.l10n.importBackupQuestion),
+        content: Text(context.l10n.importBackupBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Choose Backup'),
+            child: Text(context.l10n.chooseBackup),
           ),
         ],
       ),
@@ -815,13 +822,96 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     } on BackupValidationException catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Import rejected: ${error.message}')),
+        SnackBar(content: Text(context.l10n.importRejected(error.message))),
       );
     } catch (error) {
       if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.importFailed('$error'))),
+      );
+    }
+  }
+
+  Future<void> _displayWall(BuildContext context, MemoryState state) async {
+    final l10n = context.l10n;
+
+    if (state.events.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Import failed: $error')));
+      ).showSnackBar(SnackBar(content: Text(l10n.addMemoryBeforeDisplay)));
+      return;
+    }
+
+    final scanUri = await showWallDisplayScanner(context);
+    if (!context.mounted || scanUri == null) return;
+
+    final service = ref.read(wallDisplayServiceProvider);
+    if (!service.isDisplayScanLink(scanUri)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.notLifeThreadsDisplayQr)));
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(l10n.displayWallQuestion),
+        content: Text(l10n.displayWallBody(state.events.length)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.of(context).pop(true),
+            icon: const Icon(Icons.desktop_windows_rounded),
+            label: Text(l10n.displayAction),
+          ),
+        ],
+      ),
+    );
+    if (!context.mounted || confirmed != true) return;
+
+    var progressVisible = false;
+    try {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const _WallDisplayProgressDialog(),
+      );
+      progressVisible = true;
+
+      final result = await service.publishSnapshot(
+        scanUri: scanUri,
+        state: state,
+      );
+      if (!context.mounted) return;
+      if (progressVisible) {
+        Navigator.of(context, rootNavigator: true).pop();
+        progressVisible = false;
+      }
+      final expires = result.expiresAt == null
+          ? l10n.soon
+          : '${result.expiresAt!.hour.toString().padLeft(2, '0')}:${result.expiresAt!.minute.toString().padLeft(2, '0')}';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.wallDisplayLive(result.memoryCount, expires)),
+        ),
+      );
+    } on WallDisplayException catch (error) {
+      if (context.mounted && progressVisible) {
+        Navigator.of(context, rootNavigator: true).pop();
+        progressVisible = false;
+      }
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.message)));
+    } finally {
+      if (context.mounted && progressVisible) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
     }
   }
 
@@ -906,17 +996,17 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
           children: [
             ListTile(
               leading: const Icon(Icons.open_in_new_rounded),
-              title: const Text('Open'),
+              title: Text(context.l10n.open),
               onTap: () => Navigator.of(context).pop(_MemoryAction.open),
             ),
             ListTile(
               leading: const Icon(Icons.edit_rounded),
-              title: const Text('Edit'),
+              title: Text(context.l10n.edit),
               onTap: () => Navigator.of(context).pop(_MemoryAction.edit),
             ),
             ListTile(
               leading: const Icon(Icons.hub_rounded),
-              title: const Text('Connect'),
+              title: Text(context.l10n.connect),
               onTap: () => Navigator.of(context).pop(_MemoryAction.connect),
             ),
             ListTile(
@@ -924,9 +1014,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                 Icons.delete_outline_rounded,
                 color: Colors.redAccent,
               ),
-              title: const Text(
-                'Delete',
-                style: TextStyle(color: Colors.redAccent),
+              title: Text(
+                context.l10n.delete,
+                style: const TextStyle(color: Colors.redAccent),
               ),
               onTap: () => Navigator.of(context).pop(_MemoryAction.delete),
             ),
@@ -948,18 +1038,16 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
         final confirmed = await showDialog<bool>(
           context: context,
           builder: (_) => AlertDialog(
-            title: const Text('Delete memory?'),
-            content: const Text(
-              'This removes the memory and all its wall links.',
-            ),
+            title: Text(context.l10n.deleteMemoryQuestion),
+            content: Text(context.l10n.deleteMemoryBody),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
+                child: Text(context.l10n.cancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Delete'),
+                child: Text(context.l10n.delete),
               ),
             ],
           ),
@@ -976,10 +1064,6 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   ) async {
     final repository = ref.read(memoryRepositoryProvider.notifier);
     final sourceItem = _sourceWallItem(item, state);
-    final attachedMemoryId = _attachedMemoryId(sourceItem, state);
-    final attachedMemory = attachedMemoryId == null
-        ? null
-        : state.findEvent(attachedMemoryId);
     final action = await showModalBottomSheet<_TextAction>(
       context: context,
       showDragHandle: true,
@@ -989,31 +1073,17 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
           children: [
             ListTile(
               leading: const Icon(Icons.edit_note_rounded),
-              title: const Text('Edit Text'),
+              title: Text(context.l10n.editTextTitle),
               onTap: () => Navigator.of(context).pop(_TextAction.edit),
-            ),
-            ListTile(
-              leading: const Icon(Icons.link_rounded),
-              title: Text(
-                attachedMemory == null
-                    ? 'Attach to memory'
-                    : 'Change attachment',
-              ),
-              subtitle: Text(
-                attachedMemory == null
-                    ? 'Keep this note stuck to one memory card.'
-                    : 'Currently attached to ${attachedMemory.title}.',
-              ),
-              onTap: () => Navigator.of(context).pop(_TextAction.attach),
             ),
             ListTile(
               leading: const Icon(
                 Icons.delete_outline_rounded,
                 color: Colors.redAccent,
               ),
-              title: const Text(
-                'Delete',
-                style: TextStyle(color: Colors.redAccent),
+              title: Text(
+                context.l10n.delete,
+                style: const TextStyle(color: Colors.redAccent),
               ),
               onTap: () => Navigator.of(context).pop(_TextAction.delete),
             ),
@@ -1027,86 +1097,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     switch (action) {
       case _TextAction.edit:
         await _editTextNote(context, repository, sourceItem);
-      case _TextAction.attach:
-        await _showTextAttachments(context, state, sourceItem);
       case _TextAction.delete:
         await repository.deleteWallItem(sourceItem.id);
     }
-  }
-
-  Future<void> _showTextAttachments(
-    BuildContext context,
-    MemoryState state,
-    WallItem item,
-  ) async {
-    final repository = ref.read(memoryRepositoryProvider.notifier);
-    final sourceItem = _sourceWallItem(item, state);
-    var selectedId = _attachedMemoryId(sourceItem, state);
-
-    await showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setModalState) => SafeArea(
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              const ListTile(
-                title: Text('Attach text to a memory'),
-                subtitle: Text(
-                  'The note will stay pinned to that memory and move with it.',
-                ),
-              ),
-              ListTile(
-                selected: selectedId == null,
-                leading: Icon(
-                  selectedId == null
-                      ? Icons.radio_button_checked_rounded
-                      : Icons.radio_button_unchecked_rounded,
-                ),
-                title: const Text('Free note'),
-                subtitle: const Text('Keep it independent on the wall.'),
-                onTap: () {
-                  setModalState(() => selectedId = null);
-                  final position = _absoluteTextPosition(sourceItem, state);
-                  repository.attachTextNoteToMemory(
-                    textNoteId: sourceItem.id,
-                    memoryId: null,
-                    position: position,
-                  );
-                },
-              ),
-              for (final event in state.events)
-                ListTile(
-                  selected: selectedId == event.id,
-                  leading: Icon(
-                    selectedId == event.id
-                        ? Icons.radio_button_checked_rounded
-                        : Icons.radio_button_unchecked_rounded,
-                  ),
-                  title: Text(event.title),
-                  subtitle: Text(
-                    '${event.category.label} • ${event.locationLabel}',
-                  ),
-                  onTap: () {
-                    setModalState(() => selectedId = event.id);
-                    final offset = _nextAttachmentOffset(
-                      state: state,
-                      event: event,
-                      item: sourceItem,
-                    );
-                    repository.attachTextNoteToMemory(
-                      textNoteId: sourceItem.id,
-                      memoryId: event.id,
-                      position: offset,
-                    );
-                  },
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   Future<void> _editTextNote(
@@ -1117,8 +1110,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     final text = await showDialog<String>(
       context: context,
       builder: (_) => _TextNoteDialog(
-        title: 'Edit text',
-        actionLabel: 'Save',
+        title: context.l10n.editText,
+        actionLabel: context.l10n.save,
         initialText: item.content,
       ),
     );
@@ -1143,8 +1136,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
           children: [
             ListTile(
               leading: const Icon(Icons.cable_rounded),
-              title: const Text('Connect rope'),
-              subtitle: const Text('Attach this nail to memories.'),
+              title: Text(context.l10n.connectRope),
+              subtitle: Text(context.l10n.connectRopeSubtitle),
               onTap: () => Navigator.of(context).pop(_NailAction.connect),
             ),
             ListTile(
@@ -1152,9 +1145,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                 Icons.delete_outline_rounded,
                 color: Colors.redAccent,
               ),
-              title: const Text(
-                'Delete nail',
-                style: TextStyle(color: Colors.redAccent),
+              title: Text(
+                context.l10n.deleteNail,
+                style: const TextStyle(color: Colors.redAccent),
               ),
               onTap: () => Navigator.of(context).pop(_NailAction.delete),
             ),
@@ -1192,15 +1185,15 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
           child: ListView(
             shrinkWrap: true,
             children: [
-              const ListTile(
-                title: Text('Connect nail to memories'),
-                subtitle: Text('Selected memories will hang from this anchor.'),
+              ListTile(
+                title: Text(context.l10n.connectNailTitle),
+                subtitle: Text(context.l10n.connectNailSubtitle),
               ),
               for (final event in state.events)
                 SwitchListTile(
                   value: selectedIds.contains(event.id),
                   title: Text(event.title),
-                  subtitle: Text(event.locationLabel),
+                  subtitle: Text(_eventLocationSubtitle(event)),
                   onChanged: (value) {
                     setModalState(() {
                       if (value) {
@@ -1238,17 +1231,17 @@ class _TimelineView extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.fromLTRB(20, topPadding, 20, 120),
       children: [
-        const _ViewTitle(
+        _ViewTitle(
           icon: Icons.timeline_rounded,
-          title: 'Timeline',
-          subtitle: 'Your memories ordered by time.',
+          title: context.l10n.timelineTitle,
+          subtitle: context.l10n.timelineSubtitle,
         ),
         const SizedBox(height: 18),
         if (sorted.isEmpty)
-          const _EmptyModePanel(
+          _EmptyModePanel(
             icon: Icons.timeline_rounded,
-            title: 'No memories in this filter',
-            subtitle: 'Switch filter or add a memory to build the timeline.',
+            title: context.l10n.noMemoriesFilter,
+            subtitle: context.l10n.noMemoriesFilterBody,
           )
         else
           for (var index = 0; index < sorted.length; index++)
@@ -1367,7 +1360,7 @@ class _TimelineMemoryTile extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${event.memoryType.label} • ${event.feeling.label} • ${event.locationLabel}',
+                              _eventTimelineSubtitle(context, event),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -1407,19 +1400,18 @@ class _MapView extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(20, topPadding, 20, 120),
       child: Column(
         children: [
-          const _ViewTitle(
+          _ViewTitle(
             icon: Icons.map_rounded,
-            title: 'Memory Map',
-            subtitle: 'Your memories grouped by place.',
+            title: context.l10n.memoryMapTitle,
+            subtitle: context.l10n.memoryMapSubtitle,
           ),
           const SizedBox(height: 18),
           if (located.isEmpty)
-            const Expanded(
+            Expanded(
               child: _EmptyModePanel(
                 icon: Icons.location_off_rounded,
-                title: 'No mapped memories yet',
-                subtitle:
-                    'Add photos with location data or enter coordinates to see memories here.',
+                title: context.l10n.noMappedMemories,
+                subtitle: context.l10n.noMappedMemoriesBody,
               ),
             )
           else
@@ -1549,13 +1541,15 @@ class _MapMemoryChip extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontWeight: FontWeight.w900),
                   ),
-                  const SizedBox(height: 3),
-                  Text(
-                    event.locationLabel,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: AppColors.muted),
-                  ),
+                  if (event.hasGeoPoint) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      event.locationDisplayLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: AppColors.muted),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -1673,6 +1667,8 @@ class _WallHeader extends StatelessWidget {
     required this.onLayoutChanged,
     required this.onExportBackup,
     required this.onImportBackup,
+    required this.onDisplayWall,
+    required this.onShowTutorial,
     required this.onOpenSettings,
     required this.onCollapse,
   });
@@ -1685,6 +1681,8 @@ class _WallHeader extends StatelessWidget {
   final ValueChanged<WallLayoutMode> onLayoutChanged;
   final VoidCallback onExportBackup;
   final VoidCallback onImportBackup;
+  final VoidCallback onDisplayWall;
+  final VoidCallback onShowTutorial;
   final VoidCallback onOpenSettings;
   final VoidCallback onCollapse;
 
@@ -1746,7 +1744,7 @@ class _WallHeader extends StatelessWidget {
                           ),
                           const SizedBox(height: 1),
                           Text(
-                            'Your memories, hanging together.',
+                            context.l10n.headerSubtitle,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -1760,25 +1758,37 @@ class _WallHeader extends StatelessWidget {
                       ),
                     ),
                     _HeaderIconButton(
-                      tooltip: 'Import backup',
+                      tooltip: context.l10n.importBackupTooltip,
                       onPressed: onImportBackup,
                       icon: Icons.restore_rounded,
                       color: AppColors.muted,
                     ),
                     _HeaderIconButton(
-                      tooltip: 'Export backup',
+                      tooltip: context.l10n.exportBackupTooltip,
                       onPressed: onExportBackup,
                       icon: Icons.ios_share_rounded,
                       color: AppColors.gold,
                     ),
                     _HeaderIconButton(
-                      tooltip: 'Settings',
+                      tooltip: context.l10n.displayWallTooltip,
+                      onPressed: onDisplayWall,
+                      icon: Icons.qr_code_scanner_rounded,
+                      color: AppColors.amber,
+                    ),
+                    _HeaderIconButton(
+                      tooltip: context.l10n.tutorialTooltip,
+                      onPressed: onShowTutorial,
+                      icon: Icons.help_outline_rounded,
+                      color: AppColors.muted,
+                    ),
+                    _HeaderIconButton(
+                      tooltip: context.l10n.settingsTooltip,
                       onPressed: onOpenSettings,
                       icon: Icons.settings_rounded,
                       color: AppColors.muted,
                     ),
                     _HeaderIconButton(
-                      tooltip: 'Hide controls',
+                      tooltip: context.l10n.hideControlsTooltip,
                       onPressed: onCollapse,
                       icon: Icons.keyboard_arrow_up_rounded,
                       color: AppColors.amber,
@@ -1792,7 +1802,7 @@ class _WallHeader extends StatelessWidget {
                       _WallHeaderPill(
                         selected: selectedMode == mode,
                         icon: mode.icon,
-                        label: mode.label,
+                        label: _wallViewModeLabel(context, mode),
                         onTap: () => onModeChanged(mode),
                       ),
                   ],
@@ -1805,7 +1815,7 @@ class _WallHeader extends StatelessWidget {
                         _WallHeaderPill(
                           selected: selectedLayout == layout,
                           icon: layout.icon,
-                          label: _layoutPillLabel(layout),
+                          label: _layoutPillLabel(context, layout),
                           onTap: () => onLayoutChanged(layout),
                         ),
                     ],
@@ -1820,7 +1830,7 @@ class _WallHeader extends StatelessWidget {
                         icon: selectedFilter == filter
                             ? Icons.check_rounded
                             : null,
-                        label: filter.label,
+                        label: _filterLabel(context, filter),
                         onTap: () => onFilterChanged(filter),
                       ),
                   ],
@@ -1833,12 +1843,29 @@ class _WallHeader extends StatelessWidget {
     );
   }
 
-  String _layoutPillLabel(WallLayoutMode layout) {
+  String _layoutPillLabel(BuildContext context, WallLayoutMode layout) {
     return switch (layout) {
-      WallLayoutMode.freeform => 'Freeform',
-      WallLayoutMode.timeline => 'Timeline',
-      WallLayoutMode.categoryCluster => 'Category',
-      WallLayoutMode.locationCluster => 'Location',
+      WallLayoutMode.freeform => context.l10n.freeformLayout,
+      WallLayoutMode.timeline => context.l10n.timelineTitle,
+      WallLayoutMode.categoryCluster => context.l10n.categoryLayout,
+      WallLayoutMode.locationCluster => context.l10n.locationLayout,
+    };
+  }
+
+  String _wallViewModeLabel(BuildContext context, _WallViewMode mode) {
+    return switch (mode) {
+      _WallViewMode.wall => context.l10n.wallView,
+      _WallViewMode.timeline => context.l10n.timelineView,
+      _WallViewMode.map => context.l10n.mapView,
+    };
+  }
+
+  String _filterLabel(BuildContext context, WallFilter filter) {
+    return switch (filter) {
+      WallFilter.all => context.l10n.wallFilterAll,
+      WallFilter.family => context.l10n.categoryFamily,
+      WallFilter.travel => context.l10n.categoryTravel,
+      WallFilter.personal => context.l10n.categoryPersonal,
     };
   }
 }
@@ -1914,8 +1941,8 @@ class _CollapsedWallControlsButton extends StatelessWidget {
             children: [
               Icon(selectedMode.icon, color: AppColors.amber, size: 18),
               const SizedBox(width: 8),
-              const Text(
-                'Wall Controls',
+              Text(
+                context.l10n.wallControls,
                 style: TextStyle(
                   color: AppColors.card,
                   fontSize: 13.5,
@@ -1937,6 +1964,114 @@ class _CollapsedWallControlsButton extends StatelessWidget {
   }
 }
 
+class _MemoryRitualCard extends StatelessWidget {
+  const _MemoryRitualCard({
+    required this.event,
+    required this.onSave,
+    required this.onOpen,
+  });
+
+  final MemoryEvent? event;
+  final VoidCallback onSave;
+  final ValueChanged<MemoryEvent> onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final memory = event;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.wallInk.withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.gold.withValues(alpha: 0.14)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.28),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(13),
+        child: Row(
+          children: [
+            Icon(
+              memory == null
+                  ? Icons.edit_note_rounded
+                  : Icons.history_edu_rounded,
+              color: AppColors.gold,
+              size: 22,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: InkWell(
+                onTap: memory == null ? onSave : () => onOpen(memory),
+                borderRadius: BorderRadius.circular(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      memory == null
+                          ? context.l10n.saveToday
+                          : context.l10n.rememberThis,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.gold,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      memory == null
+                          ? context.l10n.whatHappenedToday
+                          : memory.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WallDisplayProgressDialog extends StatelessWidget {
+  const _WallDisplayProgressDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Row(
+        children: [
+          const SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 3),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              context.l10n.preparingWallDisplay,
+              style: const TextStyle(fontWeight: FontWeight.w800),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _WallInteractionHint extends StatelessWidget {
   const _WallInteractionHint();
 
@@ -1951,11 +2086,11 @@ class _WallInteractionHint extends StatelessWidget {
             borderRadius: BorderRadius.circular(999),
             border: Border.all(color: AppColors.gold.withValues(alpha: 0.12)),
           ),
-          child: const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Text(
-              'Tap to open • drag to move',
-              style: TextStyle(
+              context.l10n.tapToOpenDrag,
+              style: const TextStyle(
                 color: AppColors.muted,
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
@@ -2085,17 +2220,17 @@ class _DemoWallBanner extends StatelessWidget {
         children: [
           const Icon(Icons.preview_rounded, color: AppColors.gold, size: 20),
           const SizedBox(width: 10),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Demo wall preview. Clear it when you are ready to start fresh.',
-              style: TextStyle(
+              context.l10n.demoWallPreview,
+              style: const TextStyle(
                 color: AppColors.muted,
                 fontWeight: FontWeight.w800,
                 height: 1.25,
               ),
             ),
           ),
-          TextButton(onPressed: onClear, child: const Text('Clear demo')),
+          TextButton(onPressed: onClear, child: Text(context.l10n.clearDemo)),
         ],
       ),
     );
@@ -2215,9 +2350,9 @@ class _PlacementPreviewSheetState extends State<_PlacementPreviewSheet> {
                 );
 
                 if (constraints.maxWidth < 520) {
-                  return controls.compact();
+                  return controls.compact(context);
                 }
-                return controls.wide();
+                return controls.wide(context);
               },
             ),
           ],
@@ -2313,7 +2448,7 @@ class _PlacementControls {
   final VoidCallback onCancel;
   final VoidCallback onPlace;
 
-  Widget compact() {
+  Widget compact(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -2322,13 +2457,13 @@ class _PlacementControls {
           child: _moveRow(),
         ),
         const SizedBox(height: 10),
-        Align(alignment: Alignment.centerRight, child: _actionRow()),
+        Align(alignment: Alignment.centerRight, child: _actionRow(context)),
       ],
     );
   }
 
-  Widget wide() {
-    return Row(children: [_moveRow(), const Spacer(), _actionRow()]);
+  Widget wide(BuildContext context) {
+    return Row(children: [_moveRow(), const Spacer(), _actionRow(context)]);
   }
 
   Widget _moveRow() {
@@ -2355,16 +2490,16 @@ class _PlacementControls {
     );
   }
 
-  Widget _actionRow() {
+  Widget _actionRow(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        TextButton(onPressed: onCancel, child: const Text('Cancel')),
+        TextButton(onPressed: onCancel, child: Text(context.l10n.cancel)),
         const SizedBox(width: 8),
         FilledButton.icon(
           onPressed: onPlace,
           icon: const Icon(Icons.check_rounded),
-          label: const Text('Place here'),
+          label: Text(context.l10n.placeHere),
         ),
       ],
     );
@@ -2415,16 +2550,22 @@ class _QuickPhotoPickerSheet extends StatelessWidget {
       height: MediaQuery.sizeOf(context).height * 0.78,
       child: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(18, 0, 18, 12),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
             child: Row(
               children: [
-                Icon(Icons.add_photo_alternate_rounded, color: AppColors.gold),
-                SizedBox(width: 10),
+                const Icon(
+                  Icons.add_photo_alternate_rounded,
+                  color: AppColors.gold,
+                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Choose quick photo',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                    context.l10n.chooseQuickPhoto,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                 ),
               ],
@@ -2432,7 +2573,7 @@ class _QuickPhotoPickerSheet extends StatelessWidget {
           ),
           Expanded(
             child: assets.isEmpty
-                ? const Center(child: Text('No photos found.'))
+                ? Center(child: Text(context.l10n.noPhotosFound))
                 : GridView.builder(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                     gridDelegate:
@@ -2531,7 +2672,7 @@ class _TextNoteDialogState extends State<_TextNoteDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(_controller.text),
@@ -2543,13 +2684,12 @@ class _TextNoteDialogState extends State<_TextNoteDialog> {
 }
 
 enum _WallViewMode {
-  wall('Wall', Icons.dashboard_customize_rounded),
-  timeline('Timeline', Icons.timeline_rounded),
-  map('Map', Icons.map_rounded);
+  wall(Icons.dashboard_customize_rounded),
+  timeline(Icons.timeline_rounded),
+  map(Icons.map_rounded);
 
-  const _WallViewMode(this.label, this.icon);
+  const _WallViewMode(this.icon);
 
-  final String label;
   final IconData icon;
 }
 
@@ -2557,7 +2697,7 @@ enum _DragTargetKind { memory, wallItem }
 
 enum _MemoryAction { open, edit, connect, delete }
 
-enum _TextAction { edit, attach, delete }
+enum _TextAction { edit, delete }
 
 enum _NailAction { connect, delete }
 
@@ -2577,6 +2717,20 @@ String _formatTimelineDate(DateTime date) {
     'Dec',
   ];
   return '${months[date.month - 1]} ${date.day}, ${date.year}';
+}
+
+String _eventLocationSubtitle(MemoryEvent event) {
+  if (event.hasGeoPoint) return event.locationDisplayLabel;
+  return _formatTimelineDate(event.occurredAt);
+}
+
+String _eventTimelineSubtitle(BuildContext context, MemoryEvent event) {
+  final l10n = context.l10n;
+  return [
+    event.memoryType.localizedLabel(l10n),
+    event.feeling.localizedLabel(l10n),
+    if (event.hasGeoPoint) event.locationDisplayLabel,
+  ].join(' • ');
 }
 
 void _pushIfCurrent(BuildContext context, String location) {

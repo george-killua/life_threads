@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 
 class WallEmptyState extends StatelessWidget {
-  const WallEmptyState({super.key, required this.onAdd});
+  const WallEmptyState({
+    super.key,
+    required this.onAdd,
+    required this.onQuickPhoto,
+  });
 
   final VoidCallback onAdd;
+  final VoidCallback onQuickPhoto;
 
   @override
   Widget build(BuildContext context) {
@@ -43,22 +49,28 @@ class WallEmptyState extends StatelessWidget {
               size: 46,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Enter your memory room',
+            Text(
+              context.l10n.startWithOneThing,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900),
+              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 10),
-            const Text(
-              'Add a first memory, then connect it to the next one. The wall becomes richer as your moments grow.',
+            Text(
+              context.l10n.emptyWallBody,
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.muted, height: 1.45),
+              style: const TextStyle(color: AppColors.muted, height: 1.45),
             ),
             const SizedBox(height: 22),
             FilledButton.icon(
               onPressed: onAdd,
               icon: const Icon(Icons.add_rounded),
-              label: const Text('Add first memory'),
+              label: Text(context.l10n.saveMomentTitle),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: onQuickPhoto,
+              icon: const Icon(Icons.add_photo_alternate_rounded),
+              label: Text(context.l10n.usePhoto),
             ),
           ],
         ),

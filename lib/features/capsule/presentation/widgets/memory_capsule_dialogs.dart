@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 import '../../domain/memory_capsule_models.dart';
 
 enum MemoryCapsulePasswordPurpose { export, import }
@@ -19,18 +20,19 @@ Future<String?> showMemoryCapsulePasswordDialog(
     context: context,
     builder: (context) => StatefulBuilder(
       builder: (context, setState) {
+        final l10n = context.l10n;
         final isExport = purpose == MemoryCapsulePasswordPurpose.export;
         final isSecureShare = isExport && requirePassword;
         final isRequiredImport = !isExport && requirePassword;
         return AlertDialog(
           title: Text(
             isSecureShare
-                ? 'Share Encrypted Capsule'
+                ? l10n.shareEncryptedCapsuleTitle
                 : isRequiredImport
-                ? 'Open Shared Capsule'
+                ? l10n.openSharedCapsuleTitle
                 : isExport
-                ? 'Export Memory Capsule'
-                : 'Import Capsule',
+                ? l10n.exportMemoryCapsuleTitle
+                : l10n.importCapsuleDialogTitle,
           ),
           content: SingleChildScrollView(
             child: Column(
@@ -39,12 +41,12 @@ Future<String?> showMemoryCapsulePasswordDialog(
               children: [
                 Text(
                   isSecureShare
-                      ? 'Create a password before uploading this capsule. Send the password separately to the person receiving it.'
+                      ? l10n.secureSharePasswordBody
                       : isRequiredImport
-                      ? 'Enter the password you received for this shared memory.'
+                      ? l10n.sharedCapsulePasswordBody
                       : isExport
-                      ? 'Add a password if this memory should be protected before you send it. Leave empty for a normal capsule.'
-                      : 'If this capsule has a password, enter it. Otherwise leave empty.',
+                      ? l10n.capsuleExportBody
+                      : l10n.capsuleImportBody,
                 ),
                 const SizedBox(height: 14),
                 TextField(
@@ -52,12 +54,12 @@ Future<String?> showMemoryCapsulePasswordDialog(
                   obscureText: obscure,
                   decoration: InputDecoration(
                     labelText: isSecureShare
-                        ? 'Capsule password'
+                        ? l10n.capsulePasswordLabel
                         : isRequiredImport
-                        ? 'Shared capsule password'
+                        ? l10n.sharedCapsulePasswordLabel
                         : isExport
-                        ? 'Capsule password (optional)'
-                        : 'Capsule password',
+                        ? l10n.capsulePasswordOptional
+                        : l10n.capsulePasswordLabel,
                     errorText: errorText,
                     suffixIcon: IconButton(
                       onPressed: () => setState(() => obscure = !obscure),
@@ -71,9 +73,9 @@ Future<String?> showMemoryCapsulePasswordDialog(
                 ),
                 if (isExport) ...[
                   const SizedBox(height: 10),
-                  const Text(
-                    'LifeThreads cannot recover this password later.',
-                    style: TextStyle(
+                  Text(
+                    l10n.capsulePasswordWarning,
+                    style: const TextStyle(
                       color: AppColors.muted,
                       fontSize: 12,
                       height: 1.35,
@@ -87,13 +89,13 @@ Future<String?> showMemoryCapsulePasswordDialog(
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             FilledButton.icon(
               onPressed: () {
                 if (requirePassword && controller.text.trim().isEmpty) {
                   setState(() {
-                    errorText = 'Password is required for cloud sharing.';
+                    errorText = l10n.passwordRequiredCloudSharing;
                   });
                   return;
                 }
@@ -104,12 +106,12 @@ Future<String?> showMemoryCapsulePasswordDialog(
               ),
               label: Text(
                 isSecureShare
-                    ? 'Create Secure Share'
+                    ? l10n.createSecureShare
                     : isRequiredImport
-                    ? 'Preview Memory'
+                    ? l10n.previewMemory
                     : isExport
-                    ? 'Export'
-                    : 'Choose Capsule',
+                    ? l10n.exportAction
+                    : l10n.chooseCapsule,
               ),
             ),
           ],
@@ -126,28 +128,28 @@ Future<void> shareMemoryCapsule(
   BuildContext context,
   MemoryCapsuleExportResult result,
 ) async {
+  final l10n = context.l10n;
   try {
     final shareResult = await SharePlus.instance.share(
       ShareParams(
-        title: 'Share LifeThreads memory',
-        subject: 'LifeThreads memory capsule',
+        title: l10n.sendCapsuleTitle,
+        subject: l10n.sendCapsuleSubject,
         text: result.isEncrypted
-            ? 'Hey, I shared a protected LifeThreads memory with you. Use the password I sent you to import it.'
-            : 'Hey, I shared a LifeThreads memory with you. Import the capsule in LifeThreads to add it to your wall.',
+            ? l10n.sendEncryptedCapsuleText
+            : l10n.sendCapsuleText,
         files: [XFile(result.path, mimeType: 'application/zip')],
       ),
     );
     if (!context.mounted) return;
     final label = switch (shareResult.status) {
-      ShareResultStatus.success => 'Capsule ready to send.',
-      ShareResultStatus.dismissed => 'Capsule saved. You can share it later.',
-      ShareResultStatus.unavailable =>
-        'Capsule saved, but sharing is unavailable.',
+      ShareResultStatus.success => l10n.capsuleReadyToSend,
+      ShareResultStatus.dismissed => l10n.capsuleSavedLater,
+      ShareResultStatus.unavailable => l10n.capsuleSharingUnavailable,
     };
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: const Duration(seconds: 5),
-        content: Text('$label Saved to ${result.path}'),
+        content: Text(l10n.savedToPath(label, result.path)),
       ),
     );
   } catch (error) {
@@ -155,7 +157,7 @@ Future<void> shareMemoryCapsule(
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: const Duration(seconds: 7),
-        content: Text('Capsule saved, but sharing failed: $error'),
+        content: Text(l10n.capsuleShareFailed('$error')),
       ),
     );
   }
@@ -169,7 +171,7 @@ Future<bool> showMemoryCapsuleImportPreview(
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Text('Import this memory?'),
+      title: Text(context.l10n.importThisMemory),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,43 +183,44 @@ Future<bool> showMemoryCapsuleImportPreview(
           const SizedBox(height: 6),
           Text(
             preview.description.isEmpty
-                ? 'No story text included.'
+                ? context.l10n.noStoryTextIncluded
                 : preview.description,
             maxLines: 4,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(color: AppColors.muted, height: 1.35),
           ),
           const SizedBox(height: 14),
-          _CapsulePreviewRow(
-            icon: Icons.place_rounded,
-            label: 'Place',
-            value: preview.locationLabel,
-          ),
+          if (preview.locationLabel.trim().isNotEmpty)
+            _CapsulePreviewRow(
+              icon: Icons.place_rounded,
+              label: context.l10n.placeLabel,
+              value: preview.locationLabel,
+            ),
           _CapsulePreviewRow(
             icon: Icons.image_rounded,
-            label: 'Photos',
+            label: context.l10n.photosLabel,
             value: '${preview.photoCount}',
           ),
           _CapsulePreviewRow(
             icon: Icons.sticky_note_2_rounded,
-            label: 'Notes',
+            label: context.l10n.notesLabel,
             value: '${preview.noteCount}',
           ),
           _CapsulePreviewRow(
             icon: Icons.hub_rounded,
-            label: 'Connections',
+            label: context.l10n.connectionsLabel,
             value: '${preview.connectionCount}',
           ),
           _CapsulePreviewRow(
             icon: Icons.people_alt_rounded,
-            label: 'People',
+            label: context.l10n.peopleLabel,
             value: '${preview.peopleCount}',
           ),
           if (preview.isEncrypted) ...[
             const SizedBox(height: 8),
-            const Text(
-              'This capsule was password-protected.',
-              style: TextStyle(
+            Text(
+              context.l10n.capsulePasswordProtected,
+              style: const TextStyle(
                 color: AppColors.gold,
                 fontWeight: FontWeight.w900,
               ),
@@ -228,12 +231,12 @@ Future<bool> showMemoryCapsuleImportPreview(
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
         FilledButton.icon(
           onPressed: () => Navigator.of(context).pop(true),
           icon: const Icon(Icons.add_to_photos_rounded),
-          label: const Text('Add to Wall'),
+          label: Text(context.l10n.addToWall),
         ),
       ],
     ),

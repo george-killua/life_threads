@@ -50,7 +50,7 @@ A trip, a person, a place, a first launch, a birthday, a quiet evening, or a sma
 
 Privacy-first:
 
-LifeThreads is local-first. There is no account, no social feed, no public profile, no advertising system, and no cloud sync in the current version. Optional memory capsule sharing uploads only the one encrypted memory package you choose to share. Your memories are created for you, not for an algorithm.
+LifeThreads is local-first. There is no account, no social feed, no public profile, and no advertising system. Optional memory capsule sharing uploads only the one encrypted memory package you choose to share. Optional Cloud Sync stores only a password-protected encrypted backup archive on GK Coding servers. Your memories are created for you, not for an algorithm.
 
 Use LifeThreads for:
 
@@ -80,6 +80,7 @@ LifeThreads is still growing. The first release focuses on the core experience: 
 - Edit memories after creation
 - Manage memory connections
 - Export and import local backups
+- Optional encrypted Cloud Sync backup and restore
 - Optional encrypted memory capsule sharing
 - Shared links expire and can be deleted/revoked
 - Premium-ready structure for future unlocks
@@ -122,18 +123,18 @@ Avoid:
 - claims like "best", "#1", "award-winning", or "most secure"
 - fake reviews or testimonials
 - repeated keyword lists
-- saying full cloud sync or social sharing exists before it is implemented
+- saying account-based multi-user sync or social sharing exists before it is implemented
 
 ## Data Safety Draft
 
 Recommended Play Console answers for the current release:
 
-- Data collected by developer: Yes, only when the user chooses cloud memory sharing or uses online services such as map tiles / Play Billing.
+- Data collected by developer: Yes, only when the user chooses cloud memory sharing, Cloud Sync, or uses online services such as map tiles / Play Billing.
 - Data shared by developer: No advertising or analytics sharing.
 - Data encrypted in transit: Yes.
 - Data deletion request: Yes. Use `https://gkcoding.dev/lifethreads/delete-data`.
-- Photos and videos: User-selected photos are used for app functionality. They stay local unless the user exports or shares an encrypted memory capsule.
-- Location: Optional photo metadata/manual memory location is used for app functionality. Location metadata may be included in an encrypted shared capsule if the user chooses to share that memory. Production map tile requests are sent to MapTiler when map features are opened and may reveal viewed map area to the map tile provider.
+- Photos and videos: User-selected photos are used for app functionality. They stay local unless the user exports, shares an encrypted memory capsule, or creates an encrypted Cloud Sync backup.
+- Location: Optional photo metadata location is used for app functionality. Location metadata may be included in an encrypted shared capsule or encrypted Cloud Sync backup if the user chooses those features. Production map tile requests are sent to MapTiler when map features are opened and may reveal viewed map area to the map tile provider.
 - App activity / analytics: Not collected in the current version.
 - Account info: Not collected.
 - Financial info: Not collected by the app. Google Play Billing purchases are processed by Google Play.

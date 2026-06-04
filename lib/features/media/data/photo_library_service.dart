@@ -3,10 +3,10 @@ import 'dart:ui' as ui;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/storage/app_storage_paths.dart';
 import 'picked_memory_photo.dart';
 
 final photoLibraryServiceProvider = Provider<PhotoLibraryService>((ref) {
@@ -56,11 +56,9 @@ class PhotoLibraryService {
     final source = await asset.file;
     if (source == null) return null;
 
-    final documents = await getApplicationDocumentsDirectory();
-    final photosDirectory = Directory(p.join(documents.path, 'memory_photos'));
-    if (!photosDirectory.existsSync()) {
-      await photosDirectory.create(recursive: true);
-    }
+    final photosDirectory = await AppStoragePaths.memoryPhotosDirectory(
+      create: true,
+    );
 
     final extension = p.extension(source.path).isEmpty
         ? '.jpg'

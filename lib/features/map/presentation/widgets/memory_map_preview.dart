@@ -13,30 +13,7 @@ class MemoryMapPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (event.latitude == null || event.longitude == null) {
-      return _MapShell(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.location_off_rounded,
-              color: AppColors.gold,
-              size: 38,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              event.locationLabel,
-              style: const TextStyle(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'No GPS point attached yet.',
-              style: TextStyle(color: AppColors.muted),
-            ),
-          ],
-        ),
-      );
-    }
+    if (!event.hasGeoPoint) return const SizedBox.shrink();
 
     final point = LatLng(event.latitude!, event.longitude!);
 

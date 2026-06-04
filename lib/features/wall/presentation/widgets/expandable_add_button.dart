@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 
 class ExpandableAddButton extends StatefulWidget {
   const ExpandableAddButton({
@@ -25,6 +26,8 @@ class _ExpandableAddButtonState extends State<ExpandableAddButton> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -40,26 +43,26 @@ class _ExpandableAddButtonState extends State<ExpandableAddButton> {
                   children: [
                     _ActionChipButton(
                       icon: Icons.auto_stories_rounded,
-                      label: 'Memory',
-                      subtitle: 'Full guided story',
+                      label: l10n.expandableMemory,
+                      subtitle: l10n.expandableMemorySubtitle,
                       onTap: () => _run(widget.onAddEvent),
                     ),
                     _ActionChipButton(
                       icon: Icons.add_photo_alternate_rounded,
-                      label: 'Quick photo memory',
-                      subtitle: 'Pick photo and hang it',
+                      label: l10n.expandableQuickPhoto,
+                      subtitle: l10n.expandableQuickPhotoSubtitle,
                       onTap: () => _run(widget.onAddQuickPhoto),
                     ),
                     _ActionChipButton(
                       icon: Icons.sticky_note_2_rounded,
-                      label: 'Text note',
-                      subtitle: 'Small thought on wall',
+                      label: l10n.expandableTextNote,
+                      subtitle: l10n.expandableTextNoteSubtitle,
                       onTap: () => _run(widget.onAddText),
                     ),
                     _ActionChipButton(
                       icon: Icons.push_pin_rounded,
-                      label: 'Nail / rope anchor',
-                      subtitle: 'Manual rope point',
+                      label: l10n.expandableNail,
+                      subtitle: l10n.expandableNailSubtitle,
                       onTap: () => _run(widget.onAddNail),
                     ),
                     const SizedBox(height: 10),
@@ -91,7 +94,7 @@ class _ExpandableAddButtonState extends State<ExpandableAddButton> {
               duration: const Duration(milliseconds: 180),
               child: const Icon(Icons.add_rounded),
             ),
-            label: Text(_isOpen ? 'Close' : 'Add'),
+            label: Text(_isOpen ? l10n.close : l10n.add),
           ),
         ),
       ],

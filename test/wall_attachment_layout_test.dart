@@ -9,22 +9,25 @@ import 'package:life_threads/features/wall/domain/wall_attachment_layout.dart';
 import 'package:life_threads/features/wall/domain/wall_item.dart';
 
 void main() {
-  test('attached text note follows memory using stored offset', () {
-    final memory = _memory('m1', const Offset(200, 300));
-    final note = _note('n1', const Offset(100, -40));
-    final connection = _connection(note.id, memory.id);
+  test(
+    'text note keeps its own wall position even with old attachment data',
+    () {
+      final memory = _memory('m1', const Offset(200, 300));
+      final note = _note('n1', const Offset(100, -40));
+      final connection = _connection(note.id, memory.id);
 
-    final displayItems = WallAttachmentLayout.displayWallItems(
-      wallItems: [note],
-      visibleEvents: [memory],
-      allEvents: [memory],
-      connections: [connection],
-    );
+      final displayItems = WallAttachmentLayout.displayWallItems(
+        wallItems: [note],
+        visibleEvents: [memory],
+        allEvents: [memory],
+        connections: [connection],
+      );
 
-    expect(displayItems.single.wallPosition, const Offset(300, 260));
-  });
+      expect(displayItems.single.wallPosition, note.wallPosition);
+    },
+  );
 
-  test('dragging attached text note uses pending absolute position', () {
+  test('dragging text note uses pending wall position', () {
     final memory = _memory('m1', const Offset(200, 300));
     final note = _note('n1', const Offset(100, -40));
     final pendingPosition = const Offset(430, 240);
@@ -39,22 +42,6 @@ void main() {
     );
 
     expect(displayItems.single.wallPosition, pendingPosition);
-  });
-
-  test('next attachment offset stacks notes around the memory', () {
-    final memory = _memory('m1', const Offset(200, 300));
-    final first = _note('n1', const Offset(112, -46));
-    final second = _note('n2', const Offset(80, 80));
-
-    final offset = WallAttachmentLayout.nextAttachmentOffset(
-      wallItems: [first, second],
-      events: [memory],
-      connections: [_connection(first.id, memory.id)],
-      event: memory,
-      item: second,
-    );
-
-    expect(offset, const Offset(112, 2));
   });
 }
 

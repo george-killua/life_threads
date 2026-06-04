@@ -121,11 +121,7 @@ class WallLayoutEngine {
   }
 
   static String _locationKey(MemoryEvent event) {
-    if (event.latitude != null && event.longitude != null) {
-      return '${event.latitude!.toStringAsFixed(1)},${event.longitude!.toStringAsFixed(1)}';
-    }
-    final location = event.locationLabel.trim();
-    if (location.isEmpty) return 'Unknown place';
-    return location.split(',').first.trim().toLowerCase();
+    if (!event.hasGeoPoint) return 'Unknown place';
+    return '${event.latitude!.toStringAsFixed(1)},${event.longitude!.toStringAsFixed(1)}';
   }
 }

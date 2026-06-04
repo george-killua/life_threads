@@ -48,7 +48,7 @@
       <p>This metadata is used to pre-fill memory details, organize memories, and show memories on the map. Metadata is stored locally on your device with the memory. If you share a memory capsule, metadata included in that memory may be included inside the encrypted capsule.</p>
 
       <h2>5. Location Information</h2>
-      <p>LifeThreads may store location information when you manually add a location to a memory, choose a photo that contains location metadata, or edit or confirm a memory location inside the app.</p>
+      <p>LifeThreads may store location information when you choose a photo that contains location metadata. If no location metadata exists in the selected photos, location details are hidden and no manual location is required.</p>
       <p>LifeThreads does not request background location access. The app does not track your live location in the background.</p>
       <p>If you open map features, LifeThreads loads production map tiles from MapTiler, using OpenStreetMap map data attribution. In debug builds, LifeThreads may use OpenStreetMap public tiles for development fallback. Map tile requests may reveal technical information, such as your IP address and requested map tile area, to the map tile provider. This is necessary to display the map.</p>
 
@@ -68,37 +68,38 @@
       <p>Shared capsule links expire automatically. The app may also show a delete action after a link is created so you can revoke the shared capsule earlier.</p>
       <p>GK Coding cannot read the contents of encrypted memory capsules without the password you chose. You should send the password separately from the share link.</p>
       <p>People who receive a valid share link and password can download and import the shared memory into their own LifeThreads app. LifeThreads does not provide public feeds, public profiles, comments, likes, chat, or user discovery.</p>
+      <p>LifeThreads may also offer optional Cloud Sync. If you choose Cloud Sync, LifeThreads creates a password-protected encrypted backup archive and uploads that locked archive to GK Coding servers. GK Coding stores the encrypted archive file, basic archive metadata, and a hashed sync key used to authorize backup, restore, and delete requests. GK Coding cannot read the encrypted archive without the password you chose. You can delete the remote encrypted archive from the app.</p>
 
       <h2>9. Purchases and Premium Unlock</h2>
       <p>LifeThreads may offer an optional one-time premium unlock through Google Play Billing. Purchases are processed by Google Play. GK Coding does not receive or store your payment card details.</p>
       <p>The app may store a local premium entitlement flag after a successful purchase or restore. Google Play may process purchase-related information according to Google's own terms and privacy policy.</p>
 
       <h2>10. Internet Access</h2>
-      <p>LifeThreads uses internet access for loading map tiles, communicating with Google Play Billing, uploading encrypted shared memory capsules when you choose cloud sharing, and downloading shared memory capsules when you open a LifeThreads share link.</p>
+      <p>LifeThreads uses internet access for loading map tiles, communicating with Google Play Billing, uploading encrypted shared memory capsules when you choose cloud sharing, downloading shared memory capsules when you open a LifeThreads share link, and uploading, downloading, or deleting encrypted Cloud Sync backups when you choose to use Cloud Sync.</p>
       <p>LifeThreads does not use internet access for advertising or analytics.</p>
 
       <h2>11. Data Sharing</h2>
       <p>GK Coding does not sell your LifeThreads data and does not share your memories, photos, notes, stories, people data, or locations with advertisers.</p>
       <p>The current version does not include advertising SDKs or analytics SDKs.</p>
-      <p>Third-party services may process limited technical data when their features are used: MapTiler or OpenStreetMap for map tiles, Google Play for purchases, and GK Coding infrastructure for encrypted memory capsule uploads/downloads only when you choose cloud memory sharing.</p>
+      <p>Third-party services may process limited technical data when their features are used: MapTiler or OpenStreetMap for map tiles, Google Play for purchases, and GK Coding infrastructure for encrypted memory capsule uploads/downloads and encrypted Cloud Sync backup uploads/downloads only when you choose those features.</p>
 
       <h2>12. Data Security</h2>
       <p>LifeThreads is designed to minimize data transmission by keeping memories local-first.</p>
-      <p>Cloud-shared memory capsules are encrypted before upload. Share links are not public listings and expire automatically, but anyone with the link can access the encrypted capsule file until it expires or is deleted.</p>
+      <p>Cloud-shared memory capsules and Cloud Sync backups are encrypted before upload. Share links are not public listings and expire automatically, but anyone with a capsule link can access the encrypted capsule file until it expires or is deleted. Anyone with your Cloud Sync key and archive password could restore your encrypted backup, so keep both private.</p>
       <p>Because your memories are stored on your device, device security matters. Use a secure device passcode, keep your operating system updated, protect exported backup files, and share capsule passwords carefully.</p>
       <p>LifeThreads cannot protect data that you manually export, share, store in another app or cloud service, or send to another person.</p>
 
       <h2>13. Data Deletion</h2>
       <p>You can delete individual memories inside the app. You can remove local LifeThreads data by using the app's clear-data option where available, clearing app data in your device settings, or uninstalling the app.</p>
-      <p>You can delete a shared memory capsule link from the app immediately after creating it when the delete action is shown. Shared capsule links also expire automatically.</p>
+      <p>You can delete a shared memory capsule link from the app immediately after creating it when the delete action is shown. Shared capsule links also expire automatically. You can delete a Cloud Sync backup from the app.</p>
       <p>For help with deletion requests, use <a href="https://gkcoding.dev/lifethreads/delete-data">https://gkcoding.dev/lifethreads/delete-data</a> or contact <a href="mailto:info@gkcoding.dev">info@gkcoding.dev</a>.</p>
-      <p>GK Coding cannot remotely delete data stored only on your device. GK Coding can only help with server-side data that was uploaded through cloud memory sharing and can be identified.</p>
+      <p>GK Coding cannot remotely delete data stored only on your device. GK Coding can only help with server-side data that was uploaded through cloud memory sharing or Cloud Sync and can be identified.</p>
 
       <h2>14. Children's Privacy</h2>
       <p>LifeThreads is not directed to children. If a child or minor uses LifeThreads, a parent or guardian should supervise the use of personal photos, stories, people information, and location information.</p>
 
       <h2>15. Future Features</h2>
-      <p>If LifeThreads later adds cloud sync, shared walls, accounts, analytics, crash reporting, family collaboration, or other online services, this policy will be updated before those features are released.</p>
+      <p>If LifeThreads later adds shared walls, accounts, analytics, crash reporting, family collaboration, or other online services, this policy will be updated before those features are released.</p>
 
       <h2>16. Changes to This Policy</h2>
       <p>GK Coding may update this privacy policy when LifeThreads changes or when legal, platform, or operational requirements change.</p>

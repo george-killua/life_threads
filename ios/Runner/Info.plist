@@ -26,6 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSContactsUsageDescription</key>
+	<string>LifeThreads can import selected contact details into a private memory person entry.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>LifeThreads uses the camera to scan a wall display QR code.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>LifeThreads can save exported memories if you choose to export later.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

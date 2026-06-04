@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 import '../../../media/data/photo_library_service.dart';
 import '../../../media/data/picked_memory_photo.dart';
 import '../../data/memory_repository.dart';
@@ -16,6 +17,7 @@ import '../../domain/memory_feeling.dart';
 import '../../domain/memory_photo.dart';
 import '../../domain/memory_person.dart';
 import '../../domain/memory_type.dart';
+import '../memory_l10n.dart';
 import '../widgets/memory_people_editor.dart';
 
 class EditMemoryPage extends ConsumerStatefulWidget {
@@ -31,7 +33,6 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _locationController = TextEditingController();
   final List<_EditablePhoto> _photos = [];
   List<MemoryPersonDraft> _people = [];
 
@@ -50,23 +51,23 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    _locationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final memoryState = ref.watch(memoryRepositoryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Memory')),
+      appBar: AppBar(title: Text(l10n.editMemoryTitle)),
       body: memoryState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (state) {
           final event = state.findEvent(widget.memoryId);
           if (event == null) {
-            return const Center(child: Text('Memory not found'));
+            return Center(child: Text(l10n.memoryNotFound));
           }
           _init(
             event,
@@ -89,17 +90,17 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                 ),
                 const SizedBox(height: 22),
                 _EditPanel(
-                  title: 'Story',
+                  title: l10n.storyPanel,
                   child: Column(
                     children: [
                       TextFormField(
                         controller: _titleController,
-                        decoration: const InputDecoration(
-                          labelText: 'Memory title',
+                        decoration: InputDecoration(
+                          labelText: l10n.memoryTitleLabel,
                         ),
                         validator: (value) =>
                             value == null || value.trim().isEmpty
-                            ? 'Add a title'
+                            ? l10n.addTitleValidation
                             : null,
                       ),
                       const SizedBox(height: 14),
@@ -107,12 +108,12 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                         controller: _descriptionController,
                         minLines: 4,
                         maxLines: 7,
-                        decoration: const InputDecoration(
-                          labelText: 'Story / description',
+                        decoration: InputDecoration(
+                          labelText: l10n.storyDescriptionLabel,
                         ),
                         validator: (value) =>
                             value == null || value.trim().isEmpty
-                            ? 'Add a short story'
+                            ? l10n.addStoryValidation
                             : null,
                       ),
                     ],
@@ -120,19 +121,19 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                 ),
                 const SizedBox(height: 16),
                 _EditPanel(
-                  title: 'Shape and feeling',
+                  title: l10n.shapeFeelingTitle,
                   child: Column(
                     children: [
                       DropdownButtonFormField<MemoryType>(
                         initialValue: _memoryType,
-                        decoration: const InputDecoration(
-                          labelText: 'Memory type',
+                        decoration: InputDecoration(
+                          labelText: l10n.memoryTypeLabel,
                         ),
                         items: MemoryType.values
                             .map(
                               (type) => DropdownMenuItem(
                                 value: type,
-                                child: Text(type.label),
+                                child: Text(type.localizedLabel(l10n)),
                               ),
                             )
                             .toList(),
@@ -143,7 +144,9 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                       const SizedBox(height: 14),
                       DropdownButtonFormField<MemoryFeeling>(
                         initialValue: _feeling,
-                        decoration: const InputDecoration(labelText: 'Feeling'),
+                        decoration: InputDecoration(
+                          labelText: l10n.feelingLabel,
+                        ),
                         items: MemoryFeeling.values
                             .map(
                               (feeling) => DropdownMenuItem(
@@ -156,7 +159,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                                       size: 18,
                                     ),
                                     const SizedBox(width: 10),
-                                    Text(feeling.label),
+                                    Text(feeling.localizedLabel(l10n)),
                                   ],
                                 ),
                               ),
@@ -168,14 +171,14 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                       const SizedBox(height: 14),
                       DropdownButtonFormField<MemoryCategory>(
                         initialValue: _category,
-                        decoration: const InputDecoration(
-                          labelText: 'Category',
+                        decoration: InputDecoration(
+                          labelText: l10n.categoryLabel,
                         ),
                         items: MemoryCategory.values
                             .map(
                               (category) => DropdownMenuItem(
                                 value: category,
-                                child: Text(category.label),
+                                child: Text(category.localizedLabel(l10n)),
                               ),
                             )
                             .toList(),
@@ -188,7 +191,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                 ),
                 const SizedBox(height: 16),
                 _EditPanel(
-                  title: 'Time and place',
+                  title: l10n.timePhotoGpsTitle,
                   child: Column(
                     children: [
                       ListTile(
@@ -200,46 +203,30 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                         title: Text(
                           _dateLabel(_occurredAt ?? event.occurredAt),
                         ),
-                        subtitle: const Text('Memory date'),
+                        subtitle: Text(l10n.memoryDateLabel),
                         trailing: const Icon(Icons.edit_calendar_rounded),
                         onTap: () => _pickDate(event.occurredAt),
                       ),
                       const SizedBox(height: 14),
-                      TextFormField(
-                        controller: _locationController,
-                        decoration: const InputDecoration(
-                          labelText: 'Location',
-                          hintText: 'Linz, Austria',
-                        ),
-                        validator: (value) =>
-                            value == null || value.trim().isEmpty
-                            ? 'Add a location'
-                            : null,
+                      _PhotoGpsStatus(
+                        latitude: _latitude,
+                        longitude: _longitude,
                       ),
-                      if (_latitude != null && _longitude != null) ...[
-                        const SizedBox(height: 10),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Map point: ${_latitude!.toStringAsFixed(5)}, ${_longitude!.toStringAsFixed(5)}',
-                            style: const TextStyle(color: AppColors.muted),
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
                 _EditPanel(
-                  title: 'People',
+                  title: l10n.peopleTitle,
                   child: MemoryPeopleEditor(
                     people: _people,
+                    suggestedPeople: state.people.map(_personToDraft).toList(),
                     onChanged: (people) => setState(() => _people = people),
                   ),
                 ),
                 const SizedBox(height: 16),
                 _EditPanel(
-                  title: 'Gallery',
+                  title: l10n.galleryTitle,
                   trailing: TextButton.icon(
                     onPressed: _isPicking ? null : _pickPhotos,
                     icon: _isPicking
@@ -249,7 +236,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.add_photo_alternate_rounded),
-                    label: const Text('Add photos'),
+                    label: Text(l10n.addPhotos),
                   ),
                   child: _GalleryEditor(
                     photos: _photos,
@@ -270,7 +257,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.save_rounded),
-                  label: const Text('Save memory'),
+                  label: Text(l10n.saveMemory),
                 ),
               ],
             ),
@@ -289,7 +276,6 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
     _initialized = true;
     _titleController.text = event.title;
     _descriptionController.text = event.description;
-    _locationController.text = event.locationLabel;
     _category = event.category;
     _memoryType = event.memoryType;
     _feeling = event.feeling;
@@ -300,6 +286,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
     _photos
       ..clear()
       ..addAll(photos.map(_EditablePhoto.fromMemoryPhoto));
+    _syncLocationFromPhotos();
     _people = people.map(_personToDraft).toList();
 
     if (_coverPhotoPath != null &&
@@ -343,7 +330,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
       if (setFirstAsCover || _coverPhotoPath == null) {
         _coverPhotoPath = added.first.localPath;
       }
-      _applyMetadataDefaults(added);
+      _syncLocationFromPhotos();
     });
   }
 
@@ -366,7 +353,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
       if (_coverPhotoPath == target.localPath) {
         _coverPhotoPath = replacement.localPath;
       }
-      _applyMetadataDefaults([replacement]);
+      _syncLocationFromPhotos();
     });
   }
 
@@ -376,6 +363,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
       if (_coverPhotoPath == photo.localPath) {
         _coverPhotoPath = _photos.isEmpty ? null : _photos.first.localPath;
       }
+      _syncLocationFromPhotos();
     });
   }
 
@@ -422,19 +410,13 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
     return copied;
   }
 
-  void _applyMetadataDefaults(List<_EditablePhoto> photos) {
+  void _syncLocationFromPhotos() {
     final locatedPhoto = _firstWhereOrNull(
-      photos,
+      _photos,
       (photo) => photo.hasLocation,
     );
-    if (_latitude == null && _longitude == null && locatedPhoto != null) {
-      _latitude = locatedPhoto.latitude;
-      _longitude = locatedPhoto.longitude;
-    }
-    if (_locationController.text.trim().isEmpty && locatedPhoto != null) {
-      _locationController.text =
-          '${locatedPhoto.latitude!.toStringAsFixed(5)}, ${locatedPhoto.longitude!.toStringAsFixed(5)}';
-    }
+    _latitude = locatedPhoto?.latitude;
+    _longitude = locatedPhoto?.longitude;
   }
 
   Future<void> _save(BuildContext context) async {
@@ -457,7 +439,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
           memoryType: _memoryType,
           feeling: _feeling,
           occurredAt: _occurredAt ?? DateTime.now(),
-          locationLabel: _locationController.text.trim(),
+          locationLabel: _locationLabelFromGps(_latitude, _longitude),
           latitude: _latitude,
           longitude: _longitude,
           coverPhotoPath: coverPhotoPath,
@@ -473,6 +455,11 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
   String _dateLabel(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
   }
+}
+
+String _locationLabelFromGps(double? latitude, double? longitude) {
+  if (latitude == null || longitude == null) return '';
+  return '${latitude.toStringAsFixed(5)}, ${longitude.toStringAsFixed(5)}';
 }
 
 class _EditablePhoto {
@@ -533,6 +520,47 @@ class _EditablePhoto {
   }
 }
 
+class _PhotoGpsStatus extends StatelessWidget {
+  const _PhotoGpsStatus({required this.latitude, required this.longitude});
+
+  final double? latitude;
+  final double? longitude;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasGps = latitude != null && longitude != null;
+    final l10n = context.l10n;
+    return Container(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: AppColors.panelWarm.withValues(alpha: 0.68),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            hasGps ? Icons.location_on_rounded : Icons.location_off_rounded,
+            color: hasGps ? AppColors.gold : AppColors.muted,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              hasGps
+                  ? l10n.photoGpsDetected(
+                      latitude!.toStringAsFixed(5),
+                      longitude!.toStringAsFixed(5),
+                    )
+                  : l10n.photoGpsMissing,
+              style: const TextStyle(color: AppColors.muted, height: 1.35),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _CoverPicker extends StatelessWidget {
   const _CoverPicker({
     required this.path,
@@ -549,6 +577,7 @@ class _CoverPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasImage = path != null && File(path!).existsSync();
+    final l10n = context.l10n;
 
     return Container(
       height: 230,
@@ -561,7 +590,18 @@ class _CoverPicker extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (hasImage) Image.file(File(path!), fit: BoxFit.cover),
+          if (hasImage)
+            Image.file(
+              File(path!),
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => const Center(
+                child: Icon(
+                  Icons.photo_camera_back_rounded,
+                  color: AppColors.gold,
+                  size: 48,
+                ),
+              ),
+            ),
           if (!hasImage)
             const Center(
               child: Icon(
@@ -586,7 +626,7 @@ class _CoverPicker extends StatelessWidget {
             left: 16,
             bottom: 18,
             child: Text(
-              hasImage ? 'Cover photo' : 'No cover photo',
+              hasImage ? l10n.coverPhoto : l10n.noPhotosFound,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
             ),
           ),
@@ -610,7 +650,7 @@ class _CoverPicker extends StatelessWidget {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.image_rounded),
-                  label: Text(hasImage ? 'Change' : 'Choose'),
+                  label: Text(hasImage ? l10n.replacePhoto : l10n.choosePhoto),
                 ),
               ],
             ),
@@ -680,9 +720,9 @@ class _GalleryEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (photos.isEmpty) {
-      return const Text(
-        'No gallery photos yet. Add photos to make this memory feel alive.',
-        style: TextStyle(color: AppColors.muted, height: 1.45),
+      return Text(
+        context.l10n.noPhotosFound,
+        style: const TextStyle(color: AppColors.muted, height: 1.45),
       );
     }
 
@@ -722,6 +762,7 @@ class _GalleryPhotoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final exists = File(photo.localPath).existsSync();
+    final l10n = context.l10n;
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -742,7 +783,14 @@ class _GalleryPhotoTile extends StatelessWidget {
               width: 78,
               height: 78,
               child: exists
-                  ? Image.file(File(photo.localPath), fit: BoxFit.cover)
+                  ? Image.file(
+                      File(photo.localPath),
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const ColoredBox(
+                        color: AppColors.wallDeep,
+                        child: Icon(Icons.broken_image_rounded),
+                      ),
+                    )
                   : const ColoredBox(
                       color: AppColors.wallDeep,
                       child: Icon(Icons.broken_image_rounded),
@@ -755,7 +803,7 @@ class _GalleryPhotoTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isCover ? 'Cover photo' : 'Gallery photo',
+                  isCover ? l10n.coverPhoto : l10n.galleryPhoto,
                   style: const TextStyle(fontWeight: FontWeight.w900),
                 ),
                 const SizedBox(height: 4),
@@ -788,17 +836,17 @@ class _GalleryPhotoTile extends StatelessWidget {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: _PhotoAction.cover,
-                child: Text('Set as cover'),
+                child: Text(l10n.setAsCover),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: _PhotoAction.replace,
-                child: Text('Replace photo'),
+                child: Text(l10n.replacePhoto),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: _PhotoAction.remove,
-                child: Text('Remove photo'),
+                child: Text(l10n.removePhoto),
               ),
             ],
           ),
@@ -845,8 +893,8 @@ class _PhotoGridSheetState extends State<_PhotoGridSheet> {
                 Expanded(
                   child: Text(
                     widget.allowMultiple
-                        ? '${_selectedIds.length} selected'
-                        : 'Choose photo',
+                        ? context.l10n.selectedCount(_selectedIds.length)
+                        : context.l10n.choosePhoto,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
@@ -857,14 +905,14 @@ class _PhotoGridSheetState extends State<_PhotoGridSheet> {
                   onPressed: _selectedIds.isEmpty
                       ? null
                       : () => Navigator.of(context).pop(_selectedAssets()),
-                  child: const Text('Use selected'),
+                  child: Text(context.l10n.useSelected),
                 ),
               ],
             ),
           ),
           Expanded(
             child: widget.assets.isEmpty
-                ? const Center(child: Text('No photos found.'))
+                ? Center(child: Text(context.l10n.noPhotosFound))
                 : GridView.builder(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                     gridDelegate:

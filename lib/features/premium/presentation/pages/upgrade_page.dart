@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 import '../../../memories/data/memory_repository.dart';
 import '../../../wall/presentation/widgets/wall_background.dart';
 import '../../data/premium_billing_controller.dart';
@@ -67,7 +68,7 @@ class UpgradePage extends ConsumerWidget {
     await ref.read(premiumEntitlementProvider.notifier).setMockUnlock(true);
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Development lifetime unlock enabled.')),
+      SnackBar(content: Text(context.l10n.developmentUnlockEnabled)),
     );
     _leave(context);
   }
@@ -95,10 +96,10 @@ class _UpgradeTopBar extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_rounded),
         ),
         const SizedBox(width: 8),
-        const Expanded(
+        Expanded(
           child: Text(
-            'LifeThreads Premium',
-            style: TextStyle(
+            context.l10n.premiumPageTitle,
+            style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.8,
@@ -177,7 +178,9 @@ class _LifetimeHero extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  isPremium ? 'Lifetime active' : 'One-time lifetime unlock',
+                  isPremium
+                      ? context.l10n.lifetimeActive
+                      : context.l10n.oneTimeLifetimeUnlock,
                   style: const TextStyle(
                     color: AppColors.amber,
                     fontWeight: FontWeight.w900,
@@ -191,8 +194,8 @@ class _LifetimeHero extends StatelessWidget {
           const SizedBox(height: 22),
           Text(
             isPremium
-                ? 'Your memory wall is unlimited.'
-                : 'Move your memories between devices safely.',
+                ? context.l10n.premiumHeroActiveTitle
+                : context.l10n.premiumHeroLockedTitle,
             style: const TextStyle(
               fontSize: 34,
               fontWeight: FontWeight.w900,
@@ -203,8 +206,10 @@ class _LifetimeHero extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             isPremium
-                ? 'Premium lifetime unlock is active. Encrypted archive export, premium themes, and advanced layouts are available.'
-                : 'Free includes ${PremiumEntitlement.freeMemoryLimit} memories. Premium adds encrypted archive export/import, safe device transfer, themes, and advanced layouts.',
+                ? context.l10n.premiumHeroActiveBody
+                : context.l10n.premiumHeroLockedBody(
+                    PremiumEntitlement.freeMemoryLimit,
+                  ),
             style: const TextStyle(
               color: AppColors.muted,
               height: 1.45,
@@ -244,13 +249,15 @@ class _LimitMeter extends StatelessWidget {
           Row(
             children: [
               Text(
-                isPremium ? 'Premium memories' : 'Free memories',
+                isPremium
+                    ? context.l10n.premiumMemories
+                    : context.l10n.freeMemories,
                 style: const TextStyle(fontWeight: FontWeight.w900),
               ),
               const Spacer(),
               Text(
                 isPremium
-                    ? '$memoryCount / unlimited'
+                    ? '$memoryCount / ${context.l10n.unlimited}'
                     : '$memoryCount / ${PremiumEntitlement.freeMemoryLimit}',
                 style: const TextStyle(
                   color: AppColors.gold,
@@ -290,36 +297,31 @@ class _BenefitGrid extends StatelessWidget {
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
           childAspectRatio: isWide ? 2.65 : 3.45,
-          children: const [
+          children: [
             _BenefitCard(
               icon: Icons.all_inclusive_rounded,
-              title: 'Unlimited memories',
-              body:
-                  'No 30-memory ceiling. Keep building the wall as life grows.',
+              title: context.l10n.benefitUnlimitedTitle,
+              body: context.l10n.benefitUnlimitedBody,
             ),
             _BenefitCard(
               icon: Icons.archive_rounded,
-              title: 'Encrypted archives',
-              body:
-                  'Export and import a password-protected zip with photos, notes, ropes, layout, and metadata.',
+              title: context.l10n.benefitArchivesTitle,
+              body: context.l10n.benefitArchivesBody,
             ),
             _BenefitCard(
               icon: Icons.devices_rounded,
-              title: 'Move to another device',
-              body:
-                  'Carry your private memory wall to a new phone without active cloud sync.',
+              title: context.l10n.benefitTransferTitle,
+              body: context.l10n.benefitTransferBody,
             ),
             _BenefitCard(
               icon: Icons.palette_rounded,
-              title: 'Premium wall themes',
-              body:
-                  'Unlock richer wall moods for family, travel, archive, and gallery styles.',
+              title: context.l10n.benefitThemesTitle,
+              body: context.l10n.benefitThemesBody,
             ),
             _BenefitCard(
               icon: Icons.dashboard_customize_rounded,
-              title: 'Advanced layouts',
-              body:
-                  'More ways to arrange threads, timelines, anchors, and memory clusters.',
+              title: context.l10n.benefitLayoutsTitle,
+              body: context.l10n.benefitLayoutsBody,
             ),
           ],
         );
@@ -427,14 +429,17 @@ class _MoveDeviceCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Cloud sync is planned later',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+                Text(
+                  context.l10n.cloudSyncPlannedTitle,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 const SizedBox(height: 5),
-                const Text(
-                  'Premium Archive is the safe transfer feature now: export, move the zip, and import on another device.',
-                  style: TextStyle(
+                Text(
+                  context.l10n.cloudSyncPlannedBody,
+                  style: const TextStyle(
                     color: AppColors.muted,
                     height: 1.4,
                     fontWeight: FontWeight.w600,
@@ -444,7 +449,7 @@ class _MoveDeviceCard extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: onOpen,
                   icon: const Icon(Icons.devices_rounded),
-                  label: const Text('How device transfer works'),
+                  label: Text(context.l10n.deviceTransferHow),
                 ),
               ],
             ),
@@ -494,9 +499,9 @@ class _LifetimeOfferCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Lifetime unlock',
-            style: TextStyle(
+          Text(
+            context.l10n.lifetimeUnlock,
+            style: const TextStyle(
               color: AppColors.paperInk,
               fontSize: 23,
               fontWeight: FontWeight.w900,
@@ -506,9 +511,9 @@ class _LifetimeOfferCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             isPremium
-                ? 'Premium is active on this device.'
-                : 'One purchase. No monthly subscription for the first premium version. Keep, protect, and move your memory wall.',
-            style: TextStyle(
+                ? context.l10n.premiumActiveOnDevice
+                : context.l10n.onePurchaseBody,
+            style: const TextStyle(
               color: Color(0xFF6D5741),
               height: 1.38,
               fontWeight: FontWeight.w700,
@@ -536,10 +541,10 @@ class _LifetimeOfferCard extends StatelessWidget {
               ),
               label: Text(
                 isPremium
-                    ? 'Premium Active'
+                    ? context.l10n.premiumActiveButton
                     : purchaseState.isBusy
-                    ? 'Processing...'
-                    : 'Unlock Premium',
+                    ? context.l10n.processing
+                    : context.l10n.unlockPremium,
               ),
             ),
           ),
@@ -547,14 +552,14 @@ class _LifetimeOfferCard extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: purchaseState.isBusy ? null : onRestore,
             icon: const Icon(Icons.restore_rounded),
-            label: const Text('Restore purchase'),
+            label: Text(context.l10n.restorePurchase),
           ),
           if (onMockUnlock != null && !isPremium) ...[
             const SizedBox(height: 10),
             TextButton.icon(
               onPressed: onMockUnlock,
               icon: const Icon(Icons.science_rounded),
-              label: const Text('Enable debug mock unlock'),
+              label: Text(context.l10n.enableDebugMockUnlock),
             ),
           ],
           if (message != null) ...[
@@ -562,9 +567,9 @@ class _LifetimeOfferCard extends StatelessWidget {
             _PurchaseMessage(state: purchaseState),
           ],
           const SizedBox(height: 10),
-          const Text(
-            'Purchases are handled by Google Play. The unlock is stored locally after purchase or restore.',
-            style: TextStyle(
+          Text(
+            context.l10n.purchasesHandledByGooglePlay,
+            style: const TextStyle(
               color: Color(0xFF7A654E),
               fontSize: 12,
               height: 1.35,
@@ -603,8 +608,8 @@ class _PricePill extends StatelessWidget {
           Expanded(
             child: Text(
               purchaseState.status == PremiumPurchaseStatus.ready
-                  ? 'Lifetime unlock • $price'
-                  : _statusLabel(purchaseState.status),
+                  ? context.l10n.lifetimeUnlockWithPrice(price)
+                  : _statusLabel(context, purchaseState.status),
               style: const TextStyle(
                 color: AppColors.paperInk,
                 fontWeight: FontWeight.w900,
@@ -616,17 +621,21 @@ class _PricePill extends StatelessWidget {
     );
   }
 
-  String _statusLabel(PremiumPurchaseStatus status) {
+  String _statusLabel(BuildContext context, PremiumPurchaseStatus status) {
     return switch (status) {
-      PremiumPurchaseStatus.loading => 'Loading Play Store product...',
-      PremiumPurchaseStatus.storeUnavailable => 'Play Store unavailable',
-      PremiumPurchaseStatus.productUnavailable => 'Product not configured',
-      PremiumPurchaseStatus.pending => 'Purchase pending',
-      PremiumPurchaseStatus.purchased => 'Purchased',
-      PremiumPurchaseStatus.restored => 'Restored',
-      PremiumPurchaseStatus.failed => 'Purchase failed',
-      PremiumPurchaseStatus.idle => 'Preparing checkout...',
-      PremiumPurchaseStatus.ready => 'Lifetime unlock • $price',
+      PremiumPurchaseStatus.loading => context.l10n.loadingPlayStoreProduct,
+      PremiumPurchaseStatus.storeUnavailable =>
+        context.l10n.playStoreUnavailable,
+      PremiumPurchaseStatus.productUnavailable =>
+        context.l10n.productNotConfigured,
+      PremiumPurchaseStatus.pending => context.l10n.purchasePending,
+      PremiumPurchaseStatus.purchased => context.l10n.purchased,
+      PremiumPurchaseStatus.restored => context.l10n.restored,
+      PremiumPurchaseStatus.failed => context.l10n.purchaseFailed,
+      PremiumPurchaseStatus.idle => context.l10n.preparingCheckout,
+      PremiumPurchaseStatus.ready => context.l10n.lifetimeUnlockWithPrice(
+        price,
+      ),
     };
   }
 }
@@ -676,23 +685,26 @@ class _BillingReadyNotice extends StatelessWidget {
         borderRadius: BorderRadius.circular(26),
         border: Border.all(color: AppColors.gold.withValues(alpha: 0.14)),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.shopping_bag_rounded, color: AppColors.amber),
-          SizedBox(width: 12),
+          const Icon(Icons.shopping_bag_rounded, color: AppColors.amber),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Premium is local-first',
-                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17),
+                  context.l10n.premiumLocalFirstTitle,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 17,
+                  ),
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 Text(
-                  'Premium unlocks local-first value now. Cloud sync is planned later and is not active in this version.',
-                  style: TextStyle(color: AppColors.muted, height: 1.4),
+                  context.l10n.premiumLocalFirstBody,
+                  style: const TextStyle(color: AppColors.muted, height: 1.4),
                 ),
               ],
             ),

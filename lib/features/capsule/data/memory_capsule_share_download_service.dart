@@ -21,7 +21,11 @@ class MemoryCapsuleShareDownloadService {
   const MemoryCapsuleShareDownloadService({
     this.timeout = const Duration(seconds: 30),
     this.maxBytes = 25 * 1024 * 1024,
-    this.allowedHosts = const {'gkcoding.dev', 'www.gkcoding.dev'},
+    this.allowedHosts = const {
+      'gkcoding.dev',
+      'www.gkcoding.dev',
+      'lifethreads.gkcoding.dev',
+    },
   });
 
   final Duration timeout;
@@ -29,22 +33,42 @@ class MemoryCapsuleShareDownloadService {
   final Set<String> allowedHosts;
 
   bool isShareLink(Uri uri) {
-    return (uri.scheme == 'https' || uri.scheme == 'http') &&
-        allowedHosts.contains(uri.host) &&
-        uri.pathSegments.length == 3 &&
+    return _shareId(uri) != null;
+  }
+
+  String? _shareId(Uri uri) {
+    if ((uri.scheme != 'https' && uri.scheme != 'http') ||
+        !allowedHosts.contains(uri.host)) {
+      return null;
+    }
+
+    if (uri.pathSegments.length == 2 &&
+        uri.pathSegments[0] == 'share' &&
+        uri.pathSegments[1].isNotEmpty) {
+      return uri.pathSegments[1];
+    }
+
+    if (uri.pathSegments.length == 3 &&
         uri.pathSegments[0] == 'lifethreads' &&
         uri.pathSegments[1] == 'share' &&
-        uri.pathSegments[2].isNotEmpty;
+        uri.pathSegments[2].isNotEmpty) {
+      return uri.pathSegments[2];
+    }
+
+    return null;
   }
 
   Uri downloadUriFor(Uri shareUri) {
-    if (!isShareLink(shareUri)) {
+    final id = _shareId(shareUri);
+    if (id == null) {
       throw const MemoryCapsuleShareDownloadException(
         'This is not a LifeThreads share link.',
       );
     }
-    final id = Uri.encodeComponent(shareUri.pathSegments[2]);
-    return shareUri.replace(path: '/api/lifethreads/share/$id/download');
+    final path = shareUri.pathSegments[0] == 'share'
+        ? '/api/share/${Uri.encodeComponent(id)}/download'
+        : '/api/lifethreads/share/${Uri.encodeComponent(id)}/download';
+    return shareUri.replace(path: path);
   }
 
   Future<List<int>> downloadCapsule(Uri shareUri) async {

@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 import '../../../memories/data/memory_seed_data.dart';
 import '../../onboarding_preferences.dart';
+import '../widgets/lifethreads_tutorial.dart';
 
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
@@ -19,6 +21,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Scaffold(
       body: DecoratedBox(
         decoration: const BoxDecoration(
@@ -34,8 +38,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
             children: [
               const _BrandMark(),
               const SizedBox(height: 26),
-              const Text(
-                'Build your living wall.',
+              Text(
+                l10n.onboardingHeadline,
                 style: TextStyle(
                   fontSize: 40,
                   height: 1.02,
@@ -44,8 +48,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                 ),
               ),
               const SizedBox(height: 14),
-              const Text(
-                'A private memory room where photos, places, people, and little notes can hang together with emotional threads.',
+              Text(
+                l10n.onboardingBody,
                 style: TextStyle(
                   color: AppColors.muted,
                   fontSize: 17,
@@ -54,8 +58,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Your memories stay private: no account and no cloud upload in this MVP.',
+              Text(
+                l10n.onboardingPrivacy,
                 style: TextStyle(
                   color: AppColors.gold,
                   fontWeight: FontWeight.w900,
@@ -65,23 +69,22 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               const SizedBox(height: 26),
               const _DemoWallPreview(),
               const SizedBox(height: 28),
-              const _StoryPoint(
+              const LifeThreadsTutorialSteps(),
+              const SizedBox(height: 14),
+              _StoryPoint(
                 icon: Icons.lock_rounded,
-                title: 'Your memories stay private',
-                text:
-                    'Your memories stay private: no account and no cloud upload in this MVP.',
+                title: l10n.storyPrivacyTitle,
+                text: l10n.onboardingPrivacy,
               ),
-              const _StoryPoint(
+              _StoryPoint(
                 icon: Icons.hub_rounded,
-                title: 'Connect moments',
-                text:
-                    'Link memories, notes, and places so every chapter has context.',
+                title: l10n.storyConnectTitle,
+                text: l10n.storyConnectText,
               ),
-              const _StoryPoint(
+              _StoryPoint(
                 icon: Icons.auto_awesome_rounded,
-                title: 'Build your living wall',
-                text:
-                    'Start with one photo, then let the wall grow into something that feels alive.',
+                title: l10n.storyWallTitle,
+                text: l10n.storyWallText,
               ),
               const SizedBox(height: 26),
               FilledButton.icon(
@@ -95,7 +98,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.preview_rounded),
-                label: const Text('Preview demo wall'),
+                label: Text(l10n.previewDemoWall),
               ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
@@ -103,7 +106,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     ? null
                     : () => _continue(useDemoWall: false),
                 icon: const Icon(Icons.add_rounded),
-                label: const Text('Start fresh'),
+                label: Text(l10n.startFresh),
               ),
             ],
           ),
@@ -172,6 +175,8 @@ class _DemoWallPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final demoEvents = MemorySeedData.localizedEvents(context.l10n);
+
     return Container(
       height: 270,
       decoration: BoxDecoration(
@@ -192,14 +197,13 @@ class _DemoWallPreview extends StatelessWidget {
           children: [
             Positioned.fill(child: CustomPaint(painter: _PreviewGridPainter())),
             Positioned.fill(
-              child: CustomPaint(
-                painter: _PreviewThreadPainter(MemorySeedData.events),
-              ),
+              child: CustomPaint(painter: _PreviewThreadPainter(demoEvents)),
             ),
-            for (final event in MemorySeedData.events)
+            for (final event in demoEvents)
               _PreviewMemoryCard(
                 title: event.title,
                 color: event.coverColor,
+                imagePath: event.coverPhotoPath,
                 position: Offset(
                   event.wallPosition.dx * 0.34 + 18,
                   event.wallPosition.dy * 0.18 + 18,
@@ -221,9 +225,12 @@ class _DemoWallPreview extends StatelessWidget {
                     color: AppColors.gold.withValues(alpha: 0.18),
                   ),
                 ),
-                child: const Text(
-                  'Optional demo preview',
-                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12),
+                child: Text(
+                  context.l10n.optionalDemoPreview,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ),
@@ -238,12 +245,14 @@ class _PreviewMemoryCard extends StatelessWidget {
   const _PreviewMemoryCard({
     required this.title,
     required this.color,
+    required this.imagePath,
     required this.position,
     required this.rotation,
   });
 
   final String title;
   final Color color;
+  final String? imagePath;
   final Offset position;
   final double rotation;
 
@@ -278,6 +287,14 @@ class _PreviewMemoryCard extends StatelessWidget {
                   color: color.withValues(alpha: 0.78),
                   borderRadius: BorderRadius.circular(10),
                 ),
+                clipBehavior: Clip.antiAlias,
+                child: imagePath == null
+                    ? null
+                    : Image.asset(
+                        imagePath!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                      ),
               ),
               const SizedBox(height: 7),
               Text(

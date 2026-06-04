@@ -1,15 +1,12 @@
-import 'dart:io';
-
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../app/theme/app_colors.dart';
 import '../../../core/database/app_database.dart' as db;
 import '../../../core/database/database_provider.dart';
+import '../../../core/storage/app_storage_paths.dart';
 import '../../backup/domain/backup_models.dart';
 import '../../onboarding/onboarding_preferences.dart';
 import '../../wall/domain/wall_item.dart';
@@ -208,6 +205,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
   @override
   Future<MemoryState> build() async {
     await _seedIfEmpty();
+    await _syncDemoAssetCovers();
     return _loadState();
   }
 
@@ -215,6 +213,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final current = await _loadState();
+      final documentsPath = await AppStoragePaths.documentsPath();
       final index = current.events.length;
       final id = _uuid.v4();
       final event = MemoryEvent(
@@ -240,7 +239,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       await _database.transaction(() async {
         await _database
             .into(_database.memoryEvents)
-            .insert(_eventToCompanion(event));
+            .insert(_eventToCompanion(event, documentsPath: documentsPath));
 
         for (final photo in draft.photos) {
           await _database
@@ -249,7 +248,10 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
                 db.MemoryPhotosCompanion.insert(
                   id: _uuid.v4(),
                   eventId: id,
-                  localPath: photo.localPath,
+                  localPath: AppStoragePaths.persistPhotoPath(
+                    photo.localPath,
+                    documentsPath,
+                  ),
                   originalAssetId: Value(photo.originalAssetId),
                   capturedAt: photo.capturedAt.millisecondsSinceEpoch,
                   latitude: Value(photo.latitude),
@@ -302,6 +304,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     List<MemoryPhotoDraft>? photos,
     List<MemoryPersonDraft>? people,
   }) async {
+    final documentsPath = await AppStoragePaths.documentsPath();
     await _database.transaction(() async {
       await (_database.update(
         _database.memoryEvents,
@@ -316,7 +319,12 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
           locationLabel: Value(locationLabel),
           latitude: Value(latitude),
           longitude: Value(longitude),
-          coverPhotoPath: Value(coverPhotoPath),
+          coverPhotoPath: Value(
+            AppStoragePaths.persistOptionalPhotoPath(
+              coverPhotoPath,
+              documentsPath,
+            ),
+          ),
         ),
       );
 
@@ -332,7 +340,10 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
                 db.MemoryPhotosCompanion.insert(
                   id: _uuid.v4(),
                   eventId: id,
-                  localPath: photo.localPath,
+                  localPath: AppStoragePaths.persistPhotoPath(
+                    photo.localPath,
+                    documentsPath,
+                  ),
                   originalAssetId: Value(photo.originalAssetId),
                   capturedAt: photo.capturedAt.millisecondsSinceEpoch,
                   latitude: Value(photo.latitude),
@@ -409,8 +420,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       await _database.delete(_database.memoryEvents).go();
     });
 
-    final directory = await getApplicationDocumentsDirectory();
-    final photosDir = Directory(p.join(directory.path, 'memory_photos'));
+    final photosDir = await AppStoragePaths.memoryPhotosDirectory();
     if (await photosDir.exists()) {
       await photosDir.delete(recursive: true);
     }
@@ -579,7 +589,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
                 id: _uuid.v4(),
                 fromEventId: textNoteId,
                 toEventId: memoryId,
-                label: 'sticky note',
+                label: '',
               ),
             );
       }
@@ -657,6 +667,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
   }
 
   Future<BackupImportResult> importBackup(BackupImportData backup) async {
+    final documentsPath = await AppStoragePaths.documentsPath();
     final idMap = <String, String>{};
     var eventCount = 0;
     var photoCount = 0;
@@ -713,14 +724,17 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
                 locationLabel: _stringValue(
                   event,
                   'locationLabel',
-                  fallback: 'Unknown place',
+                  fallback: '',
                 ),
                 latitude: Value(_nullableDouble(event, 'latitude')),
                 longitude: Value(_nullableDouble(event, 'longitude')),
                 coverPhotoPath: Value(
                   coverPhotoPath == null
                       ? null
-                      : backup.photoPaths[coverPhotoPath],
+                      : AppStoragePaths.persistOptionalPhotoPath(
+                          backup.photoPaths[coverPhotoPath],
+                          documentsPath,
+                        ),
                 ),
               ),
             );
@@ -773,7 +787,10 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
               db.MemoryPhotosCompanion.insert(
                 id: _uuid.v4(),
                 eventId: eventId,
-                localPath: localPath,
+                localPath: AppStoragePaths.persistPhotoPath(
+                  localPath,
+                  documentsPath,
+                ),
                 originalAssetId: Value(
                   _nullableString(photo, 'originalAssetId'),
                 ),
@@ -846,6 +863,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
   }
 
   Future<MemoryState> _loadState() async {
+    final documentsPath = await AppStoragePaths.documentsPath();
     final eventRows = await _database.select(_database.memoryEvents).get();
     final connectionRows = await _database
         .select(_database.memoryConnections)
@@ -855,9 +873,13 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     final wallItemRows = await _database.select(_database.wallItems).get();
 
     return MemoryState(
-      events: eventRows.map(_eventFromRow).toList(),
+      events: eventRows
+          .map((row) => _eventFromRow(row, documentsPath))
+          .toList(),
       connections: connectionRows.map(_connectionFromRow).toList(),
-      photos: photoRows.map(_photoFromRow).toList(),
+      photos: photoRows
+          .map((row) => _photoFromRow(row, documentsPath))
+          .toList(),
       people: peopleRows.map(_personFromRow).toList(),
       wallItems: wallItemRows.map(_wallItemFromRow).toList(),
     );
@@ -872,12 +894,15 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     if (!shouldUseDemoWall) return;
 
     await _database.transaction(() async {
-      for (final event in MemorySeedData.events) {
+      final l10n = MemorySeedData.localizationsForLocale(
+        WidgetsBinding.instance.platformDispatcher.locale,
+      );
+      for (final event in MemorySeedData.localizedEvents(l10n)) {
         await _database
             .into(_database.memoryEvents)
             .insert(_eventToCompanion(event));
       }
-      for (final connection in MemorySeedData.connections) {
+      for (final connection in MemorySeedData.localizedConnections(l10n)) {
         await _database
             .into(_database.memoryConnections)
             .insert(
@@ -892,7 +917,33 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     });
   }
 
-  db.MemoryEventsCompanion _eventToCompanion(MemoryEvent event) {
+  Future<void> _syncDemoAssetCovers() async {
+    for (final event in MemorySeedData.events) {
+      await (_database.update(_database.memoryEvents)
+            ..where((row) => row.id.equals(event.id))
+            ..where(
+              (row) =>
+                  row.coverPhotoPath.isNull() | row.coverPhotoPath.equals(''),
+            ))
+          .write(
+            db.MemoryEventsCompanion(
+              coverPhotoPath: Value(event.coverPhotoPath),
+            ),
+          );
+    }
+  }
+
+  db.MemoryEventsCompanion _eventToCompanion(
+    MemoryEvent event, {
+    String? documentsPath,
+  }) {
+    final coverPhotoPath = documentsPath == null
+        ? event.coverPhotoPath
+        : AppStoragePaths.persistOptionalPhotoPath(
+            event.coverPhotoPath,
+            documentsPath,
+          );
+
     return db.MemoryEventsCompanion.insert(
       id: event.id,
       title: event.title,
@@ -909,7 +960,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       locationLabel: event.locationLabel,
       latitude: Value(event.latitude),
       longitude: Value(event.longitude),
-      coverPhotoPath: Value(event.coverPhotoPath),
+      coverPhotoPath: Value(coverPhotoPath),
     );
   }
 
@@ -927,7 +978,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     );
   }
 
-  MemoryEvent _eventFromRow(db.MemoryEvent row) {
+  MemoryEvent _eventFromRow(db.MemoryEvent row, String documentsPath) {
     return MemoryEvent(
       id: row.id,
       title: row.title,
@@ -943,7 +994,10 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       locationLabel: row.locationLabel,
       latitude: row.latitude,
       longitude: row.longitude,
-      coverPhotoPath: row.coverPhotoPath,
+      coverPhotoPath: AppStoragePaths.resolveOptionalPhotoPath(
+        row.coverPhotoPath,
+        documentsPath,
+      ),
     );
   }
 
@@ -956,11 +1010,11 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     );
   }
 
-  MemoryPhoto _photoFromRow(db.MemoryPhoto row) {
+  MemoryPhoto _photoFromRow(db.MemoryPhoto row, String documentsPath) {
     return MemoryPhoto(
       id: row.id,
       eventId: row.eventId,
-      localPath: row.localPath,
+      localPath: AppStoragePaths.resolvePhotoPath(row.localPath, documentsPath),
       originalAssetId: row.originalAssetId,
       capturedAt: DateTime.fromMillisecondsSinceEpoch(row.capturedAt),
       latitude: row.latitude,

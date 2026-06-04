@@ -1,0 +1,675 @@
+{
+  "appTitle": "LifeThreads",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "send": "Send",
+  "preparing": "Preparing...",
+  "settingsTitle": "Settings",
+  "languageTitle": "Language",
+  "languageBody": "Choose the app language. System follows your phone language when LifeThreads supports it.",
+  "systemLanguage": "System",
+  "englishLanguage": "English",
+  "germanLanguage": "Deutsch",
+  "arabicLanguage": "العربية",
+  "languageSelected": "Language changed to {language}.",
+  "@languageSelected": {
+    "placeholders": {
+      "language": {}
+    }
+  },
+  "privacyTitle": "Privacy",
+  "privacyBody": "LifeThreads is local-first. Your memories, photos, notes, locations, and connections stay on this device unless you export a backup yourself.",
+  "betaFeedbackTitle": "Beta feedback",
+  "betaFeedbackBody": "Send beta feedback with safe diagnostics. Logs include app events and crash types only, never memory text, photo paths, backups, or exact locations.",
+  "closedBetaBadge": "Closed beta",
+  "sendFeedback": "Send Feedback",
+  "premiumArchiveTitle": "Premium Archive",
+  "premiumArchiveBody": "Move your memories between devices safely. Export an archive with memories, photos, notes, ropes, wall layout, and metadata. Add password protection when you need it.",
+  "premiumBadge": "Premium",
+  "unlockBadge": "Unlock",
+  "exportArchive": "Export Archive",
+  "unlockExport": "Unlock Export",
+  "importArchive": "Import Archive",
+  "importCapsule": "Import Capsule",
+  "moveDevices": "Move Devices",
+  "cloudSyncTitle": "Cloud Sync",
+  "cloudSyncBody": "Back up a password-protected archive to your VPS. The server stores only the locked zip and your private sync key controls restore access.",
+  "vpsBadge": "VPS",
+  "backUpNow": "Back Up Now",
+  "unlockBackup": "Unlock Backup",
+  "restoreLatest": "Restore Latest",
+  "copyKey": "Copy Key",
+  "useKey": "Use Key",
+  "deleteCloud": "Delete Cloud",
+  "themeTitle": "Theme",
+  "themeBody": "Choose how your private wall should feel. Free users get Warm Memory Room. Premium unlocks every wall mood.",
+  "oneFreeBadge": "1 free",
+  "premiumTitle": "Premium",
+  "premiumActiveBody": "Premium lifetime unlock is active.",
+  "premiumLockedBody": "One-time unlock: unlimited memories, encrypted archive export/import, moving to another device, premium themes, and advanced layouts.",
+  "activeBadge": "Active",
+  "openPremium": "Open Premium",
+  "appVersionTitle": "App version",
+  "clearAllDataTitle": "Clear all data",
+  "clearAllDataBody": "Delete all memories, connections, wall notes, nails, and copied photos from this device.",
+  "clearData": "Clear Data",
+  "exportFailed": "Export failed: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "importRejected": "Import rejected: {message}",
+  "@importRejected": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "importFailed": "Import failed: {error}",
+  "@importFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "cloudBackupNeedsPassword": "Cloud backup needs a password.",
+  "cloudBackupSaved": "Cloud backup saved: {memoryCount} memories.",
+  "@cloudBackupSaved": {
+    "placeholders": {
+      "memoryCount": {
+        "type": "int"
+      }
+    }
+  },
+  "cloudBackupFailed": "Cloud backup failed: {message}",
+  "@cloudBackupFailed": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "cloudRestoreRejected": "Cloud restore rejected: {message}",
+  "@cloudRestoreRejected": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "cloudRestoreFailed": "Cloud restore failed: {message}",
+  "@cloudRestoreFailed": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "syncKeyCopied": "Sync key copied.",
+  "useSyncKeyTitle": "Use Sync Key",
+  "syncKeyLabel": "Sync key",
+  "syncKeySaved": "Sync key saved.",
+  "deleteCloudBackupTitle": "Delete cloud backup?",
+  "deleteCloudBackupBody": "This deletes the encrypted archive from your VPS. Local memories stay on this device.",
+  "cloudBackupDeleted": "Cloud backup deleted.",
+  "deleteFailed": "Delete failed: {message}",
+  "@deleteFailed": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "capsuleRejected": "Capsule rejected: {message}",
+  "@capsuleRejected": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "capsuleImportFailed": "Capsule import failed: {error}",
+  "@capsuleImportFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "clearAllDataQuestion": "Clear all data?",
+  "clearAllDataQuestionBody": "This permanently removes all local LifeThreads data on this device. Export a backup first if you want to keep it.",
+  "clearAll": "Clear All",
+  "allLocalDataCleared": "All local data cleared.",
+  "feedbackGeneral": "General feedback",
+  "feedbackBug": "Bug",
+  "feedbackCrash": "Crash",
+  "feedbackDesign": "Design issue",
+  "feedbackMissingFeature": "Missing feature",
+  "feedbackPerformance": "Performance",
+  "betaFeedbackIntro": "Write what happened or what felt wrong. Safe diagnostics will be attached without private memory content.",
+  "feedbackType": "Type",
+  "feedbackLabel": "Feedback",
+  "feedbackHint": "Example: I tapped Add > Quick photo and the screen froze.",
+  "betaFeedbackNotIncluded": "Not included: memory titles, stories, notes, photo paths, backup paths, exact locations.",
+  "feedbackEmpty": "Write a short feedback message first.",
+  "feedbackCopied": "No email app opened. Feedback copied to clipboard for info@gkcoding.dev.",
+  "themeSelected": "{theme} selected.",
+  "@themeSelected": {
+    "placeholders": {
+      "theme": {}
+    }
+  },
+  "onboardingHeadline": "Build your living wall.",
+  "onboardingBody": "A private memory room where photos, places, people, and little notes can hang together with emotional threads.",
+  "onboardingPrivacy": "Your memories stay private: no account and no cloud upload in this MVP.",
+  "storyPrivacyTitle": "Your memories stay private",
+  "storyConnectTitle": "Connect moments",
+  "storyConnectText": "Link memories, notes, and places so every chapter has context.",
+  "storyWallTitle": "Build your living wall",
+  "storyWallText": "Start with one photo, then let the wall grow into something that feels alive.",
+  "previewDemoWall": "Preview demo wall",
+  "startFresh": "Start fresh",
+  "optionalDemoPreview": "Optional demo preview",
+  "quickTutorial": "Quick tutorial",
+  "tutorialIntro": "The basic flow: save memories, connect the related ones, then arrange the wall.",
+  "gotIt": "Got it",
+  "howItWorks": "How it works",
+  "tutorialAddTitle": "Add a memory",
+  "tutorialAddText": "Tap Add, choose Memory or Quick photo, then save the title, date, people, and photo.",
+  "tutorialConnectTitle": "Connect memories",
+  "tutorialConnectText": "Open a card, tap the connect icon, select related memories, and add a short reason.",
+  "tutorialArrangeTitle": "Arrange the wall",
+  "tutorialArrangeText": "Drag cards, notes, and nails into place. Real connections draw ropes behind the items.",
+  "tutorialShowBoardTitle": "Show the board",
+  "tutorialShowBoardText": "Open lifethreads.gkcoding.dev/display on another screen, tap the QR button in Wall Controls, and scan the code to show a temporary read-only board.",
+  "tutorialBackupTitle": "Keep a backup",
+  "tutorialBackupText": "Use Cloud Sync or archive transfer before changing phone or testing a production build.",
+  "scanDisplayQr": "Scan display QR",
+  "scannerHintTitle": "Open lifethreads.gkcoding.dev/display on another screen.",
+  "scannerHintBody": "Scan the QR code from that page. LifeThreads sends a temporary read-only board snapshot to that browser session.",
+  "addMemoryBeforeDisplay": "Add a memory before displaying a wall.",
+  "notLifeThreadsDisplayQr": "This is not a LifeThreads display QR.",
+  "displayWallQuestion": "Display this wall?",
+  "displayWallBody": "LifeThreads will send a temporary read-only board snapshot with {memoryCount} memories to the browser session you scanned. It opens on lifethreads.gkcoding.dev/display and expires automatically.",
+  "@displayWallBody": {
+    "placeholders": {
+      "memoryCount": {
+        "type": "int"
+      }
+    }
+  },
+  "displayAction": "Display",
+  "soon": "soon",
+  "wallDisplayLive": "Wall display is live with {memoryCount} memories until {expires}.",
+  "@wallDisplayLive": {
+    "placeholders": {
+      "memoryCount": {
+        "type": "int"
+      },
+      "expires": {}
+    }
+  },
+  "preparingWallDisplay": "Preparing wall display...",
+  "open": "Open",
+  "edit": "Edit",
+  "save": "Save",
+  "done": "Done",
+  "back": "Back",
+  "continueAction": "Continue",
+  "close": "Close",
+  "add": "Add",
+  "saveReason": "Save Reason",
+  "chooseBackup": "Choose Backup",
+  "chooseArchive": "Choose Archive",
+  "chooseCapsule": "Choose Capsule",
+  "exportAction": "Export",
+  "addToWall": "Add to Wall",
+  "useSelected": "Use selected",
+  "noPhotosFound": "No photos found.",
+  "manage": "Manage",
+  "manageAccess": "Manage access",
+  "saveNow": "Save now",
+  "hangOnWall": "Hang on wall",
+  "placeHere": "Place here",
+  "openSettings": "Open Settings",
+  "viewPremium": "View Premium",
+  "memoryNotFound": "Memory not found",
+  "memoryTypeMoment": "Moment",
+  "memoryTypeTrip": "Trip",
+  "memoryTypePerson": "Person",
+  "memoryTypePlace": "Place",
+  "memoryTypeNote": "Note",
+  "memoryTypeMomentDescription": "A small scene worth keeping",
+  "memoryTypeTripDescription": "A journey or day away",
+  "memoryTypePersonDescription": "Someone important",
+  "memoryTypePlaceDescription": "A location that carries meaning",
+  "memoryTypeNoteDescription": "A thought, quote, or reminder",
+  "categoryPersonal": "Personal",
+  "categoryFamily": "Family",
+  "categoryTravel": "Travel",
+  "feelingWarm": "Warm",
+  "feelingNostalgic": "Nostalgic",
+  "feelingProud": "Proud",
+  "feelingCalm": "Calm",
+  "feelingImportant": "Important",
+  "feelingWarmDescription": "Soft, close, full of love.",
+  "feelingNostalgicDescription": "A memory that pulls you back.",
+  "feelingProudDescription": "A moment that proved something.",
+  "feelingCalmDescription": "Quiet, safe, peaceful.",
+  "feelingImportantDescription": "A memory that changed the story.",
+  "addPeopleHint": "Add people who belong to this moment. Contacts stay local.",
+  "addPerson": "Add person",
+  "editPerson": "Edit person",
+  "chooseFromContacts": "Choose from contacts",
+  "personNameLabel": "Name",
+  "personNameHint": "Type to search saved people",
+  "relationshipLabel": "Relationship",
+  "relationshipHint": "Friend, mother, partner...",
+  "phoneOptionalLabel": "Phone (optional)",
+  "emailOptionalLabel": "Email (optional)",
+  "nameRelationshipRequired": "Name and relationship are required.",
+  "contactAccessDenied": "Contact access was not granted.",
+  "couldNotOpenContacts": "Could not open contacts.",
+  "chooseContact": "Choose contact",
+  "searchContacts": "Search contacts",
+  "noContactsFound": "No contacts found.",
+  "unnamedContact": "Unnamed contact",
+  "contactRelationship": "Contact",
+  "couldNotLoadContacts": "Could not load contacts.",
+  "saveMomentTitle": "Save a moment",
+  "todayEyebrow": "Today",
+  "addMemoryStepTitle": "What happened that you do not want to lose?",
+  "addMemoryStepSubtitle": "Write one line, add a photo if you have one, and save. Details can wait.",
+  "momentLabel": "Moment",
+  "momentHint": "Dinner with Lara, first launch, quiet walk...",
+  "storyWorthLabel": "What made it worth keeping?",
+  "storyWorthHint": "A few words are enough.",
+  "feelingEyebrow": "Feeling",
+  "feelingStepTitle": "How should this feel when it returns?",
+  "feelingStepSubtitle": "This makes the memory easier to rediscover later.",
+  "contextEyebrow": "Context",
+  "whenWasItTitle": "When was it?",
+  "photoGpsStepSubtitle": "The map uses GPS saved inside selected photos. If a photo has no GPS, no place is shown.",
+  "peopleThreadsEyebrow": "People & threads",
+  "peopleThreadsTitle": "Who or what does this connect to?",
+  "peopleThreadsSubtitle": "Optional details turn single moments into a life thread.",
+  "connectExistingMemoryLabel": "Connect to an existing memory",
+  "noConnectionYet": "No connection yet",
+  "connectionReasonLabel": "Why are they connected?",
+  "connectionReasonHint": "Example: same trip, same person, before / after...",
+  "writeMomentOrPhotoFirst": "Write a moment or add a photo first.",
+  "todaysMoment": "Today's moment",
+  "savedFromTodaysPrompt": "Saved from today's prompt.",
+  "saveItBeforeItFades": "Save it before it fades",
+  "chooseDate": "Choose date",
+  "dateLabel": "Date",
+  "untitledMemory": "Untitled memory",
+  "organize": "Organize",
+  "memoryShape": "Memory shape",
+  "wallCategory": "Wall category",
+  "privatePhotos": "Private photos",
+  "pick": "Pick",
+  "addMore": "Add more",
+  "photoStorageHint": "LifeThreads copies selected photos into private app storage and keeps date/location metadata when available.",
+  "limitedPhotoAccessActive": "Limited photo access is active. You can add more allowed photos.",
+  "selectPhotos": "Select photos",
+  "photoAccessOff": "Photo access is off",
+  "photoAccessOffBody": "Enable photo access to pick memories. Your photos stay on this device.",
+  "freeMemoryLimitReached": "Free memory limit reached",
+  "freeMemoryLimitBody": "Free walls include 30 memories. Upgrade to keep building your living wall.",
+  "photoAccessNeeded": "Photo access is needed first.",
+  "quickPhotoMemory": "Quick photo memory",
+  "quickPhotoDescription": "A photo worth keeping. Add the story whenever you want.",
+  "hangQuickPhoto": "Hang quick photo",
+  "photoGpsDetected": "Photo GPS detected: {latitude}, {longitude}",
+  "photoGpsMissing": "No photo GPS detected. This memory will not appear on the map.",
+  "memoryPreviewSummary": "{title} • {type} • {feeling} • {photoCount} photo(s)",
+  "metadataDates": "{count}/{total} dates",
+  "metadataLocations": "{count}/{total} locations",
+  "metadataSizes": "{count}/{total} sizes",
+  "newSelected": "{count} new selected",
+  "selectedCount": "{count} selected",
+  "editMemoryTitle": "Edit Memory",
+  "storyPanel": "Story",
+  "memoryTitleLabel": "Memory title",
+  "addTitleValidation": "Add a title",
+  "storyDescriptionLabel": "Story / description",
+  "addStoryValidation": "Add a short story",
+  "shapeFeelingTitle": "Shape and feeling",
+  "memoryTypeLabel": "Memory type",
+  "feelingLabel": "Feeling",
+  "categoryLabel": "Category",
+  "timePhotoGpsTitle": "Time and photo GPS",
+  "memoryDateLabel": "Memory date",
+  "peopleTitle": "People",
+  "galleryTitle": "Gallery",
+  "addPhotos": "Add photos",
+  "saveMemory": "Save memory",
+  "coverPhoto": "Cover photo",
+  "galleryPhoto": "Gallery photo",
+  "setAsCover": "Set as cover",
+  "replacePhoto": "Replace photo",
+  "removePhoto": "Remove photo",
+  "choosePhoto": "Choose photo",
+  "threadReasonsTitle": "Thread Reasons",
+  "createMoreMemoriesBeforeLinking": "Create more memories before linking.",
+  "connectionHeaderBody": "Connect memories with a reason. The rope should explain why two moments belong together.",
+  "connectedMemory": "connected memory",
+  "whyConnectedTitle": "Why are they connected?",
+  "exportPremiumArchiveTitle": "Export Premium Archive",
+  "importArchiveTitle": "Import Archive",
+  "archiveExportBody": "Add a password to encrypt the archive. Leave empty for a normal local zip.",
+  "archiveImportBody": "If this archive is encrypted, enter its password. Leave empty for older or unprotected backups.",
+  "archivePasswordOptional": "Archive password (optional)",
+  "archivePasswordLabel": "Archive password",
+  "archivePasswordWarning": "Keep the password somewhere safe. It cannot be recovered if you lose it.",
+  "sendArchiveTitle": "Send LifeThreads archive",
+  "sendArchiveSubject": "LifeThreads memory archive",
+  "sendEncryptedArchiveText": "LifeThreads encrypted archive. Use the password you chose to import it on another device.",
+  "sendArchiveText": "LifeThreads archive. Import it in LifeThreads to open your memory wall on another device.",
+  "archiveReadyToSend": "Archive ready to send.",
+  "archiveSavedLater": "Archive saved. You can share it later.",
+  "archiveSharingUnavailable": "Archive saved, but sharing is unavailable.",
+  "savedToPath": "{label} Saved to {path}",
+  "archiveShareFailed": "Archive saved, but sharing failed: {error}",
+  "archiveImportedTitle": "Archive imported",
+  "memoriesLabel": "Memories",
+  "photosLabel": "Photos",
+  "wallNotesNailsLabel": "Wall notes / nails",
+  "connectionsLabel": "Connections",
+  "archiveImportSummary": "Your current wall was kept. Imported memories were added safely.",
+  "shareEncryptedCapsuleTitle": "Share Encrypted Capsule",
+  "openSharedCapsuleTitle": "Open Shared Capsule",
+  "exportMemoryCapsuleTitle": "Export Memory Capsule",
+  "importCapsuleDialogTitle": "Import Capsule",
+  "secureSharePasswordBody": "Create a password before uploading this capsule. Send the password separately to the person receiving it.",
+  "sharedCapsulePasswordBody": "Enter the password you received for this shared memory.",
+  "capsuleExportBody": "Add a password if this memory should be protected before you send it. Leave empty for a normal capsule.",
+  "capsuleImportBody": "If this capsule has a password, enter it. Otherwise leave empty.",
+  "capsulePasswordLabel": "Capsule password",
+  "sharedCapsulePasswordLabel": "Shared capsule password",
+  "capsulePasswordOptional": "Capsule password (optional)",
+  "capsulePasswordWarning": "LifeThreads cannot recover this password later.",
+  "passwordRequiredCloudSharing": "Password is required for cloud sharing.",
+  "createSecureShare": "Create Secure Share",
+  "previewMemory": "Preview Memory",
+  "sendCapsuleTitle": "Share LifeThreads memory",
+  "sendCapsuleSubject": "LifeThreads memory capsule",
+  "sendEncryptedCapsuleText": "Hey, I shared a protected LifeThreads memory with you. Use the password I sent you to import it.",
+  "sendCapsuleText": "Hey, I shared a LifeThreads memory with you. Import the capsule in LifeThreads to add it to your wall.",
+  "capsuleReadyToSend": "Capsule ready to send.",
+  "capsuleSavedLater": "Capsule saved. You can share it later.",
+  "capsuleSharingUnavailable": "Capsule saved, but sharing is unavailable.",
+  "capsuleShareFailed": "Capsule saved, but sharing failed: {error}",
+  "importThisMemory": "Import this memory?",
+  "noStoryTextIncluded": "No story text included.",
+  "placeLabel": "Place",
+  "notesLabel": "Notes",
+  "capsulePasswordProtected": "This capsule was password-protected.",
+  "openingSharedMemory": "Opening shared memory...",
+  "lifeThreadsMemoryTitle": "LifeThreads memory",
+  "shareMemoryText": "Hey, I shared a memory with you in LifeThreads.\n\n{url}",
+  "shareLinkReady": "Share link ready.",
+  "shareLinkCreated": "Share link created.",
+  "shareLinkUnavailable": "Share link created, but sharing is unavailable.",
+  "shareLinkExpiresDelete": "{label} Link expires automatically. You can delete it now.",
+  "cloudShareFailed": "Cloud share failed: {message}",
+  "sharedMemoryLinkDeleted": "Shared memory link deleted.",
+  "creatingSecureMemoryLink": "Creating secure memory link...",
+  "shareMemoryCapsule": "Share Memory Capsule",
+  "editStory": "Edit story",
+  "metaType": "Type",
+  "metaFeeling": "Feeling",
+  "metaCategory": "Category",
+  "metaDate": "Date",
+  "storyEyebrow": "Story",
+  "whyMemoryMatters": "Why this memory matters",
+  "galleryEyebrow": "Gallery",
+  "savedPhotosTitle": "{count} saved photo(s)",
+  "peopleEyebrow": "People",
+  "partOfMemory": "Part of this memory",
+  "notesEyebrow": "Notes",
+  "attachedThoughts": "Attached thoughts",
+  "stickyNote": "Sticky note",
+  "placeEyebrow": "Place",
+  "threadsEyebrow": "Threads",
+  "connectedMemories": "Connected memories",
+  "noConnectedMemoriesYet": "No connected memories yet. Connect this chapter to another moment to start a visible life thread.",
+  "backToWall": "Back to wall",
+  "addTextToWall": "Add text to wall",
+  "addTextAction": "Add Text",
+  "textNoteHint": "Write a small memory, quote, or note...",
+  "placeTextNote": "Place text note",
+  "placeRopeAnchor": "Place rope anchor",
+  "nailSubtitle": "A nail can connect ropes manually between memories.",
+  "clearDemoWallQuestion": "Clear demo wall?",
+  "clearDemoWallBody": "This removes the sample memories so you can start with an empty private wall.",
+  "importBackupQuestion": "Import backup?",
+  "importBackupBody": "This restores memories from a LifeThreads archive and keeps your current wall.",
+  "deleteMemoryQuestion": "Delete memory?",
+  "deleteMemoryBody": "This removes the memory and all its wall links.",
+  "editText": "Edit text",
+  "editTextTitle": "Edit Text",
+  "connectRope": "Connect rope",
+  "connectRopeSubtitle": "Attach this nail to memories.",
+  "deleteNail": "Delete nail",
+  "connectNailTitle": "Connect nail to memories",
+  "connectNailSubtitle": "Selected memories will hang from this anchor.",
+  "timelineTitle": "Timeline",
+  "timelineSubtitle": "Your memories ordered by time.",
+  "noMemoriesFilter": "No memories in this filter",
+  "noMemoriesFilterBody": "Switch filter or add a memory to build the timeline.",
+  "memoryMapTitle": "Memory Map",
+  "memoryMapSubtitle": "Your memories grouped by place.",
+  "noMappedMemories": "No mapped memories yet",
+  "headerSubtitle": "Your memories, hanging together.",
+  "importBackupTooltip": "Import backup",
+  "exportBackupTooltip": "Export backup",
+  "displayWallTooltip": "Display wall",
+  "tutorialTooltip": "Tutorial",
+  "settingsTooltip": "Settings",
+  "hideControlsTooltip": "Hide controls",
+  "freeformLayout": "Freeform",
+  "categoryLayout": "Category",
+  "locationLayout": "Location",
+  "wallControls": "Wall Controls",
+  "saveToday": "Save today",
+  "rememberThis": "Remember this",
+  "whatHappenedToday": "What happened today?",
+  "tapToOpenDrag": "Tap to open • drag to move",
+  "demoWallPreview": "Demo wall preview. Clear it when you are ready to start fresh.",
+  "clearDemo": "Clear demo",
+  "chooseQuickPhoto": "Choose quick photo",
+  "wallView": "Wall",
+  "timelineView": "Timeline",
+  "mapView": "Map",
+  "wallFilterAll": "All",
+  "expandableMemory": "Memory",
+  "expandableMemorySubtitle": "Full guided story",
+  "expandableQuickPhoto": "Quick photo memory",
+  "expandableQuickPhotoSubtitle": "Pick photo and hang it",
+  "expandableTextNote": "Text note",
+  "expandableTextNoteSubtitle": "Small thought on wall",
+  "expandableNail": "Nail / rope anchor",
+  "expandableNailSubtitle": "Manual rope point",
+  "startWithOneThing": "Start with one thing from today",
+  "emptyWallBody": "Save a moment before it fades. A sentence or a photo is enough.",
+  "usePhoto": "Use a photo",
+  "editMemoryTooltip": "Edit memory",
+  "connectMemoryTooltip": "Connect memory",
+  "archiveTransferTitle": "Open on another device",
+  "archiveTransferHeroTitle": "Move your memories between devices safely.",
+  "archiveTransferHeroBody": "Premium Archive creates a portable encrypted zip with your memories, photos, notes, ropes, wall positions, and metadata. Cloud Sync can also store that locked zip on your VPS for restore on another device.",
+  "archiveTransferStep1Title": "Export an archive",
+  "archiveTransferStep1Body": "Open Settings, choose Export Archive, and add a password if you want password protection.",
+  "archiveTransferStep2Title": "Move or sync the zip",
+  "archiveTransferStep2Body": "Transfer it with AirDrop, USB, Drive, email, or use Cloud Sync with a private sync key.",
+  "archiveTransferStep3Title": "Import safely",
+  "archiveTransferStep3Body": "Install LifeThreads on the other device, choose Import Archive, enter the password if needed, and restore without deleting existing data.",
+  "premiumPageTitle": "LifeThreads Premium",
+  "developmentUnlockEnabled": "Development lifetime unlock enabled.",
+  "lifetimeActive": "Lifetime active",
+  "oneTimeLifetimeUnlock": "One-time lifetime unlock",
+  "premiumHeroActiveTitle": "Your memory wall is unlimited.",
+  "premiumHeroLockedTitle": "Move your memories between devices safely.",
+  "premiumHeroActiveBody": "Premium lifetime unlock is active. Encrypted archive export, premium themes, and advanced layouts are available.",
+  "premiumHeroLockedBody": "Free includes {limit} memories. Premium adds encrypted archive export/import, safe device transfer, themes, and advanced layouts.",
+  "premiumMemories": "Premium memories",
+  "freeMemories": "Free memories",
+  "unlimited": "unlimited",
+  "benefitUnlimitedTitle": "Unlimited memories",
+  "benefitUnlimitedBody": "No 30-memory ceiling. Keep building the wall as life grows.",
+  "benefitArchivesTitle": "Encrypted archives",
+  "benefitArchivesBody": "Export and import a password-protected zip with photos, notes, ropes, layout, and metadata.",
+  "benefitTransferTitle": "Move to another device",
+  "benefitTransferBody": "Carry your private memory wall to a new phone without active cloud sync.",
+  "benefitThemesTitle": "Premium wall themes",
+  "benefitThemesBody": "Unlock richer wall moods for family, travel, archive, and gallery styles.",
+  "benefitLayoutsTitle": "Advanced layouts",
+  "benefitLayoutsBody": "More ways to arrange threads, timelines, anchors, and memory clusters.",
+  "cloudSyncPlannedTitle": "Cloud sync is planned later",
+  "cloudSyncPlannedBody": "Premium Archive is the safe transfer feature now: export, move the zip, and import on another device.",
+  "deviceTransferHow": "How device transfer works",
+  "lifetimeUnlock": "Lifetime unlock",
+  "premiumActiveOnDevice": "Premium is active on this device.",
+  "onePurchaseBody": "One purchase. No monthly subscription for the first premium version. Keep, protect, and move your memory wall.",
+  "premiumActiveButton": "Premium Active",
+  "processing": "Processing...",
+  "unlockPremium": "Unlock Premium",
+  "restorePurchase": "Restore purchase",
+  "enableDebugMockUnlock": "Enable debug mock unlock",
+  "purchasesHandledByGooglePlay": "Purchases are handled by Google Play. The unlock is stored locally after purchase or restore.",
+  "lifetimeUnlockWithPrice": "Lifetime unlock • {price}",
+  "loadingPlayStoreProduct": "Loading Play Store product...",
+  "playStoreUnavailable": "Play Store unavailable",
+  "productNotConfigured": "Product not configured",
+  "purchasePending": "Purchase pending",
+  "purchased": "Purchased",
+  "restored": "Restored",
+  "purchaseFailed": "Purchase failed",
+  "preparingCheckout": "Preparing checkout...",
+  "premiumLocalFirstTitle": "Premium is local-first",
+  "premiumLocalFirstBody": "Premium unlocks local-first value now. Cloud sync is planned later and is not active in this version.",
+  "@photoGpsDetected": {
+    "placeholders": {
+      "latitude": {},
+      "longitude": {}
+    }
+  },
+  "@memoryPreviewSummary": {
+    "placeholders": {
+      "title": {},
+      "type": {},
+      "feeling": {},
+      "photoCount": {
+        "type": "int"
+      }
+    }
+  },
+  "@metadataDates": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@metadataLocations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@metadataSizes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@newSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@selectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@savedToPath": {
+    "placeholders": {
+      "label": {},
+      "path": {}
+    }
+  },
+  "@archiveShareFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@capsuleShareFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@shareMemoryText": {
+    "placeholders": {
+      "url": {}
+    }
+  },
+  "@shareLinkExpiresDelete": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "@cloudShareFailed": {
+    "placeholders": {
+      "message": {}
+    }
+  },
+  "@savedPhotosTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@premiumHeroLockedBody": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "@lifetimeUnlockWithPrice": {
+    "placeholders": {
+      "price": {}
+    }
+  },
+  "noMappedMemoriesBody": "Add photos that contain GPS metadata to see memories here.",
+  "peopleLabel": "People",
+  "connect": "Connect",
+  "themeWarmMemoryRoom": "Warm Memory Room",
+  "themeWarmMemoryRoomDescription": "Soft dark warmth, gold light, and private-room depth.",
+  "themeMidnightArchive": "Midnight Archive",
+  "themeMidnightArchiveDescription": "Deep blue archive room with quiet museum-like focus.",
+  "themeSoftPaperWall": "Soft Paper Wall",
+  "themeSoftPaperWallDescription": "Cream paper, ink shadows, and calm scrapbook feeling.",
+  "themeTravelCorkboard": "Travel Corkboard",
+  "themeTravelCorkboardDescription": "Corkboard warmth with map-grid hints for trips and places.",
+  "demoViennaTitle": "Vienna evening walk",
+  "demoViennaDescription": "A quiet evening in Vienna, the kind of moment that stays warm because nothing needed to be perfect.",
+  "demoViennaLocation": "Vienna, Austria",
+  "demoLinzTitle": "Rain and coffee",
+  "demoLinzDescription": "A slow Linz afternoon with coffee, rain on the windows, and one photo that feels like home.",
+  "demoLinzLocation": "Linz, Austria",
+  "demoFamilyTitle": "Family table",
+  "demoFamilyDescription": "Food, noise, small jokes, and the feeling that this is what should be remembered.",
+  "demoHomeLocation": "Home",
+  "demoLaunchTitle": "First launch night",
+  "demoLaunchDescription": "The night an idea finally became something real on a screen.",
+  "demoConnectionQuietDays": "quiet days",
+  "demoConnectionHomeFocus": "home focus",
+  "demoConnectionWhyItMatters": "why it matters"
+}

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 import '../../data/memory_repository.dart';
 import '../../domain/memory_connection.dart';
 import '../../domain/memory_event.dart';
+import '../memory_l10n.dart';
 
 class ManageConnectionsPage extends ConsumerWidget {
   const ManageConnectionsPage({super.key, required this.memoryId});
@@ -13,18 +15,19 @@ class ManageConnectionsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final memoryState = ref.watch(memoryRepositoryProvider);
     final repository = ref.read(memoryRepositoryProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Thread Reasons')),
+      appBar: AppBar(title: Text(l10n.threadReasonsTitle)),
       body: memoryState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (state) {
           final memory = state.findEvent(memoryId);
           if (memory == null) {
-            return const Center(child: Text('Memory not found'));
+            return Center(child: Text(l10n.memoryNotFound));
           }
 
           final candidates = state.events
@@ -37,9 +40,9 @@ class ManageConnectionsPage extends ConsumerWidget {
               _Header(memory: memory),
               const SizedBox(height: 22),
               if (candidates.isEmpty)
-                const Text(
-                  'Create more memories before linking.',
-                  style: TextStyle(color: AppColors.muted),
+                Text(
+                  l10n.createMoreMemoriesBeforeLinking,
+                  style: const TextStyle(color: AppColors.muted),
                 )
               else
                 ...candidates.map((event) {
@@ -129,9 +132,9 @@ class _Header extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Connect memories with a reason. The rope should explain why two moments belong together.',
-            style: TextStyle(color: AppColors.muted, height: 1.45),
+          Text(
+            context.l10n.connectionHeaderBody,
+            style: const TextStyle(color: AppColors.muted, height: 1.45),
           ),
         ],
       ),
@@ -190,7 +193,10 @@ class _ConnectionReasonCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${event.category.label} • ${event.locationLabel}',
+                      [
+                        event.category.localizedLabel(context.l10n),
+                        if (event.hasGeoPoint) event.locationDisplayLabel,
+                      ].join(' • '),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: AppColors.muted),
@@ -221,7 +227,9 @@ class _ConnectionReasonCard extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      reason?.isNotEmpty == true ? reason! : 'connected memory',
+                      reason?.isNotEmpty == true
+                          ? reason!
+                          : context.l10n.connectedMemory,
                       style: const TextStyle(
                         fontWeight: FontWeight.w800,
                         height: 1.35,
@@ -230,7 +238,7 @@ class _ConnectionReasonCard extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: onEditReason,
-                    child: const Text('Edit'),
+                    child: Text(context.l10n.edit),
                   ),
                 ],
               ),
@@ -288,7 +296,7 @@ class _ConnectionReasonDialogState extends State<_ConnectionReasonDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Why are they connected?'),
+      title: Text(context.l10n.whyConnectedTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,8 +314,8 @@ class _ConnectionReasonDialogState extends State<_ConnectionReasonDialog> {
             autofocus: true,
             minLines: 3,
             maxLines: 5,
-            decoration: const InputDecoration(
-              hintText: 'Example: same trip, same person, before / after...',
+            decoration: InputDecoration(
+              hintText: context.l10n.connectionReasonHint,
             ),
           ),
         ],
@@ -315,11 +323,11 @@ class _ConnectionReasonDialogState extends State<_ConnectionReasonDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(_controller.text),
-          child: const Text('Save Reason'),
+          child: Text(context.l10n.saveReason),
         ),
       ],
     );

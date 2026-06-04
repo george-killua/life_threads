@@ -8,6 +8,7 @@ import 'package:photo_manager/photo_manager.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 import '../../../media/data/photo_library_service.dart';
 import '../../../media/data/picked_memory_photo.dart';
 import '../../../premium/data/premium_entitlement_controller.dart';
@@ -16,6 +17,7 @@ import '../../data/memory_repository.dart';
 import '../../domain/memory_category.dart';
 import '../../domain/memory_feeling.dart';
 import '../../domain/memory_type.dart';
+import '../memory_l10n.dart';
 import '../widgets/memory_people_editor.dart';
 
 class AddMemoryPage extends ConsumerStatefulWidget {
@@ -28,7 +30,6 @@ class AddMemoryPage extends ConsumerStatefulWidget {
 class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _locationController = TextEditingController();
   final _connectionReasonController = TextEditingController();
   final List<PickedMemoryPhoto> _photos = [];
   List<MemoryPersonDraft> _people = [];
@@ -44,19 +45,19 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
   bool _isSaving = false;
   PermissionState? _photoPermission;
 
-  static const _stepCount = 7;
+  static const _stepCount = 4;
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    _locationController.dispose();
     _connectionReasonController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final memoryState = ref.watch(memoryRepositoryProvider);
     final entitlement = ref.watch(premiumEntitlementProvider).asData?.value;
 
@@ -66,7 +67,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
           onPressed: () => _backToWall(context),
           icon: const Icon(Icons.arrow_back_rounded),
         ),
-        title: const Text('Create a thread'),
+        title: Text(l10n.saveMomentTitle),
       ),
       body: memoryState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -98,6 +99,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
                 isSaving: _isSaving,
                 onBack: _step == 0 ? null : () => setState(() => _step--),
                 onNext: _nextOrSave,
+                onSaveNow: _canSaveNow() ? () => _saveMemory(context) : null,
               ),
             ],
           );
@@ -107,161 +109,103 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
   }
 
   Widget _buildStep(BuildContext context, MemoryState state) {
+    final l10n = context.l10n;
+
     return switch (_step) {
       0 => _StepCard(
-        eyebrow: 'Step 1',
-        title: 'What kind of memory is this?',
-        subtitle: 'Choose the shape of the moment before writing details.',
-        child: Column(
-          children: [
-            for (final type in MemoryType.values)
-              _ChoiceTile(
-                selected: _memoryType == type,
-                icon: _iconForType(type),
-                title: type.label,
-                subtitle: type.description,
-                color: AppColors.gold,
-                onTap: () => setState(() => _memoryType = type),
-              ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Wall category',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final category in MemoryCategory.values)
-                  ChoiceChip(
-                    selected: _category == category,
-                    label: Text(category.label),
-                    onSelected: (_) => setState(() => _category = category),
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      1 => _StepCard(
-        eyebrow: 'Step 2',
-        title: 'Choose the photos that carry it.',
-        subtitle:
-            'Photos stay private on this device. Pick one or more, or continue without a photo.',
-        child: _PhotoPickerPanel(
-          photos: _photos,
-          isPicking: _isPicking,
-          permission: _photoPermission,
-          onPick: _openPhotoPicker,
-          onManageLimitedAccess: _manageLimitedPhotoAccess,
-          onRemove: (photo) => setState(() => _photos.remove(photo)),
-        ),
-      ),
-      2 => _StepCard(
-        eyebrow: 'Step 3',
-        title: 'Tell the story like a chapter.',
-        subtitle:
-            'Short is fine. The important part is why this moment matters.',
+        eyebrow: l10n.todayEyebrow,
+        title: l10n.addMemoryStepTitle,
+        subtitle: l10n.addMemoryStepSubtitle,
         child: Column(
           children: [
             TextField(
               controller: _titleController,
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: 'Memory title',
-                hintText: 'Example: First launch night',
+              decoration: InputDecoration(
+                labelText: l10n.momentLabel,
+                hintText: l10n.momentHint,
               ),
+              onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 14),
             TextField(
               controller: _descriptionController,
-              minLines: 5,
-              maxLines: 8,
-              decoration: const InputDecoration(
-                labelText: 'Why this memory matters',
-                hintText:
-                    'Write what happened, who was there, and what you felt.',
+              minLines: 3,
+              maxLines: 6,
+              decoration: InputDecoration(
+                labelText: l10n.storyWorthLabel,
+                hintText: l10n.storyWorthHint,
               ),
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 16),
+            _PhotoPickerPanel(
+              photos: _photos,
+              isPicking: _isPicking,
+              permission: _photoPermission,
+              onPick: _openPhotoPicker,
+              onManageLimitedAccess: _manageLimitedPhotoAccess,
+              onRemove: (photo) => setState(() {
+                _photos.remove(photo);
+                _syncLocationFromPhotos();
+              }),
             ),
           ],
         ),
       ),
-      3 => _StepCard(
-        eyebrow: 'Step 4',
-        title: 'What feeling should this carry?',
-        subtitle: 'This helps the wall feel alive, not just organized.',
+      1 => _StepCard(
+        eyebrow: l10n.feelingEyebrow,
+        title: l10n.feelingStepTitle,
+        subtitle: l10n.feelingStepSubtitle,
         child: Column(
           children: [
             for (final feeling in MemoryFeeling.values)
               _ChoiceTile(
                 selected: _feeling == feeling,
                 icon: feeling.icon,
-                title: feeling.label,
-                subtitle: _feelingDescription(feeling),
+                title: feeling.localizedLabel(l10n),
+                subtitle: feeling.localizedDescription(l10n),
                 color: feeling.color,
                 onTap: () => setState(() => _feeling = feeling),
               ),
           ],
         ),
       ),
-      4 => _StepCard(
-        eyebrow: 'Step 5',
-        title: 'Place it in time and space.',
-        subtitle: 'A date and place make the memory easier to find later.',
+      2 => _StepCard(
+        eyebrow: l10n.contextEyebrow,
+        title: l10n.whenWasItTitle,
+        subtitle: l10n.photoGpsStepSubtitle,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _DateButton(date: _occurredAt, onTap: _pickDate),
             const SizedBox(height: 14),
-            TextField(
-              controller: _locationController,
-              decoration: const InputDecoration(
-                labelText: 'Location',
-                hintText: 'Linz, Austria',
-              ),
-            ),
-            if (_latitude != null && _longitude != null) ...[
-              const SizedBox(height: 10),
-              Text(
-                'Photo location detected: ${_latitude!.toStringAsFixed(5)}, ${_longitude!.toStringAsFixed(5)}',
-                style: const TextStyle(color: AppColors.muted),
-              ),
-            ],
+            _PhotoGpsStatus(latitude: _latitude, longitude: _longitude),
           ],
         ),
       ),
-      5 => _StepCard(
-        eyebrow: 'Step 6',
-        title: 'Who belongs to this memory?',
-        subtitle:
-            'Mention people connected to the moment. Phone and email are optional.',
-        child: MemoryPeopleEditor(
-          people: _people,
-          onChanged: (people) => setState(() => _people = people),
-        ),
-      ),
-      6 => _StepCard(
-        eyebrow: 'Step 7',
-        title: 'Connect it to your life wall.',
-        subtitle: 'Optional, but this is where LifeThreads becomes emotional.',
+      3 => _StepCard(
+        eyebrow: l10n.peopleThreadsEyebrow,
+        title: l10n.peopleThreadsTitle,
+        subtitle: l10n.peopleThreadsSubtitle,
         child: Column(
           children: [
+            MemoryPeopleEditor(
+              people: _people,
+              suggestedPeople: _personSuggestions(state),
+              onChanged: (people) => setState(() => _people = people),
+            ),
+            const SizedBox(height: 18),
             DropdownButtonFormField<String>(
               initialValue: _connectedEventId,
               isExpanded: true,
-              decoration: const InputDecoration(
-                labelText: 'Connect to an existing memory',
+              decoration: InputDecoration(
+                labelText: l10n.connectExistingMemoryLabel,
               ),
               items: [
-                const DropdownMenuItem<String>(
+                DropdownMenuItem<String>(
                   value: null,
-                  child: Text('No connection yet'),
+                  child: Text(l10n.noConnectionYet),
                 ),
                 ...state.events.map(
                   (event) => DropdownMenuItem<String>(
@@ -282,13 +226,20 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
                 controller: _connectionReasonController,
                 minLines: 3,
                 maxLines: 5,
-                decoration: const InputDecoration(
-                  labelText: 'Why are they connected?',
-                  hintText:
-                      'Example: same trip, same person, before / after...',
+                decoration: InputDecoration(
+                  labelText: l10n.connectionReasonLabel,
+                  hintText: l10n.connectionReasonHint,
                 ),
               ),
             ],
+            const SizedBox(height: 18),
+            _MemoryDetailsPanel(
+              memoryType: _memoryType,
+              category: _category,
+              onTypeChanged: (type) => setState(() => _memoryType = type),
+              onCategoryChanged: (category) =>
+                  setState(() => _category = category),
+            ),
             const SizedBox(height: 18),
             _PreviewSummary(
               title: _titleController.text.trim(),
@@ -360,6 +311,18 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     });
   }
 
+  List<MemoryPersonDraft> _personSuggestions(MemoryState state) {
+    return [
+      for (final person in state.people)
+        MemoryPersonDraft(
+          name: person.name,
+          relationship: person.relationship,
+          phone: person.phone,
+          email: person.email,
+        ),
+    ];
+  }
+
   Future<void> _manageLimitedPhotoAccess() async {
     final service = ref.read(photoLibraryServiceProvider);
     await service.manageLimitedSelection();
@@ -378,19 +341,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     );
     _occurredAt ??= (datedPhoto ?? photos.first).capturedAt;
 
-    final locatedPhoto = _firstWhereOrNull(
-      photos,
-      (photo) => photo.hasLocation,
-    );
-    if (_latitude == null && _longitude == null && locatedPhoto != null) {
-      _latitude = locatedPhoto.latitude;
-      _longitude = locatedPhoto.longitude;
-    }
-
-    if (_locationController.text.trim().isEmpty && locatedPhoto != null) {
-      _locationController.text =
-          '${locatedPhoto.latitude!.toStringAsFixed(5)}, ${locatedPhoto.longitude!.toStringAsFixed(5)}';
-    }
+    _syncLocationFromPhotos();
 
     final namedPhoto = _firstWhereOrNull(
       photos,
@@ -413,6 +364,15 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     if (picked != null) setState(() => _occurredAt = picked);
   }
 
+  void _syncLocationFromPhotos() {
+    final locatedPhoto = _firstWhereOrNull(
+      _photos,
+      (photo) => photo.hasLocation,
+    );
+    _latitude = locatedPhoto?.latitude;
+    _longitude = locatedPhoto?.longitude;
+  }
+
   Future<void> _nextOrSave() async {
     if (!_validateStep()) return;
     if (_step < _stepCount - 1) {
@@ -423,19 +383,21 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
   }
 
   bool _validateStep() {
-    final message = switch (_step) {
-      2 when _titleController.text.trim().isEmpty => 'Add a title first.',
-      2 when _descriptionController.text.trim().isEmpty =>
-        'Write a short story first.',
-      4 when _locationController.text.trim().isEmpty => 'Add a location first.',
-      _ => null,
-    };
+    final message = _step == 0 && !_canSaveNow()
+        ? context.l10n.writeMomentOrPhotoFirst
+        : null;
 
     if (message == null) return true;
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
     return false;
+  }
+
+  bool _canSaveNow() {
+    return _titleController.text.trim().isNotEmpty ||
+        _descriptionController.text.trim().isNotEmpty ||
+        _photos.isNotEmpty;
   }
 
   Future<void> _saveMemory(BuildContext context) async {
@@ -453,17 +415,28 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
 
     setState(() => _isSaving = true);
 
+    final fallbackTitle =
+        _cleanPhotoTitle(_photos.firstOrNull?.title) ??
+        context.l10n.todaysMoment;
+    final title = _titleController.text.trim().isEmpty
+        ? fallbackTitle
+        : _titleController.text.trim();
+    final description = _descriptionController.text.trim().isEmpty
+        ? context.l10n.savedFromTodaysPrompt
+        : _descriptionController.text.trim();
+    final locationLabel = _locationLabelFromGps(_latitude, _longitude);
+
     await ref
         .read(memoryRepositoryProvider.notifier)
         .addMemory(
           NewMemoryDraft(
-            title: _titleController.text.trim(),
-            description: _descriptionController.text.trim(),
+            title: title,
+            description: description,
             category: _category,
             memoryType: _memoryType,
             feeling: _feeling,
             occurredAt: _occurredAt ?? DateTime.now(),
-            locationLabel: _locationController.text.trim(),
+            locationLabel: locationLabel,
             latitude: _latitude,
             longitude: _longitude,
             coverPhotoPath: _photos.isEmpty ? null : _photos.first.localPath,
@@ -489,26 +462,6 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     setState(() => _isSaving = false);
     if (context.mounted) _backToWall(context);
   }
-
-  IconData _iconForType(MemoryType type) {
-    return switch (type) {
-      MemoryType.moment => Icons.auto_stories_rounded,
-      MemoryType.trip => Icons.travel_explore_rounded,
-      MemoryType.person => Icons.people_alt_rounded,
-      MemoryType.place => Icons.place_rounded,
-      MemoryType.note => Icons.edit_note_rounded,
-    };
-  }
-
-  String _feelingDescription(MemoryFeeling feeling) {
-    return switch (feeling) {
-      MemoryFeeling.warm => 'Soft, close, full of love.',
-      MemoryFeeling.nostalgic => 'A memory that pulls you back.',
-      MemoryFeeling.proud => 'A moment that proved something.',
-      MemoryFeeling.calm => 'Quiet, safe, peaceful.',
-      MemoryFeeling.important => 'A memory that changed the story.',
-    };
-  }
 }
 
 T? _firstWhereOrNull<T>(Iterable<T> items, bool Function(T item) test) {
@@ -526,6 +479,52 @@ String? _cleanPhotoTitle(String? title) {
       : value;
   final cleaned = withoutExtension.replaceAll(RegExp(r'[_-]+'), ' ').trim();
   return cleaned.isEmpty ? null : cleaned;
+}
+
+String _locationLabelFromGps(double? latitude, double? longitude) {
+  if (latitude == null || longitude == null) return '';
+  return '${latitude.toStringAsFixed(5)}, ${longitude.toStringAsFixed(5)}';
+}
+
+class _PhotoGpsStatus extends StatelessWidget {
+  const _PhotoGpsStatus({required this.latitude, required this.longitude});
+
+  final double? latitude;
+  final double? longitude;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasGps = latitude != null && longitude != null;
+    final l10n = context.l10n;
+    return Container(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: AppColors.panelWarm.withValues(alpha: 0.68),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            hasGps ? Icons.location_on_rounded : Icons.location_off_rounded,
+            color: hasGps ? AppColors.gold : AppColors.muted,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              hasGps
+                  ? l10n.photoGpsDetected(
+                      latitude!.toStringAsFixed(5),
+                      longitude!.toStringAsFixed(5),
+                    )
+                  : l10n.photoGpsMissing,
+              style: const TextStyle(color: AppColors.muted, height: 1.35),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _FlowHeader extends StatelessWidget {
@@ -561,7 +560,7 @@ class _FlowHeader extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Hang a memory with meaning',
+                    context.l10n.saveItBeforeItFades,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
@@ -753,14 +752,14 @@ class _DateButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final value = date == null
-        ? 'Choose date'
+        ? context.l10n.chooseDate
         : '${date!.day.toString().padLeft(2, '0')}.${date!.month.toString().padLeft(2, '0')}.${date!.year}';
 
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
       child: InputDecorator(
-        decoration: const InputDecoration(labelText: 'Date'),
+        decoration: InputDecoration(labelText: context.l10n.dateLabel),
         child: Row(
           children: [
             const Icon(Icons.calendar_month_rounded, color: AppColors.gold),
@@ -788,6 +787,9 @@ class _PreviewSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final titleLabel = title.isEmpty ? l10n.untitledMemory : title;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -801,12 +803,97 @@ class _PreviewSummary extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              '${title.isEmpty ? 'Untitled memory' : title} • ${type.label} • ${feeling.label} • $photoCount photo${photoCount == 1 ? '' : 's'}',
+              l10n.memoryPreviewSummary(
+                titleLabel,
+                type.localizedLabel(l10n),
+                feeling.localizedLabel(l10n),
+                photoCount,
+              ),
               style: const TextStyle(fontWeight: FontWeight.w800, height: 1.3),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _MemoryDetailsPanel extends StatelessWidget {
+  const _MemoryDetailsPanel({
+    required this.memoryType,
+    required this.category,
+    required this.onTypeChanged,
+    required this.onCategoryChanged,
+  });
+
+  final MemoryType memoryType;
+  final MemoryCategory category;
+  final ValueChanged<MemoryType> onTypeChanged;
+  final ValueChanged<MemoryCategory> onCategoryChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return ExpansionTile(
+      tilePadding: EdgeInsets.zero,
+      childrenPadding: EdgeInsets.zero,
+      leading: const Icon(Icons.tune_rounded, color: AppColors.gold),
+      title: Text(
+        l10n.organize,
+        style: const TextStyle(fontWeight: FontWeight.w900),
+      ),
+      subtitle: Text(
+        '${memoryType.localizedLabel(l10n)} • ${category.localizedLabel(l10n)}',
+      ),
+      children: [
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            l10n.memoryShape,
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w900),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final type in MemoryType.values)
+              ChoiceChip(
+                selected: memoryType == type,
+                label: Text(type.localizedLabel(l10n)),
+                onSelected: (_) => onTypeChanged(type),
+              ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            l10n.wallCategory,
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w900),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final item in MemoryCategory.values)
+              ChoiceChip(
+                selected: category == item,
+                label: Text(item.localizedLabel(l10n)),
+                onSelected: (_) => onCategoryChanged(item),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -818,6 +905,7 @@ class _BottomControls extends StatelessWidget {
     required this.isSaving,
     required this.onBack,
     required this.onNext,
+    required this.onSaveNow,
   });
 
   final int step;
@@ -825,10 +913,12 @@ class _BottomControls extends StatelessWidget {
   final bool isSaving;
   final VoidCallback? onBack;
   final VoidCallback onNext;
+  final VoidCallback? onSaveNow;
 
   @override
   Widget build(BuildContext context) {
     final isLast = step == stepCount - 1;
+    final l10n = context.l10n;
 
     return SafeArea(
       top: false,
@@ -846,11 +936,18 @@ class _BottomControls extends StatelessWidget {
               TextButton.icon(
                 onPressed: isSaving ? null : onBack,
                 icon: const Icon(Icons.arrow_back_rounded),
-                label: const Text('Back'),
+                label: Text(l10n.back),
               )
             else
-              const SizedBox(width: 92),
+              const SizedBox.shrink(),
             const Spacer(),
+            if (step == 0) ...[
+              TextButton(
+                onPressed: isSaving ? null : onSaveNow,
+                child: Text(l10n.saveNow),
+              ),
+              const SizedBox(width: 8),
+            ],
             FilledButton.icon(
               onPressed: isSaving ? null : onNext,
               icon: isSaving
@@ -864,7 +961,7 @@ class _BottomControls extends StatelessWidget {
                           ? Icons.push_pin_rounded
                           : Icons.arrow_forward_rounded,
                     ),
-              label: Text(isLast ? 'Hang on wall' : 'Continue'),
+              label: Text(isLast ? l10n.hangOnWall : l10n.continueAction),
             ),
           ],
         ),
@@ -892,6 +989,8 @@ class _PhotoPickerPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -906,10 +1005,13 @@ class _PhotoPickerPanel extends StatelessWidget {
             children: [
               const Icon(Icons.photo_library_rounded, color: AppColors.gold),
               const SizedBox(width: 10),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Private photos',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                  l10n.privatePhotos,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ),
               TextButton.icon(
@@ -921,7 +1023,7 @@ class _PhotoPickerPanel extends StatelessWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.add_rounded),
-                label: Text(photos.isEmpty ? 'Pick' : 'Add more'),
+                label: Text(photos.isEmpty ? l10n.pick : l10n.addMore),
               ),
             ],
           ),
@@ -931,9 +1033,9 @@ class _PhotoPickerPanel extends StatelessWidget {
           ],
           const SizedBox(height: 14),
           if (photos.isEmpty)
-            const Text(
-              'LifeThreads copies selected photos into private app storage and keeps date/location metadata when available.',
-              style: TextStyle(color: AppColors.muted, height: 1.45),
+            Text(
+              l10n.photoStorageHint,
+              style: const TextStyle(color: AppColors.muted, height: 1.45),
             )
           else ...[
             _PhotoMetadataSummary(photos: photos),
@@ -955,6 +1057,14 @@ class _PhotoPickerPanel extends StatelessWidget {
                           width: 108,
                           height: 108,
                           fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => const ColoredBox(
+                            color: AppColors.wallDeep,
+                            child: SizedBox(
+                              width: 108,
+                              height: 108,
+                              child: Icon(Icons.photo_camera_back_rounded),
+                            ),
+                          ),
                         ),
                       ),
                       Positioned(
@@ -994,17 +1104,17 @@ class _PhotoMetadataSummary extends StatelessWidget {
       children: [
         _MetadataChip(
           icon: Icons.calendar_month_rounded,
-          label: '$dateCount/${photos.length} dates',
+          label: context.l10n.metadataDates(dateCount, photos.length),
           active: dateCount > 0,
         ),
         _MetadataChip(
           icon: Icons.place_rounded,
-          label: '$locationCount/${photos.length} locations',
+          label: context.l10n.metadataLocations(locationCount, photos.length),
           active: locationCount > 0,
         ),
         _MetadataChip(
           icon: Icons.aspect_ratio_rounded,
-          label: '$dimensionCount/${photos.length} sizes',
+          label: context.l10n.metadataSizes(dimensionCount, photos.length),
           active: dimensionCount > 0,
         ),
       ],
@@ -1079,13 +1189,13 @@ class _LimitedAccessNotice extends StatelessWidget {
         children: [
           const Icon(Icons.photo_filter_rounded, color: AppColors.gold),
           const SizedBox(width: 10),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Limited photo access is active. You can add more allowed photos.',
-              style: TextStyle(fontWeight: FontWeight.w700, height: 1.3),
+              context.l10n.limitedPhotoAccessActive,
+              style: const TextStyle(fontWeight: FontWeight.w700, height: 1.3),
             ),
           ),
-          TextButton(onPressed: onManage, child: const Text('Manage')),
+          TextButton(onPressed: onManage, child: Text(context.l10n.manage)),
         ],
       ),
     );
@@ -1131,8 +1241,8 @@ class _PhotoGridSheetState extends State<_PhotoGridSheet> {
                 Expanded(
                   child: Text(
                     _selectedIds.isEmpty
-                        ? 'Select photos'
-                        : '${_newSelectionCount()} new selected',
+                        ? context.l10n.selectPhotos
+                        : context.l10n.newSelected(_newSelectionCount()),
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
@@ -1145,20 +1255,20 @@ class _PhotoGridSheetState extends State<_PhotoGridSheet> {
                       await widget.onManageLimitedAccess();
                       if (context.mounted) Navigator.of(context).pop();
                     },
-                    child: const Text('Manage access'),
+                    child: Text(context.l10n.manageAccess),
                   ),
                 FilledButton(
                   onPressed: _newSelectionCount() == 0
                       ? null
                       : () => Navigator.of(context).pop(_selectedAssets()),
-                  child: const Text('Use selected'),
+                  child: Text(context.l10n.useSelected),
                 ),
               ],
             ),
           ),
           Expanded(
             child: widget.assets.isEmpty
-                ? const Center(child: Text('No photos found.'))
+                ? Center(child: Text(context.l10n.noPhotosFound))
                 : GridView.builder(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                     gridDelegate:
@@ -1309,15 +1419,15 @@ class _PermissionDeniedSheet extends StatelessWidget {
         children: [
           const Icon(Icons.lock_rounded, color: AppColors.gold, size: 42),
           const SizedBox(height: 14),
-          const Text(
-            'Photo access is off',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+          Text(
+            context.l10n.photoAccessOff,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Enable photo access to pick memories. Your photos stay on this device.',
+          Text(
+            context.l10n.photoAccessOffBody,
             textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.muted, height: 1.45),
+            style: const TextStyle(color: AppColors.muted, height: 1.45),
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -1327,7 +1437,7 @@ class _PermissionDeniedSheet extends StatelessWidget {
                 Navigator.of(context).pop();
                 await onOpenSettings();
               },
-              child: const Text('Open Settings'),
+              child: Text(context.l10n.openSettings),
             ),
           ),
         ],
@@ -1381,26 +1491,26 @@ class _MemoryLimitReached extends StatelessWidget {
                 size: 48,
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Free memory limit reached',
+              Text(
+                context.l10n.freeMemoryLimitReached,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -0.5,
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                'Free walls include 30 memories. Upgrade to keep building your living wall.',
+              Text(
+                context.l10n.freeMemoryLimitBody,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.muted, height: 1.45),
+                style: const TextStyle(color: AppColors.muted, height: 1.45),
               ),
               const SizedBox(height: 20),
               FilledButton.icon(
                 onPressed: () => context.go(RouteNames.upgrade),
                 icon: const Icon(Icons.lock_open_rounded),
-                label: const Text('View Premium'),
+                label: Text(context.l10n.viewPremium),
               ),
             ],
           ),

@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../features/backup/domain/backup_models.dart';
 import '../../../../features/capsule/data/memory_capsule_cloud_share_service.dart';
 import '../../../../features/capsule/data/memory_capsule_service.dart';
@@ -17,6 +18,7 @@ import '../../data/memory_repository.dart';
 import '../../domain/memory_event.dart';
 import '../../domain/memory_photo.dart';
 import '../../domain/memory_person.dart';
+import '../memory_l10n.dart';
 import '../../../wall/domain/wall_item.dart';
 
 class MemoryDetailPage extends ConsumerWidget {
@@ -90,8 +92,10 @@ class MemoryDetailPage extends ConsumerWidget {
                           previewPhotos: galleryPhotos,
                         ),
                       ],
-                      const SizedBox(height: 22),
-                      _MapSection(event: event),
+                      if (event.hasGeoPoint) ...[
+                        const SizedBox(height: 22),
+                        _MapSection(event: event),
+                      ],
                       const SizedBox(height: 22),
                       _ConnectedThreadPath(
                         memoryId: memoryId,
@@ -140,27 +144,23 @@ class MemoryDetailPage extends ConsumerWidget {
       if (!context.mounted) return;
       final shareResult = await SharePlus.instance.share(
         ShareParams(
-          title: 'LifeThreads memory',
-          subject: 'LifeThreads memory',
-          text:
-              'Hey, I shared a memory with you in LifeThreads.\n\n${cloudShare.shareUrl}',
+          title: context.l10n.lifeThreadsMemoryTitle,
+          subject: context.l10n.lifeThreadsMemoryTitle,
+          text: context.l10n.shareMemoryText(cloudShare.shareUrl),
         ),
       );
       if (!context.mounted) return;
       final label = switch (shareResult.status) {
-        ShareResultStatus.success => 'Share link ready.',
-        ShareResultStatus.dismissed => 'Share link created.',
-        ShareResultStatus.unavailable =>
-          'Share link created, but sharing is unavailable.',
+        ShareResultStatus.success => context.l10n.shareLinkReady,
+        ShareResultStatus.dismissed => context.l10n.shareLinkCreated,
+        ShareResultStatus.unavailable => context.l10n.shareLinkUnavailable,
       };
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           duration: const Duration(seconds: 9),
-          content: Text(
-            '$label Link expires automatically. You can delete it now.',
-          ),
+          content: Text(context.l10n.shareLinkExpiresDelete(label)),
           action: SnackBarAction(
-            label: 'Delete',
+            label: context.l10n.delete,
             onPressed: () {
               unawaited(_deleteSharedCapsule(context, ref, cloudShare));
             },
@@ -174,7 +174,7 @@ class MemoryDetailPage extends ConsumerWidget {
       }
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Capsule rejected: ${error.message}')),
+        SnackBar(content: Text(context.l10n.capsuleRejected(error.message))),
       );
     } on MemoryCapsuleCloudShareException catch (error) {
       if (context.mounted && progressVisible) {
@@ -183,7 +183,7 @@ class MemoryDetailPage extends ConsumerWidget {
       }
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Cloud share failed: ${error.message}')),
+        SnackBar(content: Text(context.l10n.cloudShareFailed(error.message))),
       );
     } catch (error) {
       if (context.mounted && progressVisible) {
@@ -191,9 +191,9 @@ class MemoryDetailPage extends ConsumerWidget {
         progressVisible = false;
       }
       if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Cloud share failed: $error')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.cloudShareFailed('$error'))),
+      );
     }
   }
 
@@ -216,12 +216,12 @@ class MemoryDetailPage extends ConsumerWidget {
           .revokeShare(cloudShare);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Shared memory link deleted.')),
+        SnackBar(content: Text(context.l10n.sharedMemoryLinkDeleted)),
       );
     } on MemoryCapsuleCloudShareException catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Delete failed: ${error.message}')),
+        SnackBar(content: Text(context.l10n.deleteFailed(error.message))),
       );
     }
   }
@@ -233,15 +233,15 @@ class _CloudShareProgressDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      content: const Row(
+      content: Row(
         children: [
-          SizedBox(
+          const SizedBox(
             width: 24,
             height: 24,
             child: CircularProgressIndicator(strokeWidth: 3),
           ),
-          SizedBox(width: 16),
-          Expanded(child: Text('Creating secure memory link...')),
+          const SizedBox(width: 16),
+          Expanded(child: Text(context.l10n.creatingSecureMemoryLink)),
         ],
       ),
     );
@@ -268,6 +268,7 @@ class _CinematicHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final path = event.coverPhotoPath;
+    final assetExists = path != null && path.startsWith('assets/');
     final fileExists = path != null && File(path).existsSync();
     final heroTag = 'memory-cover-${event.id}';
     final height = MediaQuery.sizeOf(context).height * 0.58;
@@ -277,7 +278,7 @@ class _CinematicHero extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (fileExists)
+          if (assetExists || fileExists)
             GestureDetector(
               onTap: () => _openPhotoPreview(
                 context,
@@ -286,11 +287,21 @@ class _CinematicHero extends StatelessWidget {
               ),
               child: Hero(
                 tag: heroTag,
-                child: Image.file(
-                  File(path),
-                  fit: BoxFit.cover,
-                  filterQuality: FilterQuality.medium,
-                ),
+                child: assetExists
+                    ? Image.asset(
+                        path,
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.medium,
+                        errorBuilder: (_, _, _) =>
+                            _HeroPlaceholder(event: event),
+                      )
+                    : Image.file(
+                        File(path),
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.medium,
+                        errorBuilder: (_, _, _) =>
+                            _HeroPlaceholder(event: event),
+                      ),
               ),
             )
           else
@@ -365,15 +376,17 @@ class _CinematicHero extends StatelessWidget {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.place_rounded,
+                    Icon(
+                      event.hasGeoPoint
+                          ? Icons.place_rounded
+                          : Icons.calendar_month_rounded,
                       color: AppColors.amber,
                       size: 20,
                     ),
                     const SizedBox(width: 7),
                     Expanded(
                       child: Text(
-                        '${event.locationLabel} • ${_formatDate(event.occurredAt)}',
+                        _heroSubtitle(event),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -501,7 +514,7 @@ class _ChapterActions extends StatelessWidget {
           child: FilledButton.icon(
             onPressed: onShareCapsule,
             icon: const Icon(Icons.inventory_2_rounded),
-            label: const Text('Share Memory Capsule'),
+            label: Text(context.l10n.shareMemoryCapsule),
           ),
         ),
         const SizedBox(height: 12),
@@ -511,7 +524,7 @@ class _ChapterActions extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onEdit,
                 icon: const Icon(Icons.edit_rounded),
-                label: const Text('Edit story'),
+                label: Text(context.l10n.editStory),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.amber,
                   side: const BorderSide(color: AppColors.line),
@@ -524,7 +537,7 @@ class _ChapterActions extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onConnect,
                 icon: const Icon(Icons.hub_rounded),
-                label: const Text('Connect'),
+                label: Text(context.l10n.connect),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.amber,
                   side: const BorderSide(color: AppColors.line),
@@ -546,6 +559,8 @@ class _MetadataGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return GridView.count(
       padding: EdgeInsets.zero,
       crossAxisCount: 2,
@@ -557,25 +572,25 @@ class _MetadataGrid extends StatelessWidget {
       children: [
         _MetaCard(
           icon: Icons.auto_stories_rounded,
-          label: 'Type',
-          value: event.memoryType.label,
+          label: l10n.metaType,
+          value: event.memoryType.localizedLabel(l10n),
           color: AppColors.gold,
         ),
         _MetaCard(
           icon: event.feeling.icon,
-          label: 'Feeling',
-          value: event.feeling.label,
+          label: l10n.metaFeeling,
+          value: event.feeling.localizedLabel(l10n),
           color: event.feeling.color,
         ),
         _MetaCard(
           icon: Icons.category_rounded,
-          label: 'Category',
-          value: event.category.label,
+          label: l10n.metaCategory,
+          value: event.category.localizedLabel(l10n),
           color: AppColors.sage,
         ),
         _MetaCard(
           icon: Icons.calendar_month_rounded,
-          label: 'Date',
+          label: l10n.metaDate,
           value: _formatDate(event.occurredAt),
           color: AppColors.blue,
         ),
@@ -647,8 +662,8 @@ class _StorySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _ChapterPanel(
-      eyebrow: 'Story',
-      title: 'Why this memory matters',
+      eyebrow: context.l10n.storyEyebrow,
+      title: context.l10n.whyMemoryMatters,
       child: Text(
         event.description,
         style: const TextStyle(
@@ -671,8 +686,8 @@ class _GallerySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _ChapterPanel(
-      eyebrow: 'Gallery',
-      title: '${photos.length} saved photo${photos.length == 1 ? '' : 's'}',
+      eyebrow: context.l10n.galleryEyebrow,
+      title: context.l10n.savedPhotosTitle(photos.length),
       child: SizedBox(
         height: 176,
         child: ListView.separated(
@@ -709,6 +724,12 @@ class _GallerySection extends StatelessWidget {
                           File(photo.localPath),
                           fit: BoxFit.cover,
                           filterQuality: FilterQuality.medium,
+                          errorBuilder: (_, _, _) => const ColoredBox(
+                            color: AppColors.wallDeep,
+                            child: Center(
+                              child: Icon(Icons.photo_camera_back_rounded),
+                            ),
+                          ),
                         ),
                       )
                     : const ColoredBox(
@@ -732,8 +753,8 @@ class _PeopleSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _ChapterPanel(
-      eyebrow: 'People',
-      title: 'Part of this memory',
+      eyebrow: context.l10n.peopleEyebrow,
+      title: context.l10n.partOfMemory,
       child: Wrap(
         spacing: 10,
         runSpacing: 10,
@@ -798,8 +819,8 @@ class _ConnectedNotesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _ChapterPanel(
-      eyebrow: 'Notes',
-      title: 'Attached thoughts',
+      eyebrow: context.l10n.notesEyebrow,
+      title: context.l10n.attachedThoughts,
       child: Column(
         children: [
           for (final note in notes)
@@ -858,8 +879,8 @@ class _AttachedNoteCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Sticky note',
+                Text(
+                  context.l10n.stickyNote,
                   style: TextStyle(
                     color: AppColors.paperInk,
                     fontWeight: FontWeight.w900,
@@ -894,8 +915,8 @@ class _MapSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _ChapterPanel(
-      eyebrow: 'Place',
-      title: event.locationLabel,
+      eyebrow: context.l10n.placeEyebrow,
+      title: event.locationDisplayLabel,
       child: MemoryMapPreview(event: event),
     );
   }
@@ -915,12 +936,12 @@ class _ConnectedThreadPath extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _ChapterPanel(
-      eyebrow: 'Threads',
-      title: 'Connected memories',
+      eyebrow: context.l10n.threadsEyebrow,
+      title: context.l10n.connectedMemories,
       child: events.isEmpty
-          ? const Text(
-              'No connected memories yet. Connect this chapter to another moment to start a visible life thread.',
-              style: TextStyle(color: AppColors.muted, height: 1.45),
+          ? Text(
+              context.l10n.noConnectedMemoriesYet,
+              style: const TextStyle(color: AppColors.muted, height: 1.45),
             )
           : Column(
               children: [
@@ -1019,7 +1040,7 @@ class _ConnectedMemoryNode extends StatelessWidget {
                             Text(
                               cleanReason?.isNotEmpty == true
                                   ? cleanReason!
-                                  : event.locationLabel,
+                                  : _eventContextLabel(event),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -1128,7 +1149,7 @@ class _NotFoundState extends StatelessWidget {
     return Center(
       child: FilledButton(
         onPressed: () => _backToWall(context),
-        child: const Text('Back to wall'),
+        child: Text(context.l10n.backToWall),
       ),
     );
   }
@@ -1209,21 +1230,7 @@ class _PhotoPreviewPageState extends State<_PhotoPreviewPage> {
                     child: InteractiveViewer(
                       minScale: 0.8,
                       maxScale: 4,
-                      child: Center(
-                        child: File(photo.path).existsSync()
-                            ? Hero(
-                                tag: photo.heroTag,
-                                child: Image.file(
-                                  File(photo.path),
-                                  fit: BoxFit.contain,
-                                ),
-                              )
-                            : const Icon(
-                                Icons.broken_image_rounded,
-                                color: AppColors.muted,
-                                size: 72,
-                              ),
-                      ),
+                      child: Center(child: _PreviewPhotoImage(photo: photo)),
                     ),
                   );
                 },
@@ -1310,13 +1317,56 @@ class _PreviewPhoto {
   final String title;
 }
 
+class _PreviewPhotoImage extends StatelessWidget {
+  const _PreviewPhotoImage({required this.photo});
+
+  final _PreviewPhoto photo;
+
+  @override
+  Widget build(BuildContext context) {
+    final isAsset = photo.path.startsWith('assets/');
+    final exists = isAsset || File(photo.path).existsSync();
+    if (!exists) {
+      return const Icon(
+        Icons.broken_image_rounded,
+        color: AppColors.muted,
+        size: 72,
+      );
+    }
+
+    return Hero(
+      tag: photo.heroTag,
+      child: isAsset
+          ? Image.asset(
+              photo.path,
+              fit: BoxFit.contain,
+              errorBuilder: (_, _, _) => const Icon(
+                Icons.broken_image_rounded,
+                color: AppColors.muted,
+                size: 72,
+              ),
+            )
+          : Image.file(
+              File(photo.path),
+              fit: BoxFit.contain,
+              errorBuilder: (_, _, _) => const Icon(
+                Icons.broken_image_rounded,
+                color: AppColors.muted,
+                size: 72,
+              ),
+            ),
+    );
+  }
+}
+
 List<_PreviewPhoto> _heroPreviewPhotos(
   MemoryEvent event,
   List<MemoryPhoto> photos,
 ) {
   final coverPath = event.coverPhotoPath;
   final previewPhotos = <_PreviewPhoto>[];
-  if (coverPath != null && File(coverPath).existsSync()) {
+  if (coverPath != null &&
+      (coverPath.startsWith('assets/') || File(coverPath).existsSync())) {
     previewPhotos.add(
       _PreviewPhoto(
         path: coverPath,
@@ -1351,6 +1401,17 @@ List<_PreviewPhoto> _galleryPreviewPhotos(List<MemoryPhoto> photos) {
 }
 
 String _photoTitle(int index) => 'Photo ${index + 1}';
+
+String _heroSubtitle(MemoryEvent event) {
+  final date = _formatDate(event.occurredAt);
+  if (!event.hasGeoPoint) return date;
+  return '${event.locationDisplayLabel} • $date';
+}
+
+String _eventContextLabel(MemoryEvent event) {
+  if (event.hasGeoPoint) return event.locationDisplayLabel;
+  return '${event.category.label} • ${_formatDate(event.occurredAt)}';
+}
 
 String _formatDate(DateTime date) {
   const months = [

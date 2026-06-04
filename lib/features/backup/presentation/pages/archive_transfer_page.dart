@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 import '../../../wall/presentation/widgets/wall_background.dart';
 
 class ArchiveTransferPage extends StatelessWidget {
@@ -22,10 +23,10 @@ class ArchiveTransferPage extends StatelessWidget {
                     icon: const Icon(Icons.arrow_back_rounded),
                   ),
                   const SizedBox(width: 8),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Open on another device',
-                      style: TextStyle(
+                      context.l10n.archiveTransferTitle,
+                      style: const TextStyle(
                         fontSize: 27,
                         fontWeight: FontWeight.w900,
                         letterSpacing: -0.8,
@@ -49,28 +50,28 @@ class ArchiveTransferPage extends StatelessWidget {
                     color: AppColors.gold.withValues(alpha: 0.2),
                   ),
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.enhanced_encryption_rounded,
                       color: AppColors.amber,
                       size: 38,
                     ),
-                    SizedBox(height: 14),
+                    const SizedBox(height: 14),
                     Text(
-                      'Move your memories between devices safely.',
-                      style: TextStyle(
+                      context.l10n.archiveTransferHeroTitle,
+                      style: const TextStyle(
                         fontSize: 30,
                         height: 1.05,
                         fontWeight: FontWeight.w900,
                         letterSpacing: -0.9,
                       ),
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     Text(
-                      'Premium Archive creates a portable encrypted zip with your memories, photos, notes, ropes, wall positions, and metadata. Cloud sync is planned later, but it is not active now.',
-                      style: TextStyle(
+                      context.l10n.archiveTransferHeroBody,
+                      style: const TextStyle(
                         color: AppColors.muted,
                         height: 1.45,
                         fontWeight: FontWeight.w600,
@@ -80,25 +81,22 @@ class ArchiveTransferPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 14),
-              const _StepCard(
+              _StepCard(
                 number: '1',
-                title: 'Export an archive',
-                body:
-                    'Open Settings, choose Export Archive, and add a password if you want password protection.',
+                title: context.l10n.archiveTransferStep1Title,
+                body: context.l10n.archiveTransferStep1Body,
                 icon: Icons.ios_share_rounded,
               ),
-              const _StepCard(
+              _StepCard(
                 number: '2',
-                title: 'Move the zip',
-                body:
-                    'Transfer it with AirDrop, USB, Drive, email, or any method you trust. LifeThreads does not upload it for you.',
+                title: context.l10n.archiveTransferStep2Title,
+                body: context.l10n.archiveTransferStep2Body,
                 icon: Icons.devices_rounded,
               ),
-              const _StepCard(
+              _StepCard(
                 number: '3',
-                title: 'Import safely',
-                body:
-                    'Install LifeThreads on the other device, choose Import Archive, enter the password if needed, and restore without deleting existing data.',
+                title: context.l10n.archiveTransferStep3Title,
+                body: context.l10n.archiveTransferStep3Body,
                 icon: Icons.restore_rounded,
               ),
             ],

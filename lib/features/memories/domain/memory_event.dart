@@ -39,6 +39,15 @@ class MemoryEvent {
   final double? longitude;
   final String? coverPhotoPath;
 
+  bool get hasGeoPoint => latitude != null && longitude != null;
+
+  String get locationDisplayLabel {
+    if (!hasGeoPoint) return '';
+    final label = locationLabel.trim();
+    if (label.isNotEmpty) return label;
+    return '${latitude!.toStringAsFixed(5)}, ${longitude!.toStringAsFixed(5)}';
+  }
+
   MemoryEvent copyWith({
     String? id,
     String? title,

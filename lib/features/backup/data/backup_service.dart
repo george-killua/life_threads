@@ -91,7 +91,7 @@ class BackupService {
                 'wallX': event.wallPosition.dx,
                 'wallY': event.wallPosition.dy,
                 'rotation': event.rotation,
-                'locationLabel': event.locationLabel,
+                'locationLabel': event.locationDisplayLabel,
                 'latitude': event.latitude,
                 'longitude': event.longitude,
                 'coverPhotoPath': event.coverPhotoPath == null
@@ -192,6 +192,13 @@ class BackupService {
 
     final picked = result.files.single;
     final bytes = picked.bytes ?? await File(picked.path!).readAsBytes();
+    return prepareImportBytes(bytes, password: password);
+  }
+
+  Future<BackupImportData> prepareImportBytes(
+    List<int> bytes, {
+    String? password,
+  }) async {
     final archive = await _decodeArchive(bytes, password: password);
     final files = {
       for (final file in archive)

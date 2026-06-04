@@ -11,12 +11,12 @@ void main() {
 
     test('includes required premium wall themes', () {
       expect(
-        WallThemePreset.all.map((theme) => theme.label),
+        WallThemePreset.all.map((theme) => theme.id),
         containsAll([
-          'Warm Memory Room',
-          'Midnight Archive',
-          'Soft Paper Wall',
-          'Travel Corkboard',
+          WallThemeId.warmMemoryRoom,
+          WallThemeId.midnightArchive,
+          WallThemeId.softPaperWall,
+          WallThemeId.travelCorkboard,
         ]),
       );
     });

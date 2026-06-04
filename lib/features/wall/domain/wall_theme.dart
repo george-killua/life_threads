@@ -17,8 +17,6 @@ enum WallThemeId {
 class WallThemePreset {
   const WallThemePreset({
     required this.id,
-    required this.label,
-    required this.description,
     required this.icon,
     required this.background,
     required this.depth,
@@ -30,8 +28,6 @@ class WallThemePreset {
   });
 
   final WallThemeId id;
-  final String label;
-  final String description;
   final IconData icon;
   final Color background;
   final Color depth;
@@ -43,8 +39,6 @@ class WallThemePreset {
 
   static const warmMemoryRoom = WallThemePreset(
     id: WallThemeId.warmMemoryRoom,
-    label: 'Warm Memory Room',
-    description: 'Soft dark warmth, gold light, and private-room depth.',
     icon: Icons.lightbulb_rounded,
     background: Color(0xFF0A070B),
     depth: Color(0xFF171018),
@@ -57,8 +51,6 @@ class WallThemePreset {
 
   static const midnightArchive = WallThemePreset(
     id: WallThemeId.midnightArchive,
-    label: 'Midnight Archive',
-    description: 'Deep blue archive room with quiet museum-like focus.',
     icon: Icons.nights_stay_rounded,
     background: Color(0xFF050914),
     depth: Color(0xFF091326),
@@ -71,8 +63,6 @@ class WallThemePreset {
 
   static const softPaperWall = WallThemePreset(
     id: WallThemeId.softPaperWall,
-    label: 'Soft Paper Wall',
-    description: 'Cream paper, ink shadows, and calm scrapbook feeling.',
     icon: Icons.article_rounded,
     background: Color(0xFF241C14),
     depth: Color(0xFF493A27),
@@ -85,8 +75,6 @@ class WallThemePreset {
 
   static const travelCorkboard = WallThemePreset(
     id: WallThemeId.travelCorkboard,
-    label: 'Travel Corkboard',
-    description: 'Corkboard warmth with map-grid hints for trips and places.',
     icon: Icons.travel_explore_rounded,
     background: Color(0xFF1F1308),
     depth: Color(0xFF3A2411),

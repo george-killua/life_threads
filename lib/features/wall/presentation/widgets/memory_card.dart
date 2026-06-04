@@ -4,7 +4,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 import '../../../memories/domain/memory_event.dart';
+import '../../../memories/presentation/memory_l10n.dart';
 import 'wall_drag_listener.dart';
 
 class MemoryCard extends StatelessWidget {
@@ -13,6 +15,7 @@ class MemoryCard extends StatelessWidget {
     required this.event,
     required this.windValue,
     required this.isDragging,
+    required this.hasConnection,
     required this.onTap,
     required this.onLongPress,
     required this.onEdit,
@@ -27,6 +30,7 @@ class MemoryCard extends StatelessWidget {
   final MemoryEvent event;
   final double windValue;
   final bool isDragging;
+  final bool hasConnection;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
   final VoidCallback onEdit;
@@ -71,13 +75,16 @@ class MemoryCard extends StatelessWidget {
                 alignment: Alignment.topCenter,
                 child: Column(
                   children: [
-                    _HangingThread(isDragging: isDragging),
+                    if (hasConnection)
+                      _HangingThread(isDragging: isDragging)
+                    else
+                      const SizedBox(height: 34),
                     Stack(
                       clipBehavior: Clip.none,
                       children: [
                         _PhotoPaper(event: event, isDragging: isDragging),
                         _Tape(isDragging: isDragging),
-                        _Pin(isDragging: isDragging),
+                        if (hasConnection) _Pin(isDragging: isDragging),
                         Positioned(
                           top: 10,
                           right: 10,
@@ -86,13 +93,13 @@ class MemoryCard extends StatelessWidget {
                               _CardActionButton(
                                 icon: Icons.edit_rounded,
                                 onTap: onEdit,
-                                tooltip: 'Edit memory',
+                                tooltip: context.l10n.editMemoryTooltip,
                               ),
                               const SizedBox(width: 7),
                               _CardActionButton(
                                 icon: Icons.hub_rounded,
                                 onTap: onConnect,
-                                tooltip: 'Connect memory',
+                                tooltip: context.l10n.connectMemoryTooltip,
                               ),
                             ],
                           ),
@@ -246,7 +253,10 @@ class _PhotoPaper extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             Text(
-              '${event.category.label} • ${event.locationLabel}',
+              [
+                event.category.localizedLabel(context.l10n),
+                if (event.hasGeoPoint) event.locationDisplayLabel,
+              ].join(' • '),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -350,14 +360,29 @@ class _CardImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final path = event.coverPhotoPath;
+    if (_isAssetPath(path)) {
+      return Image.asset(
+        path!,
+        fit: BoxFit.cover,
+        filterQuality: FilterQuality.medium,
+        errorBuilder: (_, _, _) => _buildPlaceholder(),
+      );
+    }
     if (path != null && File(path).existsSync()) {
       return Image.file(
         File(path),
         fit: BoxFit.cover,
         filterQuality: FilterQuality.medium,
+        errorBuilder: (_, _, _) => _buildPlaceholder(),
       );
     }
 
+    return _buildPlaceholder();
+  }
+
+  bool _isAssetPath(String? path) => path != null && path.startsWith('assets/');
+
+  Widget _buildPlaceholder() {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: event.coverColor,
