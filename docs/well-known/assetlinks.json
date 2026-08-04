@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "dev.gkcoding.lifethreads",
+      "sha256_cert_fingerprints": [
+        "3E:16:2A:8F:40:73:54:D9:C2:89:97:F6:73:FE:71:D1:5A:6E:23:8E:8D:44:B5:43:B1:63:E4:82:74:AD:AC:98"
+      ]
+    }
+  }
+]

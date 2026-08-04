@@ -20,6 +20,11 @@
 -keep class com.android.billingclient.** { *; }
 -keep class io.flutter.plugins.inapppurchase.** { *; }
 
+# Deferred components / Play Core optional stubs referenced by Flutter embedding
+-dontwarn com.google.android.play.core.splitcompat.SplitCompatApplication
+-dontwarn com.google.android.play.core.splitinstall.**
+-dontwarn com.google.android.play.core.tasks.**
+
 -dontwarn org.bouncycastle.**
 -dontwarn org.conscrypt.**
 -dontwarn org.openjsse.**

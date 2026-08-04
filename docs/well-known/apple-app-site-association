@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "443GVR9G8M.dev.gkcoding.lifeThreads",
+        "paths": [
+          "/lifethreads/share/*",
+          "/share/*"
+        ]
+      }
+    ]
+  }
+}
