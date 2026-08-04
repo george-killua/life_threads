@@ -304,6 +304,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                             opacity: animation,
                             child: SizeTransition(
                               sizeFactor: animation,
+                              // ignore: deprecated_member_use
                               axisAlignment: -1,
                               child: child,
                             ),

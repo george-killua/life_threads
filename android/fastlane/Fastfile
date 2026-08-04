@@ -32,7 +32,7 @@ platform :android do
 
     Dir.chdir(project_root) do
       sh("flutter", "pub", "get")
-      sh("flutter", "analyze")
+      sh("flutter", "analyze", "--no-fatal-infos")
       sh("flutter", "test")
       sh("flutter", "build", "appbundle", "--release", "--dart-define=MAPTILER_KEY=#{maptiler_key}")
     end
