@@ -46,11 +46,16 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            isShrinkResources = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
             signingConfig = if (hasReleaseKeystore) {
                 signingConfigs.getByName("release")
             } else {
+                // Local/CI verification only. Never upload debug-signed AABs.
                 signingConfigs.getByName("debug")
             }
         }

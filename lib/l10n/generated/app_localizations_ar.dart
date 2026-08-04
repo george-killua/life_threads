@@ -55,7 +55,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get privacyBody =>
-      'LifeThreads يعمل محلياً أولاً. ذكرياتك وصورك وملاحظاتك ومواقعك وروابطك تبقى على هذا الجهاز إلا إذا صدّرت نسخة احتياطية بنفسك.';
+      'LifeThreads يعمل محلياً أولاً: بلا حساب وبلا ملف عام. تبقى ذكرياتك على هذا الجهاز إلا إذا اخترت مشاركة سحابية مشفّرة أو مزامنة سحابية أو تصدير نسخة احتياطية يدوياً.';
+
+  @override
+  String get viewPrivacyPolicy => 'عرض سياسة الخصوصية';
+
+  @override
+  String get termsTitle => 'شروط الاستخدام';
+
+  @override
+  String get viewTerms => 'عرض الشروط';
 
   @override
   String get betaFeedbackTitle => 'ملاحظات بيتا';
@@ -309,7 +318,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get onboardingPrivacy =>
-      'ذكرياتك تبقى خاصة: لا حساب ولا رفع سحابي في هذا الإصدار الأولي.';
+      'ذكرياتك تبقى خاصة افتراضياً: بلا حساب وبلا ملف عام. المشاركة السحابية المشفّرة والنسخ الاحتياطي اختياريان ولا يحدثان إلا عندما تختارهما.';
 
   @override
   String get storyPrivacyTitle => 'ذكرياتك تبقى خاصة';
@@ -465,6 +474,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get addToWall => 'إضافة إلى الجدار';
+
+  @override
+  String get cinemaSkip => 'تخطي';
+
+  @override
+  String get cinemaNotNow => 'ليس الآن';
+
+  @override
+  String get cinemaSharedChapter => 'فصل ذكرى مشتركة';
+
+  @override
+  String get cinemaConnectedThread => 'خيط متصل';
+
+  @override
+  String get cinemaInviteTitle => 'إضافة هذه الذكرى إلى جدارك؟';
 
   @override
   String get useSelected => 'استخدام المحدد';
@@ -728,6 +752,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get addMore => 'إضافة المزيد';
+
+  @override
+  String get takePhoto => 'التقاط صورة';
 
   @override
   String get photoStorageHint =>

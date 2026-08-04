@@ -84,6 +84,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                   path: _coverPhotoPath,
                   isPicking: _isPicking,
                   onPick: () => _pickPhotos(setFirstAsCover: true),
+                  onCapture: () => _capturePhoto(setAsCover: true),
                   onClear: _coverPhotoPath == null
                       ? null
                       : () => setState(() => _coverPhotoPath = null),
@@ -227,16 +228,28 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                 const SizedBox(height: 16),
                 _EditPanel(
                   title: l10n.galleryTitle,
-                  trailing: TextButton.icon(
-                    onPressed: _isPicking ? null : _pickPhotos,
-                    icon: _isPicking
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.add_photo_alternate_rounded),
-                    label: Text(l10n.addPhotos),
+                  trailing: Wrap(
+                    spacing: 8,
+                    children: [
+                      TextButton.icon(
+                        onPressed: _isPicking ? null : _capturePhoto,
+                        icon: const Icon(Icons.photo_camera_rounded),
+                        label: Text(l10n.takePhoto),
+                      ),
+                      TextButton.icon(
+                        onPressed: _isPicking ? null : _pickPhotos,
+                        icon: _isPicking
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.add_photo_alternate_rounded),
+                        label: Text(l10n.addPhotos),
+                      ),
+                    ],
                   ),
                   child: _GalleryEditor(
                     photos: _photos,
@@ -329,6 +342,25 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
       _photos.addAll(added);
       if (setFirstAsCover || _coverPhotoPath == null) {
         _coverPhotoPath = added.first.localPath;
+      }
+      _syncLocationFromPhotos();
+    });
+  }
+
+  Future<void> _capturePhoto({bool setAsCover = false}) async {
+    setState(() => _isPicking = true);
+    final picked = await ref
+        .read(photoLibraryServiceProvider)
+        .capturePhotoToAppStorage();
+    if (!mounted) return;
+
+    setState(() {
+      _isPicking = false;
+      if (picked == null) return;
+      final photo = _EditablePhoto.fromPickedPhoto(picked);
+      _photos.add(photo);
+      if (setAsCover || _coverPhotoPath == null) {
+        _coverPhotoPath = photo.localPath;
       }
       _syncLocationFromPhotos();
     });
@@ -566,12 +598,14 @@ class _CoverPicker extends StatelessWidget {
     required this.path,
     required this.isPicking,
     required this.onPick,
+    required this.onCapture,
     required this.onClear,
   });
 
   final String? path;
   final bool isPicking;
   final VoidCallback onPick;
+  final VoidCallback onCapture;
   final VoidCallback? onClear;
 
   @override
@@ -641,6 +675,11 @@ class _CoverPicker extends StatelessWidget {
                     onPressed: isPicking ? null : onClear,
                     icon: const Icon(Icons.close_rounded),
                   ),
+                FilledButton.icon(
+                  onPressed: isPicking ? null : onCapture,
+                  icon: const Icon(Icons.photo_camera_rounded),
+                  label: Text(l10n.takePhoto),
+                ),
                 FilledButton.icon(
                   onPressed: isPicking ? null : onPick,
                   icon: isPicking

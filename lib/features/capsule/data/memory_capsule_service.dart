@@ -195,6 +195,11 @@ class MemoryCapsuleService {
     final people = _mapList(payload['people']);
     final connections = _mapList(payload['connections']);
     final wallItems = _mapList(payload['wallItems']);
+    final relatedMemoryTitles = [
+      for (final related in _mapList(payload['relatedMemories']))
+        if (_stringValue(related, 'title').isNotEmpty)
+          _stringValue(related, 'title'),
+    ];
 
     return MemoryCapsuleImportDraft(
       preview: _previewFromPayload(
@@ -204,6 +209,7 @@ class MemoryCapsuleService {
         photoCount: photos.length,
         connectionCount: connections.length,
       ),
+      relatedMemoryTitles: relatedMemoryTitles,
       backup: BackupImportData(
         events: events,
         photos: photos,

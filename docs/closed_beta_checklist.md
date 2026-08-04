@@ -4,7 +4,7 @@
 
 - App name: LifeThreads
 - Package: `dev.gkcoding.lifethreads`
-- Version: `0.1.0+1`
+- Version: `0.1.4+6` (from `pubspec.yaml`)
 - Premium product ID: `lifethreads_premium_lifetime`
 
 ## Build Command
@@ -14,7 +14,7 @@ flutter clean
 flutter pub get
 flutter analyze
 flutter test
-flutter build appbundle --release
+flutter build appbundle --release --dart-define=MAPTILER_KEY="$MAPTILER_KEY"
 ```
 
 Upload this file to Google Play closed testing:
@@ -30,28 +30,45 @@ build/app/outputs/bundle/release/app-release.aab
 - Confirm Play Console package name is `dev.gkcoding.lifethreads`.
 - Create the one-time managed product `lifethreads_premium_lifetime`.
 - Publish privacy policy at `https://gkcoding.dev/lifethreads/privacy`.
+- Publish terms at `https://gkcoding.dev/lifethreads/terms`.
 - Complete Data Safety and content rating forms.
-- Add closed beta testers by email or Google Group.
+- Rotate MapTiler key and inject via CI/local dart-define.
+- Verify App Links for share hosts.
+- Add closed beta testers by email or Google Group (target 10+).
 
-## Tester Instructions
+## Scripted Tester Flows
 
-Ask each tester to complete these flows:
+Ask each tester to complete these flows and note pass/fail:
 
-1. First launch and onboarding.
-2. Create a memory with one photo.
-3. Create a memory with multiple photos.
-4. Add a story, feeling, category, date, and location.
-5. Move memory cards on the wall.
-6. Add a text note.
-7. Add a nail/anchor.
-8. Connect two memories and add a connection reason.
-9. Open memory detail and preview photos fullscreen.
-10. Edit an existing memory.
-11. Switch between Wall, Timeline, and Map modes.
-12. Export a backup.
-13. Import a backup.
-14. Open Settings > Beta feedback and send feedback.
-15. Try Premium screen purchase and restore flows with a Play test account.
+1. First launch and onboarding (privacy copy mentions optional encrypted cloud).
+2. Create a memory from gallery photos.
+3. Create a memory by taking a camera photo.
+4. Create a memory with multiple photos and story/feeling/category/date.
+5. Quick-add from the wall (camera vs gallery sheet).
+6. Move memory cards on the wall; add a text note and nail/anchor.
+7. Connect two memories and add a connection reason.
+8. Open memory detail and preview photos fullscreen.
+9. Edit an existing memory (cover, gallery, people).
+10. Switch between Wall, Timeline, and Map modes (maps require MapTiler key build).
+11. Share a memory capsule link; open it on a second device/install.
+12. Export a backup and import a backup.
+13. Premium purchase + restore with a Play license tester account.
+14. Open Settings → Privacy policy / Terms links.
+15. Open Settings → Beta feedback and send feedback.
+
+## Crash and Feedback Log
+
+Track themes only (no private content):
+
+- Crash / freeze
+- Data loss
+- Permission failures (camera, photos, contacts)
+- Share link open failures
+- Premium restore failures
+- Map blank / MapTiler
+- Confusion about wall interactions
+
+Prioritize data-loss and crash fixes before public launch.
 
 ## Feedback Questions
 
@@ -77,9 +94,10 @@ Ask testers to answer:
 
 Closed beta is ready for production consideration when:
 
-- No critical crashes are reported by at least 10 testers.
-- Memory create/edit/delete flows are stable.
-- Backup export/import works on at least 3 devices.
-- Wall interactions are understandable without explanation.
-- Premium purchase and restore are verified in Play testing.
-- Privacy policy and Data Safety answers match actual app behavior.
+- At least 10 testers completed the checklist.
+- At least 5 testers created 5+ memories.
+- At least 3 testers tested backup export/import.
+- At least 3 testers tested Premium purchase/restore with Play test accounts.
+- No open data-loss bugs.
+- No critical crashes remain open.
+- Feedback confirms the app feels emotional, not just functional.

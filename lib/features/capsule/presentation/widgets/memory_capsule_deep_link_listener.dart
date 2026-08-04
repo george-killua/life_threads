@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_router.dart';
+import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../features/backup/domain/backup_models.dart';
@@ -12,6 +14,7 @@ import '../../../../features/backup/presentation/widgets/archive_feedback.dart';
 import '../../../../features/capsule/data/memory_capsule_service.dart';
 import '../../../../features/capsule/data/memory_capsule_share_download_service.dart';
 import '../../../../features/capsule/domain/memory_capsule_models.dart';
+import '../../../../features/capsule/presentation/pages/capsule_cinema_page.dart';
 import '../../../../features/capsule/presentation/widgets/memory_capsule_dialogs.dart';
 import '../../../../features/memories/data/memory_repository.dart';
 
@@ -102,9 +105,12 @@ class _MemoryCapsuleDeepLinkListenerState
           .prepareImportFromBytes(bytes, password: password);
       if (!mounted) return;
 
-      final confirmed = await showMemoryCapsuleImportPreview(_uiContext, draft);
+      final cinemaResult = await _uiContext.push<CapsuleCinemaResult>(
+        RouteNames.capsuleCinema,
+        extra: draft,
+      );
       if (!mounted) return;
-      if (!confirmed) {
+      if (cinemaResult != CapsuleCinemaResult.addToWall) {
         await ref.read(memoryCapsuleServiceProvider).discardImport(draft);
         draft = null;
         return;

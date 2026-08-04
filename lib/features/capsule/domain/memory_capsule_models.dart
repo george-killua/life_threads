@@ -45,8 +45,13 @@ class MemoryCapsulePreview {
 }
 
 class MemoryCapsuleImportDraft {
-  const MemoryCapsuleImportDraft({required this.preview, required this.backup});
+  const MemoryCapsuleImportDraft({
+    required this.preview,
+    required this.backup,
+    this.relatedMemoryTitles = const [],
+  });
 
   final MemoryCapsulePreview preview;
   final BackupImportData backup;
+  final List<String> relatedMemoryTitles;
 }

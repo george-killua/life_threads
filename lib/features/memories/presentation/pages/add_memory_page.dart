@@ -144,6 +144,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
               isPicking: _isPicking,
               permission: _photoPermission,
               onPick: _openPhotoPicker,
+              onCapture: _capturePhoto,
               onManageLimitedAccess: _manageLimitedPhotoAccess,
               onRemove: (photo) => setState(() {
                 _photos.remove(photo);
@@ -287,7 +288,8 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
       builder: (_) => _PhotoGridSheet(
         assets: assets,
         initiallySelectedIds: {
-          for (final photo in _photos) photo.originalAssetId,
+          for (final photo in _photos)
+            if (photo.originalAssetId != null) photo.originalAssetId!,
         },
         isLimited: permission.isLimited,
         onManageLimitedAccess: _manageLimitedPhotoAccess,
@@ -296,7 +298,10 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     if (!mounted || selectedAssets == null || selectedAssets.isEmpty) return;
 
     setState(() => _isPicking = true);
-    final existingIds = {for (final photo in _photos) photo.originalAssetId};
+    final existingIds = {
+      for (final photo in _photos)
+        if (photo.originalAssetId != null) photo.originalAssetId!,
+    };
     final newAssets = selectedAssets.where(
       (asset) => !existingIds.contains(asset.id),
     );
@@ -308,6 +313,21 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
       if (pickedPhotos.isEmpty) return;
       _photos.addAll(pickedPhotos);
       _applyPhotoDefaults(pickedPhotos);
+    });
+  }
+
+  Future<void> _capturePhoto() async {
+    setState(() => _isPicking = true);
+    final photo = await ref
+        .read(photoLibraryServiceProvider)
+        .capturePhotoToAppStorage();
+    if (!mounted) return;
+
+    setState(() {
+      _isPicking = false;
+      if (photo == null) return;
+      _photos.add(photo);
+      _applyPhotoDefaults([photo]);
     });
   }
 
@@ -976,6 +996,7 @@ class _PhotoPickerPanel extends StatelessWidget {
     required this.isPicking,
     required this.permission,
     required this.onPick,
+    required this.onCapture,
     required this.onManageLimitedAccess,
     required this.onRemove,
   });
@@ -984,6 +1005,7 @@ class _PhotoPickerPanel extends StatelessWidget {
   final bool isPicking;
   final PermissionState? permission;
   final VoidCallback onPick;
+  final VoidCallback onCapture;
   final Future<void> Function() onManageLimitedAccess;
   final ValueChanged<PickedMemoryPhoto> onRemove;
 
@@ -1014,18 +1036,33 @@ class _PhotoPickerPanel extends StatelessWidget {
                   ),
                 ),
               ),
-              TextButton.icon(
-                onPressed: isPicking ? null : onPick,
-                icon: isPicking
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.add_rounded),
-                label: Text(photos.isEmpty ? l10n.pick : l10n.addMore),
-              ),
             ],
+          ),
+          const SizedBox(height: 10),
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                TextButton.icon(
+                  onPressed: isPicking ? null : onCapture,
+                  icon: const Icon(Icons.photo_camera_rounded),
+                  label: Text(l10n.takePhoto),
+                ),
+                TextButton.icon(
+                  onPressed: isPicking ? null : onPick,
+                  icon: isPicking
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.add_rounded),
+                  label: Text(photos.isEmpty ? l10n.pick : l10n.addMore),
+                ),
+              ],
+            ),
           ),
           if (permission?.isLimited == true) ...[
             const SizedBox(height: 12),
@@ -1048,6 +1085,7 @@ class _PhotoPickerPanel extends StatelessWidget {
                 separatorBuilder: (_, _) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   final photo = photos[index];
+                  final isCover = index == 0;
                   return Stack(
                     children: [
                       ClipRRect(
@@ -1075,6 +1113,31 @@ class _PhotoPickerPanel extends StatelessWidget {
                           icon: const Icon(Icons.close_rounded, size: 18),
                         ),
                       ),
+                      if (isCover)
+                        Positioned(
+                          left: 6,
+                          bottom: 6,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: AppColors.gold,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              child: Text(
+                                l10n.coverPhoto,
+                                style: const TextStyle(
+                                  color: AppColors.wallDeep,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   );
                 },

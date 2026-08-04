@@ -55,7 +55,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyBody =>
-      'LifeThreads is local-first. Your memories, photos, notes, locations, and connections stay on this device unless you export a backup yourself.';
+      'LifeThreads is local-first: no account and no public profile. Your memories stay on this device unless you choose encrypted cloud share, Cloud Sync, or a manual backup export.';
+
+  @override
+  String get viewPrivacyPolicy => 'View privacy policy';
+
+  @override
+  String get termsTitle => 'Terms of use';
+
+  @override
+  String get viewTerms => 'View terms';
 
   @override
   String get betaFeedbackTitle => 'Beta feedback';
@@ -310,7 +319,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingPrivacy =>
-      'Your memories stay private: no account and no cloud upload in this MVP.';
+      'Your memories stay private by default: no account and no public profile. Optional encrypted cloud share and backup only happen when you choose them.';
 
   @override
   String get storyPrivacyTitle => 'Your memories stay private';
@@ -466,6 +475,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addToWall => 'Add to Wall';
+
+  @override
+  String get cinemaSkip => 'Skip';
+
+  @override
+  String get cinemaNotNow => 'Not now';
+
+  @override
+  String get cinemaSharedChapter => 'A shared memory chapter';
+
+  @override
+  String get cinemaConnectedThread => 'Connected thread';
+
+  @override
+  String get cinemaInviteTitle => 'Add this memory to your wall?';
 
   @override
   String get useSelected => 'Use selected';
@@ -731,6 +755,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addMore => 'Add more';
+
+  @override
+  String get takePhoto => 'Take photo';
 
   @override
   String get photoStorageHint =>

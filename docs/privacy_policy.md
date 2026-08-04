@@ -1,6 +1,6 @@
 # LifeThreads Privacy Policy
 
-Effective date: May 21, 2026
+Effective date: August 4, 2026
 
 LifeThreads is developed by GK Coding.
 
@@ -34,13 +34,19 @@ You may choose to add the following information:
 
 This information is stored locally on your device unless you choose to export, share, or back it up yourself.
 
-## 3. Photos and Media Access
+## 3. Photos, Camera, and Media Access
 
 LifeThreads requests photo/media access so you can select photos for your memories.
 
-When you select photos, LifeThreads may copy those selected files into the app's private local storage. This lets the app show your memories later even if the original photo is moved or no longer available through the photo picker.
+LifeThreads may also request camera access when you choose to take a new memory photo or scan a wall-display QR code. Camera use is optional and only happens when you start those actions.
 
-LifeThreads does not upload selected photos to GK Coding unless you choose to create a shared memory capsule or another export/share action.
+When you select or capture photos, LifeThreads may copy those files into the app's private local storage. This lets the app show your memories later even if the original photo is moved or no longer available through the photo picker.
+
+LifeThreads does not upload selected or captured photos to GK Coding unless you choose to create a shared memory capsule or another export/share action.
+
+## 3a. Contacts Access
+
+LifeThreads may request contacts access only when you choose to import selected contact details into a private memory person entry. Contacts are not uploaded automatically. Imported contact fields you keep in a memory stay local unless that memory is included in an export, shared capsule, or Cloud Sync backup you choose to create.
 
 ## 4. Photo Metadata
 

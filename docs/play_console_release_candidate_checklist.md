@@ -43,3 +43,8 @@
 - Use a real release keystore, not debug signing, before uploading to production/closed testing.
 - Build release with MAPTILER_KEY through --dart-define.
 - Rotate the MapTiler key before public release because a previous key was shared in chat.
+- Confirm privacy policy and terms pages are live:
+  - https://gkcoding.dev/lifethreads/privacy
+  - https://gkcoding.dev/lifethreads/terms
+- Confirm Android App Links verification for both share hosts.
+- Release builds use R8 minify; smoke-test camera, photo pick, IAP restore, and capsule share after enabling.

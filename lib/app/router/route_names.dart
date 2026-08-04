@@ -10,4 +10,5 @@ class RouteNames {
   static const memoryDetail = '/memories/:id';
   static const editMemory = '/memories/:id/edit';
   static const manageConnections = '/memories/:id/connections';
+  static const capsuleCinema = '/capsule/cinema';
 }

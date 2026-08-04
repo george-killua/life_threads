@@ -1,19 +1,19 @@
 class PickedMemoryPhoto {
   const PickedMemoryPhoto({
     required this.localPath,
-    required this.originalAssetId,
     required this.capturedAt,
     required this.width,
     required this.height,
     required this.hasCapturedDate,
     required this.hasDimensions,
+    this.originalAssetId,
     this.latitude,
     this.longitude,
     this.title,
   });
 
   final String localPath;
-  final String originalAssetId;
+  final String? originalAssetId;
   final DateTime capturedAt;
   final int width;
   final int height;

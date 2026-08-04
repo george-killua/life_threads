@@ -18,6 +18,7 @@ import '../../../display/data/wall_display_service.dart';
 import '../../../display/presentation/pages/wall_display_scanner_page.dart';
 import '../../../map/presentation/widgets/lifethreads_map_provider.dart';
 import '../../../media/data/photo_library_service.dart';
+import '../../../media/data/picked_memory_photo.dart';
 import '../../../memories/data/memory_repository.dart';
 import '../../../memories/presentation/memory_l10n.dart';
 import '../../../memories/domain/memory_category.dart';
@@ -661,29 +662,44 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     MemoryRepository repository,
   ) async {
     final service = ref.read(photoLibraryServiceProvider);
-    var permission = await service.currentPermission();
-    if (!permission.hasAccess) permission = await service.requestPermission();
-    if (!context.mounted) return;
-
-    if (!permission.hasAccess) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.l10n.photoAccessNeeded)));
-      await service.openSettings();
-      return;
-    }
-
-    final assets = await service.recentPhotos(limit: 90);
-    if (!context.mounted) return;
-    final asset = await showModalBottomSheet<AssetEntity>(
+    final source = await showModalBottomSheet<_QuickPhotoSource>(
       context: context,
-      isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => _QuickPhotoPickerSheet(assets: assets),
+      builder: (_) => const _QuickPhotoSourceSheet(),
     );
-    if (!context.mounted || asset == null) return;
+    if (!context.mounted || source == null) return;
 
-    final picked = await service.copyAssetToAppStorage(asset);
+    PickedMemoryPhoto? picked;
+    switch (source) {
+      case _QuickPhotoSource.camera:
+        picked = await service.capturePhotoToAppStorage();
+      case _QuickPhotoSource.gallery:
+        var permission = await service.currentPermission();
+        if (!permission.hasAccess) {
+          permission = await service.requestPermission();
+        }
+        if (!context.mounted) return;
+
+        if (!permission.hasAccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(context.l10n.photoAccessNeeded)),
+          );
+          await service.openSettings();
+          return;
+        }
+
+        final assets = await service.recentPhotos(limit: 90);
+        if (!context.mounted) return;
+        final asset = await showModalBottomSheet<AssetEntity>(
+          context: context,
+          isScrollControlled: true,
+          showDragHandle: true,
+          builder: (_) => _QuickPhotoPickerSheet(assets: assets),
+        );
+        if (!context.mounted || asset == null) return;
+
+        picked = await service.copyAssetToAppStorage(asset);
+    }
     if (!context.mounted || picked == null) return;
 
     final title =
@@ -2535,6 +2551,47 @@ class _MoveButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 6),
       child: IconButton.filledTonal(onPressed: onTap, icon: Icon(icon)),
+    );
+  }
+}
+
+enum _QuickPhotoSource { camera, gallery }
+
+class _QuickPhotoSourceSheet extends StatelessWidget {
+  const _QuickPhotoSourceSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              l10n.chooseQuickPhoto,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: () =>
+                  Navigator.of(context).pop(_QuickPhotoSource.camera),
+              icon: const Icon(Icons.photo_camera_rounded),
+              label: Text(l10n.takePhoto),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: () =>
+                  Navigator.of(context).pop(_QuickPhotoSource.gallery),
+              icon: const Icon(Icons.photo_library_rounded),
+              label: Text(l10n.choosePhoto),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

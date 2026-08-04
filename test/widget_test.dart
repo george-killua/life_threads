@@ -14,7 +14,7 @@ void main() {
     expect(find.text('Build your living wall.'), findsOneWidget);
     expect(
       find.text(
-        'Your memories stay private: no account and no cloud upload in this MVP.',
+        'Your memories stay private by default: no account and no public profile. Optional encrypted cloud share and backup only happen when you choose them.',
       ),
       findsOneWidget,
     );

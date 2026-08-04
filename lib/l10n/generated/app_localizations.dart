@@ -187,8 +187,26 @@ abstract class AppLocalizations {
   /// No description provided for @privacyBody.
   ///
   /// In en, this message translates to:
-  /// **'LifeThreads is local-first. Your memories, photos, notes, locations, and connections stay on this device unless you export a backup yourself.'**
+  /// **'LifeThreads is local-first: no account and no public profile. Your memories stay on this device unless you choose encrypted cloud share, Cloud Sync, or a manual backup export.'**
   String get privacyBody;
+
+  /// No description provided for @viewPrivacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'View privacy policy'**
+  String get viewPrivacyPolicy;
+
+  /// No description provided for @termsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of use'**
+  String get termsTitle;
+
+  /// No description provided for @viewTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'View terms'**
+  String get viewTerms;
 
   /// No description provided for @betaFeedbackTitle.
   ///
@@ -625,7 +643,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingPrivacy.
   ///
   /// In en, this message translates to:
-  /// **'Your memories stay private: no account and no cloud upload in this MVP.'**
+  /// **'Your memories stay private by default: no account and no public profile. Optional encrypted cloud share and backup only happen when you choose them.'**
   String get onboardingPrivacy;
 
   /// No description provided for @storyPrivacyTitle.
@@ -909,6 +927,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add to Wall'**
   String get addToWall;
+
+  /// No description provided for @cinemaSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get cinemaSkip;
+
+  /// No description provided for @cinemaNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get cinemaNotNow;
+
+  /// No description provided for @cinemaSharedChapter.
+  ///
+  /// In en, this message translates to:
+  /// **'A shared memory chapter'**
+  String get cinemaSharedChapter;
+
+  /// No description provided for @cinemaConnectedThread.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected thread'**
+  String get cinemaConnectedThread;
+
+  /// No description provided for @cinemaInviteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add this memory to your wall?'**
+  String get cinemaInviteTitle;
 
   /// No description provided for @useSelected.
   ///
@@ -1425,6 +1473,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add more'**
   String get addMore;
+
+  /// No description provided for @takePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get takePhoto;
 
   /// No description provided for @photoStorageHint.
   ///

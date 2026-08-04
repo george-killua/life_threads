@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/backup/presentation/pages/archive_transfer_page.dart';
+import '../../features/capsule/domain/memory_capsule_models.dart';
+import '../../features/capsule/presentation/pages/capsule_cinema_page.dart';
 import '../../features/memories/presentation/pages/add_memory_page.dart';
 import '../../features/memories/presentation/pages/edit_memory_page.dart';
 import '../../features/memories/presentation/pages/manage_connections_page.dart';
@@ -59,6 +61,16 @@ class AppRouter {
         path: RouteNames.manageConnections,
         builder: (context, state) =>
             ManageConnectionsPage(memoryId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: RouteNames.capsuleCinema,
+        builder: (context, state) {
+          final draft = state.extra;
+          if (draft is! MemoryCapsuleImportDraft) {
+            return const SizedBox.shrink();
+          }
+          return CapsuleCinemaPage(draft: draft);
+        },
       ),
     ],
   );

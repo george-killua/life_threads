@@ -80,6 +80,26 @@ class SettingsPage extends ConsumerWidget {
                 icon: Icons.lock_rounded,
                 title: l10n.privacyTitle,
                 body: l10n.privacyBody,
+                actions: [
+                  _SettingsAction(
+                    label: l10n.viewPrivacyPolicy,
+                    icon: Icons.policy_rounded,
+                    onTap: () => _openExternalUrl(
+                      context,
+                      Uri.parse('https://gkcoding.dev/lifethreads/privacy'),
+                      eventName: 'privacy_policy_opened',
+                    ),
+                  ),
+                  _SettingsAction(
+                    label: l10n.viewTerms,
+                    icon: Icons.gavel_rounded,
+                    onTap: () => _openExternalUrl(
+                      context,
+                      Uri.parse('https://gkcoding.dev/lifethreads/terms'),
+                      eventName: 'terms_opened',
+                    ),
+                  ),
+                ],
               ),
               _SettingsCard(
                 icon: Icons.feedback_rounded,
@@ -259,6 +279,25 @@ class SettingsPage extends ConsumerWidget {
       'ar' => l10n.arabicLanguage,
       _ => l10n.englishLanguage,
     };
+  }
+
+  Future<void> _openExternalUrl(
+    BuildContext context,
+    Uri uri, {
+    required String eventName,
+  }) async {
+    AppLogger.event(eventName);
+    try {
+      final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!context.mounted || opened) return;
+    } catch (_) {
+      // Fall through to clipboard fallback.
+    }
+    await Clipboard.setData(ClipboardData(text: uri.toString()));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(uri.toString())),
+    );
   }
 
   Future<void> _exportBackup(

@@ -55,7 +55,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacyBody =>
-      'LifeThreads ist lokal zuerst. Deine Erinnerungen, Fotos, Notizen, Orte und Verbindungen bleiben auf diesem Gerät, außer du exportierst selbst ein Backup.';
+      'LifeThreads ist lokal zuerst: kein Konto und kein öffentliches Profil. Deine Erinnerungen bleiben auf diesem Gerät, außer du wählst verschlüsseltes Cloud-Sharing, Cloud-Sync oder einen manuellen Backup-Export.';
+
+  @override
+  String get viewPrivacyPolicy => 'Datenschutzerklärung ansehen';
+
+  @override
+  String get termsTitle => 'Nutzungsbedingungen';
+
+  @override
+  String get viewTerms => 'Bedingungen ansehen';
 
   @override
   String get betaFeedbackTitle => 'Beta-Feedback';
@@ -310,7 +319,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get onboardingPrivacy =>
-      'Deine Erinnerungen bleiben privat: kein Konto und kein Cloud-Upload in diesem MVP.';
+      'Deine Erinnerungen bleiben standardmäßig privat: kein Konto und kein öffentliches Profil. Optionales verschlüsseltes Cloud-Sharing und Backup nur, wenn du es wählst.';
 
   @override
   String get storyPrivacyTitle => 'Deine Erinnerungen bleiben privat';
@@ -467,6 +476,21 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get addToWall => 'Zur Wand hinzufügen';
+
+  @override
+  String get cinemaSkip => 'Überspringen';
+
+  @override
+  String get cinemaNotNow => 'Nicht jetzt';
+
+  @override
+  String get cinemaSharedChapter => 'Ein geteiltes Erinnerungs-Kapitel';
+
+  @override
+  String get cinemaConnectedThread => 'Verbundener Faden';
+
+  @override
+  String get cinemaInviteTitle => 'Diese Erinnerung zu deiner Wand hinzufügen?';
 
   @override
   String get useSelected => 'Auswahl verwenden';
@@ -741,6 +765,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get addMore => 'Mehr hinzufügen';
+
+  @override
+  String get takePhoto => 'Foto aufnehmen';
 
   @override
   String get photoStorageHint =>
