@@ -34,36 +34,43 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
-      - name: Restore Android release signing
-        run: |
-          mkdir -p android/release
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/release/lifethreads-release-key.jks
-          cat > android/key.properties <<EOF
-          storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
-          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
-          storeFile=../release/lifethreads-release-key.jks
-          EOF
-          chmod 600 android/key.properties android/release/lifethreads-release-key.jks
-
       - name: Verify required secrets
         env:
           MAPTILER_KEY: ${{ secrets.MAPTILER_KEY }}
           GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           missing=0
-          if [ -z "$MAPTILER_KEY" ]; then
-            echo "Missing GitHub secret MAPTILER_KEY" >&2
-            missing=1
-          fi
-          if [ -z "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64" ]; then
-            echo "Missing GitHub secret GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64" >&2
-            missing=1
-          fi
+          for name in MAPTILER_KEY GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_PASSWORD ANDROID_KEY_ALIAS; do
+            if [ -z "${!name}" ]; then
+              echo "Missing GitHub secret $name" >&2
+              missing=1
+            fi
+          done
           if [ "$missing" -ne 0 ]; then
             echo "Add the secrets in GitHub → Settings → Secrets and variables → Actions, then re-run." >&2
             exit 1
           fi
+
+      - name: Restore Android release signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          mkdir -p android/release
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/release/lifethreads-release-key.jks
+          {
+            echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
+            echo "keyPassword=$ANDROID_KEY_PASSWORD"
+            echo "keyAlias=$ANDROID_KEY_ALIAS"
+            echo "storeFile=../release/lifethreads-release-key.jks"
+          } > android/key.properties
+          chmod 600 android/key.properties android/release/lifethreads-release-key.jks
 
       - name: Upload to closed testing
         working-directory: android
