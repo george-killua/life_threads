@@ -25,6 +25,19 @@ Local AAB currently used placeholder define `PLACEHOLDER_ROTATE_ME` for maps onl
 
 ## Closed beta / public / iOS (human store consoles)
 
+GitHub Actions secrets currently empty in CI (`MAPTILER_KEY`, `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64`).
+Add them under GitHub → Settings → Secrets and variables → Actions, then:
+
+```bash
+gh workflow run "Play Closed Test" -f play_track=alpha -f release_status=draft
+```
+
+Or locally after exporting secrets:
+
+```bash
+./scripts/upload_closed_test.sh
+```
+
 - Invite 10+ testers and run `docs/closed_beta_checklist.md`
 - After exit criteria: staged production via `docs/public_launch_runbook.md`
-- iOS: enable Associated Domains capability in Apple Developer + TestFlight (`docs/ios_app_store_checklist.md`)
+- iOS: enable Associated Domains capability in Apple Developer portal for the App ID, then TestFlight (`docs/ios_app_store_checklist.md`)
