@@ -46,10 +46,31 @@ jobs:
           EOF
           chmod 600 android/key.properties android/release/lifethreads-release-key.jks
 
-      - name: Upload to closed testing
+      - name: Verify required secrets
         env:
+          MAPTILER_KEY: ${{ secrets.MAPTILER_KEY }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 }}
+        run: |
+          missing=0
+          if [ -z "$MAPTILER_KEY" ]; then
+            echo "Missing GitHub secret MAPTILER_KEY" >&2
+            missing=1
+          fi
+          if [ -z "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64" ]; then
+            echo "Missing GitHub secret GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64" >&2
+            missing=1
+          fi
+          if [ "$missing" -ne 0 ]; then
+            echo "Add the secrets in GitHub → Settings → Secrets and variables → Actions, then re-run." >&2
+            exit 1
+          fi
+
+      - name: Upload to closed testing
+        working-directory: android
+        env:
+          BUNDLE_GEMFILE: ${{ github.workspace }}/Gemfile
           MAPTILER_KEY: ${{ secrets.MAPTILER_KEY }}
           GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 }}
           PLAY_TRACK: ${{ inputs.play_track }}
           PLAY_RELEASE_STATUS: ${{ inputs.release_status }}
-        run: bundle exec fastlane android closed_test
+        run: bundle exec fastlane closed_test

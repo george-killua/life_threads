@@ -11,21 +11,21 @@ Complete after Android closed-beta validation looks healthy.
 
 ## Privacy and compliance
 
-- [ ] `ios/Runner/PrivacyInfo.xcprivacy` present and reviewed
+- [x] `ios/Runner/PrivacyInfo.xcprivacy` present and reviewed
 - [ ] App Store Connect encryption declaration for `cryptography` / capsule encryption (standard encryption / exempt questionnaire as applicable)
 - [ ] Usage strings reviewed in `ios/Runner/Info.plist`:
   - Camera (QR + memory photos)
   - Photo library read/add
   - Contacts
-- [ ] Privacy policy URL: `https://gkcoding.dev/lifethreads/privacy`
-- [ ] Terms URL: `https://gkcoding.dev/lifethreads/terms`
+- [x] Privacy policy URL: `https://gkcoding.dev/lifethreads/privacy`
+- [x] Terms URL: `https://gkcoding.dev/lifethreads/terms`
 
 ## Associated domains / share links
 
-- [ ] Add Associated Domains entitlement for:
+- [x] Add Associated Domains entitlement for:
   - `applinks:gkcoding.dev`
   - `applinks:lifethreads.gkcoding.dev`
-- [ ] Host apple-app-site-association for both hosts
+- [x] Host apple-app-site-association for both hosts (lifethreads subdomain JSON verified; gkcoding.dev file deployed)
 - [ ] Cold-start and warm-start open of a share URL → capsule import flow
 
 ## Monetization
