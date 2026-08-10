@@ -108,18 +108,18 @@ LifeThreads keeps memories on your device in the current version. Export backups
 
 Headline:
 ```text
-Start free. Unlock forever when it becomes yours.
+Keep every memory without hitting a wall.
 ```
 
 Body:
 ```text
-The free version lets you build your first 30 memories. Premium is planned as a simple €4.99 lifetime unlock for unlimited memories, backups, premium themes, and advanced wall layouts.
+The free version lets you build your first 30 memories. Premium is a monthly Google Play subscription (€2.99/month) for unlimited memories, backups, premium themes, and advanced layouts. Cancel anytime in Google Play.
 ```
 
 Bullets:
 - 30 memories free
-- €4.99 lifetime unlock
-- no monthly subscription for the first premium version
+- €2.99 / month subscription (`lifethreads_premium_monthly`)
+- cancel anytime in Google Play
 - cloud sync only later if users actually want it
 
 ## Beta CTA
@@ -163,12 +163,12 @@ No. There is no public profile, social feed, or follower system in the current v
 
 Question:
 ```text
-Why not a subscription?
+How does Premium billing work?
 ```
 
 Answer:
 ```text
-A private memory app should be easy to trust. The first premium version is planned as a one-time lifetime unlock, not a monthly subscription.
+Premium is a monthly auto-renewing Google Play subscription (lifethreads_premium_monthly), starting at €2.99/month. Cancel anytime in Play Store subscription settings.
 ```
 
 Question:

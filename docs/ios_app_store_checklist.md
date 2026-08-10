@@ -30,7 +30,7 @@ Complete after Android closed-beta validation looks healthy.
 
 ## Monetization
 
-- [ ] StoreKit product parity with Play: lifetime premium unlock
+- [ ] StoreKit product parity with Play: monthly Premium subscription
 - [ ] Sandbox purchase + restore verified on TestFlight
 
 ## Store listing

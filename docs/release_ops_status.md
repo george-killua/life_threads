@@ -4,8 +4,8 @@ Updated: 2026-08-04
 
 ## Completed automatically
 
-- Privacy policy live at https://gkcoding.dev/lifethreads/privacy/ (Aug 4 copy: camera + contacts)
-- Terms live at https://gkcoding.dev/lifethreads/terms/
+- Privacy policy live at https://gkcoding.dev/lifethreads/privacy/ (Aug 10 copy: monthly Premium)
+- Terms live at https://gkcoding.dev/lifethreads/terms/ (Aug 10 copy: monthly subscription)
 - Android App Links `assetlinks.json` live on gkcoding.dev and lifethreads.gkcoding.dev
 - Fingerprint matches release keystore SHA-256 `3E:16:2A:8F:...:AC:98`
 - Apple AASA live on lifethreads.gkcoding.dev (JSON) and present on gkcoding.dev

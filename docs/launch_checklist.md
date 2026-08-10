@@ -23,7 +23,7 @@
 - Data Safety form matches privacy policy.
 - Content rating questionnaire completed.
 - Category set to Lifestyle.
-- Managed product created: `lifethreads_premium_lifetime`.
+- Monthly subscription created: `lifethreads_premium_monthly`.
 - Closed beta testers added.
 
 ## Closed Beta Exit Criteria

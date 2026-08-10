@@ -106,7 +106,7 @@ LifeThreads may also offer optional Cloud Sync. If you choose Cloud Sync, LifeTh
 
 ## 9. Purchases and Premium Unlock
 
-LifeThreads may offer an optional one-time premium unlock through Google Play Billing.
+LifeThreads may offer an optional monthly Premium subscription through Google Play Billing.
 
 Purchases are processed by Google Play. GK Coding does not receive or store your payment card details.
 

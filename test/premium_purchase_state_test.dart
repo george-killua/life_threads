@@ -23,14 +23,14 @@ void main() {
     test('ready state can buy when enabled', () {
       const state = PremiumPurchaseState(
         status: PremiumPurchaseStatus.ready,
-        productId: 'lifethreads_premium_lifetime',
-        price: '€4.99',
+        productId: 'lifethreads_premium_monthly',
+        price: '€2.99',
         canBuy: true,
       );
 
       expect(state.isBusy, isFalse);
       expect(state.canBuy, isTrue);
-      expect(state.price, '€4.99');
+      expect(state.price, '€2.99');
     });
   });
 }

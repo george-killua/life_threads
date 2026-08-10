@@ -126,7 +126,7 @@ Before uploading:
 2. Add `android/key.properties` locally only.
 3. Build the App Bundle with MapTiler dart-define and release keystore.
 4. Verify Play Console package name is `dev.gkcoding.lifethreads`.
-5. Create the one-time in-app product `lifethreads_premium_lifetime`.
+5. Create the one-time in-app product `lifethreads_premium_monthly`.
 6. Complete Data Safety using `docs/play_console_release_candidate_checklist.md`.
 7. Link privacy policy and terms:
    - `https://gkcoding.dev/lifethreads/privacy`

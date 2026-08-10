@@ -49,7 +49,7 @@ Shared capsule links are private invitations, not a public feed. Anyone with a v
 
 ## 6. Purchases
 
-Optional premium features may be sold as a one-time unlock through Google Play or the App Store. Payments are processed by the store provider. Refunds follow the store’s policies.
+Optional premium features may be sold as a monthly subscription through Google Play or the App Store. Payments are processed by the store provider. Refunds follow the store’s policies.
 
 ## 7. Local Data and Device Security
 

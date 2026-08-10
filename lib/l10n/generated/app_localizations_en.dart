@@ -149,11 +149,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumTitle => 'Premium';
 
   @override
-  String get premiumActiveBody => 'Premium lifetime unlock is active.';
+  String get premiumActiveBody => 'Premium subscription is active.';
 
   @override
   String get premiumLockedBody =>
-      'One-time unlock: unlimited memories, encrypted archive export/import, moving to another device, premium themes, and advanced layouts.';
+      'Monthly subscription: unlimited memories, encrypted archive export/import, moving to another device, premium themes, and advanced layouts.';
 
   @override
   String get activeBadge => 'Active';
@@ -1423,13 +1423,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumPageTitle => 'LifeThreads Premium';
 
   @override
-  String get developmentUnlockEnabled => 'Development lifetime unlock enabled.';
+  String get developmentUnlockEnabled => 'Development Premium unlock enabled.';
 
   @override
-  String get lifetimeActive => 'Lifetime active';
+  String get lifetimeActive => 'Subscription active';
 
   @override
-  String get oneTimeLifetimeUnlock => 'One-time lifetime unlock';
+  String get oneTimeLifetimeUnlock => 'Monthly subscription';
 
   @override
   String get premiumHeroActiveTitle => 'Your memory wall is unlimited.';
@@ -1440,7 +1440,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumHeroActiveBody =>
-      'Premium lifetime unlock is active. Encrypted archive export, premium themes, and advanced layouts are available.';
+      'Your Premium subscription is active. Encrypted archive export, premium themes, and advanced layouts are available.';
 
   @override
   String premiumHeroLockedBody(int limit) {
@@ -1502,14 +1502,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deviceTransferHow => 'How device transfer works';
 
   @override
-  String get lifetimeUnlock => 'Lifetime unlock';
+  String get lifetimeUnlock => 'Premium subscription';
 
   @override
   String get premiumActiveOnDevice => 'Premium is active on this device.';
 
   @override
   String get onePurchaseBody =>
-      'One purchase. No monthly subscription for the first premium version. Keep, protect, and move your memory wall.';
+      'Subscribe monthly for unlimited memories, backups, premium themes, and advanced layouts. Cancel anytime in Google Play or the App Store.';
 
   @override
   String get premiumActiveButton => 'Premium Active';
@@ -1518,21 +1518,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get processing => 'Processing...';
 
   @override
-  String get unlockPremium => 'Unlock Premium';
+  String get unlockPremium => 'Subscribe to Premium';
 
   @override
-  String get restorePurchase => 'Restore purchase';
+  String get restorePurchase => 'Restore subscription';
 
   @override
   String get enableDebugMockUnlock => 'Enable debug mock unlock';
 
   @override
   String get purchasesHandledByGooglePlay =>
-      'Purchases are handled by Google Play. The unlock is stored locally after purchase or restore.';
+      'Subscriptions are handled by Google Play or the App Store. Premium stays active while your subscription renews.';
 
   @override
   String lifetimeUnlockWithPrice(Object price) {
-    return 'Lifetime unlock • $price';
+    return 'Premium • $price/month';
   }
 
   @override

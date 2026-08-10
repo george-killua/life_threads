@@ -149,11 +149,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get premiumTitle => 'Premium';
 
   @override
-  String get premiumActiveBody => 'فتح Premium مدى الحياة مفعّل.';
+  String get premiumActiveBody => 'اشتراك Premium مفعّل.';
 
   @override
   String get premiumLockedBody =>
-      'فتح لمرة واحدة: ذكريات غير محدودة، تصدير/استيراد أرشيف مشفر، نقل إلى جهاز آخر، مظاهر Premium، وتخطيطات متقدمة.';
+      'اشتراك شهري: ذكريات غير محدودة، تصدير/استيراد أرشيف مشفر، نقل إلى جهاز آخر، مظاهر Premium، وتخطيطات متقدمة.';
 
   @override
   String get activeBadge => 'مفعّل';
@@ -1414,13 +1414,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get premiumPageTitle => 'LifeThreads Premium';
 
   @override
-  String get developmentUnlockEnabled => 'تم تفعيل فتح التطوير مدى الحياة.';
+  String get developmentUnlockEnabled => 'تم تفعيل فتح Premium للتطوير.';
 
   @override
-  String get lifetimeActive => 'مدى الحياة مفعّل';
+  String get lifetimeActive => 'الاشتراك مفعّل';
 
   @override
-  String get oneTimeLifetimeUnlock => 'فتح مدى الحياة لمرة واحدة';
+  String get oneTimeLifetimeUnlock => 'اشتراك شهري';
 
   @override
   String get premiumHeroActiveTitle => 'جدار ذكرياتك غير محدود.';
@@ -1430,7 +1430,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get premiumHeroActiveBody =>
-      'فتح Premium مدى الحياة مفعّل. تصدير الأرشيف المشفر والمظاهر المميزة والتخطيطات المتقدمة متاحة.';
+      'اشتراك Premium مفعّل. تصدير الأرشيف المشفر والمظاهر المميزة والتخطيطات المتقدمة متاحة.';
 
   @override
   String premiumHeroLockedBody(int limit) {
@@ -1492,14 +1492,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deviceTransferHow => 'كيف يعمل نقل الجهاز';
 
   @override
-  String get lifetimeUnlock => 'فتح مدى الحياة';
+  String get lifetimeUnlock => 'اشتراك Premium';
 
   @override
   String get premiumActiveOnDevice => 'Premium مفعّل على هذا الجهاز.';
 
   @override
   String get onePurchaseBody =>
-      'شراء واحد. لا اشتراك شهري لأول نسخة Premium. احتفظ بجدار ذكرياتك واحمه وانقله.';
+      'اشترك شهرياً لذكريات غير محدودة ونسخ احتياطية ومظاهر وتخطيطات متقدمة. يمكنك الإلغاء في أي وقت من Google Play أو App Store.';
 
   @override
   String get premiumActiveButton => 'Premium مفعّل';
@@ -1508,21 +1508,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get processing => 'جار المعالجة...';
 
   @override
-  String get unlockPremium => 'فتح Premium';
+  String get unlockPremium => 'اشترك في Premium';
 
   @override
-  String get restorePurchase => 'استعادة الشراء';
+  String get restorePurchase => 'استعادة الاشتراك';
 
   @override
   String get enableDebugMockUnlock => 'تفعيل فتح تجريبي';
 
   @override
   String get purchasesHandledByGooglePlay =>
-      'تتم عمليات الشراء عبر Google Play. يتم حفظ الفتح محلياً بعد الشراء أو الاستعادة.';
+      'الاشتراكات عبر Google Play أو App Store. يبقى Premium نشطاً طالما يتجدد اشتراكك.';
 
   @override
   String lifetimeUnlockWithPrice(Object price) {
-    return 'فتح مدى الحياة • $price';
+    return 'Premium • $price/شهر';
   }
 
   @override

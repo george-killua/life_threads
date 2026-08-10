@@ -204,7 +204,7 @@ Dark warm memory-room background, three hanging photo cards connected by gold th
 
 - Build signed Android App Bundle with real release keystore.
 - Confirm package name: `dev.gkcoding.lifethreads`.
-- Create a managed one-time product in Play Console: `lifethreads_premium_lifetime`.
+- Create a monthly subscription in Play Console: `lifethreads_premium_monthly`.
 - Upload app icon: 512 x 512 PNG, max 1024 KB.
 - Upload feature graphic: 1024 x 500 PNG or JPG.
 - Upload at least 6 phone screenshots.

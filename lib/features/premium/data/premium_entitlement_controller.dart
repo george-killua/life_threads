@@ -40,6 +40,12 @@ class PremiumEntitlementController extends AsyncNotifier<PremiumEntitlement> {
     await _emit(preferences);
   }
 
+  Future<void> revokeStoreUnlock() async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(_storeUnlockKey, false);
+    await _emit(preferences);
+  }
+
   Future<void> _emit(SharedPreferences preferences) async {
     final mockUnlocked =
         kDebugMode && (preferences.getBool(_mockUnlockKey) ?? false);

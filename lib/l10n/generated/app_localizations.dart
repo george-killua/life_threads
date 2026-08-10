@@ -367,13 +367,13 @@ abstract class AppLocalizations {
   /// No description provided for @premiumActiveBody.
   ///
   /// In en, this message translates to:
-  /// **'Premium lifetime unlock is active.'**
+  /// **'Premium subscription is active.'**
   String get premiumActiveBody;
 
   /// No description provided for @premiumLockedBody.
   ///
   /// In en, this message translates to:
-  /// **'One-time unlock: unlimited memories, encrypted archive export/import, moving to another device, premium themes, and advanced layouts.'**
+  /// **'Monthly subscription: unlimited memories, encrypted archive export/import, moving to another device, premium themes, and advanced layouts.'**
   String get premiumLockedBody;
 
   /// No description provided for @activeBadge.
@@ -2670,19 +2670,19 @@ abstract class AppLocalizations {
   /// No description provided for @developmentUnlockEnabled.
   ///
   /// In en, this message translates to:
-  /// **'Development lifetime unlock enabled.'**
+  /// **'Development Premium unlock enabled.'**
   String get developmentUnlockEnabled;
 
   /// No description provided for @lifetimeActive.
   ///
   /// In en, this message translates to:
-  /// **'Lifetime active'**
+  /// **'Subscription active'**
   String get lifetimeActive;
 
   /// No description provided for @oneTimeLifetimeUnlock.
   ///
   /// In en, this message translates to:
-  /// **'One-time lifetime unlock'**
+  /// **'Monthly subscription'**
   String get oneTimeLifetimeUnlock;
 
   /// No description provided for @premiumHeroActiveTitle.
@@ -2700,7 +2700,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumHeroActiveBody.
   ///
   /// In en, this message translates to:
-  /// **'Premium lifetime unlock is active. Encrypted archive export, premium themes, and advanced layouts are available.'**
+  /// **'Your Premium subscription is active. Encrypted archive export, premium themes, and advanced layouts are available.'**
   String get premiumHeroActiveBody;
 
   /// No description provided for @premiumHeroLockedBody.
@@ -2808,7 +2808,7 @@ abstract class AppLocalizations {
   /// No description provided for @lifetimeUnlock.
   ///
   /// In en, this message translates to:
-  /// **'Lifetime unlock'**
+  /// **'Premium subscription'**
   String get lifetimeUnlock;
 
   /// No description provided for @premiumActiveOnDevice.
@@ -2820,7 +2820,7 @@ abstract class AppLocalizations {
   /// No description provided for @onePurchaseBody.
   ///
   /// In en, this message translates to:
-  /// **'One purchase. No monthly subscription for the first premium version. Keep, protect, and move your memory wall.'**
+  /// **'Subscribe monthly for unlimited memories, backups, premium themes, and advanced layouts. Cancel anytime in Google Play or the App Store.'**
   String get onePurchaseBody;
 
   /// No description provided for @premiumActiveButton.
@@ -2838,13 +2838,13 @@ abstract class AppLocalizations {
   /// No description provided for @unlockPremium.
   ///
   /// In en, this message translates to:
-  /// **'Unlock Premium'**
+  /// **'Subscribe to Premium'**
   String get unlockPremium;
 
   /// No description provided for @restorePurchase.
   ///
   /// In en, this message translates to:
-  /// **'Restore purchase'**
+  /// **'Restore subscription'**
   String get restorePurchase;
 
   /// No description provided for @enableDebugMockUnlock.
@@ -2856,13 +2856,13 @@ abstract class AppLocalizations {
   /// No description provided for @purchasesHandledByGooglePlay.
   ///
   /// In en, this message translates to:
-  /// **'Purchases are handled by Google Play. The unlock is stored locally after purchase or restore.'**
+  /// **'Subscriptions are handled by Google Play or the App Store. Premium stays active while your subscription renews.'**
   String get purchasesHandledByGooglePlay;
 
   /// No description provided for @lifetimeUnlockWithPrice.
   ///
   /// In en, this message translates to:
-  /// **'Lifetime unlock • {price}'**
+  /// **'Premium • {price}/month'**
   String lifetimeUnlockWithPrice(Object price);
 
   /// No description provided for @loadingPlayStoreProduct.

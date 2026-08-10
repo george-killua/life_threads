@@ -11,7 +11,7 @@ Use after closed beta exit criteria in `docs/closed_beta_checklist.md` are met.
 - [ ] Privacy + terms URLs live and linked in Play Console + in-app Settings
 - [ ] Data Safety form matches `docs/privacy_policy.md`
 - [ ] Content rating complete; category Lifestyle
-- [ ] Managed product `lifethreads_premium_lifetime` active
+- [ ] Monthly subscription `lifethreads_premium_monthly` active
 - [ ] Soft-ask beta testers for private feedback before public reviews
 
 ## Go-live

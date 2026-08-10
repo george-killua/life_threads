@@ -149,11 +149,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get premiumTitle => 'Premium';
 
   @override
-  String get premiumActiveBody => 'Premium Lifetime Unlock ist aktiv.';
+  String get premiumActiveBody => 'Premium-Abo ist aktiv.';
 
   @override
   String get premiumLockedBody =>
-      'Einmalige Freischaltung: unbegrenzte Erinnerungen, verschlüsselter Archiv-Export/Import, Gerätewechsel, Premium-Designs und erweiterte Layouts.';
+      'Monatsabo: unbegrenzte Erinnerungen, verschlüsselter Archiv-Export/Import, Gerätewechsel, Premium-Designs und erweiterte Layouts.';
 
   @override
   String get activeBadge => 'Aktiv';
@@ -1438,13 +1438,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get developmentUnlockEnabled =>
-      'Entwicklungs-Lifetime-Unlock aktiviert.';
+      'Entwicklungs-Premium-Freischaltung aktiviert.';
 
   @override
-  String get lifetimeActive => 'Lifetime aktiv';
+  String get lifetimeActive => 'Abo aktiv';
 
   @override
-  String get oneTimeLifetimeUnlock => 'Einmaliger Lifetime-Unlock';
+  String get oneTimeLifetimeUnlock => 'Monatsabo';
 
   @override
   String get premiumHeroActiveTitle => 'Deine Erinnerungswand ist unbegrenzt.';
@@ -1455,7 +1455,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get premiumHeroActiveBody =>
-      'Premium Lifetime Unlock ist aktiv. Verschlüsselter Archivexport, Premium-Designs und erweiterte Layouts sind verfügbar.';
+      'Dein Premium-Abo ist aktiv. Verschlüsselter Archivexport, Premium-Designs und erweiterte Layouts sind verfügbar.';
 
   @override
   String premiumHeroLockedBody(int limit) {
@@ -1517,14 +1517,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get deviceTransferHow => 'So funktioniert Gerätewechsel';
 
   @override
-  String get lifetimeUnlock => 'Lifetime Unlock';
+  String get lifetimeUnlock => 'Premium-Abo';
 
   @override
   String get premiumActiveOnDevice => 'Premium ist auf diesem Gerät aktiv.';
 
   @override
   String get onePurchaseBody =>
-      'Ein Kauf. Kein Monatsabo für die erste Premium-Version. Behalte, schütze und verschiebe deine Erinnerungswand.';
+      'Monatliches Abo für unbegrenzte Erinnerungen, Backups, Premium-Designs und erweiterte Layouts. Jederzeit in Google Play oder im App Store kündbar.';
 
   @override
   String get premiumActiveButton => 'Premium aktiv';
@@ -1533,21 +1533,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get processing => 'Wird verarbeitet...';
 
   @override
-  String get unlockPremium => 'Premium freischalten';
+  String get unlockPremium => 'Premium abonnieren';
 
   @override
-  String get restorePurchase => 'Kauf wiederherstellen';
+  String get restorePurchase => 'Abo wiederherstellen';
 
   @override
   String get enableDebugMockUnlock => 'Debug-Mock-Unlock aktivieren';
 
   @override
   String get purchasesHandledByGooglePlay =>
-      'Käufe werden über Google Play abgewickelt. Die Freischaltung wird nach Kauf oder Wiederherstellung lokal gespeichert.';
+      'Abos laufen über Google Play oder den App Store. Premium bleibt aktiv, solange dein Abo verlängert wird.';
 
   @override
   String lifetimeUnlockWithPrice(Object price) {
-    return 'Lifetime Unlock • $price';
+    return 'Premium • $price/Monat';
   }
 
   @override

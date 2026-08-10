@@ -1,5 +1,8 @@
 class PremiumProductIds {
   const PremiumProductIds._();
 
-  static const lifetimeUnlock = 'lifethreads_premium_lifetime';
+  /// Google Play / App Store auto-renewable monthly subscription.
+  static const monthlySubscription = 'lifethreads_premium_monthly';
+
+  static const all = {monthlySubscription};
 }

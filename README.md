@@ -71,6 +71,6 @@ See [docs/product_success_plan.md](docs/product_success_plan.md) for the monetiz
 
 Current direction:
 - Free: 30 memories, local-only.
-- Premium: €4.99 lifetime unlock for unlimited memories, export, themes, and advanced layouts.
-- Subscription only later for encrypted backup/sync.
-- Google Play Billing product ID: `lifethreads_premium_lifetime`.
+- Premium: monthly subscription (`lifethreads_premium_monthly`) for unlimited memories, export, themes, and advanced layouts.
+- Cloud sync remains a later add-on.
+- Google Play subscription product ID: `lifethreads_premium_monthly`.

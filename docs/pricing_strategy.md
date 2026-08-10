@@ -6,22 +6,14 @@ Launch with:
 
 ```text
 Free: 30 memories
-Premium: €4.99 lifetime unlock
+Premium: monthly subscription (store-managed auto-renew)
+Product ID: lifethreads_premium_monthly
+Suggested start price: €2.99 / month
 ```
 
-Do not launch with a subscription for the local-first MVP.
+## Why Subscription
 
-## Why €4.99 Lifetime
-
-LifeThreads is personal and emotional, but early users do not yet know if it will become a habit. A subscription adds too much friction before trust is built.
-
-A €4.99 lifetime unlock is low-friction, clear, and fair:
-
-- easy impulse purchase
-- no subscription anxiety
-- good fit for a private local app
-- simple Play Store product setup
-- easier messaging in screenshots and landing page
+Premium unlocks ongoing value (unlimited memories, backups, themes, layouts). A monthly subscription matches that ongoing access and keeps the price low at the free-limit conversion moment.
 
 ## Free Tier
 
@@ -33,15 +25,9 @@ Free includes:
 - memory detail pages
 - wall, timeline, and map modes
 
-Purpose:
-
-```text
-Let users feel the emotional value before asking for money.
-```
-
 ## Premium Tier
 
-Premium includes:
+Premium includes while subscribed:
 
 - unlimited memories
 - export/import backups
@@ -52,23 +38,23 @@ Premium includes:
 Positioning:
 
 ```text
-Unlock your full memory wall forever.
+Keep every memory without hitting a wall.
 ```
 
-## Price Tests
+## Play / App Store Setup
 
-Start:
+### Google Play
 
-```text
-€4.99 lifetime
-```
+1. Monetize → Subscriptions → Create subscription
+2. Product ID: `lifethreads_premium_monthly`
+3. Add a monthly base plan (e.g. `monthly`)
+4. Activate the base plan and subscription
+5. Add license testers for closed testing
 
-Only test higher prices after retention is proven:
+### App Store
 
-- €6.99 if users create many memories and backup/export is strong
-- €9.99 only after photo book/export/themes feel premium
-
-Do not test lower than €4.99 unless conversion is extremely weak. A lower price may make the app feel less valuable.
+1. Create an auto-renewable subscription with the same product ID when shipping iOS
+2. Put it in a subscription group (e.g. LifeThreads Premium)
 
 ## Upgrade Timing
 
@@ -79,8 +65,6 @@ Show upgrade prompts when:
 - user taps premium theme
 - user taps advanced layout
 - user taps export if export is premium-gated
-
-Avoid showing upgrade prompts during first memory creation. The app must earn trust first.
 
 ## Copy
 
@@ -93,48 +77,28 @@ Keep every memory without hitting a wall.
 Price line:
 
 ```text
-One-time lifetime unlock. No monthly subscription.
+Premium • {store price}/month — cancel anytime
 ```
 
 CTA:
 
 ```text
-Unlock Premium
+Subscribe to Premium
 ```
 
 Restore CTA:
 
 ```text
-Restore purchase
+Restore subscription
 ```
-
-## When to Add Subscription Later
-
-Only add subscription if there is a real recurring cost and recurring value:
-
-- encrypted cloud backup
-- Google Drive/iCloud sync
-- family shared walls
-- cross-device sync
-- large media storage
-
-Subscription should not replace the lifetime local unlock. It should be an optional cloud plan.
 
 ## Success Metrics
 
-Track manually at first:
+Track:
 
 - installs
-- first memory created
-- users reaching 5 memories
-- users reaching 25 memories
+- users reaching memory limit
 - premium screen views
-- premium purchases
-- refunds
+- subscription starts
+- cancels / refunds
 - feedback mentioning price
-
-Target early signal:
-
-```text
-3-5% of users who reach the memory limit buy premium.
-```

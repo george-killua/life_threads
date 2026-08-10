@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 
 import '../domain/premium_product.dart';
 import '../domain/premium_purchase_state.dart';
@@ -15,7 +17,9 @@ final premiumBillingProvider =
 class PremiumBillingController extends Notifier<PremiumPurchaseState> {
   final InAppPurchase _store = InAppPurchase.instance;
   StreamSubscription<List<PurchaseDetails>>? _subscription;
-  ProductDetails? _lifetimeProduct;
+  ProductDetails? _subscriptionProduct;
+  var _awaitingRestoreResult = false;
+  var _deliveredDuringRestore = false;
 
   @override
   PremiumPurchaseState build() {
@@ -25,9 +29,9 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
         state = PremiumPurchaseState(
           status: PremiumPurchaseStatus.failed,
           message: 'Billing update failed. Please try again.',
-          canBuy: _lifetimeProduct != null,
-          productId: _lifetimeProduct?.id,
-          price: _lifetimeProduct?.price,
+          canBuy: _subscriptionProduct != null,
+          productId: _subscriptionProduct?.id,
+          price: _subscriptionProduct?.price,
         );
       },
     );
@@ -44,14 +48,14 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
       if (!available) {
         state = const PremiumPurchaseState(
           status: PremiumPurchaseStatus.storeUnavailable,
-          message: 'Google Play Billing is not available on this device.',
+          message: 'Store billing is not available on this device.',
         );
         return;
       }
 
-      final response = await _store.queryProductDetails({
-        PremiumProductIds.lifetimeUnlock,
-      });
+      final response = await _store.queryProductDetails(
+        PremiumProductIds.all,
+      );
 
       if (response.error != null) {
         state = PremiumPurchaseState(
@@ -65,28 +69,31 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
         state = const PremiumPurchaseState(
           status: PremiumPurchaseStatus.productUnavailable,
           message:
-              'Premium is not available yet. Check the Play Console product setup.',
+              'Premium subscription is not available yet. Check the store product setup.',
         );
         return;
       }
 
-      _lifetimeProduct = response.productDetails.first;
+      _subscriptionProduct = _pickSubscriptionOffer(response.productDetails);
       state = PremiumPurchaseState(
         status: PremiumPurchaseStatus.ready,
-        productId: _lifetimeProduct!.id,
-        price: _lifetimeProduct!.price,
+        productId: _subscriptionProduct!.id,
+        price: _subscriptionProduct!.price,
         canBuy: true,
       );
+
+      // Refresh entitlement from the store (active subscription → premium).
+      unawaited(restorePurchases(silent: true));
     } catch (_) {
-      state = PremiumPurchaseState(
+      state = const PremiumPurchaseState(
         status: PremiumPurchaseStatus.failed,
-        message: 'Could not load Premium from Google Play. Please try again.',
+        message: 'Could not load Premium from the store. Please try again.',
       );
     }
   }
 
-  Future<void> buyLifetimeUnlock() async {
-    final product = _lifetimeProduct;
+  Future<void> buySubscription() async {
+    final product = _subscriptionProduct;
     if (product == null) {
       await loadProduct();
       return;
@@ -94,12 +101,12 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
 
     state = state.copyWith(
       status: PremiumPurchaseStatus.pending,
-      message: 'Opening Google Play checkout.',
+      message: 'Opening store checkout.',
       canBuy: false,
     );
 
     try {
-      final purchaseParam = PurchaseParam(productDetails: product);
+      final purchaseParam = _purchaseParamFor(product);
       final started = await _store.buyNonConsumable(
         purchaseParam: purchaseParam,
       );
@@ -124,38 +131,61 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
     }
   }
 
-  Future<void> restorePurchases() async {
-    state = state.copyWith(
-      isRestoring: true,
-      message: 'Checking your previous purchases.',
-    );
+  Future<void> restorePurchases({bool silent = false}) async {
+    if (!silent) {
+      state = state.copyWith(
+        isRestoring: true,
+        message: 'Checking your subscription.',
+      );
+    }
+
+    _awaitingRestoreResult = true;
+    _deliveredDuringRestore = false;
+
     try {
       await _store.restorePurchases();
-      final restored =
-          state.status == PremiumPurchaseStatus.restored ||
-          state.status == PremiumPurchaseStatus.purchased;
-      if (!restored) {
-        state = state.copyWith(
-          status: _lifetimeProduct == null
-              ? PremiumPurchaseStatus.idle
-              : PremiumPurchaseStatus.ready,
-          isRestoring: false,
-          canBuy: _lifetimeProduct != null,
-          message: 'No previous premium purchase was found.',
-        );
+      // purchaseStream delivers restores asynchronously after this returns.
+      await Future<void>.delayed(const Duration(milliseconds: 900));
+
+      if (!_deliveredDuringRestore) {
+        await ref.read(premiumEntitlementProvider.notifier).revokeStoreUnlock();
+        if (!silent) {
+          state = state.copyWith(
+            status: _subscriptionProduct == null
+                ? PremiumPurchaseStatus.idle
+                : PremiumPurchaseStatus.ready,
+            isRestoring: false,
+            canBuy: _subscriptionProduct != null,
+            message: 'No active Premium subscription was found.',
+          );
+        } else if (_subscriptionProduct != null) {
+          state = state.copyWith(
+            status: PremiumPurchaseStatus.ready,
+            canBuy: true,
+            isRestoring: false,
+          );
+        }
+      } else if (!silent) {
+        state = state.copyWith(isRestoring: false);
       }
     } catch (_) {
-      state = state.copyWith(
-        status: PremiumPurchaseStatus.failed,
-        isRestoring: false,
-        message: 'Restore failed. Please try again.',
-      );
+      if (!silent) {
+        state = state.copyWith(
+          status: PremiumPurchaseStatus.failed,
+          isRestoring: false,
+          message: 'Restore failed. Please try again.',
+        );
+      }
+    } finally {
+      _awaitingRestoreResult = false;
     }
   }
 
   Future<void> _handlePurchases(List<PurchaseDetails> purchases) async {
     for (final purchase in purchases) {
-      if (purchase.productID != PremiumProductIds.lifetimeUnlock) continue;
+      if (purchase.productID != PremiumProductIds.monthlySubscription) {
+        continue;
+      }
 
       switch (purchase.status) {
         case PurchaseStatus.pending:
@@ -164,32 +194,27 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
             message: 'Purchase is pending. Premium unlocks after approval.',
             canBuy: false,
           );
-          break;
         case PurchaseStatus.purchased:
           await _deliverPurchase(purchase, PremiumPurchaseStatus.purchased);
-          break;
         case PurchaseStatus.restored:
           await _deliverPurchase(purchase, PremiumPurchaseStatus.restored);
-          break;
         case PurchaseStatus.error:
           state = PremiumPurchaseState(
             status: PremiumPurchaseStatus.failed,
-            productId: _lifetimeProduct?.id,
-            price: _lifetimeProduct?.price,
-            canBuy: _lifetimeProduct != null,
+            productId: _subscriptionProduct?.id,
+            price: _subscriptionProduct?.price,
+            canBuy: _subscriptionProduct != null,
             message:
                 purchase.error?.message ?? 'Purchase failed. Please try again.',
           );
-          break;
         case PurchaseStatus.canceled:
           state = PremiumPurchaseState(
             status: PremiumPurchaseStatus.failed,
-            productId: _lifetimeProduct?.id,
-            price: _lifetimeProduct?.price,
-            canBuy: _lifetimeProduct != null,
+            productId: _subscriptionProduct?.id,
+            price: _subscriptionProduct?.price,
+            canBuy: _subscriptionProduct != null,
             message: 'Purchase canceled.',
           );
-          break;
       }
 
       if (purchase.pendingCompletePurchase) {
@@ -202,15 +227,42 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
     PurchaseDetails purchase,
     PremiumPurchaseStatus status,
   ) async {
+    if (_awaitingRestoreResult) {
+      _deliveredDuringRestore = true;
+    }
     await ref.read(premiumEntitlementProvider.notifier).grantStoreUnlock();
     state = PremiumPurchaseState(
       status: status,
       productId: purchase.productID,
-      price: _lifetimeProduct?.price,
+      price: _subscriptionProduct?.price,
       canBuy: true,
+      isRestoring: false,
       message: status == PremiumPurchaseStatus.restored
-          ? 'Premium purchase restored.'
-          : 'Premium lifetime unlock is active.',
+          ? 'Premium subscription restored.'
+          : 'Premium subscription is active.',
     );
+  }
+
+  ProductDetails _pickSubscriptionOffer(List<ProductDetails> products) {
+    // Prefer a Google Play offer that already carries an offerToken.
+    for (final product in products) {
+      if (product is GooglePlayProductDetails && product.offerToken != null) {
+        return product;
+      }
+    }
+    return products.first;
+  }
+
+  PurchaseParam _purchaseParamFor(ProductDetails product) {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+      final offerToken = product is GooglePlayProductDetails
+          ? product.offerToken
+          : null;
+      return GooglePlayPurchaseParam(
+        productDetails: product,
+        offerToken: offerToken,
+      );
+    }
+    return PurchaseParam(productDetails: product);
   }
 }

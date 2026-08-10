@@ -5,7 +5,7 @@
 - App name: LifeThreads
 - Package: `dev.gkcoding.lifethreads`
 - Version: `0.1.4+6` (from `pubspec.yaml`)
-- Premium product ID: `lifethreads_premium_lifetime`
+- Premium product ID: `lifethreads_premium_monthly`
 
 ## Build Command
 
@@ -28,7 +28,7 @@ build/app/outputs/bundle/release/app-release.aab
 - Confirm release keystore is configured in `android/key.properties`.
 - Confirm the App Bundle is release-signed, not debug-signed.
 - Confirm Play Console package name is `dev.gkcoding.lifethreads`.
-- Create the one-time managed product `lifethreads_premium_lifetime`.
+- Create the monthly subscription product `lifethreads_premium_monthly`.
 - Publish privacy policy at `https://gkcoding.dev/lifethreads/privacy`.
 - Publish terms at `https://gkcoding.dev/lifethreads/terms`.
 - Complete Data Safety and content rating forms.

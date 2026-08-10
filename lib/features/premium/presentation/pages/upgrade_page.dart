@@ -33,7 +33,7 @@ class UpgradePage extends ConsumerWidget {
             children: [
               _UpgradeTopBar(onBack: () => _leave(context)),
               const SizedBox(height: 18),
-              _LifetimeHero(isPremium: isPremium, memoryCount: memoryCount),
+              _SubscriptionHero(isPremium: isPremium, memoryCount: memoryCount),
               const SizedBox(height: 16),
               const _BenefitGrid(),
               const SizedBox(height: 16),
@@ -41,12 +41,12 @@ class UpgradePage extends ConsumerWidget {
                 onOpen: () => context.push(RouteNames.archiveTransfer),
               ),
               const SizedBox(height: 16),
-              _LifetimeOfferCard(
+              _SubscriptionOfferCard(
                 isPremium: isPremium,
                 purchaseState: purchaseState,
                 onPurchase: () => ref
                     .read(premiumBillingProvider.notifier)
-                    .buyLifetimeUnlock(),
+                    .buySubscription(),
                 onRestore: () => ref
                     .read(premiumBillingProvider.notifier)
                     .restorePurchases(),
@@ -111,8 +111,8 @@ class _UpgradeTopBar extends StatelessWidget {
   }
 }
 
-class _LifetimeHero extends StatelessWidget {
-  const _LifetimeHero({required this.isPremium, required this.memoryCount});
+class _SubscriptionHero extends StatelessWidget {
+  const _SubscriptionHero({required this.isPremium, required this.memoryCount});
 
   final bool isPremium;
   final int memoryCount;
@@ -460,8 +460,8 @@ class _MoveDeviceCard extends StatelessWidget {
   }
 }
 
-class _LifetimeOfferCard extends StatelessWidget {
-  const _LifetimeOfferCard({
+class _SubscriptionOfferCard extends StatelessWidget {
+  const _SubscriptionOfferCard({
     required this.isPremium,
     required this.purchaseState,
     required this.onPurchase,
@@ -479,7 +479,7 @@ class _LifetimeOfferCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final price = purchaseState.price ?? '€4.99';
+    final price = purchaseState.price ?? '€2.99';
     final canBuy = purchaseState.canBuy && !purchaseState.isBusy;
     final message = purchaseState.message;
 
