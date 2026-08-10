@@ -90,6 +90,18 @@
   "onboardingHeadline": "ابنِ جدار ذكرياتك الحي.",
   "onboardingBody": "غرفة ذكريات خاصة يمكن أن تتجمع فيها الصور والأماكن والأشخاص والملاحظات الصغيرة بخيوط عاطفية.",
   "onboardingPrivacy": "ذكرياتك تبقى خاصة افتراضياً: بلا حساب وبلا ملف عام. المشاركة السحابية المشفّرة والنسخ الاحتياطي اختياريان ولا يحدثان إلا عندما تختارهما.",
+  "onboardingPrivacyShort": "بلا حساب وبلا ملف عام. ذكرياتك تبقى على هذا الجهاز ما لم تختر غير ذلك.",
+  "onboardingNext": "التالي",
+  "onboardingNameTitle": "بماذا نناديك؟",
+  "onboardingNameHint": "اسمك",
+  "onboardingNiceToMeetYou": "سررنا بلقائك، {name}.",
+  "onboardingGetStartedTitle": "اختر كيف تبدأ",
+  "onboardingGetStartedBody": "عاين جداراً تجريبياً، أو ابدأ بجدار فارغ وعلّق ذكرياتك.",
+  "wallWelcome": "أهلاً، {name}.",
+  "settingsNameTitle": "اسمك",
+  "settingsNameBody": "يظهر كتحية على جدارك.",
+  "settingsNameHint": "اسمك",
+  "settingsNameSaved": "تم تحديث الاسم.",
   "storyPrivacyTitle": "ذكرياتك تبقى خاصة",
   "storyConnectTitle": "اربط اللحظات",
   "storyConnectText": "اربط الذكريات والملاحظات والأماكن حتى يصبح لكل فصل سياقه.",
@@ -229,6 +241,20 @@
   "pick": "اختيار",
   "addMore": "إضافة المزيد",
   "takePhoto": "التقاط صورة",
+  "takePhotosNow": "التقاط صور الآن",
+  "takePhotosFabTooltip": "التقاط صور لذكرى جديدة",
+  "takeAnotherPhoto": "التقاط صورة أخرى",
+  "continueWithPhotos": "المتابعة بهذه الصور",
+  "addPhotosToMemory": "إضافة إلى الذكرى",
+  "takeAnotherOrContinueBody": "استمر بالتصوير لهذه الذكرى، أو تابع وأضف القصة.",
+  "photosCapturedCount": "{count, plural, =1{تم التقاط صورة واحدة} other{تم التقاط {count} صور}}",
+  "@photosCapturedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "photoStorageHint": "ينسخ LifeThreads الصور المحددة إلى تخزين التطبيق الخاص ويحافظ على بيانات التاريخ/الموقع عند توفرها.",
   "limitedPhotoAccessActive": "وصول الصور المحدود مفعّل. يمكنك إضافة صور مسموحة أخرى.",
   "selectPhotos": "اختر الصور",

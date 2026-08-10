@@ -21,7 +21,9 @@ import '../memory_l10n.dart';
 import '../widgets/memory_people_editor.dart';
 
 class AddMemoryPage extends ConsumerStatefulWidget {
-  const AddMemoryPage({super.key});
+  const AddMemoryPage({super.key, this.initialPhotos = const []});
+
+  final List<PickedMemoryPhoto> initialPhotos;
 
   @override
   ConsumerState<AddMemoryPage> createState() => _AddMemoryPageState();
@@ -31,7 +33,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _connectionReasonController = TextEditingController();
-  final List<PickedMemoryPhoto> _photos = [];
+  late final List<PickedMemoryPhoto> _photos = [...widget.initialPhotos];
   List<MemoryPersonDraft> _people = [];
   int _step = 0;
   String? _connectedEventId;
@@ -46,6 +48,18 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
   PermissionState? _photoPermission;
 
   static const _stepCount = 4;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialPhotos.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _applyPhotoDefaults(widget.initialPhotos);
+        setState(() {});
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -318,17 +332,74 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
 
   Future<void> _capturePhoto() async {
     setState(() => _isPicking = true);
-    final photo = await ref
-        .read(photoLibraryServiceProvider)
-        .capturePhotoToAppStorage();
-    if (!mounted) return;
+    while (mounted) {
+      final photo = await ref
+          .read(photoLibraryServiceProvider)
+          .capturePhotoToAppStorage();
+      if (!mounted) return;
+      if (photo == null) {
+        setState(() => _isPicking = false);
+        return;
+      }
 
-    setState(() {
-      _isPicking = false;
-      if (photo == null) return;
-      _photos.add(photo);
-      _applyPhotoDefaults([photo]);
-    });
+      setState(() {
+        _photos.add(photo);
+        _applyPhotoDefaults([photo]);
+      });
+
+      final takeAnother = await showModalBottomSheet<bool>(
+        context: context,
+        backgroundColor: AppColors.panelWarm,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        builder: (context) {
+          final l10n = context.l10n;
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    l10n.photosCapturedCount(_photos.length),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 20,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.takeAnotherOrContinueBody,
+                    style: const TextStyle(
+                      color: AppColors.muted,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  FilledButton.icon(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    icon: const Icon(Icons.photo_camera_rounded),
+                    label: Text(l10n.takeAnotherPhoto),
+                  ),
+                  const SizedBox(height: 10),
+                  OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: Text(l10n.continueWithPhotos),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+
+      if (takeAnother != true) {
+        if (mounted) setState(() => _isPicking = false);
+        return;
+      }
+    }
   }
 
   List<MemoryPersonDraft> _personSuggestions(MemoryState state) {

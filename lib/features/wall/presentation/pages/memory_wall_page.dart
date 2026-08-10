@@ -25,6 +25,7 @@ import '../../../memories/domain/memory_category.dart';
 import '../../../memories/domain/memory_event.dart';
 import '../../../memories/domain/memory_feeling.dart';
 import '../../../memories/domain/memory_type.dart';
+import '../../../onboarding/onboarding_preferences.dart';
 import '../../../onboarding/presentation/widgets/lifethreads_tutorial.dart';
 import '../../../premium/data/premium_entitlement_controller.dart';
 import '../../../premium/domain/premium_entitlement.dart';
@@ -55,6 +56,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   final TransformationController _wallController = TransformationController();
   bool _didSetInitialViewport = false;
   bool _isRouteTransitioning = false;
+  bool _isCapturingPhotos = false;
   bool _controlsExpanded = false;
   WallFilter _filter = WallFilter.all;
   _WallViewMode _mode = _WallViewMode.wall;
@@ -151,6 +153,12 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                           canCreateMemory,
                           () => _createQuickPhotoMemory(context, repository),
                         ),
+                        onTakePhotos: _isCapturingPhotos
+                            ? null
+                            : () => _guardMemoryCreation(
+                                canCreateMemory,
+                                () => _capturePhotosForNewMemory(),
+                              ),
                       )
                     else if (_mode == _WallViewMode.wall)
                       Positioned.fill(
@@ -313,6 +321,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                         child: _controlsExpanded
                             ? _WallHeader(
                                 key: const ValueKey('expanded-wall-controls'),
+                                greetingName: ref
+                                    .watch(userDisplayNameProvider)
+                                    .asData
+                                    ?.value,
                                 selectedFilter: _filter,
                                 selectedMode: _mode,
                                 selectedLayout: _layoutMode,
@@ -388,6 +400,15 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                               ),
                             ),
                             const SizedBox(width: 12),
+                            _CameraCaptureFab(
+                              onPressed: _isCapturingPhotos
+                                  ? null
+                                  : () => _guardMemoryCreation(
+                                      canCreateMemory,
+                                      () => _capturePhotosForNewMemory(),
+                                    ),
+                            ),
+                            const SizedBox(width: 10),
                             ExpandableAddButton(
                               onAddEvent: () => _guardMemoryCreation(
                                 canCreateMemory,
@@ -411,17 +432,36 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                       Positioned(
                         right: 20,
                         bottom: 24,
-                        child: ExpandableAddButton(
-                          onAddEvent: () => _guardMemoryCreation(
-                            canCreateMemory,
-                            () => _pushRoute(RouteNames.addMemory),
-                          ),
-                          onAddQuickPhoto: () => _guardMemoryCreation(
-                            canCreateMemory,
-                            () => _createQuickPhotoMemory(context, repository),
-                          ),
-                          onAddText: () => _createTextNote(context, repository),
-                          onAddNail: () => _createNail(context, repository),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            _CameraCaptureFab(
+                              onPressed: _isCapturingPhotos
+                                  ? null
+                                  : () => _guardMemoryCreation(
+                                      canCreateMemory,
+                                      () => _capturePhotosForNewMemory(),
+                                    ),
+                            ),
+                            const SizedBox(width: 10),
+                            ExpandableAddButton(
+                              onAddEvent: () => _guardMemoryCreation(
+                                canCreateMemory,
+                                () => _pushRoute(RouteNames.addMemory),
+                              ),
+                              onAddQuickPhoto: () => _guardMemoryCreation(
+                                canCreateMemory,
+                                () => _createQuickPhotoMemory(
+                                  context,
+                                  repository,
+                                ),
+                              ),
+                              onAddText: () =>
+                                  _createTextNote(context, repository),
+                              onAddNail: () => _createNail(context, repository),
+                            ),
+                          ],
                         ),
                       ),
                   ],
@@ -567,12 +607,12 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     );
   }
 
-  Future<void> _pushRoute(String location) async {
+  Future<void> _pushRoute(String location, {Object? extra}) async {
     if (!mounted || _isRouteTransitioning || !_isCurrentRoute(context)) return;
     _cancelDrag();
     _isRouteTransitioning = true;
     try {
-      await context.push(location);
+      await context.push(location, extra: extra);
     } finally {
       if (mounted) _isRouteTransitioning = false;
     }
@@ -584,6 +624,103 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       return;
     }
     _pushRoute(RouteNames.upgrade);
+  }
+
+  Future<void> _capturePhotosForNewMemory() async {
+    if (_isCapturingPhotos) return;
+    setState(() => _isCapturingPhotos = true);
+
+    try {
+      final photos = <PickedMemoryPhoto>[];
+      final photoService = ref.read(photoLibraryServiceProvider);
+
+      while (mounted) {
+        final photo = await photoService.capturePhotoToAppStorage();
+        if (!mounted) return;
+        if (photo == null) {
+          if (photos.isEmpty) return;
+          break;
+        }
+
+        photos.add(photo);
+        final action = await showModalBottomSheet<_CameraSessionAction>(
+          context: context,
+          backgroundColor: AppColors.panelWarm,
+          isDismissible: true,
+          enableDrag: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          builder: (sheetContext) {
+            final l10n = sheetContext.l10n;
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      l10n.photosCapturedCount(photos.length),
+                      style: const TextStyle(
+                        color: AppColors.text,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.takeAnotherOrContinueBody,
+                      style: const TextStyle(
+                        color: AppColors.muted,
+                        fontWeight: FontWeight.w600,
+                        height: 1.35,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    FilledButton.icon(
+                      onPressed: () => Navigator.of(
+                        sheetContext,
+                      ).pop(_CameraSessionAction.takeAnother),
+                      icon: const Icon(Icons.photo_camera_rounded),
+                      label: Text(l10n.takeAnotherPhoto),
+                    ),
+                    const SizedBox(height: 10),
+                    FilledButton.tonalIcon(
+                      onPressed: () => Navigator.of(
+                        sheetContext,
+                      ).pop(_CameraSessionAction.addToMemory),
+                      icon: const Icon(Icons.auto_stories_rounded),
+                      label: Text(l10n.addPhotosToMemory),
+                    ),
+                    const SizedBox(height: 4),
+                    TextButton(
+                      onPressed: () => Navigator.of(
+                        sheetContext,
+                      ).pop(_CameraSessionAction.cancel),
+                      child: Text(l10n.cancel),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+
+        if (action == _CameraSessionAction.takeAnother) continue;
+        if (action == _CameraSessionAction.addToMemory) break;
+        return;
+      }
+
+      if (!mounted || photos.isEmpty) return;
+      await _pushRoute(RouteNames.addMemory, extra: photos);
+    } finally {
+      if (mounted) {
+        setState(() => _isCapturingPhotos = false);
+      } else {
+        _isCapturingPhotos = false;
+      }
+    }
   }
 
   void _cancelDrag() {
@@ -1676,6 +1813,7 @@ class _EmptyModePanel extends StatelessWidget {
 class _WallHeader extends StatelessWidget {
   const _WallHeader({
     super.key,
+    required this.greetingName,
     required this.selectedFilter,
     required this.selectedMode,
     required this.selectedLayout,
@@ -1690,6 +1828,7 @@ class _WallHeader extends StatelessWidget {
     required this.onCollapse,
   });
 
+  final String? greetingName;
   final WallFilter selectedFilter;
   final _WallViewMode selectedMode;
   final WallLayoutMode selectedLayout;
@@ -1708,6 +1847,10 @@ class _WallHeader extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxWidth < 390;
+        final name = greetingName?.trim();
+        final subtitle = (name != null && name.isNotEmpty)
+            ? context.l10n.wallWelcome(name)
+            : context.l10n.headerSubtitle;
         return ClipRRect(
           borderRadius: BorderRadius.circular(28),
           child: Container(
@@ -1761,7 +1904,7 @@ class _WallHeader extends StatelessWidget {
                           ),
                           const SizedBox(height: 1),
                           Text(
-                            context.l10n.headerSubtitle,
+                            subtitle,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -2737,6 +2880,41 @@ class _TextNoteDialogState extends State<_TextNoteDialog> {
           child: Text(widget.actionLabel),
         ),
       ],
+    );
+  }
+}
+
+enum _CameraSessionAction { takeAnother, addToMemory, cancel }
+
+class _CameraCaptureFab extends StatelessWidget {
+  const _CameraCaptureFab({required this.onPressed});
+
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gold.withValues(alpha: 0.28),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.34),
+            blurRadius: 20,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: FloatingActionButton(
+        heroTag: 'wall-camera-capture',
+        tooltip: context.l10n.takePhotosFabTooltip,
+        onPressed: onPressed,
+        child: const Icon(Icons.photo_camera_rounded),
+      ),
     );
   }
 }

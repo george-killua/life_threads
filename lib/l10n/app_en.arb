@@ -152,6 +152,32 @@
   "onboardingHeadline": "Build your living wall.",
   "onboardingBody": "A private memory room where photos, places, people, and little notes can hang together with emotional threads.",
   "onboardingPrivacy": "Your memories stay private by default: no account and no public profile. Optional encrypted cloud share and backup only happen when you choose them.",
+  "onboardingPrivacyShort": "No account and no public profile. Your memories stay on this device unless you choose otherwise.",
+  "onboardingNext": "Next",
+  "onboardingNameTitle": "What should we call you?",
+  "onboardingNameHint": "Your name",
+  "onboardingNiceToMeetYou": "Nice to meet you, {name}.",
+  "@onboardingNiceToMeetYou": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingGetStartedTitle": "Choose how to begin",
+  "onboardingGetStartedBody": "Preview a sample wall, or start with a blank one and hang your own memories.",
+  "wallWelcome": "Welcome, {name}.",
+  "@wallWelcome": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsNameTitle": "Your name",
+  "settingsNameBody": "Shown as a greeting on your wall.",
+  "settingsNameHint": "Your name",
+  "settingsNameSaved": "Name updated.",
   "storyPrivacyTitle": "Your memories stay private",
   "storyConnectTitle": "Connect moments",
   "storyConnectText": "Link memories, notes, and places so every chapter has context.",
@@ -306,6 +332,20 @@
   "pick": "Pick",
   "addMore": "Add more",
   "takePhoto": "Take photo",
+  "takePhotosNow": "Take photos now",
+  "takePhotosFabTooltip": "Take photos for a new memory",
+  "takeAnotherPhoto": "Take another photo",
+  "continueWithPhotos": "Continue with these photos",
+  "addPhotosToMemory": "Add to memory",
+  "takeAnotherOrContinueBody": "Keep shooting for this memory, or continue and add the story.",
+  "photosCapturedCount": "{count, plural, =1{1 photo captured} other{{count} photos captured}}",
+  "@photosCapturedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "photoStorageHint": "LifeThreads copies selected photos into private app storage and keeps date/location metadata when available.",
   "limitedPhotoAccessActive": "Limited photo access is active. You can add more allowed photos.",
   "selectPhotos": "Select photos",

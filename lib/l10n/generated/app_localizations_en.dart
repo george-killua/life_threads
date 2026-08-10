@@ -322,6 +322,48 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your memories stay private by default: no account and no public profile. Optional encrypted cloud share and backup only happen when you choose them.';
 
   @override
+  String get onboardingPrivacyShort =>
+      'No account and no public profile. Your memories stay on this device unless you choose otherwise.';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String get onboardingNameTitle => 'What should we call you?';
+
+  @override
+  String get onboardingNameHint => 'Your name';
+
+  @override
+  String onboardingNiceToMeetYou(String name) {
+    return 'Nice to meet you, $name.';
+  }
+
+  @override
+  String get onboardingGetStartedTitle => 'Choose how to begin';
+
+  @override
+  String get onboardingGetStartedBody =>
+      'Preview a sample wall, or start with a blank one and hang your own memories.';
+
+  @override
+  String wallWelcome(String name) {
+    return 'Welcome, $name.';
+  }
+
+  @override
+  String get settingsNameTitle => 'Your name';
+
+  @override
+  String get settingsNameBody => 'Shown as a greeting on your wall.';
+
+  @override
+  String get settingsNameHint => 'Your name';
+
+  @override
+  String get settingsNameSaved => 'Name updated.';
+
+  @override
   String get storyPrivacyTitle => 'Your memories stay private';
 
   @override
@@ -758,6 +800,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get takePhoto => 'Take photo';
+
+  @override
+  String get takePhotosNow => 'Take photos now';
+
+  @override
+  String get takePhotosFabTooltip => 'Take photos for a new memory';
+
+  @override
+  String get takeAnotherPhoto => 'Take another photo';
+
+  @override
+  String get continueWithPhotos => 'Continue with these photos';
+
+  @override
+  String get addPhotosToMemory => 'Add to memory';
+
+  @override
+  String get takeAnotherOrContinueBody =>
+      'Keep shooting for this memory, or continue and add the story.';
+
+  @override
+  String photosCapturedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos captured',
+      one: '1 photo captured',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get photoStorageHint =>

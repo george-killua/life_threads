@@ -90,6 +90,18 @@
   "onboardingHeadline": "Baue deine lebendige Wand.",
   "onboardingBody": "Ein privater Erinnerungsraum, in dem Fotos, Orte, Menschen und kleine Notizen mit emotionalen Fäden zusammenhängen.",
   "onboardingPrivacy": "Deine Erinnerungen bleiben standardmäßig privat: kein Konto und kein öffentliches Profil. Optionales verschlüsseltes Cloud-Sharing und Backup nur, wenn du es wählst.",
+  "onboardingPrivacyShort": "Kein Konto und kein öffentliches Profil. Deine Erinnerungen bleiben auf diesem Gerät, bis du etwas anderes wählst.",
+  "onboardingNext": "Weiter",
+  "onboardingNameTitle": "Wie sollen wir dich nennen?",
+  "onboardingNameHint": "Dein Name",
+  "onboardingNiceToMeetYou": "Schön, dich kennenzulernen, {name}.",
+  "onboardingGetStartedTitle": "So möchtest du starten",
+  "onboardingGetStartedBody": "Sieh dir eine Beispielwand an oder beginne leer und hänge deine eigenen Erinnerungen auf.",
+  "wallWelcome": "Willkommen, {name}.",
+  "settingsNameTitle": "Dein Name",
+  "settingsNameBody": "Wird als Begrüßung auf deiner Wand angezeigt.",
+  "settingsNameHint": "Dein Name",
+  "settingsNameSaved": "Name aktualisiert.",
   "storyPrivacyTitle": "Deine Erinnerungen bleiben privat",
   "storyConnectTitle": "Momente verbinden",
   "storyConnectText": "Verbinde Erinnerungen, Notizen und Orte, damit jedes Kapitel Kontext bekommt.",
@@ -229,6 +241,20 @@
   "pick": "Wählen",
   "addMore": "Mehr hinzufügen",
   "takePhoto": "Foto aufnehmen",
+  "takePhotosNow": "Jetzt Fotos aufnehmen",
+  "takePhotosFabTooltip": "Fotos für eine neue Erinnerung aufnehmen",
+  "takeAnotherPhoto": "Weiteres Foto aufnehmen",
+  "continueWithPhotos": "Mit diesen Fotos weiter",
+  "addPhotosToMemory": "Zur Erinnerung hinzufügen",
+  "takeAnotherOrContinueBody": "Nimm weitere Fotos für diese Erinnerung auf oder fahre fort und ergänze die Geschichte.",
+  "photosCapturedCount": "{count, plural, =1{1 Foto aufgenommen} other{{count} Fotos aufgenommen}}",
+  "@photosCapturedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "photoStorageHint": "LifeThreads kopiert ausgewählte Fotos in den privaten App-Speicher und behält Datum/Ort-Metadaten, wenn vorhanden.",
   "limitedPhotoAccessActive": "Eingeschränkter Fotozugriff ist aktiv. Du kannst weitere erlaubte Fotos hinzufügen.",
   "selectPhotos": "Fotos auswählen",

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/backup/presentation/pages/archive_transfer_page.dart';
 import '../../features/capsule/domain/memory_capsule_models.dart';
 import '../../features/capsule/presentation/pages/capsule_cinema_page.dart';
+import '../../features/media/data/picked_memory_photo.dart';
 import '../../features/memories/presentation/pages/add_memory_page.dart';
 import '../../features/memories/presentation/pages/edit_memory_page.dart';
 import '../../features/memories/presentation/pages/manage_connections_page.dart';
@@ -45,7 +46,13 @@ class AppRouter {
       ),
       GoRoute(
         path: RouteNames.addMemory,
-        builder: (context, state) => const AddMemoryPage(),
+        builder: (context, state) {
+          final extra = state.extra;
+          final initialPhotos = extra is List<PickedMemoryPhoto>
+              ? extra
+              : const <PickedMemoryPhoto>[];
+          return AddMemoryPage(initialPhotos: initialPhotos);
+        },
       ),
       GoRoute(
         path: RouteNames.memoryDetail,

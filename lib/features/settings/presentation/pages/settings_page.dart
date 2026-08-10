@@ -19,6 +19,7 @@ import '../../../capsule/data/memory_capsule_service.dart';
 import '../../../capsule/domain/memory_capsule_models.dart';
 import '../../../capsule/presentation/widgets/memory_capsule_dialogs.dart';
 import '../../../memories/data/memory_repository.dart';
+import '../../../onboarding/onboarding_preferences.dart';
 import '../../../premium/data/premium_entitlement_controller.dart';
 import '../../../wall/data/wall_theme_controller.dart';
 import '../../../wall/domain/wall_theme.dart';
@@ -33,6 +34,7 @@ class SettingsPage extends ConsumerWidget {
     final memoryState = ref.watch(memoryRepositoryProvider);
     final entitlement = ref.watch(premiumEntitlementProvider).asData?.value;
     final selectedLocale = ref.watch(localeControllerProvider).asData?.value;
+    final displayName = ref.watch(userDisplayNameProvider).asData?.value ?? '';
     final selectedTheme =
         ref.watch(wallThemeProvider).asData?.value ??
         WallThemePreset.warmMemoryRoom;
@@ -67,6 +69,23 @@ class SettingsPage extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 18),
+              _SettingsCard(
+                icon: Icons.person_rounded,
+                title: l10n.settingsNameTitle,
+                body: l10n.settingsNameBody,
+                child: _DisplayNameEditor(
+                  initialName: displayName,
+                  onSave: (name) async {
+                    await ref
+                        .read(userDisplayNameProvider.notifier)
+                        .setDisplayName(name);
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.settingsNameSaved)),
+                    );
+                  },
+                ),
+              ),
               _SettingsCard(
                 icon: Icons.language_rounded,
                 title: l10n.languageTitle,
@@ -1084,6 +1103,105 @@ String _themeDescription(BuildContext context, WallThemePreset theme) {
     WallThemeId.softPaperWall => context.l10n.themeSoftPaperWallDescription,
     WallThemeId.travelCorkboard => context.l10n.themeTravelCorkboardDescription,
   };
+}
+
+class _DisplayNameEditor extends StatefulWidget {
+  const _DisplayNameEditor({
+    required this.initialName,
+    required this.onSave,
+  });
+
+  final String initialName;
+  final Future<void> Function(String name) onSave;
+
+  @override
+  State<_DisplayNameEditor> createState() => _DisplayNameEditorState();
+}
+
+class _DisplayNameEditorState extends State<_DisplayNameEditor> {
+  late final TextEditingController _controller;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialName);
+  }
+
+  @override
+  void didUpdateWidget(covariant _DisplayNameEditor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialName == widget.initialName) return;
+    // Only hydrate from provider when the field still matches the old
+    // loaded value (or is empty after initial async load). Never wipe
+    // in-progress edits the user typed while prefs were loading.
+    final current = _controller.text.trim();
+    final oldInitial = oldWidget.initialName.trim();
+    if (current.isEmpty || current == oldInitial) {
+      _controller.text = widget.initialName;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final name = _controller.text.trim();
+    if (name.isEmpty || name == widget.initialName.trim()) return;
+    setState(() => _saving = true);
+    try {
+      await widget.onSave(name);
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final canSave =
+        !_saving &&
+        _controller.text.trim().isNotEmpty &&
+        _controller.text.trim() != widget.initialName.trim();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextField(
+          controller: _controller,
+          textCapitalization: TextCapitalization.words,
+          textInputAction: TextInputAction.done,
+          onChanged: (_) => setState(() {}),
+          onSubmitted: (_) {
+            if (canSave) _save();
+          },
+          decoration: InputDecoration(
+            hintText: l10n.settingsNameHint,
+            filled: true,
+            fillColor: AppColors.wallInk.withValues(alpha: 0.35),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerRight,
+          child: FilledButton.icon(
+            onPressed: canSave ? _save : null,
+            icon: _saving
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.check_rounded),
+            label: Text(l10n.save),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _SettingsCard extends StatelessWidget {

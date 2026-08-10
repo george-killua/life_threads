@@ -322,6 +322,49 @@ class AppLocalizationsDe extends AppLocalizations {
       'Deine Erinnerungen bleiben standardmäßig privat: kein Konto und kein öffentliches Profil. Optionales verschlüsseltes Cloud-Sharing und Backup nur, wenn du es wählst.';
 
   @override
+  String get onboardingPrivacyShort =>
+      'Kein Konto und kein öffentliches Profil. Deine Erinnerungen bleiben auf diesem Gerät, bis du etwas anderes wählst.';
+
+  @override
+  String get onboardingNext => 'Weiter';
+
+  @override
+  String get onboardingNameTitle => 'Wie sollen wir dich nennen?';
+
+  @override
+  String get onboardingNameHint => 'Dein Name';
+
+  @override
+  String onboardingNiceToMeetYou(String name) {
+    return 'Schön, dich kennenzulernen, $name.';
+  }
+
+  @override
+  String get onboardingGetStartedTitle => 'So möchtest du starten';
+
+  @override
+  String get onboardingGetStartedBody =>
+      'Sieh dir eine Beispielwand an oder beginne leer und hänge deine eigenen Erinnerungen auf.';
+
+  @override
+  String wallWelcome(String name) {
+    return 'Willkommen, $name.';
+  }
+
+  @override
+  String get settingsNameTitle => 'Dein Name';
+
+  @override
+  String get settingsNameBody =>
+      'Wird als Begrüßung auf deiner Wand angezeigt.';
+
+  @override
+  String get settingsNameHint => 'Dein Name';
+
+  @override
+  String get settingsNameSaved => 'Name aktualisiert.';
+
+  @override
   String get storyPrivacyTitle => 'Deine Erinnerungen bleiben privat';
 
   @override
@@ -768,6 +811,36 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get takePhoto => 'Foto aufnehmen';
+
+  @override
+  String get takePhotosNow => 'Jetzt Fotos aufnehmen';
+
+  @override
+  String get takePhotosFabTooltip => 'Fotos für eine neue Erinnerung aufnehmen';
+
+  @override
+  String get takeAnotherPhoto => 'Weiteres Foto aufnehmen';
+
+  @override
+  String get continueWithPhotos => 'Mit diesen Fotos weiter';
+
+  @override
+  String get addPhotosToMemory => 'Zur Erinnerung hinzufügen';
+
+  @override
+  String get takeAnotherOrContinueBody =>
+      'Nimm weitere Fotos für diese Erinnerung auf oder fahre fort und ergänze die Geschichte.';
+
+  @override
+  String photosCapturedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos aufgenommen',
+      one: '1 Foto aufgenommen',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get photoStorageHint =>

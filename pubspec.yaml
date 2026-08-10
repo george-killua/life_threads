@@ -1,7 +1,7 @@
 name: life_threads
 description: "A private animated memory wall for photos, places, and life stories."
 publish_to: 'none'
-version: 0.1.5+7
+version: 0.1.6+8
 
 environment:
   sdk: ^3.11.4

@@ -646,6 +646,78 @@ abstract class AppLocalizations {
   /// **'Your memories stay private by default: no account and no public profile. Optional encrypted cloud share and backup only happen when you choose them.'**
   String get onboardingPrivacy;
 
+  /// No description provided for @onboardingPrivacyShort.
+  ///
+  /// In en, this message translates to:
+  /// **'No account and no public profile. Your memories stay on this device unless you choose otherwise.'**
+  String get onboardingPrivacyShort;
+
+  /// No description provided for @onboardingNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardingNext;
+
+  /// No description provided for @onboardingNameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What should we call you?'**
+  String get onboardingNameTitle;
+
+  /// No description provided for @onboardingNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get onboardingNameHint;
+
+  /// No description provided for @onboardingNiceToMeetYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Nice to meet you, {name}.'**
+  String onboardingNiceToMeetYou(String name);
+
+  /// No description provided for @onboardingGetStartedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how to begin'**
+  String get onboardingGetStartedTitle;
+
+  /// No description provided for @onboardingGetStartedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview a sample wall, or start with a blank one and hang your own memories.'**
+  String get onboardingGetStartedBody;
+
+  /// No description provided for @wallWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome, {name}.'**
+  String wallWelcome(String name);
+
+  /// No description provided for @settingsNameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get settingsNameTitle;
+
+  /// No description provided for @settingsNameBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown as a greeting on your wall.'**
+  String get settingsNameBody;
+
+  /// No description provided for @settingsNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get settingsNameHint;
+
+  /// No description provided for @settingsNameSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Name updated.'**
+  String get settingsNameSaved;
+
   /// No description provided for @storyPrivacyTitle.
   ///
   /// In en, this message translates to:
@@ -1479,6 +1551,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Take photo'**
   String get takePhoto;
+
+  /// No description provided for @takePhotosNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photos now'**
+  String get takePhotosNow;
+
+  /// No description provided for @takePhotosFabTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photos for a new memory'**
+  String get takePhotosFabTooltip;
+
+  /// No description provided for @takeAnotherPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take another photo'**
+  String get takeAnotherPhoto;
+
+  /// No description provided for @continueWithPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with these photos'**
+  String get continueWithPhotos;
+
+  /// No description provided for @addPhotosToMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to memory'**
+  String get addPhotosToMemory;
+
+  /// No description provided for @takeAnotherOrContinueBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep shooting for this memory, or continue and add the story.'**
+  String get takeAnotherOrContinueBody;
+
+  /// No description provided for @photosCapturedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 photo captured} other{{count} photos captured}}'**
+  String photosCapturedCount(int count);
 
   /// No description provided for @photoStorageHint.
   ///

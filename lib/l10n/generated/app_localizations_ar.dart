@@ -321,6 +321,48 @@ class AppLocalizationsAr extends AppLocalizations {
       'ذكرياتك تبقى خاصة افتراضياً: بلا حساب وبلا ملف عام. المشاركة السحابية المشفّرة والنسخ الاحتياطي اختياريان ولا يحدثان إلا عندما تختارهما.';
 
   @override
+  String get onboardingPrivacyShort =>
+      'بلا حساب وبلا ملف عام. ذكرياتك تبقى على هذا الجهاز ما لم تختر غير ذلك.';
+
+  @override
+  String get onboardingNext => 'التالي';
+
+  @override
+  String get onboardingNameTitle => 'بماذا نناديك؟';
+
+  @override
+  String get onboardingNameHint => 'اسمك';
+
+  @override
+  String onboardingNiceToMeetYou(String name) {
+    return 'سررنا بلقائك، $name.';
+  }
+
+  @override
+  String get onboardingGetStartedTitle => 'اختر كيف تبدأ';
+
+  @override
+  String get onboardingGetStartedBody =>
+      'عاين جداراً تجريبياً، أو ابدأ بجدار فارغ وعلّق ذكرياتك.';
+
+  @override
+  String wallWelcome(String name) {
+    return 'أهلاً، $name.';
+  }
+
+  @override
+  String get settingsNameTitle => 'اسمك';
+
+  @override
+  String get settingsNameBody => 'يظهر كتحية على جدارك.';
+
+  @override
+  String get settingsNameHint => 'اسمك';
+
+  @override
+  String get settingsNameSaved => 'تم تحديث الاسم.';
+
+  @override
   String get storyPrivacyTitle => 'ذكرياتك تبقى خاصة';
 
   @override
@@ -755,6 +797,36 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get takePhoto => 'التقاط صورة';
+
+  @override
+  String get takePhotosNow => 'التقاط صور الآن';
+
+  @override
+  String get takePhotosFabTooltip => 'التقاط صور لذكرى جديدة';
+
+  @override
+  String get takeAnotherPhoto => 'التقاط صورة أخرى';
+
+  @override
+  String get continueWithPhotos => 'المتابعة بهذه الصور';
+
+  @override
+  String get addPhotosToMemory => 'إضافة إلى الذكرى';
+
+  @override
+  String get takeAnotherOrContinueBody =>
+      'استمر بالتصوير لهذه الذكرى، أو تابع وأضف القصة.';
+
+  @override
+  String photosCapturedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم التقاط $count صور',
+      one: 'تم التقاط صورة واحدة',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get photoStorageHint =>

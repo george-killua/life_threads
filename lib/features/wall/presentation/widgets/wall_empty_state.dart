@@ -8,10 +8,12 @@ class WallEmptyState extends StatelessWidget {
     super.key,
     required this.onAdd,
     required this.onQuickPhoto,
+    required this.onTakePhotos,
   });
 
   final VoidCallback onAdd;
   final VoidCallback onQuickPhoto;
+  final VoidCallback? onTakePhotos;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +64,12 @@ class WallEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 22),
             FilledButton.icon(
+              onPressed: onTakePhotos,
+              icon: const Icon(Icons.photo_camera_rounded),
+              label: Text(context.l10n.takePhotosNow),
+            ),
+            const SizedBox(height: 10),
+            FilledButton.tonalIcon(
               onPressed: onAdd,
               icon: const Icon(Icons.add_rounded),
               label: Text(context.l10n.saveMomentTitle),

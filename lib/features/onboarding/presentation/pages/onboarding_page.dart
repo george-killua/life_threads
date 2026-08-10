@@ -5,9 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
-import '../../../memories/data/memory_seed_data.dart';
 import '../../onboarding_preferences.dart';
-import '../widgets/lifethreads_tutorial.dart';
+import '../widgets/onboarding_demo_wall_preview.dart';
 
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
@@ -17,7 +16,36 @@ class OnboardingPage extends ConsumerStatefulWidget {
 }
 
 class _OnboardingPageState extends ConsumerState<OnboardingPage> {
+  static const _pageCount = 5;
+
+  final _pageController = PageController();
+  final _nameController = TextEditingController();
+  final _nameFocus = FocusNode();
+
+  int _pageIndex = 0;
   bool _isContinuing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _nameController.dispose();
+    _nameFocus.dispose();
+    super.dispose();
+  }
+
+  String get _trimmedName => _nameController.text.trim();
+
+  bool get _canAdvanceFromName => _trimmedName.isNotEmpty;
+
+  bool get _isLastPage => _pageIndex == _pageCount - 1;
+
+  bool get _isNamePage => _pageIndex == 2;
 
   @override
   Widget build(BuildContext context) {
@@ -33,80 +61,143 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           ),
         ),
         child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(22, 26, 22, 26),
+          child: Column(
             children: [
-              const _BrandMark(),
-              const SizedBox(height: 26),
-              Text(
-                l10n.onboardingHeadline,
-                style: TextStyle(
-                  fontSize: 40,
-                  height: 1.02,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -1.2,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 18, 22, 8),
+                child: Row(
+                  children: [
+                    const _BrandMark(),
+                    const Spacer(),
+                    Text(
+                      '${_pageIndex + 1}/$_pageCount',
+                      style: const TextStyle(
+                        color: AppColors.muted,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 14),
-              Text(
-                l10n.onboardingBody,
-                style: TextStyle(
-                  color: AppColors.muted,
-                  fontSize: 17,
-                  height: 1.48,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onPageChanged: (index) {
+                    setState(() => _pageIndex = index);
+                    if (index == 2) {
+                      _nameFocus.requestFocus();
+                    } else {
+                      _nameFocus.unfocus();
+                    }
+                  },
+                  children: [
+                    _WelcomeStep(headline: l10n.onboardingHeadline, body: l10n.onboardingBody),
+                    _HowItWorksStep(
+                      title: l10n.howItWorks,
+                      cards: [
+                        (
+                          Icons.auto_awesome_rounded,
+                          l10n.storyWallTitle,
+                          l10n.storyWallText,
+                        ),
+                        (
+                          Icons.hub_rounded,
+                          l10n.storyConnectTitle,
+                          l10n.storyConnectText,
+                        ),
+                        (
+                          Icons.lock_rounded,
+                          l10n.storyPrivacyTitle,
+                          l10n.onboardingPrivacyShort,
+                        ),
+                      ],
+                    ),
+                    _NameStep(
+                      controller: _nameController,
+                      focusNode: _nameFocus,
+                      title: l10n.onboardingNameTitle,
+                      hint: l10n.onboardingNameHint,
+                      preview: _trimmedName.isEmpty
+                          ? null
+                          : l10n.onboardingNiceToMeetYou(_trimmedName),
+                    ),
+                    _PrivacyStep(
+                      title: l10n.storyPrivacyTitle,
+                      body: l10n.onboardingPrivacy,
+                    ),
+                    _GetStartedStep(
+                      title: l10n.onboardingGetStartedTitle,
+                      body: l10n.onboardingGetStartedBody,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 12),
-              Text(
-                l10n.onboardingPrivacy,
-                style: TextStyle(
-                  color: AppColors.gold,
-                  fontWeight: FontWeight.w900,
-                  height: 1.35,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 8, 22, 18),
+                child: Column(
+                  children: [
+                    _PageDots(count: _pageCount, index: _pageIndex),
+                    const SizedBox(height: 16),
+                    if (_isLastPage) ...[
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: _isContinuing
+                              ? null
+                              : () => _continue(useDemoWall: true),
+                          icon: _isContinuing
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.preview_rounded),
+                          label: Text(l10n.previewDemoWall),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: _isContinuing
+                              ? null
+                              : () => _continue(useDemoWall: false),
+                          icon: const Icon(Icons.add_rounded),
+                          label: Text(l10n.startFresh),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: _isContinuing ? null : _goBack,
+                        child: Text(l10n.back),
+                      ),
+                    ] else
+                      Row(
+                        children: [
+                          if (_pageIndex > 0)
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: _isContinuing ? null : _goBack,
+                                child: Text(l10n.back),
+                              ),
+                            ),
+                          if (_pageIndex > 0) const SizedBox(width: 12),
+                          Expanded(
+                            child: FilledButton(
+                              onPressed: _isContinuing ||
+                                      (_isNamePage && !_canAdvanceFromName)
+                                  ? null
+                                  : _goNext,
+                              child: Text(l10n.onboardingNext),
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 26),
-              const _DemoWallPreview(),
-              const SizedBox(height: 28),
-              const LifeThreadsTutorialSteps(),
-              const SizedBox(height: 14),
-              _StoryPoint(
-                icon: Icons.lock_rounded,
-                title: l10n.storyPrivacyTitle,
-                text: l10n.onboardingPrivacy,
-              ),
-              _StoryPoint(
-                icon: Icons.hub_rounded,
-                title: l10n.storyConnectTitle,
-                text: l10n.storyConnectText,
-              ),
-              _StoryPoint(
-                icon: Icons.auto_awesome_rounded,
-                title: l10n.storyWallTitle,
-                text: l10n.storyWallText,
-              ),
-              const SizedBox(height: 26),
-              FilledButton.icon(
-                onPressed: _isContinuing
-                    ? null
-                    : () => _continue(useDemoWall: true),
-                icon: _isContinuing
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.preview_rounded),
-                label: Text(l10n.previewDemoWall),
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                onPressed: _isContinuing
-                    ? null
-                    : () => _continue(useDemoWall: false),
-                icon: const Icon(Icons.add_rounded),
-                label: Text(l10n.startFresh),
               ),
             ],
           ),
@@ -115,11 +206,37 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     );
   }
 
+  Future<void> _goNext() async {
+    if (_isNamePage && !_canAdvanceFromName) return;
+    await _pageController.nextPage(
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  Future<void> _goBack() async {
+    await _pageController.previousPage(
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
   Future<void> _continue({required bool useDemoWall}) async {
+    if (!_canAdvanceFromName) {
+      await _pageController.animateToPage(
+        2,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+      );
+      return;
+    }
+
     setState(() => _isContinuing = true);
+    final name = _trimmedName;
     await ref
         .read(onboardingPreferencesProvider)
-        .markCompleted(useDemoWall: useDemoWall);
+        .markCompleted(useDemoWall: useDemoWall, displayName: name);
+    ref.invalidate(userDisplayNameProvider);
 
     if (!mounted) return;
     setState(() => _isContinuing = false);
@@ -135,34 +252,26 @@ class _BrandMark extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 68,
-          height: 68,
+          width: 48,
+          height: 48,
           decoration: BoxDecoration(
             color: AppColors.gold.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(color: AppColors.gold.withValues(alpha: 0.38)),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.gold.withValues(alpha: 0.11),
-                blurRadius: 32,
-              ),
-            ],
           ),
           child: const Icon(
             Icons.auto_awesome_rounded,
             color: AppColors.gold,
-            size: 34,
+            size: 24,
           ),
         ),
-        const SizedBox(width: 14),
-        const Expanded(
-          child: Text(
-            'LifeThreads',
-            style: TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.5,
-            ),
+        const SizedBox(width: 12),
+        const Text(
+          'LifeThreads',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.4,
           ),
         ),
       ],
@@ -170,154 +279,103 @@ class _BrandMark extends StatelessWidget {
   }
 }
 
-class _DemoWallPreview extends StatelessWidget {
-  const _DemoWallPreview();
+class _PageDots extends StatelessWidget {
+  const _PageDots({required this.count, required this.index});
+
+  final int count;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
-    final demoEvents = MemorySeedData.localizedEvents(context.l10n);
-
-    return Container(
-      height: 270,
-      decoration: BoxDecoration(
-        color: AppColors.wallDeep.withValues(alpha: 0.72),
-        borderRadius: BorderRadius.circular(34),
-        border: Border.all(color: AppColors.gold.withValues(alpha: 0.16)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.32),
-            blurRadius: 36,
-            offset: const Offset(0, 18),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        for (var i = 0; i < count; i++)
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            width: i == index ? 22 : 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: i == index
+                  ? AppColors.gold
+                  : AppColors.gold.withValues(alpha: 0.28),
+              borderRadius: BorderRadius.circular(999),
+            ),
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(34),
-        child: Stack(
-          children: [
-            Positioned.fill(child: CustomPaint(painter: _PreviewGridPainter())),
-            Positioned.fill(
-              child: CustomPaint(painter: _PreviewThreadPainter(demoEvents)),
-            ),
-            for (final event in demoEvents)
-              _PreviewMemoryCard(
-                title: event.title,
-                color: event.coverColor,
-                imagePath: event.coverPhotoPath,
-                position: Offset(
-                  event.wallPosition.dx * 0.34 + 18,
-                  event.wallPosition.dy * 0.18 + 18,
-                ),
-                rotation: event.rotation,
-              ),
-            Positioned(
-              left: 18,
-              bottom: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.wallInk.withValues(alpha: 0.78),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(
-                    color: AppColors.gold.withValues(alpha: 0.18),
-                  ),
-                ),
-                child: Text(
-                  context.l10n.optionalDemoPreview,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      ],
     );
   }
 }
 
-class _PreviewMemoryCard extends StatelessWidget {
-  const _PreviewMemoryCard({
-    required this.title,
-    required this.color,
-    required this.imagePath,
-    required this.position,
-    required this.rotation,
-  });
+class _WelcomeStep extends StatelessWidget {
+  const _WelcomeStep({required this.headline, required this.body});
+
+  final String headline;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(22, 12, 22, 12),
+      children: [
+        Text(
+          headline,
+          style: const TextStyle(
+            fontSize: 36,
+            height: 1.05,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -1.1,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          body,
+          style: const TextStyle(
+            color: AppColors.muted,
+            fontSize: 16,
+            height: 1.45,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 22),
+        const OnboardingDemoWallPreview(),
+      ],
+    );
+  }
+}
+
+class _HowItWorksStep extends StatelessWidget {
+  const _HowItWorksStep({required this.title, required this.cards});
 
   final String title;
-  final Color color;
-  final String? imagePath;
-  final Offset position;
-  final double rotation;
+  final List<(IconData, String, String)> cards;
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: position.dx,
-      top: position.dy,
-      child: Transform.rotate(
-        angle: rotation,
-        child: Container(
-          width: 104,
-          padding: const EdgeInsets.all(7),
-          decoration: BoxDecoration(
-            color: AppColors.card,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.34),
-                blurRadius: 20,
-                offset: const Offset(0, 11),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: 54,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.78),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: imagePath == null
-                    ? null
-                    : Image.asset(
-                        imagePath!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                      ),
-              ),
-              const SizedBox(height: 7),
-              Text(
-                title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AppColors.paperInk,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w900,
-                  height: 1.05,
-                ),
-              ),
-            ],
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(22, 12, 22, 12),
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.8,
           ),
         ),
-      ),
+        const SizedBox(height: 18),
+        for (final card in cards) ...[
+          _FeatureCard(icon: card.$1, title: card.$2, text: card.$3),
+          const SizedBox(height: 12),
+        ],
+      ],
     );
   }
 }
 
-class _StoryPoint extends StatelessWidget {
-  const _StoryPoint({
+class _FeatureCard extends StatelessWidget {
+  const _FeatureCard({
     required this.icon,
     required this.title,
     required this.text,
@@ -329,97 +387,204 @@ class _StoryPoint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Container(
-        padding: const EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          color: AppColors.panel.withValues(alpha: 0.58),
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: AppColors.line),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: AppColors.gold, size: 22),
-            const SizedBox(width: 13),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(fontWeight: FontWeight.w900),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    text,
-                    style: const TextStyle(
-                      color: AppColors.muted,
-                      height: 1.35,
-                    ),
-                  ),
-                ],
-              ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.panel.withValues(alpha: 0.62),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.gold.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(16),
             ),
-          ],
-        ),
+            child: Icon(icon, color: AppColors.gold),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  text,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppColors.muted,
+                    height: 1.35,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _PreviewGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.gold.withValues(alpha: 0.055)
-      ..strokeWidth = 1;
-    for (double x = 0; x < size.width; x += 52) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-    for (double y = 0; y < size.height; y += 52) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-  }
+class _NameStep extends StatelessWidget {
+  const _NameStep({
+    required this.controller,
+    required this.focusNode,
+    required this.title,
+    required this.hint,
+    required this.preview,
+  });
+
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final String title;
+  final String hint;
+  final String? preview;
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(22, 12, 22, 12),
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.8,
+          ),
+        ),
+        const SizedBox(height: 24),
+        TextField(
+          controller: controller,
+          focusNode: focusNode,
+          textCapitalization: TextCapitalization.words,
+          textInputAction: TextInputAction.done,
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: AppColors.panel.withValues(alpha: 0.72),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(color: AppColors.gold.withValues(alpha: 0.24)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(color: AppColors.gold.withValues(alpha: 0.24)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(color: AppColors.gold, width: 1.4),
+            ),
+          ),
+        ),
+        if (preview != null) ...[
+          const SizedBox(height: 18),
+          Text(
+            preview!,
+            style: const TextStyle(
+              color: AppColors.gold,
+              fontWeight: FontWeight.w900,
+              fontSize: 18,
+              height: 1.3,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
 }
 
-class _PreviewThreadPainter extends CustomPainter {
-  const _PreviewThreadPainter(this.events);
+class _PrivacyStep extends StatelessWidget {
+  const _PrivacyStep({required this.title, required this.body});
 
-  final List<dynamic> events;
+  final String title;
+  final String body;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.rope.withValues(alpha: 0.42)
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final points = [
-      for (final event in events)
-        Offset(
-          event.wallPosition.dx * 0.34 + 70,
-          event.wallPosition.dy * 0.18 + 48,
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(22, 12, 22, 12),
+      children: [
+        Container(
+          width: 72,
+          height: 72,
+          decoration: BoxDecoration(
+            color: AppColors.gold.withValues(alpha: 0.14),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.gold.withValues(alpha: 0.32)),
+          ),
+          child: const Icon(Icons.lock_rounded, color: AppColors.gold, size: 34),
         ),
-    ];
-    for (var index = 0; index < points.length - 1; index++) {
-      final start = points[index];
-      final end = points[index + 1];
-      final control = Offset(
-        (start.dx + end.dx) / 2,
-        (start.dy + end.dy) / 2 + 38,
-      );
-      final path = Path()
-        ..moveTo(start.dx, start.dy)
-        ..quadraticBezierTo(control.dx, control.dy, end.dx, end.dy);
-      canvas.drawPath(path, paint);
-    }
+        const SizedBox(height: 22),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.8,
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          body,
+          style: const TextStyle(
+            color: AppColors.muted,
+            fontSize: 17,
+            height: 1.45,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
   }
+}
+
+class _GetStartedStep extends StatelessWidget {
+  const _GetStartedStep({
+    required this.title,
+    required this.body,
+  });
+
+  final String title;
+  final String body;
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(22, 12, 22, 12),
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.8,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          body,
+          style: const TextStyle(
+            color: AppColors.muted,
+            fontSize: 16,
+            height: 1.45,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 22),
+        const OnboardingDemoWallPreview(),
+      ],
+    );
+  }
 }
