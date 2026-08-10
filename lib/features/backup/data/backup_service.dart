@@ -186,12 +186,11 @@ class BackupService {
     final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: const ['zip'],
-      withData: true,
     );
     if (result == null || result.files.isEmpty) return null;
 
     final picked = result.files.single;
-    final bytes = picked.bytes ?? await File(picked.path!).readAsBytes();
+    final bytes = await picked.readAsBytes();
     return prepareImportBytes(bytes, password: password);
   }
 
