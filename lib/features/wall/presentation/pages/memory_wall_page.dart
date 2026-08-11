@@ -167,8 +167,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                           clipBehavior: Clip.none,
                           minScale: 0.5,
                           maxScale: 2.1,
-                          panEnabled:
-                              _draggingNodeId == null && !_nodePointerIsDown,
+                          // Pan is handled by [_WallPanSurface] behind nodes so
+                          // card/nail/note drags never fight InteractiveViewer.
+                          panEnabled: false,
                           scaleEnabled:
                               _draggingNodeId == null && !_nodePointerIsDown,
                           boundaryMargin: const EdgeInsets.all(1400),
@@ -182,13 +183,22 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                   clipBehavior: Clip.none,
                                   children: [
                                     Positioned.fill(
-                                      child: CustomPaint(
-                                        painter: RopePainter(
-                                          anchors: anchors,
-                                          connections: visibleConnections,
-                                          windValue: _windController.value,
-                                          activeNodeId: _draggingNodeId,
-                                          paintAnchors: false,
+                                      child: _WallPanSurface(
+                                        controller: _wallController,
+                                        enabled: _draggingNodeId == null &&
+                                            !_nodePointerIsDown,
+                                      ),
+                                    ),
+                                    Positioned.fill(
+                                      child: IgnorePointer(
+                                        child: CustomPaint(
+                                          painter: RopePainter(
+                                            anchors: anchors,
+                                            connections: visibleConnections,
+                                            windValue: _windController.value,
+                                            activeNodeId: _draggingNodeId,
+                                            paintAnchors: false,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -549,33 +559,38 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     };
   }
 
-  void _startDrag(String nodeId, Offset startPosition, _DragTargetKind kind) {
-    if (!mounted || _isRouteTransitioning) return;
-    HapticFeedback.selectionClick();
-    setState(() {
-      _draggingNodeId = nodeId;
-      _draggingKind = kind;
-      _pendingDragPosition = startPosition;
-      _nodePointerIsDown = true;
-    });
-  }
-
   void _lockWallGestures() {
     if (!mounted || _nodePointerIsDown) return;
-    setState(() => _nodePointerIsDown = true);
+    // Sync flag first so any same-frame logic sees the lock; setState disables
+    // InteractiveViewer pan/scale before the finger moves far.
+    _nodePointerIsDown = true;
+    setState(() {});
   }
 
   void _unlockWallGestures() {
     if (!mounted || !_nodePointerIsDown) return;
-    setState(() => _nodePointerIsDown = false);
+    _nodePointerIsDown = false;
+    setState(() {});
   }
 
-  void _updateDrag(Offset delta) {
+  void _startDrag(String nodeId, Offset startPosition, _DragTargetKind kind) {
+    if (!mounted || _isRouteTransitioning) return;
+    HapticFeedback.selectionClick();
+    _nodePointerIsDown = true;
+    setState(() {
+      _draggingNodeId = nodeId;
+      _draggingKind = kind;
+      _pendingDragPosition = startPosition;
+    });
+  }
+
+  void _updateDrag(Offset globalDelta) {
     final current = _pendingDragPosition;
     final kind = _draggingKind;
     if (!mounted || current == null || kind == null) return;
-    final scale = _wallController.value.getMaxScaleOnAxis();
-    final next = current + delta / scale;
+    // globalDelta is screen-space so it stays correct even if the viewer pans.
+    final scale = _wallController.value.getMaxScaleOnAxis().clamp(0.01, 10.0);
+    final next = current + globalDelta / scale;
     setState(() => _pendingDragPosition = _clampDragPosition(next, kind));
   }
 
@@ -611,22 +626,21 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
     final clamped = _clampDragPosition(position, kind);
 
-    switch (kind) {
-      case _DragTargetKind.memory:
-        _manualLayoutOverrides[nodeId] = clamped;
-        await repository.moveMemory(nodeId, clamped);
-      case _DragTargetKind.wallItem:
-        // Optimistic repository update first so clearing pending does not snap.
-        await repository.moveWallItem(nodeId, clamped);
-    }
-
-    if (!mounted) return;
-    setState(() {
+    try {
+      switch (kind) {
+        case _DragTargetKind.memory:
+          _manualLayoutOverrides[nodeId] = clamped;
+          await repository.moveMemory(nodeId, clamped);
+        case _DragTargetKind.wallItem:
+          await repository.moveWallItem(nodeId, clamped);
+      }
+    } finally {
       _draggingNodeId = null;
       _draggingKind = null;
       _pendingDragPosition = null;
       _nodePointerIsDown = false;
-    });
+      if (mounted) setState(() {});
+    }
   }
 
   Offset _defaultDropPosition(BuildContext context) {
@@ -2960,6 +2974,50 @@ enum _WallViewMode {
   const _WallViewMode(this.icon);
 
   final IconData icon;
+}
+
+/// Pans the wall via [TransformationController] on empty canvas hits only.
+/// Nodes sit above this in the stack, so their drags never compete with pan.
+class _WallPanSurface extends StatefulWidget {
+  const _WallPanSurface({
+    required this.controller,
+    required this.enabled,
+  });
+
+  final TransformationController controller;
+  final bool enabled;
+
+  @override
+  State<_WallPanSurface> createState() => _WallPanSurfaceState();
+}
+
+class _WallPanSurfaceState extends State<_WallPanSurface> {
+  Offset? _lastGlobal;
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      behavior: HitTestBehavior.opaque,
+      onPointerDown: (event) {
+        if (!widget.enabled) return;
+        _lastGlobal = event.position;
+      },
+      onPointerMove: (event) {
+        if (!widget.enabled) return;
+        final last = _lastGlobal;
+        if (last == null) return;
+        final delta = event.position - last;
+        _lastGlobal = event.position;
+        if (delta == Offset.zero) return;
+        final next = Matrix4.copy(widget.controller.value)
+          ..translateByDouble(delta.dx, delta.dy, 0, 1);
+        widget.controller.value = next;
+      },
+      onPointerUp: (_) => _lastGlobal = null,
+      onPointerCancel: (_) => _lastGlobal = null,
+      child: const SizedBox.expand(),
+    );
+  }
 }
 
 enum _DragTargetKind { memory, wallItem }
