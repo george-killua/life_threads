@@ -7,6 +7,7 @@ import 'package:image/image.dart' as img;
 
 import '../../memories/data/memory_repository.dart';
 import '../../memories/domain/memory_photo.dart';
+import '../../wall/domain/wall_attachment_layout.dart';
 import '../../wall/domain/wall_item.dart';
 
 final wallDisplayServiceProvider = Provider<WallDisplayService>((ref) {
@@ -210,7 +211,10 @@ class WallDisplayService {
       'type': 'wallDisplaySnapshot',
       'version': 1,
       'createdAt': DateTime.now().toUtc().toIso8601String(),
-      'wall': {'width': 1280, 'height': 1180},
+      'wall': {
+        'width': WallAttachmentLayout.canvasSize.width,
+        'height': WallAttachmentLayout.canvasSize.height,
+      },
       'events': events,
       'wallItems': [
         for (final item in state.wallItems)

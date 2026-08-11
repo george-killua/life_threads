@@ -7,7 +7,9 @@ import 'wall_item.dart';
 class WallAttachmentLayout {
   const WallAttachmentLayout._();
 
-  static const canvasSize = Size(1280, 1180);
+  /// Large freeform board — cards can be placed well beyond the first viewport.
+  /// Kept for display snapshots / previews; the live wall is effectively unbounded.
+  static const canvasSize = Size(3600, 3200);
 
   static List<WallItem> displayWallItems({
     required List<WallItem> wallItems,

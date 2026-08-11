@@ -49,7 +49,10 @@ class MemoryWallPage extends ConsumerStatefulWidget {
 
 class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     with SingleTickerProviderStateMixin {
-  static const _canvasSize = Size(1280, 1180);
+  /// Virtual board large enough that placement feels unbounded.
+  /// Wall coordinates are free; widgets are shifted by [_boardOrigin] into this box.
+  static const _boardOrigin = Offset(-40000, -40000);
+  static const _boardSize = Size(80000, 80000);
 
   late final AnimationController _windController;
   final TransformationController _wallController = TransformationController();
@@ -65,6 +68,16 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   _DragTargetKind? _draggingKind;
   Offset? _pendingDragPosition;
   var _nodePointerIsDown = false;
+
+  Offset _toBoardLocal(Offset wallPosition) => wallPosition - _boardOrigin;
+
+  MemoryEvent _toBoardLocalMemory(MemoryEvent event) {
+    return event.copyWith(wallPosition: _toBoardLocal(event.wallPosition));
+  }
+
+  WallItem _toBoardLocalWallItem(WallItem item) {
+    return item.copyWith(wallPosition: _toBoardLocal(item.wallPosition));
+  }
 
   @override
   void initState() {
@@ -103,7 +116,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                 manualOverrides: _manualLayoutOverrides,
               ).map(_withPendingMemory).toList();
               final displayWallItems = _displayWallItems(state, filteredEvents);
-              final anchors = _buildAnchors(filteredEvents, displayWallItems);
+              final boardEvents = filteredEvents.map(_toBoardLocalMemory).toList();
+              final boardWallItems =
+                  displayWallItems.map(_toBoardLocalWallItem).toList();
+              final anchors = _buildAnchors(boardEvents, boardWallItems);
               final textNoteIds = {
                 for (final item in displayWallItems)
                   if (item.type == WallItemType.text) item.id,
@@ -132,8 +148,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
               if (_mode == _WallViewMode.wall) {
                 _setInitialViewport(
                   context,
-                  filteredEvents,
-                  displayWallItems,
+                  boardEvents,
+                  boardWallItems,
                   controlsExpanded: _controlsExpanded,
                 );
               }
@@ -172,10 +188,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                           panEnabled: false,
                           scaleEnabled:
                               _draggingNodeId == null && !_nodePointerIsDown,
-                          boundaryMargin: const EdgeInsets.all(1400),
+                          boundaryMargin: const EdgeInsets.all(4000),
                           child: SizedBox(
-                            width: _canvasSize.width,
-                            height: _canvasSize.height,
+                            width: _boardSize.width,
+                            height: _boardSize.height,
                             child: AnimatedBuilder(
                               animation: _windController,
                               builder: (context, _) {
@@ -205,7 +221,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                     for (final item in displayWallItems)
                                       switch (item.type) {
                                         WallItemType.text => WallTextNoteWidget(
-                                          item: item,
+                                          item: _toBoardLocalWallItem(item),
                                           windValue: _windController.value,
                                           isDragging:
                                               _draggingNodeId == item.id,
@@ -230,7 +246,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                           onDragEnd: () => _endDrag(repository),
                                         ),
                                         WallItemType.nail => WallNailWidget(
-                                          item: item,
+                                          item: _toBoardLocalWallItem(item),
                                           isDragging:
                                               _draggingNodeId == item.id,
                                           onLongPress: () => _showNailMenu(
@@ -251,7 +267,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                       },
                                     for (final event in filteredEvents)
                                       MemoryCard(
-                                        event: event,
+                                        event: _toBoardLocalMemory(event),
                                         windValue: _windController.value,
                                         isDragging: _draggingNodeId == event.id,
                                         hasConnection: connectedMemoryIds
@@ -276,17 +292,6 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                         onDragUpdate: _updateDrag,
                                         onDragEnd: () => _endDrag(repository),
                                       ),
-                                    if (filteredEvents.isEmpty &&
-                                        state.events.isNotEmpty)
-                                      Center(
-                                        child: Text(
-                                          context.l10n.noMemoriesFilter,
-                                          style: const TextStyle(
-                                            color: AppColors.muted,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ),
                                   ],
                                 );
                               },
@@ -306,6 +311,18 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                         child: _MapView(
                           events: filteredEvents,
                           topPadding: _controlsExpanded ? 206 : 92,
+                        ),
+                      ),
+                    if (_mode == _WallViewMode.wall &&
+                        filteredEvents.isEmpty &&
+                        state.events.isNotEmpty)
+                      Center(
+                        child: Text(
+                          context.l10n.noMemoriesFilter,
+                          style: const TextStyle(
+                            color: AppColors.muted,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     Positioned(
@@ -586,25 +603,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
   void _updateDrag(Offset globalDelta) {
     final current = _pendingDragPosition;
-    final kind = _draggingKind;
-    if (!mounted || current == null || kind == null) return;
+    if (!mounted || current == null) return;
     // globalDelta is screen-space so it stays correct even if the viewer pans.
     final scale = _wallController.value.getMaxScaleOnAxis().clamp(0.01, 10.0);
-    final next = current + globalDelta / scale;
-    setState(() => _pendingDragPosition = _clampDragPosition(next, kind));
-  }
-
-  Offset _clampDragPosition(Offset position, _DragTargetKind kind) {
-    return switch (kind) {
-      _DragTargetKind.memory => Offset(
-        _clampDouble(position.dx, 50, _canvasSize.width - 240),
-        _clampDouble(position.dy, 110, _canvasSize.height - 190),
-      ),
-      _DragTargetKind.wallItem => Offset(
-        _clampDouble(position.dx, 24, _canvasSize.width - 220),
-        _clampDouble(position.dy, 80, _canvasSize.height - 120),
-      ),
-    };
+    setState(() => _pendingDragPosition = current + globalDelta / scale);
   }
 
   Future<void> _endDrag(MemoryRepository repository) async {
@@ -624,15 +626,13 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       return;
     }
 
-    final clamped = _clampDragPosition(position, kind);
-
     try {
       switch (kind) {
         case _DragTargetKind.memory:
-          _manualLayoutOverrides[nodeId] = clamped;
-          await repository.moveMemory(nodeId, clamped);
+          _manualLayoutOverrides[nodeId] = position;
+          await repository.moveMemory(nodeId, position);
         case _DragTargetKind.wallItem:
-          await repository.moveWallItem(nodeId, clamped);
+          await repository.moveWallItem(nodeId, position);
       }
     } finally {
       _draggingNodeId = null;
@@ -645,13 +645,11 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
   Offset _defaultDropPosition(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final scene = _wallController.toScene(
+    final local = _wallController.toScene(
       Offset(size.width * 0.58, size.height * 0.58),
     );
-    return Offset(
-      _clampDouble(scene.dx - 90, 70, _canvasSize.width - 230),
-      _clampDouble(scene.dy - 70, 120, _canvasSize.height - 180),
-    );
+    // Convert board-local scene coords back to free wall coordinates.
+    return local + _boardOrigin - const Offset(90, 70);
   }
 
   Future<void> _pushRoute(String location, {Object? extra}) async {
@@ -793,10 +791,6 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
   bool _isCurrentRoute(BuildContext context) {
     return ModalRoute.of(context)?.isCurrent ?? true;
-  }
-
-  double _clampDouble(double value, double min, double max) {
-    return value.clamp(min, max).toDouble();
   }
 
   Future<void> _createTextNote(
@@ -1132,7 +1126,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
         subtitle: subtitle,
         icon: icon,
         color: color,
-        canvasSize: _canvasSize,
+        canvasSize: WallAttachmentLayout.canvasSize,
         initialPosition: initialPosition,
       ),
     );
@@ -2569,12 +2563,7 @@ class _PlacementPreviewSheetState extends State<_PlacementPreviewSheet> {
   }
 
   void _move(Offset delta) {
-    setState(() {
-      _position = Offset(
-        (_position.dx + delta.dx).clamp(50, widget.canvasSize.width - 240),
-        (_position.dy + delta.dy).clamp(110, widget.canvasSize.height - 190),
-      );
-    });
+    setState(() => _position += delta);
   }
 }
 
@@ -2597,11 +2586,14 @@ class _PlacementMiniWall extends StatelessWidget {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         const height = 150.0;
-        final x = (position.dx / canvasSize.width * width).clamp(
+        // Map free wall coords into the preview by centering around the card.
+        final localX = position.dx - (canvasSize.width * 0.5);
+        final localY = position.dy - (canvasSize.height * 0.5);
+        final x = ((0.5 + localX / canvasSize.width) * width).clamp(
           12.0,
           width - 52,
         );
-        final y = (position.dy / canvasSize.height * height).clamp(
+        final y = ((0.5 + localY / canvasSize.height) * height).clamp(
           12.0,
           height - 52,
         );
