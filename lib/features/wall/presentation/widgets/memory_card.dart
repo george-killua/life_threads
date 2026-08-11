@@ -7,9 +7,10 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../memories/domain/memory_event.dart';
 import '../../../memories/presentation/memory_l10n.dart';
+import 'metallic_ball_pin.dart';
 import 'wall_drag_listener.dart';
 
-class MemoryCard extends StatelessWidget {
+class MemoryCard extends StatefulWidget {
   const MemoryCard({
     super.key,
     required this.event,
@@ -45,70 +46,102 @@ class MemoryCard extends StatelessWidget {
   static const Offset pinHeadOffset = Offset(89.5, 1.5);
 
   @override
+  State<MemoryCard> createState() => _MemoryCardState();
+}
+
+class _MemoryCardState extends State<MemoryCard> {
+  var _suppressTap = false;
+
+  @override
   Widget build(BuildContext context) {
-    final phase = windValue * math.pi * 2 + event.wallPosition.dx / 86;
-    final sway = isDragging ? 0.0 : math.sin(phase) * 0.038;
-    final bob = isDragging ? -7.0 : math.sin(phase * 0.7) * 2.4;
-    final scale = isDragging ? 1.055 : 1.0;
+    final phase =
+        widget.windValue * math.pi * 2 + widget.event.wallPosition.dx / 86;
+    final sway = widget.isDragging ? 0.0 : math.sin(phase) * 0.038;
+    final bob = widget.isDragging ? -7.0 : math.sin(phase * 0.7) * 2.4;
+    final scale = widget.isDragging ? 1.055 : 1.0;
 
     return Positioned(
-      left: event.wallPosition.dx,
-      top: event.wallPosition.dy,
-      child: WallDragListener(
-        onDragStart: onDragStart,
-        onDragUpdate: onDragUpdate,
-        onDragEnd: onDragEnd,
-        onPointerDown: onPointerDown,
-        onPointerUp: onPointerUp,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: onTap,
-          onLongPress: onLongPress,
-          child: AnimatedScale(
-            scale: scale,
-            duration: const Duration(milliseconds: 120),
-            curve: Curves.easeOutCubic,
-            child: Transform.translate(
-              offset: Offset(0, bob),
-              child: Transform.rotate(
-                angle: event.rotation + sway,
-                alignment: Alignment.topCenter,
-                child: Column(
-                  children: [
-                    if (hasConnection)
-                      _HangingThread(isDragging: isDragging)
-                    else
-                      const SizedBox(height: 34),
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        _PhotoPaper(event: event, isDragging: isDragging),
-                        _Tape(isDragging: isDragging),
-                        if (hasConnection) _Pin(isDragging: isDragging),
-                        Positioned(
-                          top: 10,
-                          right: 10,
-                          child: Row(
+      left: widget.event.wallPosition.dx,
+      top: widget.event.wallPosition.dy,
+      child: AnimatedScale(
+        scale: scale,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOutCubic,
+        child: Transform.translate(
+          offset: Offset(0, bob),
+          child: Transform.rotate(
+            angle: widget.event.rotation + sway,
+            alignment: Alignment.topCenter,
+            child: Column(
+              children: [
+                if (widget.hasConnection)
+                  _HangingThread(isDragging: widget.isDragging)
+                else
+                  const SizedBox(height: 34),
+                SizedBox(
+                  width: 190,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      WallDragListener(
+                        onDragStart: widget.onDragStart,
+                        onDragUpdate: widget.onDragUpdate,
+                        onDragEnd: widget.onDragEnd,
+                        onPointerDown: () {
+                          _suppressTap = false;
+                          widget.onPointerDown();
+                        },
+                        onPointerUp: widget.onPointerUp,
+                        onDraggingChanged: (dragging) {
+                          if (dragging) _suppressTap = true;
+                        },
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            if (_suppressTap) return;
+                            widget.onTap();
+                          },
+                          onLongPress: () {
+                            if (_suppressTap) return;
+                            widget.onLongPress();
+                          },
+                          child: Stack(
+                            clipBehavior: Clip.none,
                             children: [
-                              _CardActionButton(
-                                icon: Icons.edit_rounded,
-                                onTap: onEdit,
-                                tooltip: context.l10n.editMemoryTooltip,
+                              _PhotoPaper(
+                                event: widget.event,
+                                isDragging: widget.isDragging,
                               ),
-                              const SizedBox(width: 7),
-                              _CardActionButton(
-                                icon: Icons.hub_rounded,
-                                onTap: onConnect,
-                                tooltip: context.l10n.connectMemoryTooltip,
-                              ),
+                              _Tape(isDragging: widget.isDragging),
+                              if (widget.hasConnection)
+                                _Pin(isDragging: widget.isDragging),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Row(
+                          children: [
+                            _CardActionButton(
+                              icon: Icons.edit_rounded,
+                              onTap: widget.onEdit,
+                              tooltip: context.l10n.editMemoryTooltip,
+                            ),
+                            const SizedBox(width: 7),
+                            _CardActionButton(
+                              icon: Icons.hub_rounded,
+                              onTap: widget.onConnect,
+                              tooltip: context.l10n.connectMemoryTooltip,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
@@ -168,19 +201,20 @@ class _HangingThread extends StatelessWidget {
       width: 2.4,
       height: 34,
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
         gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
           colors: [
-            AppColors.rope.withValues(alpha: 0.45),
-            isDragging ? AppColors.amber : AppColors.rope,
-            AppColors.rope.withValues(alpha: 0.58),
+            AppColors.rope.withValues(alpha: isDragging ? 0.95 : 0.72),
+            AppColors.rope.withValues(alpha: 0.35),
           ],
         ),
-        borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.34),
-            blurRadius: 7,
-            offset: const Offset(1, 3),
+            color: Colors.black.withValues(alpha: 0.22),
+            blurRadius: 8,
+            offset: const Offset(1, 4),
           ),
         ],
       ),
@@ -320,33 +354,10 @@ class _Pin extends StatelessWidget {
     return Positioned(
       top: -44,
       left: 80,
-      child: Container(
-        width: 17,
-        height: 17,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: LinearGradient(
-            colors: [
-              isDragging ? AppColors.amber : const Color(0xFFFFD77D),
-              const Color(0xFF9C6727),
-            ],
-          ),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.58),
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.gold.withValues(alpha: 0.28),
-              blurRadius: 15,
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.34),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
+      child: MetallicBallPin(
+        size: 17,
+        showStem: false,
+        elevated: isDragging,
       ),
     );
   }
@@ -390,26 +401,13 @@ class _CardImage extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            event.coverColor.withValues(alpha: 0.94),
-            event.coverColor.withValues(alpha: 0.72),
-            AppColors.wallPlum.withValues(alpha: 0.32),
+            event.coverColor.withValues(alpha: 0.92),
+            event.coverColor,
+            AppColors.cardDark.withValues(alpha: 0.55),
           ],
         ),
       ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: CustomPaint(painter: _PhotoPlaceholderPainter()),
-          ),
-          Center(
-            child: Icon(
-              Icons.photo_camera_back_rounded,
-              size: 38,
-              color: Colors.white.withValues(alpha: 0.78),
-            ),
-          ),
-        ],
-      ),
+      child: CustomPaint(painter: _PhotoPlaceholderPainter()),
     );
   }
 }
@@ -417,31 +415,12 @@ class _CardImage extends StatelessWidget {
 class _PaperTexturePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final line = Paint()
-      ..color = const Color(0xFF7A5A27).withValues(alpha: 0.03)
+    final paint = Paint()
+      ..color = const Color(0xFF8A6A32).withValues(alpha: 0.045)
       ..strokeWidth = 1;
-    final edge = Paint()
-      ..color = Colors.black.withValues(alpha: 0.035)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    for (double y = 8; y < size.height; y += 10.5) {
-      canvas.drawLine(Offset(2, y), Offset(size.width - 2, y + 1.6), line);
+    for (double y = 8; y < size.height; y += 7) {
+      canvas.drawLine(Offset(6, y), Offset(size.width - 6, y), paint);
     }
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(14)),
-      edge,
-    );
-
-    final fold = Path()
-      ..moveTo(size.width - 32, size.height)
-      ..lineTo(size.width, size.height - 32)
-      ..lineTo(size.width, size.height)
-      ..close();
-    canvas.drawPath(
-      fold,
-      Paint()..color = Colors.black.withValues(alpha: 0.045),
-    );
   }
 
   @override
@@ -452,15 +431,16 @@ class _PhotoPlaceholderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.08)
-      ..strokeWidth = 1;
-    for (double x = -size.height; x < size.width; x += 18) {
-      canvas.drawLine(
-        Offset(x, size.height),
-        Offset(x + size.height, 0),
-        paint,
-      );
-    }
+      ..color = Colors.white.withValues(alpha: 0.18)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(12, 12, size.width - 24, size.height - 24),
+        const Radius.circular(10),
+      ),
+      paint,
+    );
   }
 
   @override

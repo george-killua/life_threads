@@ -1,6 +1,5 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -552,10 +551,12 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
   void _startDrag(String nodeId, Offset startPosition, _DragTargetKind kind) {
     if (!mounted || _isRouteTransitioning) return;
+    HapticFeedback.selectionClick();
     setState(() {
       _draggingNodeId = nodeId;
       _draggingKind = kind;
       _pendingDragPosition = startPosition;
+      _nodePointerIsDown = true;
     });
   }
 
@@ -571,29 +572,61 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
   void _updateDrag(Offset delta) {
     final current = _pendingDragPosition;
-    if (!mounted || current == null) return;
+    final kind = _draggingKind;
+    if (!mounted || current == null || kind == null) return;
     final scale = _wallController.value.getMaxScaleOnAxis();
-    setState(() => _pendingDragPosition = current + delta / scale);
+    final next = current + delta / scale;
+    setState(() => _pendingDragPosition = _clampDragPosition(next, kind));
+  }
+
+  Offset _clampDragPosition(Offset position, _DragTargetKind kind) {
+    return switch (kind) {
+      _DragTargetKind.memory => Offset(
+        _clampDouble(position.dx, 50, _canvasSize.width - 240),
+        _clampDouble(position.dy, 110, _canvasSize.height - 190),
+      ),
+      _DragTargetKind.wallItem => Offset(
+        _clampDouble(position.dx, 24, _canvasSize.width - 220),
+        _clampDouble(position.dy, 80, _canvasSize.height - 120),
+      ),
+    };
   }
 
   Future<void> _endDrag(MemoryRepository repository) async {
     final nodeId = _draggingNodeId;
     final position = _pendingDragPosition;
     final kind = _draggingKind;
+
+    if (nodeId == null || position == null || kind == null) {
+      _unlockWallGestures();
+      if (mounted) {
+        setState(() {
+          _draggingNodeId = null;
+          _draggingKind = null;
+          _pendingDragPosition = null;
+        });
+      }
+      return;
+    }
+
+    final clamped = _clampDragPosition(position, kind);
+
+    switch (kind) {
+      case _DragTargetKind.memory:
+        _manualLayoutOverrides[nodeId] = clamped;
+        await repository.moveMemory(nodeId, clamped);
+      case _DragTargetKind.wallItem:
+        // Optimistic repository update first so clearing pending does not snap.
+        await repository.moveWallItem(nodeId, clamped);
+    }
+
+    if (!mounted) return;
     setState(() {
       _draggingNodeId = null;
       _draggingKind = null;
       _pendingDragPosition = null;
+      _nodePointerIsDown = false;
     });
-
-    if (nodeId == null || position == null || kind == null) return;
-    switch (kind) {
-      case _DragTargetKind.memory:
-        _manualLayoutOverrides[nodeId] = position;
-        await repository.moveMemory(nodeId, position);
-      case _DragTargetKind.wallItem:
-        await repository.moveWallItem(nodeId, position);
-    }
   }
 
   Offset _defaultDropPosition(BuildContext context) {

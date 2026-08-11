@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class WallDragListener extends StatefulWidget {
@@ -9,6 +10,7 @@ class WallDragListener extends StatefulWidget {
     required this.onDragEnd,
     this.onPointerDown,
     this.onPointerUp,
+    this.onDraggingChanged,
   });
 
   final Widget child;
@@ -16,15 +18,17 @@ class WallDragListener extends StatefulWidget {
   final ValueChanged<Offset> onDragUpdate;
   final VoidCallback onDragEnd;
   final VoidCallback? onPointerDown;
+
+  /// Called on pointer up/cancel only when a drag did **not** start.
+  /// Drag end unlocks the wall via [onDragEnd] instead.
   final VoidCallback? onPointerUp;
+  final ValueChanged<bool>? onDraggingChanged;
 
   @override
   State<WallDragListener> createState() => _WallDragListenerState();
 }
 
 class _WallDragListenerState extends State<WallDragListener> {
-  static const _dragSlop = 4.0;
-
   var _pointerDown = false;
   var _dragging = false;
   var _pendingDelta = Offset.zero;
@@ -44,8 +48,9 @@ class _WallDragListenerState extends State<WallDragListener> {
 
         _pendingDelta += event.delta;
         if (!_dragging) {
-          if (_pendingDelta.distance < _dragSlop) return;
+          if (_pendingDelta.distance < kTouchSlop) return;
           _dragging = true;
+          widget.onDraggingChanged?.call(true);
           widget.onDragStart();
           widget.onDragUpdate(_pendingDelta);
           _pendingDelta = Offset.zero;
@@ -61,12 +66,17 @@ class _WallDragListenerState extends State<WallDragListener> {
   }
 
   void _finishDrag() {
+    if (!_pointerDown) return;
     _pointerDown = false;
     _pendingDelta = Offset.zero;
-    widget.onPointerUp?.call();
-    if (!_dragging) return;
 
-    _dragging = false;
-    widget.onDragEnd();
+    if (_dragging) {
+      _dragging = false;
+      widget.onDraggingChanged?.call(false);
+      widget.onDragEnd();
+      return;
+    }
+
+    widget.onPointerUp?.call();
   }
 }
