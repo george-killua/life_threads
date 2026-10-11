@@ -71,13 +71,16 @@ class _MemoryCapsuleDeepLinkListenerState
     if (_isImporting || !_handledLinks.add(key)) return;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _importSharedCapsule(uri);
+      if (mounted) _importSharedCapsule(uri, key);
     });
+    // A post-frame callback alone waits for whatever frame comes next.
+    WidgetsBinding.instance.scheduleFrame();
   }
 
-  Future<void> _importSharedCapsule(Uri uri) async {
+  Future<void> _importSharedCapsule(Uri uri, String key) async {
     _isImporting = true;
     var progressVisible = false;
+    var imported = false;
     MemoryCapsuleImportDraft? draft;
 
     try {
@@ -103,6 +106,13 @@ class _MemoryCapsuleDeepLinkListenerState
       draft = await ref
           .read(memoryCapsuleServiceProvider)
           .prepareImportFromBytes(bytes, password: password);
+      if (!draft.preview.isEncrypted) {
+        // Cloud shares are always encrypted; a plain capsule here was not
+        // created by LifeThreads sharing.
+        throw const BackupValidationException(
+          'Shared memories must be encrypted.',
+        );
+      }
       if (!mounted) return;
 
       final cinemaResult = await _uiContext.push<CapsuleCinemaResult>(
@@ -120,6 +130,7 @@ class _MemoryCapsuleDeepLinkListenerState
           .read(memoryRepositoryProvider.notifier)
           .importBackup(draft.backup);
       draft = null;
+      imported = true;
       if (!mounted) return;
       await showArchiveImportSummary(_uiContext, result);
     } on MemoryCapsuleShareDownloadException catch (error) {
@@ -143,6 +154,9 @@ class _MemoryCapsuleDeepLinkListenerState
     } finally {
       _closeProgressIfNeeded(progressVisible);
       _isImporting = false;
+      // Let the user retry the same link after a failure or cancel; only a
+      // completed import stays de-duplicated.
+      if (!imported) _handledLinks.remove(key);
     }
   }
 
@@ -150,7 +164,11 @@ class _MemoryCapsuleDeepLinkListenerState
     showDialog<void>(
       context: _uiContext,
       barrierDismissible: false,
-      builder: (context) => const _SharedMemoryProgressDialog(),
+      // Back must not dismiss it: the caller pops it when work finishes.
+      builder: (context) => const PopScope(
+        canPop: false,
+        child: _SharedMemoryProgressDialog(),
+      ),
     );
   }
 

@@ -89,6 +89,13 @@ class CloudSyncService {
     return key;
   }
 
+  /// Removes the sync key from this device. The cloud snapshot is untouched
+  /// and can still be restored by entering the key again.
+  Future<void> forgetSyncKey() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_syncKeyPreference);
+  }
+
   Future<void> setSyncKey(String value) async {
     final key = value.trim();
     if (!_syncKeyPattern.hasMatch(key)) {

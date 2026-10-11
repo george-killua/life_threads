@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations_x.dart';
 
 const lifeThreadsMapTilerKey = String.fromEnvironment('MAPTILER_KEY');
 const lifeThreadsMapTilerMapId = String.fromEnvironment(
@@ -125,22 +126,25 @@ class LifeThreadsMapUnavailablePanel extends StatelessWidget {
         border: Border.all(color: AppColors.line),
       ),
       padding: const EdgeInsets.all(22),
-      child: const Column(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.map_outlined, color: AppColors.gold, size: 38),
-          SizedBox(height: 12),
+          const Icon(Icons.map_outlined, color: AppColors.gold, size: 38),
+          const SizedBox(height: 12),
           Text(
-            'Map tiles are not configured.',
+            context.l10n.mapUnavailable,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
           ),
-          SizedBox(height: 6),
-          Text(
-            'Build with --dart-define MAPTILER_KEY to enable production maps.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.muted, height: 1.35),
-          ),
+          // The build hint is for developers only, never for users.
+          if (kDebugMode) ...[
+            const SizedBox(height: 6),
+            const Text(
+              'Build with --dart-define MAPTILER_KEY to enable production maps.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.muted, height: 1.35),
+            ),
+          ],
         ],
       ),
     );

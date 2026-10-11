@@ -233,9 +233,18 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
     setState(() => _isContinuing = true);
     final name = _trimmedName;
-    await ref
-        .read(onboardingPreferencesProvider)
-        .markCompleted(useDemoWall: useDemoWall, displayName: name);
+    try {
+      await ref
+          .read(onboardingPreferencesProvider)
+          .markCompleted(useDemoWall: useDemoWall, displayName: name);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isContinuing = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.somethingWentWrong)),
+      );
+      return;
+    }
     ref.invalidate(userDisplayNameProvider);
 
     if (!mounted) return;

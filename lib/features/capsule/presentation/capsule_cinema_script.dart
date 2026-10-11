@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart' show StringCharacters;
+
 import '../../memories/domain/memory_feeling.dart';
 import '../domain/memory_capsule_models.dart';
 
@@ -172,8 +174,10 @@ class CapsuleCinemaScript {
 
   static String _truncateStory(String value) {
     final trimmed = value.trim();
-    if (trimmed.length <= storyMaxChars) return trimmed;
-    return '${trimmed.substring(0, storyMaxChars - 1).trimRight()}…';
+    // Count user-perceived characters so emoji are never split in half.
+    final characters = trimmed.characters;
+    if (characters.length <= storyMaxChars) return trimmed;
+    return '${characters.take(storyMaxChars - 1).toString().trimRight()}…';
   }
 
   static String _string(Object? value) {

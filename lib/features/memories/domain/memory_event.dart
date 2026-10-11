@@ -39,7 +39,16 @@ class MemoryEvent {
   final double? longitude;
   final String? coverPhotoPath;
 
-  bool get hasGeoPoint => latitude != null && longitude != null;
+  bool get hasGeoPoint {
+    final lat = latitude;
+    final lng = longitude;
+    return lat != null &&
+        lng != null &&
+        lat.isFinite &&
+        lng.isFinite &&
+        lat.abs() <= 90 &&
+        lng.abs() <= 180;
+  }
 
   String get locationDisplayLabel {
     if (!hasGeoPoint) return '';

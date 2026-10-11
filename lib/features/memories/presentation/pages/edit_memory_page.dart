@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import '../../../../app/theme/app_colors.dart';
@@ -42,6 +43,10 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
   DateTime? _occurredAt;
   double? _latitude;
   double? _longitude;
+  String _locationLabel = '';
+  // True when the location shown comes from photo GPS rather than from the
+  // memory's own saved place (restored, imported or demo memories).
+  bool _locationFromPhotos = false;
   String? _coverPhotoPath;
   bool _initialized = false;
   bool _isPicking = false;
@@ -195,18 +200,23 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                   title: l10n.timePhotoGpsTitle,
                   child: Column(
                     children: [
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: const Icon(
-                          Icons.event_rounded,
-                          color: AppColors.gold,
+                      Material(
+                        type: MaterialType.transparency,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(
+                            Icons.event_rounded,
+                            color: AppColors.gold,
+                          ),
+                          title: Text(
+                            DateFormat.yMMMd(
+                              Localizations.localeOf(context).toLanguageTag(),
+                            ).format(_occurredAt ?? event.occurredAt),
+                          ),
+                          subtitle: Text(l10n.memoryDateLabel),
+                          trailing: const Icon(Icons.edit_calendar_rounded),
+                          onTap: () => _pickDate(event.occurredAt),
                         ),
-                        title: Text(
-                          _dateLabel(_occurredAt ?? event.occurredAt),
-                        ),
-                        subtitle: Text(l10n.memoryDateLabel),
-                        trailing: const Icon(Icons.edit_calendar_rounded),
-                        onTap: () => _pickDate(event.occurredAt),
                       ),
                       const SizedBox(height: 14),
                       _PhotoGpsStatus(
@@ -295,17 +305,13 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
     _occurredAt = event.occurredAt;
     _latitude = event.latitude;
     _longitude = event.longitude;
+    _locationLabel = event.locationLabel;
     _coverPhotoPath = event.coverPhotoPath;
     _photos
       ..clear()
       ..addAll(photos.map(_EditablePhoto.fromMemoryPhoto));
-    _syncLocationFromPhotos();
+    if (!event.hasGeoPoint) _syncLocationFromPhotos();
     _people = people.map(_personToDraft).toList();
-
-    if (_coverPhotoPath != null &&
-        !_photos.any((photo) => photo.localPath == _coverPhotoPath)) {
-      _coverPhotoPath = _photos.isEmpty ? null : _photos.first.localPath;
-    }
   }
 
   MemoryPersonDraft _personToDraft(MemoryPerson person) {
@@ -318,11 +324,16 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
   }
 
   Future<void> _pickDate(DateTime initialDate) async {
+    final firstDate = DateTime(1900);
+    final lastDate = DateTime.now().add(const Duration(days: 365));
+    var initial = _occurredAt ?? initialDate;
+    if (initial.isBefore(firstDate)) initial = firstDate;
+    if (initial.isAfter(lastDate)) initial = lastDate;
     final picked = await showDatePicker(
       context: context,
-      initialDate: _occurredAt ?? initialDate,
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      initialDate: initial,
+      firstDate: firstDate,
+      lastDate: lastDate,
     );
     if (picked != null) setState(() => _occurredAt = picked);
   }
@@ -442,50 +453,63 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
     return copied;
   }
 
+  /// Follows photo GPS when a photo carries a location. Without one, a saved
+  /// place is kept, while a location that came from a removed photo clears.
   void _syncLocationFromPhotos() {
     final locatedPhoto = _firstWhereOrNull(
       _photos,
       (photo) => photo.hasLocation,
     );
-    _latitude = locatedPhoto?.latitude;
-    _longitude = locatedPhoto?.longitude;
+    if (locatedPhoto != null) {
+      _latitude = locatedPhoto.latitude;
+      _longitude = locatedPhoto.longitude;
+      _locationFromPhotos = true;
+    } else if (_locationFromPhotos) {
+      _latitude = null;
+      _longitude = null;
+      _locationFromPhotos = false;
+    }
   }
 
   Future<void> _save(BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
 
-    final coverPhotoPath =
-        _coverPhotoPath != null &&
-            _photos.any((photo) => photo.localPath == _coverPhotoPath)
-        ? _coverPhotoPath
-        : (_photos.isEmpty ? null : _photos.first.localPath);
+    final locationLabel = _locationFromPhotos
+        ? _locationLabelFromGps(_latitude, _longitude)
+        : _locationLabel;
 
-    await ref
-        .read(memoryRepositoryProvider.notifier)
-        .updateMemory(
-          id: widget.memoryId,
-          title: _titleController.text.trim(),
-          description: _descriptionController.text.trim(),
-          category: _category,
-          memoryType: _memoryType,
-          feeling: _feeling,
-          occurredAt: _occurredAt ?? DateTime.now(),
-          locationLabel: _locationLabelFromGps(_latitude, _longitude),
-          latitude: _latitude,
-          longitude: _longitude,
-          coverPhotoPath: coverPhotoPath,
-          photos: _photos.map((photo) => photo.toDraft()).toList(),
-          people: _people,
-        );
+    try {
+      await ref
+          .read(memoryRepositoryProvider.notifier)
+          .updateMemory(
+            id: widget.memoryId,
+            title: _titleController.text.trim(),
+            description: _descriptionController.text.trim(),
+            category: _category,
+            memoryType: _memoryType,
+            feeling: _feeling,
+            occurredAt: _occurredAt ?? DateTime.now(),
+            locationLabel: locationLabel,
+            latitude: _latitude,
+            longitude: _longitude,
+            coverPhotoPath: _coverPhotoPath,
+            photos: _photos.map((photo) => photo.toDraft()).toList(),
+            people: _people,
+          );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      final messenger = ScaffoldMessenger.of(this.context);
+      messenger.showSnackBar(
+        SnackBar(content: Text(this.context.l10n.memorySaveFailed)),
+      );
+      return;
+    }
 
     if (!mounted) return;
     setState(() => _isSaving = false);
     if (context.mounted) _backToPrevious(context);
-  }
-
-  String _dateLabel(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
   }
 }
 
@@ -610,7 +634,8 @@ class _CoverPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasImage = path != null && File(path!).existsSync();
+    final isAsset = path?.startsWith('assets/') ?? false;
+    final hasImage = path != null && (isAsset || File(path!).existsSync());
     final l10n = context.l10n;
 
     return Container(
@@ -624,7 +649,8 @@ class _CoverPicker extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (hasImage)
+          if (hasImage && isAsset) Image.asset(path!, fit: BoxFit.cover),
+          if (hasImage && !isAsset)
             Image.file(
               File(path!),
               fit: BoxFit.cover,

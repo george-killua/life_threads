@@ -1,8 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart' as p;
 
 import '../domain/memory_capsule_models.dart';
 
@@ -33,6 +33,8 @@ class MemoryCapsuleCloudShareException implements Exception {
 }
 
 class MemoryCapsuleCloudShareService {
+  static const _encryptedShareTitle = 'LifeThreads memory';
+
   const MemoryCapsuleCloudShareService({
     this.endpoint = defaultEndpoint,
     this.timeout = const Duration(seconds: 30),
@@ -85,29 +87,33 @@ class MemoryCapsuleCloudShareService {
         writeText('$value\r\n');
       }
 
-      writeField('title', capsule.title);
+      // The capsule itself is encrypted; don't leak its title alongside it.
+      writeField(
+        'title',
+        capsule.isEncrypted ? _encryptedShareTitle : capsule.title,
+      );
       writeField('expiresInDays', '$expiresInDays');
       writeField('_honey', '');
 
       writeText('--$boundary\r\n');
       writeText(
         'Content-Disposition: form-data; name="capsule"; '
-        'filename="${p.basename(file.path)}"\r\n',
+        'filename="capsule.zip"\r\n',
       );
       writeText('Content-Type: application/zip\r\n\r\n');
       request.add(await file.readAsBytes());
       writeText('\r\n--$boundary--\r\n');
 
       final response = await request.close().timeout(timeout);
-      final body = await response.transform(utf8.decoder).join();
-      final decoded = jsonDecode(body);
+      final body = await _readBody(response);
+      final decoded = _decodeJson(body);
       if (response.statusCode < 200 ||
           response.statusCode >= 300 ||
           decoded is! Map ||
           decoded['success'] != true) {
         final message = decoded is Map && decoded['message'] is String
             ? decoded['message'] as String
-            : 'Share upload failed.';
+            : _statusMessage(response.statusCode, 'Share upload failed.');
         throw MemoryCapsuleCloudShareException(message);
       }
 
@@ -130,6 +136,10 @@ class MemoryCapsuleCloudShareService {
       );
     } on MemoryCapsuleCloudShareException {
       rethrow;
+    } on TimeoutException {
+      throw const MemoryCapsuleCloudShareException(
+        'The upload timed out. Check your connection and try again.',
+      );
     } catch (error) {
       throw MemoryCapsuleCloudShareException(
         'Could not upload capsule: $error',
@@ -155,19 +165,23 @@ class MemoryCapsuleCloudShareService {
       request.headers.set('x-revoke-token', token);
 
       final response = await request.close().timeout(timeout);
-      final body = await response.transform(utf8.decoder).join();
-      final decoded = body.trim().isEmpty ? null : jsonDecode(body);
+      final body = await _readBody(response);
+      final decoded = _decodeJson(body);
       if (response.statusCode < 200 ||
           response.statusCode >= 300 ||
           decoded is! Map ||
           decoded['success'] != true) {
         final message = decoded is Map && decoded['message'] is String
             ? decoded['message'] as String
-            : 'Share deletion failed.';
+            : _statusMessage(response.statusCode, 'Share deletion failed.');
         throw MemoryCapsuleCloudShareException(message);
       }
     } on MemoryCapsuleCloudShareException {
       rethrow;
+    } on TimeoutException {
+      throw const MemoryCapsuleCloudShareException(
+        'Deleting the share timed out. Please try again.',
+      );
     } catch (error) {
       throw MemoryCapsuleCloudShareException(
         'Could not delete shared capsule: $error',
@@ -175,6 +189,29 @@ class MemoryCapsuleCloudShareService {
     } finally {
       client.close(force: true);
     }
+  }
+
+  /// Reads the whole response body within [timeout], not just the headers.
+  Future<String> _readBody(HttpClientResponse response) {
+    return response.transform(utf8.decoder).join().timeout(timeout);
+  }
+
+  /// Error pages from proxies are often HTML; treat them as "no JSON".
+  Object? _decodeJson(String body) {
+    if (body.trim().isEmpty) return null;
+    try {
+      return jsonDecode(body);
+    } on FormatException {
+      return null;
+    }
+  }
+
+  String _statusMessage(int statusCode, String fallback) {
+    return switch (statusCode) {
+      429 => 'Too many requests. Please wait and try again.',
+      >= 500 => 'The share service is unavailable right now. Try again later.',
+      _ => fallback,
+    };
   }
 
   Uri _deleteUriFor(String shareUrl) {

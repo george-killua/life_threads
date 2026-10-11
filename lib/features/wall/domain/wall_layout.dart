@@ -122,6 +122,9 @@ class WallLayoutEngine {
 
   static String _locationKey(MemoryEvent event) {
     if (!event.hasGeoPoint) return 'Unknown place';
-    return '${event.latitude!.toStringAsFixed(1)},${event.longitude!.toStringAsFixed(1)}';
+    // Integer tenths avoid separate "-0.0" and "0.0" buckets around 0°.
+    final lat = (event.latitude! * 10).round();
+    final lng = (event.longitude! * 10).round();
+    return '$lat,$lng';
   }
 }

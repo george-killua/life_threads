@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/logging/app_logger.dart';
+import '../../../memories/presentation/memory_l10n.dart';
 import '../../domain/memory_capsule_models.dart';
 import '../capsule_cinema_controller.dart';
 import '../capsule_cinema_script.dart';
@@ -279,7 +280,7 @@ class _BeatContent extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  script.feeling.label,
+                  script.feeling.localizedLabel(context.l10n),
                   style: const TextStyle(
                     color: AppColors.wallInk,
                     fontWeight: FontWeight.w900,

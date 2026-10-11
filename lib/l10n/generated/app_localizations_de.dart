@@ -973,6 +973,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get saveMemory => 'Erinnerung speichern';
 
   @override
+  String get memorySaveFailed =>
+      'Die Erinnerung konnte nicht gespeichert werden. Bitte versuche es erneut.';
+
+  @override
+  String get passwordOnlySpaces =>
+      'Ein Passwort darf nicht nur aus Leerzeichen bestehen.';
+
+  @override
+  String get somethingWentWrong =>
+      'Etwas ist schiefgelaufen. Bitte versuche es erneut.';
+
+  @override
+  String get mapUnavailable => 'Die Karte ist gerade nicht verfügbar.';
+
+  @override
   String get coverPhoto => 'Titelbild';
 
   @override

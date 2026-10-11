@@ -23,6 +23,10 @@ class AppRouter {
   static final router = GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: RouteNames.home,
+    // Unknown locations (e.g. a share link the OS also hands to the router)
+    // fall back to the wall instead of a dead-end error page. Share links
+    // themselves are handled by MemoryCapsuleDeepLinkListener.
+    onException: (context, state, router) => router.go(RouteNames.home),
     routes: [
       GoRoute(
         path: RouteNames.home,
@@ -71,13 +75,11 @@ class AppRouter {
       ),
       GoRoute(
         path: RouteNames.capsuleCinema,
-        builder: (context, state) {
-          final draft = state.extra;
-          if (draft is! MemoryCapsuleImportDraft) {
-            return const SizedBox.shrink();
-          }
-          return CapsuleCinemaPage(draft: draft);
-        },
+        // The cinema only makes sense for an import in progress.
+        redirect: (context, state) =>
+            state.extra is MemoryCapsuleImportDraft ? null : RouteNames.home,
+        builder: (context, state) =>
+            CapsuleCinemaPage(draft: state.extra! as MemoryCapsuleImportDraft),
       ),
     ],
   );

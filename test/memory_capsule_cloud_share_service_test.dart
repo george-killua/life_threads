@@ -86,7 +86,7 @@ void main() {
       );
       expect(result.revokeToken, 'revoke-token');
       expect(requestBody, contains('name="title"'));
-      expect(requestBody, contains('Vienna arrival'));
+      expect(requestBody, isNot(contains('Vienna arrival')));
       expect(requestBody, contains('name="expiresInDays"'));
       expect(requestBody, contains('7'));
       expect(requestBody, contains('name="capsule"'));

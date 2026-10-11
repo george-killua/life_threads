@@ -91,7 +91,7 @@ class BackupService {
                 'wallX': event.wallPosition.dx,
                 'wallY': event.wallPosition.dy,
                 'rotation': event.rotation,
-                'locationLabel': event.locationDisplayLabel,
+                'locationLabel': event.locationLabel,
                 'latitude': event.latitude,
                 'longitude': event.longitude,
                 'coverPhotoPath': event.coverPhotoPath == null
@@ -156,7 +156,7 @@ class BackupService {
         .replaceAll(':', '')
         .replaceAll('.', '-');
     final plainBytes = ZipEncoder().encodeBytes(archive);
-    final exportPassword = password?.trim() ?? '';
+    final exportPassword = _exportPassword(password);
     final isEncrypted = exportPassword.isNotEmpty;
     final exportBytes = isEncrypted
         ? await _encryptArchive(plainBytes, exportPassword)
@@ -519,5 +519,17 @@ class BackupService {
         'Backup photo path is invalid: $archivePath.',
       );
     }
+  }
+
+  /// Empty means "no password". A password made only of spaces is rejected
+  /// rather than silently producing an unencrypted file.
+  String _exportPassword(String? password) {
+    final trimmed = password?.trim() ?? '';
+    if (trimmed.isEmpty && (password?.isNotEmpty ?? false)) {
+      throw const BackupValidationException(
+        'A password cannot be only spaces.',
+      );
+    }
+    return trimmed;
   }
 }

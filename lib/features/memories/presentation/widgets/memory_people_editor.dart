@@ -7,6 +7,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
+import '../../../../core/widgets/dispose_on_unmount.dart';
 import '../../data/memory_repository.dart';
 
 class MemoryPeopleEditor extends StatelessWidget {
@@ -99,142 +100,147 @@ class MemoryPeopleEditor extends StatelessWidget {
     final result = await showDialog<MemoryPersonDraft>(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: Text(initial == null ? l10n.addPerson : l10n.editPerson),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: isPickingContact
-                            ? null
-                            : () async {
-                                setDialogState(() => isPickingContact = true);
-                                final person = await _pickDeviceContact(
-                                  context,
-                                  fallbackRelationship:
-                                      relationshipController.text,
-                                );
-                                if (context.mounted && person != null) {
-                                  applyPerson(person);
-                                }
-                                if (context.mounted) {
-                                  setDialogState(
-                                    () => isPickingContact = false,
+        return DisposeOnUnmount(
+          disposables: [
+            nameFocusNode,
+            nameController,
+            relationshipController,
+            phoneController,
+            emailController,
+          ],
+          child: StatefulBuilder(
+            builder: (context, setDialogState) {
+              return AlertDialog(
+                title: Text(initial == null ? l10n.addPerson : l10n.editPerson),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: isPickingContact
+                              ? null
+                              : () async {
+                                  setDialogState(() => isPickingContact = true);
+                                  final person = await _pickDeviceContact(
+                                    context,
+                                    fallbackRelationship:
+                                        relationshipController.text,
                                   );
-                                }
-                              },
-                        icon: isPickingContact
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+                                  if (context.mounted && person != null) {
+                                    applyPerson(person);
+                                  }
+                                  if (context.mounted) {
+                                    setDialogState(
+                                      () => isPickingContact = false,
+                                    );
+                                  }
+                                },
+                          icon: isPickingContact
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.contacts_rounded),
+                          label: Text(l10n.chooseFromContacts),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      RawAutocomplete<MemoryPersonDraft>(
+                        textEditingController: nameController,
+                        focusNode: nameFocusNode,
+                        displayStringForOption: (person) => person.name,
+                        optionsBuilder: (textEditingValue) {
+                          return _matchingPeople(textEditingValue.text);
+                        },
+                        onSelected: applyPerson,
+                        fieldViewBuilder:
+                            (context, controller, focusNode, onFieldSubmitted) {
+                              return TextField(
+                                controller: controller,
+                                focusNode: focusNode,
+                                textInputAction: TextInputAction.next,
+                                decoration: InputDecoration(
+                                  labelText: l10n.personNameLabel,
+                                  hintText: l10n.personNameHint,
                                 ),
-                              )
-                            : const Icon(Icons.contacts_rounded),
-                        label: Text(l10n.chooseFromContacts),
+                              );
+                            },
+                        optionsViewBuilder: (context, onSelected, options) {
+                          return _PersonSuggestions(
+                            options: options.toList(),
+                            onSelected: onSelected,
+                          );
+                        },
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    RawAutocomplete<MemoryPersonDraft>(
-                      textEditingController: nameController,
-                      focusNode: nameFocusNode,
-                      displayStringForOption: (person) => person.name,
-                      optionsBuilder: (textEditingValue) {
-                        return _matchingPeople(textEditingValue.text);
-                      },
-                      onSelected: applyPerson,
-                      fieldViewBuilder:
-                          (context, controller, focusNode, onFieldSubmitted) {
-                            return TextField(
-                              controller: controller,
-                              focusNode: focusNode,
-                              textInputAction: TextInputAction.next,
-                              decoration: InputDecoration(
-                                labelText: l10n.personNameLabel,
-                                hintText: l10n.personNameHint,
-                              ),
-                            );
-                          },
-                      optionsViewBuilder: (context, onSelected, options) {
-                        return _PersonSuggestions(
-                          options: options.toList(),
-                          onSelected: onSelected,
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: relationshipController,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          labelText: l10n.relationshipLabel,
+                          hintText: l10n.relationshipHint,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: phoneController,
+                        keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          labelText: l10n.phoneOptionalLabel,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: l10n.emailOptionalLabel,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text(l10n.cancel),
+                  ),
+                  FilledButton(
+                    onPressed: () {
+                      final name = nameController.text.trim();
+                      final relationship = relationshipController.text.trim();
+                      if (name.isEmpty || relationship.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.nameRelationshipRequired),
+                          ),
                         );
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: relationshipController,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        labelText: l10n.relationshipLabel,
-                        hintText: l10n.relationshipHint,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: phoneController,
-                      keyboardType: TextInputType.phone,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        labelText: l10n.phoneOptionalLabel,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        labelText: l10n.emailOptionalLabel,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(l10n.cancel),
-                ),
-                FilledButton(
-                  onPressed: () {
-                    final name = nameController.text.trim();
-                    final relationship = relationshipController.text.trim();
-                    if (name.isEmpty || relationship.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.nameRelationshipRequired)),
+                        return;
+                      }
+                      Navigator.of(context).pop(
+                        MemoryPersonDraft(
+                          name: name,
+                          relationship: relationship,
+                          phone: _optional(phoneController.text),
+                          email: _optional(emailController.text),
+                        ),
                       );
-                      return;
-                    }
-                    Navigator.of(context).pop(
-                      MemoryPersonDraft(
-                        name: name,
-                        relationship: relationship,
-                        phone: _optional(phoneController.text),
-                        email: _optional(emailController.text),
-                      ),
-                    );
-                  },
-                  child: Text(l10n.save),
-                ),
-              ],
-            );
-          },
+                    },
+                    child: Text(l10n.save),
+                  ),
+                ],
+              );
+            },
+          ),
         );
       },
     );
-
-    nameFocusNode.dispose();
-    nameController.dispose();
-    relationshipController.dispose();
-    phoneController.dispose();
-    emailController.dispose();
 
     if (result == null) return;
     final updated = [...people];

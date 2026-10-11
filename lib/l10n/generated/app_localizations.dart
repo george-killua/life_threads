@@ -1809,6 +1809,30 @@ abstract class AppLocalizations {
   /// **'Save memory'**
   String get saveMemory;
 
+  /// No description provided for @memorySaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save this memory. Please try again.'**
+  String get memorySaveFailed;
+
+  /// No description provided for @passwordOnlySpaces.
+  ///
+  /// In en, this message translates to:
+  /// **'A password can\'t be only spaces.'**
+  String get passwordOnlySpaces;
+
+  /// No description provided for @somethingWentWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get somethingWentWrong;
+
+  /// No description provided for @mapUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The map isn\'t available right now.'**
+  String get mapUnavailable;
+
   /// No description provided for @coverPhoto.
   ///
   /// In en, this message translates to:

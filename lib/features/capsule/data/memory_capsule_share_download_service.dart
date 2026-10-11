@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -26,19 +27,25 @@ class MemoryCapsuleShareDownloadService {
       'www.gkcoding.dev',
       'lifethreads.gkcoding.dev',
     },
+    this.allowInsecureHttp = false,
   });
 
   final Duration timeout;
   final int maxBytes;
   final Set<String> allowedHosts;
 
+  /// Plain http is only for local test servers. Real share links must be
+  /// https so a capsule can't be swapped in transit.
+  final bool allowInsecureHttp;
+
   bool isShareLink(Uri uri) {
     return _shareId(uri) != null;
   }
 
   String? _shareId(Uri uri) {
-    if ((uri.scheme != 'https' && uri.scheme != 'http') ||
-        !allowedHosts.contains(uri.host)) {
+    final schemeAllowed =
+        uri.scheme == 'https' || (allowInsecureHttp && uri.scheme == 'http');
+    if (!schemeAllowed || !allowedHosts.contains(uri.host)) {
       return null;
     }
 
@@ -78,7 +85,9 @@ class MemoryCapsuleShareDownloadService {
       final request = await client.getUrl(downloadUri).timeout(timeout);
       request.headers.set(HttpHeaders.acceptHeader, 'application/zip');
       final response = await request.close().timeout(timeout);
-      final bytes = await _readBytes(response);
+      // The timeout covers the whole body: a server that sends headers and
+      // then stalls must not leave the import dialog up forever.
+      final bytes = await _readBytes(response).timeout(timeout);
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         if (bytes.isEmpty) {
@@ -94,6 +103,10 @@ class MemoryCapsuleShareDownloadService {
       );
     } on MemoryCapsuleShareDownloadException {
       rethrow;
+    } on TimeoutException {
+      throw const MemoryCapsuleShareDownloadException(
+        'The download timed out. Check your connection and try again.',
+      );
     } on SocketException {
       throw const MemoryCapsuleShareDownloadException(
         'You appear to be offline. Try again when internet is available.',

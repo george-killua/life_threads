@@ -61,6 +61,7 @@ void main() {
       final localService = MemoryCapsuleShareDownloadService(
         timeout: const Duration(seconds: 2),
         allowedHosts: {server.address.address},
+        allowInsecureHttp: true,
       );
       final bytes = await localService.downloadCapsule(
         Uri.parse(
@@ -89,6 +90,7 @@ void main() {
       final localService = MemoryCapsuleShareDownloadService(
         timeout: const Duration(seconds: 2),
         allowedHosts: {server.address.address},
+        allowInsecureHttp: true,
       );
 
       await expectLater(

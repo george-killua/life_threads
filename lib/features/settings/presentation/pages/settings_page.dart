@@ -10,6 +10,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/localization/locale_controller.dart';
 import '../../../../core/logging/app_logger.dart';
+import '../../../../core/widgets/dispose_on_unmount.dart';
 import '../../../backup/data/backup_service.dart';
 import '../../../backup/data/cloud_sync_service.dart';
 import '../../../backup/domain/backup_models.dart';
@@ -490,7 +491,9 @@ class SettingsPage extends ConsumerWidget {
 
     final key = await showDialog<String>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (_) => DisposeOnUnmount(
+        disposables: [controller],
+        child: AlertDialog(
         title: Text(l10n.useSyncKeyTitle),
         content: TextField(
           controller: controller,
@@ -513,8 +516,8 @@ class SettingsPage extends ConsumerWidget {
           ),
         ],
       ),
+      ),
     );
-    controller.dispose();
     if (!context.mounted || key == null) return;
 
     try {
@@ -634,7 +637,15 @@ class SettingsPage extends ConsumerWidget {
       ),
     );
     if (!context.mounted || confirmed != true) return;
-    await ref.read(memoryRepositoryProvider.notifier).clearAllData();
+    try {
+      await ref.read(memoryRepositoryProvider.notifier).clearAllData();
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.somethingWentWrong)));
+      return;
+    }
     if (!context.mounted) return;
     ScaffoldMessenger.of(
       context,
@@ -778,14 +789,14 @@ class _BetaFeedbackDialogState extends State<_BetaFeedbackDialog> {
       diagnostics,
     ].join('\n');
 
-    final uri = Uri(
-      scheme: 'mailto',
-      path: 'info@gkcoding.dev',
-      queryParameters: {
-        'subject':
-            'LifeThreads closed beta feedback - ${_feedbackCategoryLabel(context, _category)}',
-        'body': body,
-      },
+    final subject =
+        'LifeThreads closed beta feedback - ${_feedbackCategoryLabel(context, _category)}';
+    // Uri(queryParameters:) form-encodes spaces as '+', which mail apps show
+    // literally in mailto links (RFC 6068), so encode each value by hand.
+    final uri = Uri.parse(
+      'mailto:info@gkcoding.dev'
+      '?subject=${Uri.encodeComponent(subject)}'
+      '&body=${Uri.encodeComponent(body)}',
     );
 
     final messenger = ScaffoldMessenger.of(context);

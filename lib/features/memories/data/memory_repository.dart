@@ -1,12 +1,16 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
 import '../../../app/theme/app_colors.dart';
 import '../../../core/database/app_database.dart' as db;
 import '../../../core/database/database_provider.dart';
 import '../../../core/storage/app_storage_paths.dart';
+import '../../backup/data/cloud_sync_service.dart';
 import '../../backup/domain/backup_models.dart';
 import '../../onboarding/onboarding_preferences.dart';
 import '../../wall/domain/wall_item.dart';
@@ -277,9 +281,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
                   id: _uuid.v4(),
                   fromEventId: connectedEventId,
                   toEventId: id,
-                  label: draft.connectionReason?.trim().isNotEmpty == true
-                      ? draft.connectionReason!.trim()
-                      : 'new thread',
+                  label: _cleanConnectionLabel(draft.connectionReason),
                 ),
               );
         }
@@ -305,7 +307,11 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     List<MemoryPersonDraft>? people,
   }) async {
     final documentsPath = await AppStoragePaths.documentsPath();
+    final replacedFiles = <String>{};
     await _database.transaction(() async {
+      replacedFiles.addAll(
+        await _storedPhotoPathsFor([id], includePhotos: photos != null),
+      );
       await (_database.update(
         _database.memoryEvents,
       )..where((row) => row.id.equals(id))).write(
@@ -367,11 +373,14 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
         }
       }
     });
+    await _deleteUnreferencedPhotoFiles(replacedFiles);
     state = await AsyncValue.guard(_loadState);
   }
 
   Future<void> deleteMemory(String id) async {
+    final removedFiles = <String>{};
     await _database.transaction(() async {
+      removedFiles.addAll(await _storedPhotoPathsFor([id]));
       await (_database.delete(
         _database.memoryPhotos,
       )..where((row) => row.eventId.equals(id))).go();
@@ -386,7 +395,68 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
         _database.memoryEvents,
       )..where((row) => row.id.equals(id))).go();
     });
+    await _deleteUnreferencedPhotoFiles(removedFiles);
     state = await AsyncValue.guard(_loadState);
+  }
+
+  /// Stored (DB-form) paths of the photo files and covers owned by [eventIds].
+  Future<Set<String>> _storedPhotoPathsFor(
+    List<String> eventIds, {
+    bool includePhotos = true,
+  }) async {
+    final paths = <String>{};
+    if (includePhotos) {
+      final photos = await (_database.select(
+        _database.memoryPhotos,
+      )..where((row) => row.eventId.isIn(eventIds))).get();
+      paths.addAll(photos.map((row) => row.localPath));
+    }
+    final events = await (_database.select(
+      _database.memoryEvents,
+    )..where((row) => row.id.isIn(eventIds))).get();
+    for (final event in events) {
+      final cover = event.coverPhotoPath;
+      if (cover != null && cover.isNotEmpty) paths.add(cover);
+    }
+    return paths;
+  }
+
+  /// Deletes app-owned photo files that no memory references any more.
+  /// Only files inside the app's memory_photos folder are ever touched.
+  Future<void> _deleteUnreferencedPhotoFiles(Set<String> storedPaths) async {
+    if (storedPaths.isEmpty) return;
+    try {
+      final documentsPath = await AppStoragePaths.documentsPath();
+      final photosDir = p.normalize(
+        p.join(documentsPath, AppStoragePaths.memoryPhotosDirectoryName),
+      );
+
+      final referenced = <String>{};
+      for (final row in await _database.select(_database.memoryPhotos).get()) {
+        referenced.add(
+          AppStoragePaths.resolvePhotoPath(row.localPath, documentsPath),
+        );
+      }
+      for (final row in await _database.select(_database.memoryEvents).get()) {
+        final cover = AppStoragePaths.resolveOptionalPhotoPath(
+          row.coverPhotoPath,
+          documentsPath,
+        );
+        if (cover != null) referenced.add(cover);
+      }
+
+      for (final stored in storedPaths) {
+        final resolved = p.normalize(
+          AppStoragePaths.resolvePhotoPath(stored, documentsPath),
+        );
+        if (referenced.contains(resolved)) continue;
+        if (!p.isWithin(photosDir, resolved)) continue;
+        final file = File(resolved);
+        if (await file.exists()) await file.delete();
+      }
+    } catch (_) {
+      // Cleanup is best effort; the memory change itself already committed.
+    }
   }
 
   Future<void> clearDemoWall() async {
@@ -425,7 +495,12 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       await photosDir.delete(recursive: true);
     }
 
-    await ref.read(onboardingPreferencesProvider).disableDemoWall();
+    // "All local data" includes the profile name and the cloud sync key.
+    final preferences = ref.read(onboardingPreferencesProvider);
+    await preferences.disableDemoWall();
+    await preferences.setDisplayName('');
+    await ref.read(cloudSyncServiceProvider).forgetSyncKey();
+    ref.invalidate(userDisplayNameProvider);
     state = await AsyncValue.guard(_loadState);
   }
 
@@ -449,38 +524,54 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     required bool isConnected,
     String? label,
   }) async {
-    final existing =
-        await (_database.select(_database.memoryConnections)..where(
-              (row) =>
-                  (row.fromEventId.equals(fromId) &
-                      row.toEventId.equals(toId)) |
-                  (row.fromEventId.equals(toId) & row.toEventId.equals(fromId)),
-            ))
-            .getSingleOrNull();
+    if (fromId == toId) return;
 
-    if (isConnected && existing == null) {
-      await _database
-          .into(_database.memoryConnections)
-          .insert(
-            db.MemoryConnectionsCompanion.insert(
-              id: _uuid.v4(),
-              fromEventId: fromId,
-              toEventId: toId,
-              label: _cleanConnectionLabel(label),
-            ),
-          );
-    }
+    // Check-and-write runs in one transaction; drift serialises transactions,
+    // so fast repeated toggles can't both insert the same pair.
+    await _database.transaction(() async {
+      final matches =
+          await (_database.select(_database.memoryConnections)..where(
+                (row) =>
+                    (row.fromEventId.equals(fromId) &
+                        row.toEventId.equals(toId)) |
+                    (row.fromEventId.equals(toId) &
+                        row.toEventId.equals(fromId)),
+              ))
+              .get();
+      final existing = matches.isEmpty ? null : matches.first;
 
-    if (isConnected && existing != null && label != null) {
-      await updateConnectionLabel(existing.id, label);
-      return;
-    }
+      // Heal duplicate pairs left behind by older builds.
+      for (final duplicate in matches.skip(1)) {
+        await (_database.delete(
+          _database.memoryConnections,
+        )..where((row) => row.id.equals(duplicate.id))).go();
+      }
 
-    if (!isConnected && existing != null) {
-      await (_database.delete(
-        _database.memoryConnections,
-      )..where((row) => row.id.equals(existing.id))).go();
-    }
+      if (isConnected && existing == null) {
+        await _database
+            .into(_database.memoryConnections)
+            .insert(
+              db.MemoryConnectionsCompanion.insert(
+                id: _uuid.v4(),
+                fromEventId: fromId,
+                toEventId: toId,
+                label: _cleanConnectionLabel(label),
+              ),
+            );
+      } else if (isConnected && existing != null && label != null) {
+        await (_database.update(
+          _database.memoryConnections,
+        )..where((row) => row.id.equals(existing.id))).write(
+          db.MemoryConnectionsCompanion(
+            label: Value(_cleanConnectionLabel(label)),
+          ),
+        );
+      } else if (!isConnected && existing != null) {
+        await (_database.delete(
+          _database.memoryConnections,
+        )..where((row) => row.id.equals(existing.id))).go();
+      }
+    });
 
     state = await AsyncValue.guard(_loadState);
   }
@@ -611,22 +702,24 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
   }
 
   Future<void> moveMemory(String id, Offset position) async {
-    final current = state.asData?.value;
-    if (current == null) return;
-
-    final updatedEvents = [
-      for (final event in current.events)
-        if (event.id == id) event.copyWith(wallPosition: position) else event,
-    ];
-    state = AsyncData(
-      MemoryState(
-        events: updatedEvents,
-        connections: current.connections,
-        photos: current.photos,
-        people: current.people,
-        wallItems: current.wallItems,
-      ),
-    );
+    // `value` keeps the previous data while another write is loading, so a
+    // drag that ends during addMemory is still applied and persisted.
+    final current = state.value;
+    if (current != null) {
+      final updatedEvents = [
+        for (final event in current.events)
+          if (event.id == id) event.copyWith(wallPosition: position) else event,
+      ];
+      state = AsyncData(
+        MemoryState(
+          events: updatedEvents,
+          connections: current.connections,
+          photos: current.photos,
+          people: current.people,
+          wallItems: current.wallItems,
+        ),
+      );
+    }
 
     await (_database.update(
       _database.memoryEvents,
@@ -639,22 +732,22 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
   }
 
   Future<void> moveWallItem(String id, Offset position) async {
-    final current = state.asData?.value;
-    if (current == null) return;
-
-    final updatedItems = [
-      for (final item in current.wallItems)
-        if (item.id == id) item.copyWith(wallPosition: position) else item,
-    ];
-    state = AsyncData(
-      MemoryState(
-        events: current.events,
-        connections: current.connections,
-        photos: current.photos,
-        people: current.people,
-        wallItems: updatedItems,
-      ),
-    );
+    final current = state.value;
+    if (current != null) {
+      final updatedItems = [
+        for (final item in current.wallItems)
+          if (item.id == id) item.copyWith(wallPosition: position) else item,
+      ];
+      state = AsyncData(
+        MemoryState(
+          events: current.events,
+          connections: current.connections,
+          photos: current.photos,
+          people: current.people,
+          wallItems: updatedItems,
+        ),
+      );
+    }
 
     await (_database.update(
       _database.wallItems,
@@ -674,183 +767,204 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     var personCount = 0;
     var wallItemCount = 0;
     var connectionCount = 0;
+    final importedPairs = <String>{};
 
-    await _database.transaction(() async {
-      for (final event in backup.events) {
-        final sourceId = _stringValue(event, 'id');
-        final newId = _uuid.v4();
-        final offset = 52.0 + eventCount * 8.0;
-        final coverPhotoPath = _nullableString(event, 'coverPhotoPath');
-        idMap[sourceId] = newId;
+    try {
+      await _database.transaction(() async {
+        // Restoring onto an empty wall keeps the saved arrangement; importing
+        // next to existing memories nudges the imports so they don't overlap.
+        final wallIsEmpty =
+            (await _database.select(_database.memoryEvents).get()).isEmpty &&
+            (await _database.select(_database.wallItems).get()).isEmpty;
 
-        await _database
-            .into(_database.memoryEvents)
-            .insert(
-              db.MemoryEventsCompanion.insert(
-                id: newId,
-                title: _stringValue(
-                  event,
-                  'title',
-                  fallback: 'Restored memory',
+        for (final event in backup.events) {
+          final sourceId = _stringValue(event, 'id');
+          final newId = _uuid.v4();
+          final offset = wallIsEmpty ? 0.0 : 52.0 + eventCount * 8.0;
+          final coverPhotoPath = _nullableString(event, 'coverPhotoPath');
+          idMap[sourceId] = newId;
+
+          await _database
+              .into(_database.memoryEvents)
+              .insert(
+                db.MemoryEventsCompanion.insert(
+                  id: newId,
+                  title: _stringValue(
+                    event,
+                    'title',
+                    fallback: 'Restored memory',
+                  ),
+                  description: _stringValue(event, 'description'),
+                  category: Value(
+                    _stringValue(event, 'category', fallback: 'personal'),
+                  ),
+                  memoryType: Value(
+                    _stringValue(event, 'memoryType', fallback: 'moment'),
+                  ),
+                  feeling: Value(
+                    _stringValue(event, 'feeling', fallback: 'warm'),
+                  ),
+                  occurredAt: _intValue(
+                    event,
+                    'occurredAt',
+                    fallback: DateTime.now().millisecondsSinceEpoch,
+                  ),
+                  createdAt: _intValue(
+                    event,
+                    'createdAt',
+                    fallback: DateTime.now().millisecondsSinceEpoch,
+                  ),
+                  coverColorValue: _intValue(
+                    event,
+                    'coverColorValue',
+                    fallback: AppColors.gold.toARGB32(),
+                  ),
+                  wallX: _doubleValue(event, 'wallX', fallback: 180) + offset,
+                  wallY: _doubleValue(event, 'wallY', fallback: 220) + offset,
+                  rotation: _doubleValue(event, 'rotation'),
+                  locationLabel: _stringValue(
+                    event,
+                    'locationLabel',
+                    fallback: '',
+                  ),
+                  latitude: Value(_nullableDouble(event, 'latitude')),
+                  longitude: Value(_nullableDouble(event, 'longitude')),
+                  coverPhotoPath: Value(
+                    coverPhotoPath == null
+                        ? null
+                        : AppStoragePaths.persistOptionalPhotoPath(
+                            backup.photoPaths[coverPhotoPath],
+                            documentsPath,
+                          ),
+                  ),
                 ),
-                description: _stringValue(event, 'description'),
-                category: Value(
-                  _stringValue(event, 'category', fallback: 'personal'),
+              );
+          eventCount++;
+        }
+
+        for (final item in backup.wallItems) {
+          final sourceId = _stringValue(item, 'id');
+          final newId = _uuid.v4();
+          final offset = wallIsEmpty ? 0.0 : 52.0 + wallItemCount * 6.0;
+          idMap[sourceId] = newId;
+
+          await _database
+              .into(_database.wallItems)
+              .insert(
+                db.WallItemsCompanion.insert(
+                  id: newId,
+                  type: _stringValue(
+                    item,
+                    'type',
+                    fallback: WallItemType.text.name,
+                  ),
+                  content: _stringValue(item, 'content'),
+                  createdAt: _intValue(
+                    item,
+                    'createdAt',
+                    fallback: DateTime.now().millisecondsSinceEpoch,
+                  ),
+                  wallX: _doubleValue(item, 'wallX', fallback: 220) + offset,
+                  wallY: _doubleValue(item, 'wallY', fallback: 260) + offset,
+                  colorValue: _intValue(
+                    item,
+                    'colorValue',
+                    fallback: AppColors.cardDark.toARGB32(),
+                  ),
                 ),
-                memoryType: Value(
-                  _stringValue(event, 'memoryType', fallback: 'moment'),
+              );
+          wallItemCount++;
+        }
+
+        for (final photo in backup.photos) {
+          final eventId = idMap[_stringValue(photo, 'eventId')];
+          final archivePath = _stringValue(photo, 'localPath');
+          final localPath = backup.photoPaths[archivePath];
+          if (eventId == null || localPath == null) continue;
+
+          await _database
+              .into(_database.memoryPhotos)
+              .insert(
+                db.MemoryPhotosCompanion.insert(
+                  id: _uuid.v4(),
+                  eventId: eventId,
+                  localPath: AppStoragePaths.persistPhotoPath(
+                    localPath,
+                    documentsPath,
+                  ),
+                  originalAssetId: Value(
+                    _nullableString(photo, 'originalAssetId'),
+                  ),
+                  capturedAt: _intValue(
+                    photo,
+                    'capturedAt',
+                    fallback: DateTime.now().millisecondsSinceEpoch,
+                  ),
+                  latitude: Value(_nullableDouble(photo, 'latitude')),
+                  longitude: Value(_nullableDouble(photo, 'longitude')),
+                  width: _intValue(photo, 'width'),
+                  height: _intValue(photo, 'height'),
                 ),
-                feeling: Value(
-                  _stringValue(event, 'feeling', fallback: 'warm'),
+              );
+          photoCount++;
+        }
+
+        for (final person in backup.people) {
+          final eventId = idMap[_stringValue(person, 'eventId')];
+          if (eventId == null) continue;
+
+          await _database
+              .into(_database.memoryPeople)
+              .insert(
+                db.MemoryPeopleCompanion.insert(
+                  id: _uuid.v4(),
+                  eventId: eventId,
+                  name: _stringValue(person, 'name', fallback: 'Someone'),
+                  relationship: _stringValue(
+                    person,
+                    'relationship',
+                    fallback: 'person',
+                  ),
+                  phone: Value(_nullableString(person, 'phone')),
+                  email: Value(_nullableString(person, 'email')),
                 ),
-                occurredAt: _intValue(
-                  event,
-                  'occurredAt',
-                  fallback: DateTime.now().millisecondsSinceEpoch,
+              );
+          personCount++;
+        }
+
+        for (final connection in backup.connections) {
+          final fromId = idMap[_stringValue(connection, 'fromEventId')];
+          final toId = idMap[_stringValue(connection, 'toEventId')];
+          if (fromId == null || toId == null || fromId == toId) continue;
+          final pairKey = ([fromId, toId]..sort()).join('|');
+          if (!importedPairs.add(pairKey)) continue;
+
+          await _database
+              .into(_database.memoryConnections)
+              .insert(
+                db.MemoryConnectionsCompanion.insert(
+                  id: _uuid.v4(),
+                  fromEventId: fromId,
+                  toEventId: toId,
+                  label: _cleanConnectionLabel(
+                    _nullableString(connection, 'label'),
+                  ),
                 ),
-                createdAt: _intValue(
-                  event,
-                  'createdAt',
-                  fallback: DateTime.now().millisecondsSinceEpoch,
-                ),
-                coverColorValue: _intValue(
-                  event,
-                  'coverColorValue',
-                  fallback: AppColors.gold.toARGB32(),
-                ),
-                wallX: _doubleValue(event, 'wallX', fallback: 180) + offset,
-                wallY: _doubleValue(event, 'wallY', fallback: 220) + offset,
-                rotation: _doubleValue(event, 'rotation'),
-                locationLabel: _stringValue(
-                  event,
-                  'locationLabel',
-                  fallback: '',
-                ),
-                latitude: Value(_nullableDouble(event, 'latitude')),
-                longitude: Value(_nullableDouble(event, 'longitude')),
-                coverPhotoPath: Value(
-                  coverPhotoPath == null
-                      ? null
-                      : AppStoragePaths.persistOptionalPhotoPath(
-                          backup.photoPaths[coverPhotoPath],
-                          documentsPath,
-                        ),
-                ),
-              ),
-            );
-        eventCount++;
+              );
+          connectionCount++;
+        }
+      });
+    } catch (_) {
+      // The archive's photos were already written to disk; nothing references
+      // them after the rolled-back import.
+      for (final path in backup.photoPaths.values) {
+        try {
+          final file = File(path);
+          if (await file.exists()) await file.delete();
+        } catch (_) {}
       }
-
-      for (final item in backup.wallItems) {
-        final sourceId = _stringValue(item, 'id');
-        final newId = _uuid.v4();
-        final offset = 52.0 + wallItemCount * 6.0;
-        idMap[sourceId] = newId;
-
-        await _database
-            .into(_database.wallItems)
-            .insert(
-              db.WallItemsCompanion.insert(
-                id: newId,
-                type: _stringValue(
-                  item,
-                  'type',
-                  fallback: WallItemType.text.name,
-                ),
-                content: _stringValue(item, 'content'),
-                createdAt: _intValue(
-                  item,
-                  'createdAt',
-                  fallback: DateTime.now().millisecondsSinceEpoch,
-                ),
-                wallX: _doubleValue(item, 'wallX', fallback: 220) + offset,
-                wallY: _doubleValue(item, 'wallY', fallback: 260) + offset,
-                colorValue: _intValue(
-                  item,
-                  'colorValue',
-                  fallback: AppColors.cardDark.toARGB32(),
-                ),
-              ),
-            );
-        wallItemCount++;
-      }
-
-      for (final photo in backup.photos) {
-        final eventId = idMap[_stringValue(photo, 'eventId')];
-        final archivePath = _stringValue(photo, 'localPath');
-        final localPath = backup.photoPaths[archivePath];
-        if (eventId == null || localPath == null) continue;
-
-        await _database
-            .into(_database.memoryPhotos)
-            .insert(
-              db.MemoryPhotosCompanion.insert(
-                id: _uuid.v4(),
-                eventId: eventId,
-                localPath: AppStoragePaths.persistPhotoPath(
-                  localPath,
-                  documentsPath,
-                ),
-                originalAssetId: Value(
-                  _nullableString(photo, 'originalAssetId'),
-                ),
-                capturedAt: _intValue(
-                  photo,
-                  'capturedAt',
-                  fallback: DateTime.now().millisecondsSinceEpoch,
-                ),
-                latitude: Value(_nullableDouble(photo, 'latitude')),
-                longitude: Value(_nullableDouble(photo, 'longitude')),
-                width: _intValue(photo, 'width'),
-                height: _intValue(photo, 'height'),
-              ),
-            );
-        photoCount++;
-      }
-
-      for (final person in backup.people) {
-        final eventId = idMap[_stringValue(person, 'eventId')];
-        if (eventId == null) continue;
-
-        await _database
-            .into(_database.memoryPeople)
-            .insert(
-              db.MemoryPeopleCompanion.insert(
-                id: _uuid.v4(),
-                eventId: eventId,
-                name: _stringValue(person, 'name', fallback: 'Someone'),
-                relationship: _stringValue(
-                  person,
-                  'relationship',
-                  fallback: 'person',
-                ),
-                phone: Value(_nullableString(person, 'phone')),
-                email: Value(_nullableString(person, 'email')),
-              ),
-            );
-        personCount++;
-      }
-
-      for (final connection in backup.connections) {
-        final fromId = idMap[_stringValue(connection, 'fromEventId')];
-        final toId = idMap[_stringValue(connection, 'toEventId')];
-        if (fromId == null || toId == null || fromId == toId) continue;
-
-        await _database
-            .into(_database.memoryConnections)
-            .insert(
-              db.MemoryConnectionsCompanion.insert(
-                id: _uuid.v4(),
-                fromEventId: fromId,
-                toEventId: toId,
-                label: _cleanConnectionLabel(
-                  _nullableString(connection, 'label'),
-                ),
-              ),
-            );
-        connectionCount++;
-      }
-    });
+      rethrow;
+    }
 
     state = await AsyncValue.guard(_loadState);
     return BackupImportResult(
@@ -915,6 +1029,9 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
             );
       }
     });
+    // The demo wall is seeded once. Deleting the demo memories later must not
+    // bring them back on the next launch.
+    await ref.read(onboardingPreferencesProvider).disableDemoWall();
   }
 
   Future<void> _syncDemoAssetCovers() async {
@@ -1056,7 +1173,8 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
 
   String _cleanConnectionLabel(String? label) {
     final clean = label?.trim();
-    return clean == null || clean.isEmpty ? 'connected memory' : clean;
+    // Empty means "no reason"; the UI shows a translated fallback.
+    return clean ?? '';
   }
 
   String? _cleanOptional(String? value) {
@@ -1100,8 +1218,12 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
 
   double? _nullableDouble(Map<String, Object?> map, String key) {
     final value = map[key];
-    if (value is num) return value.toDouble();
-    if (value is String) return double.tryParse(value);
-    return null;
+    final parsed = value is num
+        ? value.toDouble()
+        : value is String
+        ? double.tryParse(value)
+        : null;
+    // "NaN"/"Infinity" parse fine but break maps and layout downstream.
+    return parsed != null && parsed.isFinite ? parsed : null;
   }
 }

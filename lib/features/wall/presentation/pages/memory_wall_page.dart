@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -9,6 +11,7 @@ import 'package:photo_manager/photo_manager.dart' hide LatLng;
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
+import '../../../../core/logging/app_logger.dart';
 import '../../../backup/data/backup_service.dart';
 import '../../../backup/domain/backup_models.dart';
 import '../../../backup/presentation/widgets/archive_feedback.dart';
@@ -63,7 +66,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   WallFilter _filter = WallFilter.all;
   _WallViewMode _mode = _WallViewMode.wall;
   WallLayoutMode _layoutMode = WallLayoutMode.freeform;
-  final Map<String, Offset> _manualLayoutOverrides = {};
+  // Per layout: a card nudged in Timeline must not move it in Freeform.
+  final Map<WallLayoutMode, Map<String, Offset>> _manualLayoutOverrides = {};
   String? _draggingNodeId;
   _DragTargetKind? _draggingKind;
   Offset? _pendingDragPosition;
@@ -113,7 +117,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                     .where((event) => _filter.matches(event.category))
                     .toList(),
                 mode: _layoutMode,
-                manualOverrides: _manualLayoutOverrides,
+                manualOverrides:
+                    _manualLayoutOverrides[_layoutMode] ?? const {},
               ).map(_withPendingMemory).toList();
               final displayWallItems = _displayWallItems(state, filteredEvents);
               final boardEvents = filteredEvents.map(_toBoardLocalMemory).toList();
@@ -242,8 +247,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                             item.wallPosition,
                                             _DragTargetKind.wallItem,
                                           ),
-                                          onDragUpdate: _updateDrag,
-                                          onDragEnd: () => _endDrag(repository),
+                                          onDragUpdate: (delta) =>
+                                              _updateDrag(item.id, delta),
+                                          onDragEnd: () =>
+                                              _endDrag(repository, item.id),
                                         ),
                                         WallItemType.nail => WallNailWidget(
                                           item: _toBoardLocalWallItem(item),
@@ -261,8 +268,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                             item.wallPosition,
                                             _DragTargetKind.wallItem,
                                           ),
-                                          onDragUpdate: _updateDrag,
-                                          onDragEnd: () => _endDrag(repository),
+                                          onDragUpdate: (delta) =>
+                                              _updateDrag(item.id, delta),
+                                          onDragEnd: () =>
+                                              _endDrag(repository, item.id),
                                         ),
                                       },
                                     for (final event in filteredEvents)
@@ -289,8 +298,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                           event.wallPosition,
                                           _DragTargetKind.memory,
                                         ),
-                                        onDragUpdate: _updateDrag,
-                                        onDragEnd: () => _endDrag(repository),
+                                        onDragUpdate: (delta) =>
+                                            _updateDrag(event.id, delta),
+                                        onDragEnd: () =>
+                                            _endDrag(repository, event.id),
                                       ),
                                   ],
                                 );
@@ -592,6 +603,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
   void _startDrag(String nodeId, Offset startPosition, _DragTargetKind kind) {
     if (!mounted || _isRouteTransitioning) return;
+    // One node at a time: a second finger on another card doesn't take over.
+    if (_draggingNodeId != null && _draggingNodeId != nodeId) return;
     HapticFeedback.selectionClick();
     _nodePointerIsDown = true;
     setState(() {
@@ -601,15 +614,26 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     });
   }
 
-  void _updateDrag(Offset globalDelta) {
+  void _updateDrag(String nodeId, Offset globalDelta) {
     final current = _pendingDragPosition;
-    if (!mounted || current == null) return;
+    if (!mounted || current == null || _draggingNodeId != nodeId) return;
     // globalDelta is screen-space so it stays correct even if the viewer pans.
-    final scale = _wallController.value.getMaxScaleOnAxis().clamp(0.01, 10.0);
+    final scale = _viewportScale().clamp(0.01, 10.0);
     setState(() => _pendingDragPosition = current + globalDelta / scale);
   }
 
-  Future<void> _endDrag(MemoryRepository repository) async {
+  /// Zoom of the wall viewport, read from the x axis. getMaxScaleOnAxis()
+  /// is wrong here when the z axis isn't scaled along with x and y.
+  double _viewportScale() {
+    final m = _wallController.value;
+    return math.sqrt(m.entry(0, 0) * m.entry(0, 0) + m.entry(1, 0) * m.entry(1, 0));
+  }
+
+  Future<void> _endDrag(MemoryRepository repository, String endedNodeId) async {
+    // A release from a node that isn't the active drag (e.g. a second finger)
+    // must not end or save the active one.
+    if (_draggingNodeId != null && _draggingNodeId != endedNodeId) return;
+
     final nodeId = _draggingNodeId;
     final position = _pendingDragPosition;
     final kind = _draggingKind;
@@ -626,20 +650,34 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       return;
     }
 
+    // The move applies to the repository state synchronously; only the
+    // database write is awaited below.
+    final Future<void> save;
+    switch (kind) {
+      case _DragTargetKind.memory:
+        _manualLayoutOverrides.putIfAbsent(_layoutMode, () => {})[nodeId] =
+            position;
+        // Computed layouts place cards themselves; a nudge there stays for
+        // this session instead of overwriting the hand-made freeform spot.
+        save = _layoutMode == WallLayoutMode.freeform
+            ? repository.moveMemory(nodeId, position)
+            : Future<void>.value();
+      case _DragTargetKind.wallItem:
+        save = repository.moveWallItem(nodeId, position);
+    }
+
+    // End the drag now, not after the save: a slow write must not clear a
+    // drag the user has started on another node in the meantime.
+    _draggingNodeId = null;
+    _draggingKind = null;
+    _pendingDragPosition = null;
+    _nodePointerIsDown = false;
+    if (mounted) setState(() {});
+
     try {
-      switch (kind) {
-        case _DragTargetKind.memory:
-          _manualLayoutOverrides[nodeId] = position;
-          await repository.moveMemory(nodeId, position);
-        case _DragTargetKind.wallItem:
-          await repository.moveWallItem(nodeId, position);
-      }
-    } finally {
-      _draggingNodeId = null;
-      _draggingKind = null;
-      _pendingDragPosition = null;
-      _nodePointerIsDown = false;
-      if (mounted) setState(() {});
+      await save;
+    } catch (error, stackTrace) {
+      AppLogger.recordCrash(error, stackTrace);
     }
   }
 
@@ -1073,7 +1111,11 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       showDialog<void>(
         context: context,
         barrierDismissible: false,
-        builder: (_) => const _WallDisplayProgressDialog(),
+        // Back must not dismiss it: the caller pops it when work finishes.
+        builder: (_) => const PopScope(
+          canPop: false,
+          child: _WallDisplayProgressDialog(),
+        ),
       );
       progressVisible = true;
 
@@ -1176,7 +1218,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
       _wallController.value = Matrix4.identity()
         ..translateByDouble(translateX, translateY, 0, 1)
-        ..scaleByDouble(scale, scale, 1, 1);
+        ..scaleByDouble(scale, scale, scale, 1);
     });
   }
 
@@ -1587,9 +1629,7 @@ class _MapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final located = events
-        .where((event) => event.latitude != null && event.longitude != null)
-        .toList();
+    final located = events.where((event) => event.hasGeoPoint).toList();
 
     return Padding(
       padding: EdgeInsets.fromLTRB(20, topPadding, 20, 120),
@@ -2985,30 +3025,40 @@ class _WallPanSurface extends StatefulWidget {
 
 class _WallPanSurfaceState extends State<_WallPanSurface> {
   Offset? _lastGlobal;
+  int? _pointer;
 
   @override
   Widget build(BuildContext context) {
     return Listener(
       behavior: HitTestBehavior.opaque,
       onPointerDown: (event) {
-        if (!widget.enabled) return;
+        if (!widget.enabled || _pointer != null) return;
+        _pointer = event.pointer;
         _lastGlobal = event.position;
       },
       onPointerMove: (event) {
-        if (!widget.enabled) return;
+        if (!widget.enabled || event.pointer != _pointer) return;
         final last = _lastGlobal;
         if (last == null) return;
         final delta = event.position - last;
         _lastGlobal = event.position;
         if (delta == Offset.zero) return;
-        final next = Matrix4.copy(widget.controller.value)
-          ..translateByDouble(delta.dx, delta.dy, 0, 1);
+        // Pre-multiply so the translation is in screen pixels and the wall
+        // moves 1:1 with the finger at any zoom.
+        final next = Matrix4.translationValues(delta.dx, delta.dy, 0)
+          ..multiply(widget.controller.value);
         widget.controller.value = next;
       },
-      onPointerUp: (_) => _lastGlobal = null,
-      onPointerCancel: (_) => _lastGlobal = null,
+      onPointerUp: (event) => _release(event.pointer),
+      onPointerCancel: (event) => _release(event.pointer),
       child: const SizedBox.expand(),
     );
+  }
+
+  void _release(int pointer) {
+    if (pointer != _pointer) return;
+    _pointer = null;
+    _lastGlobal = null;
   }
 }
 

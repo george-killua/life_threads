@@ -962,6 +962,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saveMemory => 'Save memory';
 
   @override
+  String get memorySaveFailed =>
+      'Could not save this memory. Please try again.';
+
+  @override
+  String get passwordOnlySpaces => 'A password can\'t be only spaces.';
+
+  @override
+  String get somethingWentWrong => 'Something went wrong. Please try again.';
+
+  @override
+  String get mapUnavailable => 'The map isn\'t available right now.';
+
+  @override
   String get coverPhoto => 'Cover photo';
 
   @override

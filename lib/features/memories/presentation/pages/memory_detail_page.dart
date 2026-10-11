@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../app/router/route_names.dart';
@@ -201,7 +202,11 @@ class MemoryDetailPage extends ConsumerWidget {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const _CloudShareProgressDialog(),
+      // Back must not dismiss it: the caller pops it when work finishes.
+      builder: (context) => const PopScope(
+        canPop: false,
+        child: _CloudShareProgressDialog(),
+      ),
     );
   }
 
@@ -386,7 +391,7 @@ class _CinematicHero extends StatelessWidget {
                     const SizedBox(width: 7),
                     Expanded(
                       child: Text(
-                        _heroSubtitle(event),
+                        _heroSubtitle(context, event),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -457,7 +462,8 @@ class _FeelingBadge extends StatelessWidget {
           Icon(event.feeling.icon, color: event.feeling.color, size: 18),
           const SizedBox(width: 8),
           Text(
-            '${event.feeling.label} ${event.memoryType.label}',
+            '${event.feeling.localizedLabel(context.l10n)} '
+            '${event.memoryType.localizedLabel(context.l10n)}',
             style: const TextStyle(fontWeight: FontWeight.w900),
           ),
         ],
@@ -591,7 +597,7 @@ class _MetadataGrid extends StatelessWidget {
         _MetaCard(
           icon: Icons.calendar_month_rounded,
           label: l10n.metaDate,
-          value: _formatDate(event.occurredAt),
+          value: _formatDate(context, event.occurredAt),
           color: AppColors.blue,
         ),
       ],
@@ -950,7 +956,7 @@ class _ConnectedThreadPath extends StatelessWidget {
                     event: events[index],
                     reason: state
                         .connectionBetween(memoryId, events[index].id)
-                        ?.label,
+                        ?.reason,
                     isLast: index == events.length - 1,
                   ),
               ],
@@ -1040,7 +1046,7 @@ class _ConnectedMemoryNode extends StatelessWidget {
                             Text(
                               cleanReason?.isNotEmpty == true
                                   ? cleanReason!
-                                  : _eventContextLabel(event),
+                                  : _eventContextLabel(context, event),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -1402,31 +1408,19 @@ List<_PreviewPhoto> _galleryPreviewPhotos(List<MemoryPhoto> photos) {
 
 String _photoTitle(int index) => 'Photo ${index + 1}';
 
-String _heroSubtitle(MemoryEvent event) {
-  final date = _formatDate(event.occurredAt);
+String _heroSubtitle(BuildContext context, MemoryEvent event) {
+  final date = _formatDate(context, event.occurredAt);
   if (!event.hasGeoPoint) return date;
   return '${event.locationDisplayLabel} • $date';
 }
 
-String _eventContextLabel(MemoryEvent event) {
+String _eventContextLabel(BuildContext context, MemoryEvent event) {
   if (event.hasGeoPoint) return event.locationDisplayLabel;
-  return '${event.category.label} • ${_formatDate(event.occurredAt)}';
+  final category = event.category.localizedLabel(context.l10n);
+  return '$category • ${_formatDate(context, event.occurredAt)}';
 }
 
-String _formatDate(DateTime date) {
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  return '${months[date.month - 1]} ${date.day}, ${date.year}';
+String _formatDate(BuildContext context, DateTime date) {
+  final locale = Localizations.localeOf(context).toLanguageTag();
+  return DateFormat.yMMMd(locale).format(date);
 }

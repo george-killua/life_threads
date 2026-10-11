@@ -958,6 +958,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get saveMemory => 'حفظ الذكرى';
 
   @override
+  String get memorySaveFailed => 'تعذّر حفظ هذه الذكرى. حاول مرة أخرى.';
+
+  @override
+  String get passwordOnlySpaces =>
+      'لا يمكن أن تتكون كلمة المرور من مسافات فقط.';
+
+  @override
+  String get somethingWentWrong => 'حدث خطأ ما. حاول مرة أخرى.';
+
+  @override
+  String get mapUnavailable => 'الخريطة غير متاحة الآن.';
+
+  @override
   String get coverPhoto => 'صورة الغلاف';
 
   @override

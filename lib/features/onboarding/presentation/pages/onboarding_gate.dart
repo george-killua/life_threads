@@ -13,6 +13,9 @@ class OnboardingGate extends ConsumerWidget {
     return FutureBuilder<bool>(
       future: ref.read(onboardingPreferencesProvider).isCompleted(),
       builder: (context, snapshot) {
+        // If the flag can't be read, show onboarding rather than spinning
+        // forever; finishing it writes the flag again.
+        if (snapshot.hasError) return const OnboardingPage();
         if (!snapshot.hasData) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),

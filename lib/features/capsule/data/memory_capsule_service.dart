@@ -33,6 +33,11 @@ class MemoryCapsuleService {
   static const encryptedCapsuleVersion = 1;
   static const _kdfIterations = 120000;
 
+  /// Same cap as a downloaded share link.
+  static const maxCapsuleFileBytes = 25 * 1024 * 1024;
+  static const maxUncompressedBytes = 150 * 1024 * 1024;
+  static const maxArchiveEntries = 400;
+
   Future<MemoryCapsuleExportResult> exportCapsule({
     required MemoryState state,
     required String memoryId,
@@ -117,7 +122,7 @@ class MemoryCapsuleService {
         .toIso8601String()
         .replaceAll(':', '')
         .replaceAll('.', '-');
-    final exportPassword = password?.trim() ?? '';
+    final exportPassword = _exportPassword(password);
     final isEncrypted = exportPassword.isNotEmpty;
     final plainBytes = ZipEncoder().encodeBytes(archive);
     final exportBytes = isEncrypted
@@ -151,6 +156,11 @@ class MemoryCapsuleService {
     if (result == null || result.files.isEmpty) return null;
 
     final picked = result.files.single;
+    if (picked.size > maxCapsuleFileBytes) {
+      throw const BackupValidationException(
+        'This memory capsule is too large to import.',
+      );
+    }
     final bytes = await picked.readAsBytes();
     return prepareImportFromBytes(bytes, password: password);
   }
@@ -185,10 +195,8 @@ class MemoryCapsuleService {
       payload,
       files.keys.toSet(),
     );
-    final restoredPhotoPaths = await _restorePhotoFiles(
-      referencedPhotoPaths,
-      files,
-    );
+    // Parse everything that can still reject the capsule before any photo is
+    // written to disk, so a rejected capsule leaves no files behind.
     final events = _mapList(payload['events']);
     final photos = _mapList(payload['photos']);
     final people = _mapList(payload['people']);
@@ -199,15 +207,20 @@ class MemoryCapsuleService {
         if (_stringValue(related, 'title').isNotEmpty)
           _stringValue(related, 'title'),
     ];
+    final preview = _previewFromPayload(
+      payload,
+      isEncrypted: isEncrypted,
+      noteCount: wallItems.length,
+      photoCount: photos.length,
+      connectionCount: connections.length,
+    );
+    final restoredPhotoPaths = await _restorePhotoFiles(
+      referencedPhotoPaths,
+      files,
+    );
 
     return MemoryCapsuleImportDraft(
-      preview: _previewFromPayload(
-        payload,
-        isEncrypted: isEncrypted,
-        noteCount: wallItems.length,
-        photoCount: photos.length,
-        connectionCount: connections.length,
-      ),
+      preview: preview,
       relatedMemoryTitles: relatedMemoryTitles,
       backup: BackupImportData(
         events: events,
@@ -353,8 +366,26 @@ class MemoryCapsuleService {
     return ZipEncoder().encodeBytes(wrapper);
   }
 
+  /// Rejects archives that would inflate to an unreasonable size (zip bombs)
+  /// before any entry is decompressed.
+  static void _checkArchiveSize(Archive archive) {
+    var total = 0;
+    var count = 0;
+    for (final file in archive) {
+      if (!file.isFile) continue;
+      count++;
+      total += file.size;
+      if (count > maxArchiveEntries || total > maxUncompressedBytes) {
+        throw const BackupValidationException(
+          'This memory capsule is too large to import.',
+        );
+      }
+    }
+  }
+
   Future<Archive> _decodeCapsule(List<int> bytes, {String? password}) async {
     final archive = ZipDecoder().decodeBytes(bytes, verify: true);
+    _checkArchiveSize(archive);
     final files = {
       for (final file in archive)
         if (file.isFile) file.name: file,
@@ -400,7 +431,9 @@ class MemoryCapsuleService {
         SecretBox(payloadBytes, nonce: nonce, mac: mac),
         secretKey: secretKey,
       );
-      return ZipDecoder().decodeBytes(plainBytes, verify: true);
+      final inner = ZipDecoder().decodeBytes(plainBytes, verify: true);
+      _checkArchiveSize(inner);
+      return inner;
     } on BackupValidationException {
       rethrow;
     } catch (_) {
@@ -433,23 +466,31 @@ class MemoryCapsuleService {
     const uuid = Uuid();
     final restored = <String, String>{};
 
-    for (final archivePath in referencedPhotoPaths) {
-      final archiveFile = files[archivePath];
-      final bytes = archiveFile?.readBytes();
-      if (bytes == null) {
-        throw BackupValidationException(
-          'Capsule photo is missing: $archivePath.',
-        );
-      }
+    try {
+      for (final archivePath in referencedPhotoPaths) {
+        final archiveFile = files[archivePath];
+        final bytes = archiveFile?.readBytes();
+        if (bytes == null) {
+          throw BackupValidationException(
+            'Capsule photo is missing: $archivePath.',
+          );
+        }
 
-      final extension = p.extension(archivePath).isEmpty
-          ? '.jpg'
-          : p.extension(archivePath);
-      final file = File(
-        p.join(photosDir.path, 'capsule_${uuid.v4()}$extension'),
-      );
-      await file.writeAsBytes(bytes, flush: true);
-      restored[archivePath] = file.path;
+        final extension = p.extension(archivePath).isEmpty
+            ? '.jpg'
+            : p.extension(archivePath);
+        final file = File(
+          p.join(photosDir.path, 'capsule_${uuid.v4()}$extension'),
+        );
+        await file.writeAsBytes(bytes, flush: true);
+        restored[archivePath] = file.path;
+      }
+    } catch (_) {
+      for (final path in restored.values) {
+        final file = File(path);
+        if (await file.exists()) await file.delete();
+      }
+      rethrow;
     }
 
     return restored;
@@ -671,5 +712,17 @@ class MemoryCapsuleService {
         'Capsule photo path is invalid: $archivePath.',
       );
     }
+  }
+
+  /// Empty means "no password". A password made only of spaces is rejected
+  /// rather than silently producing an unencrypted file.
+  String _exportPassword(String? password) {
+    final trimmed = password?.trim() ?? '';
+    if (trimmed.isEmpty && (password?.isNotEmpty ?? false)) {
+      throw const BackupValidationException(
+        'A password cannot be only spaces.',
+      );
+    }
+    return trimmed;
   }
 }

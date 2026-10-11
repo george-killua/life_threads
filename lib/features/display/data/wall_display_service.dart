@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
@@ -54,7 +56,8 @@ class WallDisplayService {
   }
 
   String? _displaySessionId(Uri uri) {
-    if ((uri.scheme != 'https' && uri.scheme != 'http') ||
+    // https only: the token and the whole wall travel in this request.
+    if (uri.scheme != 'https' ||
         !allowedHosts.contains(uri.host) ||
         !(uri.queryParameters['token']?.isNotEmpty ?? false)) {
       return null;
@@ -79,7 +82,7 @@ class WallDisplayService {
   }
 
   bool _usesDedicatedDisplayPath(Uri uri) {
-    return (uri.scheme == 'https' || uri.scheme == 'http') &&
+    return uri.scheme == 'https' &&
         allowedHosts.contains(uri.host) &&
         uri.pathSegments.length == 3 &&
         uri.pathSegments[0] == 'display';
@@ -95,13 +98,13 @@ class WallDisplayService {
       );
     }
 
-    final snapshot = await _snapshotFor(state);
-    final bytes = utf8.encode(jsonEncode(snapshot));
     final uploadUri = _uploadUriFor(scanUri);
     final token = scanUri.queryParameters['token']!;
 
     final client = HttpClient();
     try {
+      final snapshot = await _snapshotFor(state);
+      final bytes = utf8.encode(jsonEncode(snapshot));
       final boundary =
           '----lifethreads-display-${DateTime.now().microsecondsSinceEpoch}';
       final request = await client.postUrl(uploadUri).timeout(timeout);
@@ -126,8 +129,16 @@ class WallDisplayService {
       writeText('\r\n--$boundary--\r\n');
 
       final response = await request.close().timeout(timeout);
-      final body = await response.transform(utf8.decoder).join();
-      final decoded = jsonDecode(body);
+      final body = await response
+          .transform(utf8.decoder)
+          .join()
+          .timeout(timeout);
+      Object? decoded;
+      try {
+        decoded = body.trim().isEmpty ? null : jsonDecode(body);
+      } on FormatException {
+        decoded = null;
+      }
       if (response.statusCode < 200 ||
           response.statusCode >= 300 ||
           decoded is! Map ||
@@ -156,6 +167,10 @@ class WallDisplayService {
     } on SocketException {
       throw const WallDisplayException(
         'You appear to be offline. Connect to the internet and try again.',
+      );
+    } on TimeoutException {
+      throw const WallDisplayException(
+        'The display took too long to respond. Please try again.',
       );
     } catch (error) {
       throw WallDisplayException('Could not display wall: $error');
@@ -246,14 +261,24 @@ class WallDisplayService {
         ? (await rootBundle.load(path)).buffer.asUint8List()
         : await _readFileBytes(path);
     if (source == null) return null;
+    try {
+      // Decoding and re-encoding is CPU heavy; keep it off the UI isolate.
+      final encoded = await Isolate.run(() => _resizeToJpeg(source));
+      if (encoded == null) return null;
+      return 'data:image/jpeg;base64,${base64Encode(encoded)}';
+    } catch (_) {
+      // A truncated or corrupt photo is skipped instead of failing the wall.
+      return null;
+    }
+  }
+
+  static Uint8List? _resizeToJpeg(Uint8List source) {
     final decoded = img.decodeImage(source);
     if (decoded == null) return null;
-
     final resized = decoded.width > 640
         ? img.copyResize(decoded, width: 640)
         : decoded;
-    final encoded = img.encodeJpg(resized, quality: 72);
-    return 'data:image/jpeg;base64,${base64Encode(encoded)}';
+    return img.encodeJpg(resized, quality: 72);
   }
 
   Future<Uint8List?> _readFileBytes(String path) async {

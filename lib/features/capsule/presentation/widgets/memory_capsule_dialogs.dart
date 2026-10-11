@@ -3,6 +3,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
+import '../../../../core/widgets/dispose_on_unmount.dart';
 import '../../domain/memory_capsule_models.dart';
 
 enum MemoryCapsulePasswordPurpose { export, import }
@@ -18,109 +19,116 @@ Future<String?> showMemoryCapsulePasswordDialog(
 
   final result = await showDialog<String>(
     context: context,
-    builder: (context) => StatefulBuilder(
-      builder: (context, setState) {
-        final l10n = context.l10n;
-        final isExport = purpose == MemoryCapsulePasswordPurpose.export;
-        final isSecureShare = isExport && requirePassword;
-        final isRequiredImport = !isExport && requirePassword;
-        return AlertDialog(
-          title: Text(
-            isSecureShare
-                ? l10n.shareEncryptedCapsuleTitle
-                : isRequiredImport
-                ? l10n.openSharedCapsuleTitle
-                : isExport
-                ? l10n.exportMemoryCapsuleTitle
-                : l10n.importCapsuleDialogTitle,
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isSecureShare
-                      ? l10n.secureSharePasswordBody
-                      : isRequiredImport
-                      ? l10n.sharedCapsulePasswordBody
-                      : isExport
-                      ? l10n.capsuleExportBody
-                      : l10n.capsuleImportBody,
-                ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: controller,
-                  obscureText: obscure,
-                  decoration: InputDecoration(
-                    labelText: isSecureShare
-                        ? l10n.capsulePasswordLabel
+    builder: (context) => DisposeOnUnmount(
+      disposables: [controller],
+      child: StatefulBuilder(
+        builder: (context, setState) {
+          final l10n = context.l10n;
+          final isExport = purpose == MemoryCapsulePasswordPurpose.export;
+          final isSecureShare = isExport && requirePassword;
+          final isRequiredImport = !isExport && requirePassword;
+          return AlertDialog(
+            title: Text(
+              isSecureShare
+                  ? l10n.shareEncryptedCapsuleTitle
+                  : isRequiredImport
+                  ? l10n.openSharedCapsuleTitle
+                  : isExport
+                  ? l10n.exportMemoryCapsuleTitle
+                  : l10n.importCapsuleDialogTitle,
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isSecureShare
+                        ? l10n.secureSharePasswordBody
                         : isRequiredImport
-                        ? l10n.sharedCapsulePasswordLabel
+                        ? l10n.sharedCapsulePasswordBody
                         : isExport
-                        ? l10n.capsulePasswordOptional
-                        : l10n.capsulePasswordLabel,
-                    errorText: errorText,
-                    suffixIcon: IconButton(
-                      onPressed: () => setState(() => obscure = !obscure),
-                      icon: Icon(
-                        obscure
-                            ? Icons.visibility_rounded
-                            : Icons.visibility_off_rounded,
+                        ? l10n.capsuleExportBody
+                        : l10n.capsuleImportBody,
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: controller,
+                    obscureText: obscure,
+                    decoration: InputDecoration(
+                      labelText: isSecureShare
+                          ? l10n.capsulePasswordLabel
+                          : isRequiredImport
+                          ? l10n.sharedCapsulePasswordLabel
+                          : isExport
+                          ? l10n.capsulePasswordOptional
+                          : l10n.capsulePasswordLabel,
+                      errorText: errorText,
+                      suffixIcon: IconButton(
+                        onPressed: () => setState(() => obscure = !obscure),
+                        icon: Icon(
+                          obscure
+                              ? Icons.visibility_rounded
+                              : Icons.visibility_off_rounded,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                if (isExport) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    l10n.capsulePasswordWarning,
-                    style: const TextStyle(
-                      color: AppColors.muted,
-                      fontSize: 12,
-                      height: 1.35,
-                      fontWeight: FontWeight.w700,
+                  if (isExport) ...[
+                    const SizedBox(height: 10),
+                    Text(
+                      l10n.capsulePasswordWarning,
+                      style: const TextStyle(
+                        color: AppColors.muted,
+                        fontSize: 12,
+                        height: 1.35,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.cancel),
-            ),
-            FilledButton.icon(
-              onPressed: () {
-                if (requirePassword && controller.text.trim().isEmpty) {
-                  setState(() {
-                    errorText = l10n.passwordRequiredCloudSharing;
-                  });
-                  return;
-                }
-                Navigator.of(context).pop(controller.text);
-              },
-              icon: Icon(
-                isExport ? Icons.inventory_2_rounded : Icons.download_rounded,
-              ),
-              label: Text(
-                isSecureShare
-                    ? l10n.createSecureShare
-                    : isRequiredImport
-                    ? l10n.previewMemory
-                    : isExport
-                    ? l10n.exportAction
-                    : l10n.chooseCapsule,
               ),
             ),
-          ],
-        );
-      },
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton.icon(
+                onPressed: () {
+                  final text = controller.text;
+                  if (requirePassword && text.trim().isEmpty) {
+                    setState(() {
+                      errorText = l10n.passwordRequiredCloudSharing;
+                    });
+                    return;
+                  }
+                  if (isExport && text.isNotEmpty && text.trim().isEmpty) {
+                    setState(() => errorText = l10n.passwordOnlySpaces);
+                    return;
+                  }
+                  Navigator.of(context).pop(controller.text);
+                },
+                icon: Icon(
+                  isExport ? Icons.inventory_2_rounded : Icons.download_rounded,
+                ),
+                label: Text(
+                  isSecureShare
+                      ? l10n.createSecureShare
+                      : isRequiredImport
+                      ? l10n.previewMemory
+                      : isExport
+                      ? l10n.exportAction
+                      : l10n.chooseCapsule,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     ),
   );
 
-  controller.dispose();
   return result;
 }
 

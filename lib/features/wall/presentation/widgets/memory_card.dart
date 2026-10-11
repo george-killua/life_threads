@@ -379,7 +379,9 @@ class _CardImage extends StatelessWidget {
         errorBuilder: (_, _, _) => _buildPlaceholder(),
       );
     }
-    if (path != null && File(path).existsSync()) {
+    // No existsSync() here: this rebuilds on every wind-animation frame, and
+    // errorBuilder already covers a missing file.
+    if (path != null && path.isNotEmpty) {
       return Image.file(
         File(path),
         fit: BoxFit.cover,

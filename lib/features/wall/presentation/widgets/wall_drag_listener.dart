@@ -34,6 +34,8 @@ class WallDragListener extends StatefulWidget {
 }
 
 class _WallDragListenerState extends State<WallDragListener> {
+  // Only the first finger drives the drag; extra fingers are ignored.
+  int? _activePointer;
   var _pointerDown = false;
   var _dragging = false;
   Offset? _lastGlobalPosition;
@@ -46,6 +48,8 @@ class _WallDragListenerState extends State<WallDragListener> {
     return Listener(
       behavior: HitTestBehavior.opaque,
       onPointerDown: (event) {
+        if (_activePointer != null) return;
+        _activePointer = event.pointer;
         _pointerDown = true;
         _dragging = false;
         _pendingGlobalDelta = Offset.zero;
@@ -53,7 +57,7 @@ class _WallDragListenerState extends State<WallDragListener> {
         widget.onPointerDown?.call();
       },
       onPointerMove: (event) {
-        if (!_pointerDown) return;
+        if (!_pointerDown || event.pointer != _activePointer) return;
         final last = _lastGlobalPosition;
         if (last == null) return;
 
@@ -74,14 +78,15 @@ class _WallDragListenerState extends State<WallDragListener> {
 
         widget.onDragUpdate(globalDelta);
       },
-      onPointerUp: (_) => _finishDrag(),
-      onPointerCancel: (_) => _finishDrag(),
+      onPointerUp: (event) => _finishDrag(event.pointer),
+      onPointerCancel: (event) => _finishDrag(event.pointer),
       child: widget.child,
     );
   }
 
-  void _finishDrag() {
-    if (!_pointerDown) return;
+  void _finishDrag(int pointer) {
+    if (!_pointerDown || pointer != _activePointer) return;
+    _activePointer = null;
     _pointerDown = false;
     _lastGlobalPosition = null;
     _pendingGlobalDelta = Offset.zero;

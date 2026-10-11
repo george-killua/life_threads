@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import '../../../../app/router/route_names.dart';
@@ -41,6 +42,9 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
   MemoryType _memoryType = MemoryType.moment;
   MemoryFeeling _feeling = MemoryFeeling.warm;
   DateTime? _occurredAt;
+  // True while the date was filled in from a photo rather than picked by the
+  // user, so it can follow photo additions and removals.
+  bool _dateFromPhotos = false;
   double? _latitude;
   double? _longitude;
   bool _isPicking = false;
@@ -162,6 +166,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
               onManageLimitedAccess: _manageLimitedPhotoAccess,
               onRemove: (photo) => setState(() {
                 _photos.remove(photo);
+                if (_dateFromPhotos) _syncDateFromPhotos();
                 _syncLocationFromPhotos();
               }),
             ),
@@ -426,11 +431,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     final photos = pickedPhotos.toList();
     if (photos.isEmpty) return;
 
-    final datedPhoto = _firstWhereOrNull(
-      photos,
-      (photo) => photo.hasCapturedDate,
-    );
-    _occurredAt ??= (datedPhoto ?? photos.first).capturedAt;
+    if (_occurredAt == null || _dateFromPhotos) _syncDateFromPhotos();
 
     _syncLocationFromPhotos();
 
@@ -444,15 +445,38 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     }
   }
 
+  void _syncDateFromPhotos() {
+    if (_photos.isEmpty) {
+      _occurredAt = null;
+      _dateFromPhotos = false;
+      return;
+    }
+    final datedPhoto = _firstWhereOrNull(
+      _photos,
+      (photo) => photo.hasCapturedDate,
+    );
+    _occurredAt = (datedPhoto ?? _photos.first).capturedAt;
+    _dateFromPhotos = true;
+  }
+
   Future<void> _pickDate() async {
     final now = DateTime.now();
+    final firstDate = DateTime(1900);
+    final lastDate = now.add(const Duration(days: 1));
     final picked = await showDatePicker(
       context: context,
-      initialDate: _occurredAt ?? now,
-      firstDate: DateTime(1900),
-      lastDate: now.add(const Duration(days: 1)),
+      // Photo dates can be out of range (wrong camera clock); clamp them so
+      // the picker still opens and the date can be corrected.
+      initialDate: _clampDate(_occurredAt ?? now, firstDate, lastDate),
+      firstDate: firstDate,
+      lastDate: lastDate,
     );
-    if (picked != null) setState(() => _occurredAt = picked);
+    if (picked != null) {
+      setState(() {
+        _occurredAt = picked;
+        _dateFromPhotos = false;
+      });
+    }
   }
 
   void _syncLocationFromPhotos() {
@@ -517,42 +541,54 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
         : _descriptionController.text.trim();
     final locationLabel = _locationLabelFromGps(_latitude, _longitude);
 
-    await ref
-        .read(memoryRepositoryProvider.notifier)
-        .addMemory(
-          NewMemoryDraft(
-            title: title,
-            description: description,
-            category: _category,
-            memoryType: _memoryType,
-            feeling: _feeling,
-            occurredAt: _occurredAt ?? DateTime.now(),
-            locationLabel: locationLabel,
-            latitude: _latitude,
-            longitude: _longitude,
-            coverPhotoPath: _photos.isEmpty ? null : _photos.first.localPath,
-            connectedEventId: _connectedEventId,
-            connectionReason: _connectionReasonController.text.trim(),
-            people: _people,
-            photos: [
-              for (final photo in _photos)
-                MemoryPhotoDraft(
-                  localPath: photo.localPath,
-                  originalAssetId: photo.originalAssetId,
-                  capturedAt: photo.capturedAt,
-                  latitude: photo.latitude,
-                  longitude: photo.longitude,
-                  width: photo.width,
-                  height: photo.height,
-                ),
-            ],
-          ),
-        );
+    final repository = ref.read(memoryRepositoryProvider.notifier);
+    await repository.addMemory(
+      NewMemoryDraft(
+        title: title,
+        description: description,
+        category: _category,
+        memoryType: _memoryType,
+        feeling: _feeling,
+        occurredAt: _occurredAt ?? DateTime.now(),
+        locationLabel: locationLabel,
+        latitude: _latitude,
+        longitude: _longitude,
+        coverPhotoPath: _photos.isEmpty ? null : _photos.first.localPath,
+        connectedEventId: _connectedEventId,
+        connectionReason: _connectionReasonController.text.trim(),
+        people: _people,
+        photos: [
+          for (final photo in _photos)
+            MemoryPhotoDraft(
+              localPath: photo.localPath,
+              originalAssetId: photo.originalAssetId,
+              capturedAt: photo.capturedAt,
+              latitude: photo.latitude,
+              longitude: photo.longitude,
+              width: photo.width,
+              height: photo.height,
+            ),
+        ],
+      ),
+    );
 
     if (!mounted) return;
     setState(() => _isSaving = false);
+    // addMemory reports failures through the provider state, not by throwing.
+    if (ref.read(memoryRepositoryProvider).hasError) {
+      ScaffoldMessenger.of(this.context).showSnackBar(
+        SnackBar(content: Text(this.context.l10n.memorySaveFailed)),
+      );
+      return;
+    }
     if (context.mounted) _backToWall(context);
   }
+}
+
+DateTime _clampDate(DateTime date, DateTime min, DateTime max) {
+  if (date.isBefore(min)) return min;
+  if (date.isAfter(max)) return max;
+  return date;
 }
 
 T? _firstWhereOrNull<T>(Iterable<T> items, bool Function(T item) test) {
@@ -844,7 +880,9 @@ class _DateButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final value = date == null
         ? context.l10n.chooseDate
-        : '${date!.day.toString().padLeft(2, '0')}.${date!.month.toString().padLeft(2, '0')}.${date!.year}';
+        : DateFormat.yMMMd(
+            Localizations.localeOf(context).toLanguageTag(),
+          ).format(date!);
 
     return InkWell(
       onTap: onTap,

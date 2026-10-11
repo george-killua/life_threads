@@ -83,7 +83,7 @@ class ManageConnectionsPage extends ConsumerWidget {
                             final reason = await _askConnectionReason(
                               context,
                               connectedTitle: event.title,
-                              initialReason: connection.label,
+                              initialReason: connection.reason,
                             );
                             if (!context.mounted || reason == null) return;
                             await repository.updateConnectionLabel(
@@ -158,7 +158,7 @@ class _ConnectionReasonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isConnected = connection != null;
-    final reason = connection?.label.trim();
+    final reason = connection?.reason;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),

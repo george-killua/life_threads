@@ -91,8 +91,12 @@ class PhotoLibraryService {
   ) async {
     final copied = <PickedMemoryPhoto>[];
     for (final asset in assets) {
-      final photo = await copyAssetToAppStorage(asset);
-      if (photo != null) copied.add(photo);
+      try {
+        final photo = await copyAssetToAppStorage(asset);
+        if (photo != null) copied.add(photo);
+      } catch (_) {
+        // Skip an unreadable asset instead of dropping the ones already copied.
+      }
     }
     return copied;
   }
@@ -117,6 +121,10 @@ class PhotoLibraryService {
       final fileName = '${const Uuid().v4()}$extension';
       final targetPath = p.join(photosDirectory.path, fileName);
       final copied = await source.copy(targetPath);
+      // image_picker leaves its capture in the temp folder; the copy is ours.
+      try {
+        await source.delete();
+      } catch (_) {}
       final metadata = await _extractCapturedFileMetadata(copied);
 
       return PickedMemoryPhoto(
@@ -171,8 +179,10 @@ class PhotoLibraryService {
     AssetEntity asset,
     File file,
   ) async {
+    // photo_manager reports a missing creation date as 0 (1970-01-01).
+    final hasAssetDate = (asset.createDateSecond ?? 0) > 0;
     final assetDate = asset.createDateTime;
-    if (_isReasonablePhotoDate(assetDate)) {
+    if (hasAssetDate && _isReasonablePhotoDate(assetDate)) {
       return (date: assetDate, isFromAsset: true);
     }
 
