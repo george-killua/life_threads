@@ -44,7 +44,7 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           missing=0
-          for name in MAPTILER_KEY GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_PASSWORD ANDROID_KEY_ALIAS; do
+          for name in GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_PASSWORD ANDROID_KEY_ALIAS; do
             if [ -z "${!name}" ]; then
               echo "Missing GitHub secret $name" >&2
               missing=1

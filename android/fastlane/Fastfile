@@ -28,13 +28,16 @@ end
 platform :android do
   desc "Verify and build the signed release app bundle"
   lane :build_release do
-    maptiler_key = required_env("MAPTILER_KEY")
+    # Maps use OpenFreeMap by default; a MapTiler key is an optional override.
+    maptiler_key = ENV["MAPTILER_KEY"].to_s.strip
+    build_args = ["flutter", "build", "appbundle", "--release"]
+    build_args << "--dart-define=MAPTILER_KEY=#{maptiler_key}" unless maptiler_key.empty?
 
     Dir.chdir(project_root) do
       sh("flutter", "pub", "get")
       sh("flutter", "analyze", "--no-fatal-infos")
       sh("flutter", "test")
-      sh("flutter", "build", "appbundle", "--release", "--dart-define=MAPTILER_KEY=#{maptiler_key}")
+      sh(*build_args)
     end
   end
 

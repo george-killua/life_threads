@@ -1,7 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:vector_map_tiles/vector_map_tiles.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
@@ -12,10 +12,16 @@ const lifeThreadsMapTilerMapId = String.fromEnvironment(
   defaultValue: 'streets-v4',
 );
 const lifeThreadsHasMapTilerKey = lifeThreadsMapTilerKey != '';
-const lifeThreadsOsmTileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+/// OpenFreeMap vector style: free, no API key, commercial use allowed.
+/// Other styles: positron, bright (https://openfreemap.org).
+const lifeThreadsOpenFreeMapStyleUrl = String.fromEnvironment(
+  'LIFETHREADS_MAP_STYLE_URL',
+  defaultValue: 'https://tiles.openfreemap.org/styles/liberty',
+);
 const lifeThreadsUserAgentPackageName = 'dev.gkcoding.lifethreads';
 
-enum LifeThreadsMapProviderKind { mapTiler, osmDebug, unavailable }
+enum LifeThreadsMapProviderKind { openFreeMap, mapTiler }
 
 class LifeThreadsMapProvider {
   const LifeThreadsMapProvider._({
@@ -25,9 +31,13 @@ class LifeThreadsMapProvider {
   });
 
   final LifeThreadsMapProviderKind kind;
+
+  /// Raster tile URL; null for vector providers.
   final String? tileUrl;
   final int maxNativeZoom;
 
+  /// OpenFreeMap by default. A MapTiler key passed with --dart-define
+  /// switches back to MapTiler raster tiles.
   static const current = lifeThreadsHasMapTilerKey
       ? LifeThreadsMapProvider._(
           kind: LifeThreadsMapProviderKind.mapTiler,
@@ -35,20 +45,15 @@ class LifeThreadsMapProvider {
               'https://api.maptiler.com/maps/$lifeThreadsMapTilerMapId/256/{z}/{x}/{y}.png?key=$lifeThreadsMapTilerKey',
           maxNativeZoom: 20,
         )
-      : kDebugMode
-      ? LifeThreadsMapProvider._(
-          kind: LifeThreadsMapProviderKind.osmDebug,
-          tileUrl: lifeThreadsOsmTileUrl,
-          maxNativeZoom: 19,
-        )
       : LifeThreadsMapProvider._(
-          kind: LifeThreadsMapProviderKind.unavailable,
+          kind: LifeThreadsMapProviderKind.openFreeMap,
           tileUrl: null,
-          maxNativeZoom: 0,
+          maxNativeZoom: 14,
         );
 
-  bool get hasTiles => tileUrl != null;
+  bool get hasTiles => true;
   bool get isMapTiler => kind == LifeThreadsMapProviderKind.mapTiler;
+  bool get isOpenFreeMap => kind == LifeThreadsMapProviderKind.openFreeMap;
 }
 
 class LifeThreadsMapTileLayer extends StatelessWidget {
@@ -58,12 +63,50 @@ class LifeThreadsMapTileLayer extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = LifeThreadsMapProvider.current;
     final url = provider.tileUrl;
-    if (url == null) return const SizedBox.shrink();
+    if (url != null) {
+      return TileLayer(
+        urlTemplate: url,
+        userAgentPackageName: lifeThreadsUserAgentPackageName,
+        maxNativeZoom: provider.maxNativeZoom,
+      );
+    }
+    return const _OpenFreeMapLayer();
+  }
+}
 
-    return TileLayer(
-      urlTemplate: url,
-      userAgentPackageName: lifeThreadsUserAgentPackageName,
-      maxNativeZoom: provider.maxNativeZoom,
+class _OpenFreeMapLayer extends StatefulWidget {
+  const _OpenFreeMapLayer();
+
+  @override
+  State<_OpenFreeMapLayer> createState() => _OpenFreeMapLayerState();
+}
+
+class _OpenFreeMapLayerState extends State<_OpenFreeMapLayer> {
+  // The style JSON is shared by every map in the app and fetched once; a
+  // failed fetch is retried the next time a map is shown.
+  static Future<Style>? _style;
+
+  late final Future<Style> _future = _style ??= StyleReader(
+    uri: lifeThreadsOpenFreeMapStyleUrl,
+  ).read().catchError((Object error) {
+    _style = null;
+    throw error;
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Style>(
+      future: _future,
+      builder: (context, snapshot) {
+        final style = snapshot.data;
+        if (style == null) return const SizedBox.shrink();
+        return VectorTileLayer(
+          tileProviders: style.providers,
+          theme: style.theme,
+          sprites: style.sprites,
+          maximumZoom: 20,
+        );
+      },
     );
   }
 }
@@ -99,6 +142,16 @@ class LifeThreadsMapAttribution extends StatelessWidget {
                     onTap: () =>
                         _openUrl('https://www.maptiler.com/copyright/'),
                   ),
+                if (provider.isOpenFreeMap) ...[
+                  _AttributionLink(
+                    label: 'OpenFreeMap',
+                    onTap: () => _openUrl('https://openfreemap.org'),
+                  ),
+                  _AttributionLink(
+                    label: 'OpenMapTiles',
+                    onTap: () => _openUrl('https://www.openmaptiles.org/'),
+                  ),
+                ],
                 _AttributionLink(
                   label: 'OpenStreetMap',
                   onTap: () =>
@@ -136,15 +189,6 @@ class LifeThreadsMapUnavailablePanel extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
           ),
-          // The build hint is for developers only, never for users.
-          if (kDebugMode) ...[
-            const SizedBox(height: 6),
-            const Text(
-              'Build with --dart-define MAPTILER_KEY to enable production maps.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.muted, height: 1.35),
-            ),
-          ],
         ],
       ),
     );

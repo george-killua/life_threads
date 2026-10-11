@@ -37,7 +37,8 @@ storeFile=../release/lifethreads-release-key.jks
 
 ## MapTiler
 
-Production maps require a MapTiler key at build time:
+Maps use OpenFreeMap vector tiles by default (free, no API key). A MapTiler
+key is an optional override that switches back to MapTiler raster tiles:
 
 ```bash
 flutter build appbundle --release --dart-define=MAPTILER_KEY="$MAPTILER_KEY"
@@ -48,7 +49,7 @@ Before public release:
 2. Update GitHub Actions secret `MAPTILER_KEY` and local shell env.
 3. Confirm closed-test and production AABs are built with the rotated key.
 
-Without `MAPTILER_KEY`, release map views show the unavailable panel instead of tiles.
+Without `MAPTILER_KEY`, release builds use OpenFreeMap.
 
 ## App Links
 
