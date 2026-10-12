@@ -1,0 +1,6 @@
+Copyright (c) 2026 George Kassih. All rights reserved.
+
+This package is part of the LifeThreads app and is not licensed for use
+outside it. It contains no third-party code: it calls only the media APIs
+of Android (MediaCodec, MediaMuxer, MediaExtractor, EGL/OpenGL ES) and iOS
+(AVFoundation, Accelerate, CoreVideo).

@@ -1,0 +1,26 @@
+name: story_video_encoder
+description: "Encodes Flutter-rendered RGBA frames into an H.264 MP4 with an optional AAC music track, using only platform media APIs (MediaCodec / AVFoundation)."
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.11.0
+  flutter: '>=3.32.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: dev.gkcoding.lifethreads.story_video_encoder
+        pluginClass: StoryVideoEncoderPlugin
+      ios:
+        pluginClass: StoryVideoEncoderPlugin
