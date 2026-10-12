@@ -141,7 +141,7 @@ void main() {
 
   testWidgets('saving an untouched edit keeps a cover that is not one '
       'of the gallery rows (demo / asset cover)', (tester) async {
-    const cover = 'assets/demo_people/linz_rain_coffee.jpg';
+    const cover = 'assets/demo_moments/first_home.jpg';
     await _pumpEdit(tester, _state(_event(cover: cover)));
     await _tapSave(tester);
     expect(repo.saved!['cover'], cover);

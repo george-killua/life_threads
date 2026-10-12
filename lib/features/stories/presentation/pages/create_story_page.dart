@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import '../../../memories/domain/memory_event.dart';
 import '../../../premium/domain/premium_feature.dart';
 import '../../../premium/presentation/premium_gate.dart';
 import '../../data/music_catalog.dart';
+import '../../data/music_preview.dart';
 import '../../data/story_exporter.dart';
 import '../../domain/music_track.dart';
 import '../../domain/story_template.dart';
@@ -43,6 +45,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
   final _pages = PageController();
   var _video = false;
   MusicTrack? _music;
+  late final MusicPreview _preview;
   var _busy = false;
   final _shareButtonKey = GlobalKey();
 
@@ -57,10 +60,18 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
         ? const StorySelection()
         : StorySelection([initial]);
     _editing = initial != null;
+    _preview = ref.read(musicPreviewProvider);
+  }
+
+  /// Picks [track] (or no music) and plays it so the user hears it.
+  void _selectMusic(MusicTrack? track) {
+    setState(() => _music = track);
+    unawaited(track == null ? _preview.stop() : _preview.play(track));
   }
 
   @override
   void dispose() {
+    unawaited(_preview.stop());
     _caption.dispose();
     _pages.dispose();
     super.dispose();
@@ -196,7 +207,10 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
                   value: _video,
                   onChanged: _busy
                       ? null
-                      : (value) => setState(() => _video = value),
+                      : (value) {
+                          setState(() => _video = value);
+                          if (!value) _selectMusic(null);
+                        },
                   title: Text(
                     l10n.storyVideoSwitch,
                     style: const TextStyle(fontWeight: FontWeight.w900),
@@ -220,7 +234,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
                       ChoiceChip(
                         label: Text(l10n.storyMusicNone),
                         selected: _music == null,
-                        onSelected: (_) => setState(() => _music = null),
+                        onSelected: (_) => _selectMusic(null),
                       ),
                       for (final track in bundledMusicTracks)
                         ChoiceChip(
@@ -230,7 +244,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
                             '${musicMoodLabel(l10n, track.mood)}',
                           ),
                           selected: _music?.id == track.id,
-                          onSelected: (_) => setState(() => _music = track),
+                          onSelected: (_) => _selectMusic(track),
                         ),
                     ],
                   ),
@@ -369,6 +383,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
     }
     if (!mounted) return null;
     final exporter = ref.read(storyExporterProvider);
+    unawaited(_preview.stop());
     setState(() => _busy = true);
     try {
       final File? file;
@@ -432,6 +447,7 @@ String musicMoodLabel(AppLocalizations l10n, MusicMood mood) {
     MusicMood.calm => l10n.storyMoodCalm,
     MusicMood.nostalgic => l10n.storyMoodNostalgic,
     MusicMood.epic => l10n.storyMoodEpic,
+    MusicMood.emotional => l10n.storyMoodEmotional,
   };
 }
 

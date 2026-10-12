@@ -2949,89 +2949,245 @@ abstract class AppLocalizations {
   /// **'Corkboard warmth with map-grid hints for trips and places.'**
   String get themeTravelCorkboardDescription;
 
-  /// No description provided for @demoViennaTitle.
+  /// No description provided for @demoFirstDanceTitle.
   ///
   /// In en, this message translates to:
-  /// **'Vienna evening walk'**
-  String get demoViennaTitle;
+  /// **'Our first dance'**
+  String get demoFirstDanceTitle;
 
-  /// No description provided for @demoViennaDescription.
+  /// No description provided for @demoFirstDanceStory.
   ///
   /// In en, this message translates to:
-  /// **'A quiet evening in Vienna, the kind of moment that stays warm because nothing needed to be perfect.'**
-  String get demoViennaDescription;
+  /// **'The band played our song and the whole barn went quiet. I stepped on your foot twice, you laughed through all of it, and for three minutes nobody else was there.'**
+  String get demoFirstDanceStory;
 
-  /// No description provided for @demoViennaLocation.
+  /// No description provided for @demoFirstDancePlace.
   ///
   /// In en, this message translates to:
-  /// **'Vienna, Austria'**
-  String get demoViennaLocation;
+  /// **'Salzburg'**
+  String get demoFirstDancePlace;
 
-  /// No description provided for @demoLinzTitle.
+  /// No description provided for @demoNewbornTitle.
   ///
   /// In en, this message translates to:
-  /// **'Rain and coffee'**
-  String get demoLinzTitle;
+  /// **'Welcome home, Lina'**
+  String get demoNewbornTitle;
 
-  /// No description provided for @demoLinzDescription.
+  /// No description provided for @demoNewbornStory.
   ///
   /// In en, this message translates to:
-  /// **'A slow Linz afternoon with coffee, rain on the windows, and one photo that feels like home.'**
-  String get demoLinzDescription;
+  /// **'Her whole hand fit around one finger. The first quiet morning at home.'**
+  String get demoNewbornStory;
 
-  /// No description provided for @demoLinzLocation.
+  /// No description provided for @demoNewbornPlace.
   ///
   /// In en, this message translates to:
-  /// **'Linz, Austria'**
-  String get demoLinzLocation;
+  /// **'Vienna'**
+  String get demoNewbornPlace;
 
-  /// No description provided for @demoFamilyTitle.
+  /// No description provided for @demoBeachSunsetTitle.
   ///
   /// In en, this message translates to:
-  /// **'Family table'**
-  String get demoFamilyTitle;
+  /// **'Summer by the sea'**
+  String get demoBeachSunsetTitle;
 
-  /// No description provided for @demoFamilyDescription.
+  /// No description provided for @demoBeachSunsetStory.
   ///
   /// In en, this message translates to:
-  /// **'Food, noise, small jokes, and the feeling that this is what should be remembered.'**
-  String get demoFamilyDescription;
+  /// **'Barefoot until the sun went down, Lina asleep on your shoulders on the way back.'**
+  String get demoBeachSunsetStory;
 
-  /// No description provided for @demoHomeLocation.
+  /// No description provided for @demoBeachSunsetPlace.
   ///
   /// In en, this message translates to:
-  /// **'Home'**
-  String get demoHomeLocation;
+  /// **'Split, Croatia'**
+  String get demoBeachSunsetPlace;
 
-  /// No description provided for @demoLaunchTitle.
+  /// No description provided for @demoGrandmaKitchenTitle.
   ///
   /// In en, this message translates to:
-  /// **'First launch night'**
-  String get demoLaunchTitle;
+  /// **'Grandma\'s kitchen'**
+  String get demoGrandmaKitchenTitle;
 
-  /// No description provided for @demoLaunchDescription.
+  /// No description provided for @demoGrandmaKitchenStory.
   ///
   /// In en, this message translates to:
-  /// **'The night an idea finally became something real on a screen.'**
-  String get demoLaunchDescription;
+  /// **'Her apricot cake, finally written down – and flour everywhere.'**
+  String get demoGrandmaKitchenStory;
 
-  /// No description provided for @demoConnectionQuietDays.
+  /// No description provided for @demoGrandmaKitchenPlace.
   ///
   /// In en, this message translates to:
-  /// **'quiet days'**
-  String get demoConnectionQuietDays;
+  /// **'Graz'**
+  String get demoGrandmaKitchenPlace;
 
-  /// No description provided for @demoConnectionHomeFocus.
+  /// No description provided for @demoGraduationTitle.
   ///
   /// In en, this message translates to:
-  /// **'home focus'**
-  String get demoConnectionHomeFocus;
+  /// **'Graduation day'**
+  String get demoGraduationTitle;
 
-  /// No description provided for @demoConnectionWhyItMatters.
+  /// No description provided for @demoGraduationStory.
   ///
   /// In en, this message translates to:
-  /// **'why it matters'**
-  String get demoConnectionWhyItMatters;
+  /// **'Dad cried before the caps even landed.'**
+  String get demoGraduationStory;
+
+  /// No description provided for @demoGraduationPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Innsbruck'**
+  String get demoGraduationPlace;
+
+  /// No description provided for @demoFirstHomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keys to our first home'**
+  String get demoFirstHomeTitle;
+
+  /// No description provided for @demoFirstHomeStory.
+  ///
+  /// In en, this message translates to:
+  /// **'No furniture yet, just boxes, pizza on the floor and a lot of plans.'**
+  String get demoFirstHomeStory;
+
+  /// No description provided for @demoFirstHomePlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Linz'**
+  String get demoFirstHomePlace;
+
+  /// No description provided for @demoAlpineSummitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Above the clouds'**
+  String get demoAlpineSummitTitle;
+
+  /// No description provided for @demoAlpineSummitStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Up at 4 a.m. for this. Worth every step.'**
+  String get demoAlpineSummitStory;
+
+  /// No description provided for @demoAlpineSummitPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Grossglockner'**
+  String get demoAlpineSummitPlace;
+
+  /// No description provided for @demoFirstBikeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'First ride, no hands'**
+  String get demoFirstBikeTitle;
+
+  /// No description provided for @demoFirstBikeStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Three steps, a wobble, then he was gone – and so proud.'**
+  String get demoFirstBikeStory;
+
+  /// No description provided for @demoFirstBikePlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Prater, Vienna'**
+  String get demoFirstBikePlace;
+
+  /// No description provided for @demoGardenDinnerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Grandpa\'s 80th'**
+  String get demoGardenDinnerTitle;
+
+  /// No description provided for @demoGardenDinnerStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Four generations at one long table, and he still told the best stories.'**
+  String get demoGardenDinnerStory;
+
+  /// No description provided for @demoGardenDinnerPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Wachau'**
+  String get demoGardenDinnerPlace;
+
+  /// No description provided for @demoThreadFirstDanceToFirstHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Our story'**
+  String get demoThreadFirstDanceToFirstHome;
+
+  /// No description provided for @demoThreadFirstHomeToNewborn.
+  ///
+  /// In en, this message translates to:
+  /// **'Then came Lina'**
+  String get demoThreadFirstHomeToNewborn;
+
+  /// No description provided for @demoThreadNewbornToBeachSunset.
+  ///
+  /// In en, this message translates to:
+  /// **'Her first summer'**
+  String get demoThreadNewbornToBeachSunset;
+
+  /// No description provided for @demoThreadGrandmaKitchenToGardenDinner.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get demoThreadGrandmaKitchenToGardenDinner;
+
+  /// No description provided for @demoThreadGraduationToFirstHome.
+  ///
+  /// In en, this message translates to:
+  /// **'New chapter'**
+  String get demoThreadGraduationToFirstHome;
+
+  /// No description provided for @demoThreadAlpineSummitToFirstBike.
+  ///
+  /// In en, this message translates to:
+  /// **'Little adventures'**
+  String get demoThreadAlpineSummitToFirstBike;
+
+  /// No description provided for @demoThreadFirstBikeToGardenDinner.
+  ///
+  /// In en, this message translates to:
+  /// **'Grandpa watched'**
+  String get demoThreadFirstBikeToGardenDinner;
+
+  /// No description provided for @demoRelationGrandpa.
+  ///
+  /// In en, this message translates to:
+  /// **'Grandpa'**
+  String get demoRelationGrandpa;
+
+  /// No description provided for @demoRelationGrandma.
+  ///
+  /// In en, this message translates to:
+  /// **'Grandma'**
+  String get demoRelationGrandma;
+
+  /// No description provided for @demoRelationDaughter.
+  ///
+  /// In en, this message translates to:
+  /// **'Daughter'**
+  String get demoRelationDaughter;
+
+  /// No description provided for @demoRelationWife.
+  ///
+  /// In en, this message translates to:
+  /// **'Wife'**
+  String get demoRelationWife;
+
+  /// No description provided for @demoRelationBestMan.
+  ///
+  /// In en, this message translates to:
+  /// **'Best man'**
+  String get demoRelationBestMan;
+
+  /// No description provided for @demoRelationMother.
+  ///
+  /// In en, this message translates to:
+  /// **'Mother'**
+  String get demoRelationMother;
 
   /// No description provided for @savedToPath.
   ///
@@ -3560,6 +3716,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Epic'**
   String get storyMoodEpic;
+
+  /// No description provided for @storyMoodEmotional.
+  ///
+  /// In en, this message translates to:
+  /// **'Emotional'**
+  String get storyMoodEmotional;
 
   /// No description provided for @storyShare.
   ///

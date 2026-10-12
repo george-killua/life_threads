@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:life_threads/core/database/app_database.dart' as db;
+import 'package:life_threads/core/database/database_provider.dart';
 import 'package:life_threads/features/backup/domain/backup_models.dart';
 import 'package:life_threads/features/memories/data/memory_repository.dart';
 import 'package:life_threads/features/memories/data/memory_seed_data.dart';
@@ -41,6 +43,32 @@ MemoryPhotoDraft _photo(String path) => MemoryPhotoDraft(
   width: 1,
   height: 1,
 );
+
+/// Writes bare memories straight into the database, as an older version
+/// would have left them, before the repository first loads.
+Future<void> _insertEvents(Iterable<String> ids) async {
+  final container = ProviderContainer();
+  final database = container.read(appDatabaseProvider);
+  for (final id in ids) {
+    await database
+        .into(database.memoryEvents)
+        .insert(
+          db.MemoryEventsCompanion.insert(
+            id: id,
+            title: id,
+            description: '',
+            occurredAt: 0,
+            createdAt: 0,
+            coverColorValue: 0,
+            wallX: 0,
+            wallY: 0,
+            rotation: 0,
+            locationLabel: '',
+          ),
+        );
+  }
+  container.dispose();
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -156,6 +184,51 @@ void main() {
     addTearDown(container.dispose);
     final relaunched = await container.read(memoryRepositoryProvider.future);
     expect(relaunched.events, isEmpty);
+  });
+
+  test('the demo wall is the one from the store screenshots', () async {
+    SharedPreferences.setMockInitialValues({'demo_wall_enabled': true});
+    final container = _container();
+    addTearDown(container.dispose);
+    final seeded = await container.read(memoryRepositoryProvider.future);
+
+    expect(seeded.isDemoOnly, isTrue);
+    expect(seeded.events, hasLength(9));
+    expect(seeded.connections, hasLength(7));
+    expect(seeded.people, hasLength(7));
+    for (final event in seeded.events) {
+      expect(event.coverPhotoPath, startsWith('assets/demo_moments/'));
+      expect(File(event.coverPhotoPath!).existsSync(), isTrue);
+    }
+  });
+
+  test('an install still showing the old demo wall gets the new one', () async {
+    SharedPreferences.setMockInitialValues({});
+    await _insertEvents(MemorySeedData.legacyEventIds);
+    final container = _container();
+    addTearDown(container.dispose);
+
+    final state = await container.read(memoryRepositoryProvider.future);
+    expect(
+      state.events.map((event) => event.id).toSet(),
+      MemorySeedData.eventIds,
+    );
+
+    await container.read(memoryRepositoryProvider.notifier).clearDemoWall();
+    expect(container.read(memoryRepositoryProvider).value!.events, isEmpty);
+  });
+
+  test('the old demo wall stays when the user added a memory', () async {
+    SharedPreferences.setMockInitialValues({});
+    await _insertEvents([MemorySeedData.legacyEventIds.first, 'mine']);
+    final container = _container();
+    addTearDown(container.dispose);
+
+    final state = await container.read(memoryRepositoryProvider.future);
+    expect(state.events.map((event) => event.id).toSet(), {
+      MemorySeedData.legacyEventIds.first,
+      'mine',
+    });
   });
 
   test('clearing all data also removes the name and cloud sync key', () async {

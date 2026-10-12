@@ -15,6 +15,7 @@ import 'package:life_threads/features/premium/data/premium_entitlement_controlle
 import 'package:life_threads/features/premium/domain/premium_feature.dart';
 import 'package:life_threads/features/stories/data/story_exporter.dart';
 import 'package:life_threads/features/stories/domain/music_track.dart';
+import 'package:life_threads/features/stories/data/music_preview.dart';
 import 'package:life_threads/features/stories/domain/story_film.dart';
 import 'package:life_threads/features/wall/presentation/pages/memory_wall_page.dart';
 import 'package:life_threads/features/year_thread/data/year_thread_providers.dart';
@@ -25,6 +26,7 @@ import 'package:life_threads/features/year_thread/presentation/year_thread_image
 import 'package:life_threads/l10n/generated/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'support/fake_music_preview.dart';
 import 'support/on_this_day_fakes.dart';
 import 'support/year_thread_fixtures.dart';
 
@@ -129,6 +131,7 @@ void main() {
               () => FakePremium(isPremium: isPremium),
             ),
             storyExporterProvider.overrideWithValue(fake),
+            musicPreviewProvider.overrideWithValue(FakeMusicPreview()),
           ],
           child: MaterialApp.router(
             routerConfig: router,

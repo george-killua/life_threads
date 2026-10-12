@@ -25,10 +25,10 @@ Scenes, in listing order: `wall`, `memory` (a memory's hero), `story` (story, pe
 
 ## How it works
 
-- `fixtures.dart` holds the nine demo moments (titles and stories per language), their threads,
-  people and the captions. The photos are in `store_listing_assets/store_moments/`, generated with
-  Figma AI; they are served to the app as `assets/store_moments/…` by a test asset bundle and are
-  not shipped in the app.
+- The wall in the screenshots is the app's demo wall: nine moments with their threads and people
+  from `lib/features/memories/data/memory_seed_data.dart` (texts in the ARB files as `demo…`), and
+  the photos in `assets/demo_moments/` (generated with Figma AI, shipped in the app). Change the
+  demo there and both the app and the screenshots follow. `fixtures.dart` holds the captions.
 - `fonts.dart` loads Avenir (the theme font) and SF Arabic from macOS, as an iPhone shows them,
   plus Material Icons from the Flutter SDK. So this runs on a Mac only.
 - `store_frame.dart` draws the caption, device frame and status bar (9:41); the app is laid out at

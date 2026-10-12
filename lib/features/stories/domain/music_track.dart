@@ -1,4 +1,4 @@
-enum MusicMood { warm, joyful, calm, nostalgic, epic }
+enum MusicMood { warm, joyful, calm, nostalgic, epic, emotional }
 
 /// A song bundled with the app for story videos. Every track needs a license
 /// that allows shipping it inside a commercial app; its record lives in

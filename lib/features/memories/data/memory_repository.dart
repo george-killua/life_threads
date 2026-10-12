@@ -209,6 +209,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
   @override
   Future<MemoryState> build() async {
     await _seedIfEmpty();
+    await _replaceLegacyDemoWall();
     await _syncDemoAssetCovers();
     return _loadState();
   }
@@ -460,25 +461,31 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
   }
 
   Future<void> clearDemoWall() async {
-    final demoIds = MemorySeedData.eventIds;
-    await _database.transaction(() async {
-      await (_database.delete(
-        _database.memoryPhotos,
-      )..where((row) => row.eventId.isIn(demoIds))).go();
-      await (_database.delete(
-        _database.memoryPeople,
-      )..where((row) => row.eventId.isIn(demoIds))).go();
-      await (_database.delete(_database.memoryConnections)..where(
-            (row) =>
-                row.fromEventId.isIn(demoIds) | row.toEventId.isIn(demoIds),
-          ))
-          .go();
-      await (_database.delete(
-        _database.memoryEvents,
-      )..where((row) => row.id.isIn(demoIds))).go();
-    });
+    await _database.transaction(_deleteDemoRows);
     await ref.read(onboardingPreferencesProvider).disableDemoWall();
     state = await AsyncValue.guard(_loadState);
+  }
+
+  /// Deletes every demo memory (current and pre-0.1.9 demo wall) with its
+  /// photos, people and threads.
+  Future<void> _deleteDemoRows() async {
+    final demoIds = {
+      ...MemorySeedData.eventIds,
+      ...MemorySeedData.legacyEventIds,
+    };
+    await (_database.delete(
+      _database.memoryPhotos,
+    )..where((row) => row.eventId.isIn(demoIds))).go();
+    await (_database.delete(
+      _database.memoryPeople,
+    )..where((row) => row.eventId.isIn(demoIds))).go();
+    await (_database.delete(_database.memoryConnections)..where(
+          (row) => row.fromEventId.isIn(demoIds) | row.toEventId.isIn(demoIds),
+        ))
+        .go();
+    await (_database.delete(
+      _database.memoryEvents,
+    )..where((row) => row.id.isIn(demoIds))).go();
   }
 
   Future<void> clearAllData() async {
@@ -1010,31 +1017,63 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
         .shouldUseDemoWall();
     if (!shouldUseDemoWall) return;
 
-    await _database.transaction(() async {
-      final l10n = MemorySeedData.localizationsForLocale(
-        WidgetsBinding.instance.platformDispatcher.locale,
-      );
-      for (final event in MemorySeedData.localizedEvents(l10n)) {
-        await _database
-            .into(_database.memoryEvents)
-            .insert(_eventToCompanion(event));
-      }
-      for (final connection in MemorySeedData.localizedConnections(l10n)) {
-        await _database
-            .into(_database.memoryConnections)
-            .insert(
-              db.MemoryConnectionsCompanion.insert(
-                id: connection.id,
-                fromEventId: connection.fromEventId,
-                toEventId: connection.toEventId,
-                label: connection.label,
-              ),
-            );
-      }
-    });
+    await _database.transaction(_insertDemoRows);
     // The demo wall is seeded once. Deleting the demo memories later must not
     // bring them back on the next launch.
     await ref.read(onboardingPreferencesProvider).disableDemoWall();
+  }
+
+  /// Installs that still show the pre-0.1.9 demo wall (nothing of their own
+  /// added) get the current one, the wall from the store screenshots.
+  Future<void> _replaceLegacyDemoWall() async {
+    final events = await _database.select(_database.memoryEvents).get();
+    if (events.isEmpty ||
+        !events.every(
+          (row) => MemorySeedData.legacyEventIds.contains(row.id),
+        )) {
+      return;
+    }
+    final wallItems = await _database.select(_database.wallItems).get();
+    if (wallItems.isNotEmpty) return;
+    await _database.transaction(() async {
+      await _deleteDemoRows();
+      await _insertDemoRows();
+    });
+  }
+
+  Future<void> _insertDemoRows() async {
+    final l10n = MemorySeedData.localizationsForLocale(
+      WidgetsBinding.instance.platformDispatcher.locale,
+    );
+    for (final event in MemorySeedData.localizedEvents(l10n)) {
+      await _database
+          .into(_database.memoryEvents)
+          .insert(_eventToCompanion(event));
+    }
+    for (final connection in MemorySeedData.localizedConnections(l10n)) {
+      await _database
+          .into(_database.memoryConnections)
+          .insert(
+            db.MemoryConnectionsCompanion.insert(
+              id: connection.id,
+              fromEventId: connection.fromEventId,
+              toEventId: connection.toEventId,
+              label: connection.label,
+            ),
+          );
+    }
+    for (final person in MemorySeedData.localizedPeople(l10n)) {
+      await _database
+          .into(_database.memoryPeople)
+          .insert(
+            db.MemoryPeopleCompanion.insert(
+              id: person.id,
+              eventId: person.eventId,
+              name: person.name,
+              relationship: person.relationship,
+            ),
+          );
+    }
   }
 
   Future<void> _syncDemoAssetCovers() async {

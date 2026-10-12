@@ -1587,50 +1587,132 @@ class AppLocalizationsEn extends AppLocalizations {
       'Corkboard warmth with map-grid hints for trips and places.';
 
   @override
-  String get demoViennaTitle => 'Vienna evening walk';
+  String get demoFirstDanceTitle => 'Our first dance';
 
   @override
-  String get demoViennaDescription =>
-      'A quiet evening in Vienna, the kind of moment that stays warm because nothing needed to be perfect.';
+  String get demoFirstDanceStory =>
+      'The band played our song and the whole barn went quiet. I stepped on your foot twice, you laughed through all of it, and for three minutes nobody else was there.';
 
   @override
-  String get demoViennaLocation => 'Vienna, Austria';
+  String get demoFirstDancePlace => 'Salzburg';
 
   @override
-  String get demoLinzTitle => 'Rain and coffee';
+  String get demoNewbornTitle => 'Welcome home, Lina';
 
   @override
-  String get demoLinzDescription =>
-      'A slow Linz afternoon with coffee, rain on the windows, and one photo that feels like home.';
+  String get demoNewbornStory =>
+      'Her whole hand fit around one finger. The first quiet morning at home.';
 
   @override
-  String get demoLinzLocation => 'Linz, Austria';
+  String get demoNewbornPlace => 'Vienna';
 
   @override
-  String get demoFamilyTitle => 'Family table';
+  String get demoBeachSunsetTitle => 'Summer by the sea';
 
   @override
-  String get demoFamilyDescription =>
-      'Food, noise, small jokes, and the feeling that this is what should be remembered.';
+  String get demoBeachSunsetStory =>
+      'Barefoot until the sun went down, Lina asleep on your shoulders on the way back.';
 
   @override
-  String get demoHomeLocation => 'Home';
+  String get demoBeachSunsetPlace => 'Split, Croatia';
 
   @override
-  String get demoLaunchTitle => 'First launch night';
+  String get demoGrandmaKitchenTitle => 'Grandma\'s kitchen';
 
   @override
-  String get demoLaunchDescription =>
-      'The night an idea finally became something real on a screen.';
+  String get demoGrandmaKitchenStory =>
+      'Her apricot cake, finally written down – and flour everywhere.';
 
   @override
-  String get demoConnectionQuietDays => 'quiet days';
+  String get demoGrandmaKitchenPlace => 'Graz';
 
   @override
-  String get demoConnectionHomeFocus => 'home focus';
+  String get demoGraduationTitle => 'Graduation day';
 
   @override
-  String get demoConnectionWhyItMatters => 'why it matters';
+  String get demoGraduationStory => 'Dad cried before the caps even landed.';
+
+  @override
+  String get demoGraduationPlace => 'Innsbruck';
+
+  @override
+  String get demoFirstHomeTitle => 'Keys to our first home';
+
+  @override
+  String get demoFirstHomeStory =>
+      'No furniture yet, just boxes, pizza on the floor and a lot of plans.';
+
+  @override
+  String get demoFirstHomePlace => 'Linz';
+
+  @override
+  String get demoAlpineSummitTitle => 'Above the clouds';
+
+  @override
+  String get demoAlpineSummitStory =>
+      'Up at 4 a.m. for this. Worth every step.';
+
+  @override
+  String get demoAlpineSummitPlace => 'Grossglockner';
+
+  @override
+  String get demoFirstBikeTitle => 'First ride, no hands';
+
+  @override
+  String get demoFirstBikeStory =>
+      'Three steps, a wobble, then he was gone – and so proud.';
+
+  @override
+  String get demoFirstBikePlace => 'Prater, Vienna';
+
+  @override
+  String get demoGardenDinnerTitle => 'Grandpa\'s 80th';
+
+  @override
+  String get demoGardenDinnerStory =>
+      'Four generations at one long table, and he still told the best stories.';
+
+  @override
+  String get demoGardenDinnerPlace => 'Wachau';
+
+  @override
+  String get demoThreadFirstDanceToFirstHome => 'Our story';
+
+  @override
+  String get demoThreadFirstHomeToNewborn => 'Then came Lina';
+
+  @override
+  String get demoThreadNewbornToBeachSunset => 'Her first summer';
+
+  @override
+  String get demoThreadGrandmaKitchenToGardenDinner => 'Family';
+
+  @override
+  String get demoThreadGraduationToFirstHome => 'New chapter';
+
+  @override
+  String get demoThreadAlpineSummitToFirstBike => 'Little adventures';
+
+  @override
+  String get demoThreadFirstBikeToGardenDinner => 'Grandpa watched';
+
+  @override
+  String get demoRelationGrandpa => 'Grandpa';
+
+  @override
+  String get demoRelationGrandma => 'Grandma';
+
+  @override
+  String get demoRelationDaughter => 'Daughter';
+
+  @override
+  String get demoRelationWife => 'Wife';
+
+  @override
+  String get demoRelationBestMan => 'Best man';
+
+  @override
+  String get demoRelationMother => 'Mother';
 
   @override
   String savedToPath(Object label, Object path) {
@@ -2007,6 +2089,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storyMoodEpic => 'Epic';
+
+  @override
+  String get storyMoodEmotional => 'Emotional';
 
   @override
   String get storyShare => 'Share';

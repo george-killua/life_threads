@@ -23,7 +23,7 @@ import 'fixtures.dart';
 import 'fonts.dart';
 import 'store_frame.dart';
 
-const _momentsDir = 'store_listing_assets/store_moments';
+const _momentsDir = 'assets/demo_moments';
 const _outDir = 'store_listing_assets/store_screenshots';
 
 /// Serves the demo photos from disk under [momentsPrefix]; everything else
@@ -66,7 +66,7 @@ final List<_Scene> _scenes = [
   (
     name: 'memory',
     caption: 'detail',
-    open: (tester, l10n) => _go(tester, '/memories/first-dance'),
+    open: (tester, l10n) => _go(tester, '/memories/demo-first-dance'),
   ),
   (
     name: 'story',
@@ -74,10 +74,10 @@ final List<_Scene> _scenes = [
     open: (tester, l10n) async {
       // A memory without a map pin, scrolled to its story, people and the
       // memories it is threaded to (the vector map does not render in tests).
-      await _go(tester, '/memories/garden-dinner');
+      await _go(tester, '/memories/demo-garden-dinner');
       final story = storeMemoryState(
         _lang,
-      ).events.firstWhere((event) => event.id == 'garden-dinner').description;
+      ).events.firstWhere((event) => event.id == 'demo-garden-dinner').description;
       await tester.runAsync(() async {});
       Scrollable.ensureVisible(
         tester.element(find.text(story)),
@@ -99,9 +99,9 @@ final List<_Scene> _scenes = [
         '/memories/new',
         extra: [
           for (final name in [
-            '03_beach_sunset.jpg',
-            '02_newborn.jpg',
-            '01_first_dance.jpg',
+            'beach_sunset.jpg',
+            'newborn.jpg',
+            'first_dance.jpg',
           ])
             PickedMemoryPhoto(
               localPath: File('$_momentsDir/$name').absolute.path,
@@ -333,8 +333,9 @@ void main() {
                               ),
                               // No Thread of the Year card in December
                               // and January runs.
-                              yearThreadWallCardYearProvider
-                                  .overrideWithValue(null),
+                              yearThreadWallCardYearProvider.overrideWithValue(
+                                null,
+                              ),
                             ],
                             child: MaterialApp.router(
                               debugShowCheckedModeBanner: false,

@@ -1,10 +1,14 @@
 # Story music: candidates for approval
 
-Proposed 2026-10-12 for Create Story videos (plan session 3). **Nothing here is downloaded or
-bundled yet.** The app ships only a generated placeholder (`assets/music/placeholder_pad.m4a`).
-Approve tracks by ticking them; each approved track then gets an ~30 s AAC excerpt with a fade,
-a row in `assets/music/LICENSES.md`, a saved copy of its licence page and a catalog entry in
-`lib/features/stories/data/music_catalog.dart`.
+Proposed 2026-10-12 for Create Story videos (plan session 3).
+
+**Update 2026-10-13:** the placeholder is gone. The app now ships 13 tracks, listed with their
+sources in `assets/music/LICENSES.md`: from this list 1, 2, 3, 4, 6, 8 (Musopen / CC0 recordings
+on Wikimedia Commons), plus more emotional pieces found on Commons with the same licence rules:
+Chopin's Nocturne in C-sharp minor (B. 49) and Étude "Tristesse", Schumann's Träumerei, Grieg's
+"The Death of Åse" and "Morning Mood" (Musopen), and Komiku's CC0 "Dreaming of you" and "Sad walk
+with sad piano". Not taken: 5 (unclear Musopen note), 7 (the theme starts late), 9–12 (not on
+Commons; OpenGameArt pages need a separate check).
 
 ## What a track must allow
 

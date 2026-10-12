@@ -1576,50 +1576,132 @@ class AppLocalizationsAr extends AppLocalizations {
       'دفء لوحة فلين مع تلميحات شبكة خرائط للرحلات والأماكن.';
 
   @override
-  String get demoViennaTitle => 'مشي مساء في فيينا';
+  String get demoFirstDanceTitle => 'رقصتنا الأولى';
 
   @override
-  String get demoViennaDescription =>
-      'مساء هادئ في فيينا، من تلك اللحظات التي تبقى دافئة لأن شيئاً لم يكن بحاجة أن يكون مثالياً.';
+  String get demoFirstDanceStory =>
+      'عزفت الفرقة أغنيتنا فسكت المكان كلّه. دست على قدمك مرّتين وأنتِ تضحكين، ولثلاث دقائق لم يكن هناك أحد غيرنا.';
 
   @override
-  String get demoViennaLocation => 'فيينا، النمسا';
+  String get demoFirstDancePlace => 'سالزبورغ';
 
   @override
-  String get demoLinzTitle => 'مطر وقهوة';
+  String get demoNewbornTitle => 'أهلاً بكِ في البيت يا لينا';
 
   @override
-  String get demoLinzDescription =>
-      'بعد ظهر بطيء في لينتس مع قهوة ومطر على النوافذ وصورة واحدة تشبه البيت.';
+  String get demoNewbornStory =>
+      'أمسكت يدها الصغيرة بإصبع واحد. أول صباح هادئ في البيت.';
 
   @override
-  String get demoLinzLocation => 'لينتس، النمسا';
+  String get demoNewbornPlace => 'فيينا';
 
   @override
-  String get demoFamilyTitle => 'طاولة العائلة';
+  String get demoBeachSunsetTitle => 'صيف على البحر';
 
   @override
-  String get demoFamilyDescription =>
-      'طعام وضجيج ونكات صغيرة وشعور بأن هذا ما يجب تذكره.';
+  String get demoBeachSunsetStory =>
+      'حفاة حتى غابت الشمس، ولينا نائمة على كتفيك في طريق العودة.';
 
   @override
-  String get demoHomeLocation => 'البيت';
+  String get demoBeachSunsetPlace => 'سبليت، كرواتيا';
 
   @override
-  String get demoLaunchTitle => 'ليلة الإطلاق الأولى';
+  String get demoGrandmaKitchenTitle => 'في مطبخ جدّتي';
 
   @override
-  String get demoLaunchDescription =>
-      'الليلة التي تحولت فيها فكرة أخيراً إلى شيء حقيقي على الشاشة.';
+  String get demoGrandmaKitchenStory =>
+      'كتبنا أخيراً وصفة كعكة المشمش – والطحين في كل مكان.';
 
   @override
-  String get demoConnectionQuietDays => 'أيام هادئة';
+  String get demoGrandmaKitchenPlace => 'غراتس';
 
   @override
-  String get demoConnectionHomeFocus => 'تركيز البيت';
+  String get demoGraduationTitle => 'يوم التخرّج';
 
   @override
-  String get demoConnectionWhyItMatters => 'لماذا يهم';
+  String get demoGraduationStory => 'بكى أبي قبل أن تسقط القبعات.';
+
+  @override
+  String get demoGraduationPlace => 'إنسبروك';
+
+  @override
+  String get demoFirstHomeTitle => 'مفتاح بيتنا الأول';
+
+  @override
+  String get demoFirstHomeStory =>
+      'لا أثاث بعد، فقط صناديق وبيتزا على الأرض وأحلام كثيرة.';
+
+  @override
+  String get demoFirstHomePlace => 'لينتس';
+
+  @override
+  String get demoAlpineSummitTitle => 'فوق الغيوم';
+
+  @override
+  String get demoAlpineSummitStory =>
+      'استيقظنا في الرابعة فجراً من أجل هذا المنظر، وكانت كل خطوة تستحق.';
+
+  @override
+  String get demoAlpineSummitPlace => 'غروسغلوكنر';
+
+  @override
+  String get demoFirstBikeTitle => 'أول جولة وحده';
+
+  @override
+  String get demoFirstBikeStory =>
+      'ثلاث دفعات، ثم ترنّح قليلاً، ثم انطلق – وكان فخوراً جداً.';
+
+  @override
+  String get demoFirstBikePlace => 'براتر، فيينا';
+
+  @override
+  String get demoGardenDinnerTitle => 'عيد ميلاد جدّي الثمانين';
+
+  @override
+  String get demoGardenDinnerStory =>
+      'أربعة أجيال حول طاولة واحدة، وما زال يروي أجمل القصص.';
+
+  @override
+  String get demoGardenDinnerPlace => 'فاخاو';
+
+  @override
+  String get demoThreadFirstDanceToFirstHome => 'قصّتنا';
+
+  @override
+  String get demoThreadFirstHomeToNewborn => 'ثم جاءت لينا';
+
+  @override
+  String get demoThreadNewbornToBeachSunset => 'صيفها الأول';
+
+  @override
+  String get demoThreadGrandmaKitchenToGardenDinner => 'العائلة';
+
+  @override
+  String get demoThreadGraduationToFirstHome => 'فصل جديد';
+
+  @override
+  String get demoThreadAlpineSummitToFirstBike => 'مغامرات صغيرة';
+
+  @override
+  String get demoThreadFirstBikeToGardenDinner => 'وجدّي يتفرّج';
+
+  @override
+  String get demoRelationGrandpa => 'جدّي';
+
+  @override
+  String get demoRelationGrandma => 'جدّتي';
+
+  @override
+  String get demoRelationDaughter => 'ابنتي';
+
+  @override
+  String get demoRelationWife => 'زوجتي';
+
+  @override
+  String get demoRelationBestMan => 'الإشبين';
+
+  @override
+  String get demoRelationMother => 'أمي';
 
   @override
   String savedToPath(Object label, Object path) {
@@ -2027,6 +2109,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get storyMoodEpic => 'ملحمية';
+
+  @override
+  String get storyMoodEmotional => 'مؤثرة';
 
   @override
   String get storyShare => 'مشاركة';

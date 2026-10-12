@@ -9,6 +9,7 @@ import 'package:life_threads/features/memories/data/memory_repository.dart';
 import 'package:life_threads/features/premium/data/premium_entitlement_controller.dart';
 import 'package:life_threads/features/premium/domain/premium_feature.dart';
 import 'package:life_threads/features/stories/data/music_catalog.dart';
+import 'package:life_threads/features/stories/data/music_preview.dart';
 import 'package:life_threads/features/stories/data/story_exporter.dart';
 import 'package:life_threads/features/stories/domain/music_track.dart';
 import 'package:life_threads/features/stories/domain/story_film.dart';
@@ -17,6 +18,7 @@ import 'package:life_threads/features/stories/presentation/pages/create_story_pa
 import 'package:life_threads/features/stories/presentation/templates/story_templates.dart';
 import 'package:life_threads/l10n/generated/app_localizations.dart';
 
+import 'support/fake_music_preview.dart';
 import 'support/on_this_day_fakes.dart';
 
 class _FakeExporter implements StoryExporter {
@@ -63,11 +65,14 @@ void main() {
       ).copyWith(description: 'Story of memory $i'),
   ];
 
+  late FakeMusicPreview preview;
+
   Future<_FakeExporter> pumpPage(
     WidgetTester tester, {
     required bool isPremium,
     String? initialMemoryId,
   }) async {
+    preview = FakeMusicPreview();
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2;
     addTearDown(tester.view.reset);
@@ -98,6 +103,7 @@ void main() {
             () => FakePremium(isPremium: isPremium),
           ),
           storyExporterProvider.overrideWithValue(exporter),
+          musicPreviewProvider.overrideWithValue(preview),
         ],
         child: MaterialApp.router(
           routerConfig: router,
@@ -222,9 +228,27 @@ void main() {
     );
     await tester.tap(find.byKey(const ValueKey('story-video-switch')));
     await tester.pump();
+    // The song list is long; bring the hint below it into view.
+    await tester.scrollUntilVisible(
+      find.text(l10n.storyMusicNoneHint),
+      200,
+      scrollable: find
+          .byWidgetPredicate(
+            (widget) =>
+                widget is Scrollable &&
+                widget.axisDirection == AxisDirection.down,
+          )
+          .first,
+    );
     expect(find.text(l10n.storyMusicNoneHint), findsOneWidget);
+    await tester.ensureVisible(
+      find.textContaining(bundledMusicTracks.first.title),
+    );
+    await tester.pump();
     await tester.tap(find.textContaining(bundledMusicTracks.first.title));
     await tester.pump();
+    // Picking a song plays it.
+    expect(preview.calls, ['play:${bundledMusicTracks.first.id}']);
     await tester.tap(find.byKey(const ValueKey('story-save')));
     for (var i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 100));
@@ -235,5 +259,7 @@ void main() {
       'save:mp4',
     ]);
     expect(find.text(l10n.storySaved), findsOneWidget);
+    // The preview stops when the export starts.
+    expect(preview.calls.last, 'stop');
   });
 }

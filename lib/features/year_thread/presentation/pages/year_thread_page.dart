@@ -12,6 +12,7 @@ import '../../../../core/rendering/story_canvas.dart';
 import '../../../memories/data/memory_repository.dart';
 import '../../../premium/domain/premium_feature.dart';
 import '../../../premium/presentation/premium_gate.dart';
+import '../../../stories/data/music_preview.dart';
 import '../../../stories/data/story_exporter.dart';
 import '../../../stories/domain/music_track.dart';
 import '../../../wall/presentation/widgets/wall_background.dart';
@@ -41,7 +42,26 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
   List<String>? _chosen;
   var _cut = YearThreadCut.full;
   MusicTrack? _music;
+  late final MusicPreview _musicPreview;
   var _exporting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _musicPreview = ref.read(musicPreviewProvider);
+  }
+
+  @override
+  void dispose() {
+    unawaited(_musicPreview.stop());
+    super.dispose();
+  }
+
+  /// Picks [track] (or no music) and plays it so the user hears it.
+  void _selectMusic(MusicTrack? track) {
+    setState(() => _music = track);
+    unawaited(track == null ? _musicPreview.stop() : _musicPreview.play(track));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -264,7 +284,7 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
                             child: Text('${track.title} · ${track.artist}'),
                           ),
                       ],
-                      onChanged: (track) => setState(() => _music = track),
+                      onChanged: _selectMusic,
                     ),
             ),
           ],
@@ -359,6 +379,9 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
     for (final image in film.images) {
       unawaited(precacheImage(image, context, onError: (_, _) {}));
     }
+    // The chosen song plays from the start with the preview.
+    final music = _music;
+    if (music != null) unawaited(_musicPreview.play(music));
     await showDialog<void>(
       context: context,
       builder: (context) => Dialog(
@@ -383,6 +406,7 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
         ),
       ),
     );
+    if (music != null) unawaited(_musicPreview.stop());
   }
 
   Future<String?> _pick(
@@ -510,6 +534,7 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
   }) async {
     final l10n = context.l10n;
     final navigator = Navigator.of(context, rootNavigator: true);
+    unawaited(_musicPreview.stop());
     setState(() => _exporting = true);
     unawaited(
       showDialog<void>(
