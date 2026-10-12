@@ -126,7 +126,7 @@ void main() {
     testWidgets('family screens without a family service say so', (
       tester,
     ) async {
-      // The real provider still throws; the screen must not.
+      // A service that fails to start must not break the screen.
       await pumpFamilyScreens(tester, null);
       expect(find.text('Not available yet'), findsOneWidget);
       await tapAndSettle(tester, find.byType(BackButtonIcon));

@@ -160,7 +160,7 @@ enum FamilySyncStatus { idle, syncing, offline, error }
 
 /// A user-facing failure from the family service. [code] matches the
 /// server's error codes (e.g. `subscription_required`, `invite_expired`,
-/// `quota_exceeded`, `terms_required`, `family_full`).
+/// `quota_exceeded`, `terms_not_accepted`, `family_full`).
 class FamilyException implements Exception {
   const FamilyException(this.code, [this.message]);
 

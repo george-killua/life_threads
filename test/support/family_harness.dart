@@ -60,8 +60,12 @@ Future<GoRouter> pumpFamilyScreens(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        // Without a service the real, still unimplemented provider is used.
-        if (service != null) familyServiceProvider.overrideWithValue(service),
+        // Without a service the screens see one that cannot be created.
+        service != null
+            ? familyServiceProvider.overrideWithValue(service)
+            : familyServiceProvider.overrideWith(
+                (ref) => throw UnimplementedError('No family service.'),
+              ),
         premiumEntitlementProvider.overrideWith(
           () => FakePremium(isPremium: isPremium),
         ),
