@@ -10,4 +10,7 @@
         domain="sharedpref"
         path="."
         requireFlags="deviceToDeviceTransfer" />
+    <exclude
+        domain="sharedpref"
+        path="FlutterSecureStorage.xml" />
 </full-backup-content>

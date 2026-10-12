@@ -65,6 +65,16 @@
                     android:host="lifethreads.gkcoding.dev"
                     android:pathPrefix="/share" />
             </intent-filter>
+            <!-- Family wall invites; the key travels in the URL fragment. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="lifethreads.gkcoding.dev"
+                    android:path="/family/join" />
+            </intent-filter>
         </activity>
         <!-- flutter_local_notifications: shows scheduled On this day reminders
              and reschedules them after a reboot or app update. -->
