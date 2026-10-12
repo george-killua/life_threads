@@ -41,6 +41,9 @@ dependencies:
   flutter_local_notifications: ^22.3.2
   timezone: ^0.11.2
   flutter_timezone: ^5.1.1
+  gal: ^2.3.3
+  story_video_encoder:
+    path: packages/story_video_encoder
 
 
 dev_dependencies:
@@ -60,3 +63,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/demo_people/
+    - assets/music/

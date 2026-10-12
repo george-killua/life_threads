@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app/app.dart';
 import 'core/logging/app_logger.dart';
 import 'features/backup/data/backup_service.dart';
+import 'features/stories/data/story_files.dart';
 
 void main() {
   runZonedGuarded(() {
@@ -18,6 +19,12 @@ void main() {
     unawaited(
       const BackupService().deleteExportedArchives().catchError(
         (Object error) => AppLogger.event('export_cleanup_failed'),
+      ),
+    );
+    // Story images and videos likewise: shared or saved by now.
+    unawaited(
+      const StoryFiles().deleteExportedStories().catchError(
+        (Object error) => AppLogger.event('story_cleanup_failed'),
       ),
     );
   }, AppLogger.recordCrash);
