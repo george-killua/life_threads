@@ -434,10 +434,15 @@ class _FamilyWallHeader extends StatelessWidget {
             icon: const BackButtonIcon(),
             color: AppColors.muted,
           ),
-          Flexible(
-            child: WallSwitcherButton(currentFamilyId: familyId, label: title),
+          Expanded(
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: WallSwitcherButton(
+                currentFamilyId: familyId,
+                label: title,
+              ),
+            ),
           ),
-          const Spacer(),
           if (status != null && status != FamilySyncStatus.idle)
             _SyncChip(status: status),
           IconButton(
