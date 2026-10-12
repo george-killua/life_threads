@@ -1,16 +1,48 @@
 import 'dart:io';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 import '../domain/family_models.dart';
+import 'api_family_service.dart';
+import 'family_api_client.dart';
+import 'family_local_cache.dart';
+import 'family_platform.dart';
+import 'family_secure_store.dart';
+
+/// The family API base URL; override with
+/// `--dart-define=LIFETHREADS_FAMILY_API_URL=...` (e.g. a local server).
+const familyApiUrl = String.fromEnvironment(
+  'LIFETHREADS_FAMILY_API_URL',
+  defaultValue: 'https://lifethreads.gkcoding.dev/api/lifethreads/family',
+);
 
 /// Everything the family wall screens need: account, families, invites,
 /// end-to-end encrypted memories and photos, and moderation. Talks to the
 /// family API on lifethreads.gkcoding.dev; each family's key stays on the
 /// device (secure storage) and travels only inside invite links.
-final familyServiceProvider = Provider<FamilyService>(
-  (ref) => throw UnimplementedError('FamilyService is not implemented yet.'),
-);
+final familyServiceProvider = Provider<FamilyService>((ref) {
+  final service = ApiFamilyService(
+    api: FamilyApiClient(baseUrl: familyApiUrl, http: IoFamilyHttp()),
+    secrets: FamilySecrets(FlutterFamilySecretStorage()),
+    cache: FamilyLocalCache(
+      getApplicationSupportDirectory().then(
+        (dir) => Directory(p.join(dir.path, 'family_wall')),
+      ),
+    ),
+    identity: PlatformFamilyIdentityProvider(),
+    purchases: const StoreFamilyPurchaseSource(),
+  );
+  // Pull what changed while the app was in the background.
+  final lifecycle = AppLifecycleListener(onResume: service.syncWatched);
+  ref.onDispose(() {
+    lifecycle.dispose();
+    service.dispose();
+  });
+  return service;
+});
 
 abstract interface class FamilyService {
   // Account ------------------------------------------------------------------
