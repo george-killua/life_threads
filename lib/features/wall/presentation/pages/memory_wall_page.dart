@@ -13,6 +13,7 @@ import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/logging/app_logger.dart';
+import '../../../backup/data/backup_reminder.dart';
 import '../../../backup/data/backup_service.dart';
 import '../../../backup/domain/backup_models.dart';
 import '../../../backup/presentation/widgets/archive_feedback.dart';
@@ -105,6 +106,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     final memoryState = ref.watch(memoryRepositoryProvider);
     final entitlement = ref.watch(premiumEntitlementProvider).asData?.value;
     final repository = ref.read(memoryRepositoryProvider.notifier);
+    final backupReminder = ref.watch(backupReminderProvider).asData?.value;
 
     return Scaffold(
       body: WallBackground(
@@ -416,6 +418,24 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                             : 120,
                         child: _DemoWallBanner(
                           onClear: () => _clearDemoWall(context, repository),
+                        ),
+                      )
+                    else if (backupReminder != null &&
+                        backupReminder.shouldRemind(state.events))
+                      Positioned(
+                        left: 20,
+                        right: 20,
+                        top: _controlsExpanded
+                            ? (_mode == _WallViewMode.wall ? 226 : 190)
+                            : 120,
+                        child: _BackupReminderBanner(
+                          unsavedCount: backupReminder.unsavedMemories(
+                            state.events,
+                          ),
+                          onBackUp: () => _exportBackup(context, state),
+                          onLater: () => ref
+                              .read(backupReminderProvider.notifier)
+                              .snooze(),
                         ),
                       ),
                     if (hasWallContent && !_controlsExpanded)
@@ -989,13 +1009,6 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   }
 
   Future<void> _exportBackup(BuildContext context, MemoryState state) async {
-    final isPremium =
-        ref.read(premiumEntitlementProvider).asData?.value.isPremium ?? false;
-    if (!isPremium) {
-      await context.push(RouteNames.upgrade);
-      return;
-    }
-
     final password = await showArchivePasswordDialog(
       context,
       purpose: ArchivePasswordPurpose.export,
@@ -1007,7 +1020,11 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
           .read(backupServiceProvider)
           .exportBackup(state, password: password);
       if (!context.mounted) return;
-      await shareExportedArchive(context, result);
+      await shareExportedArchive(
+        context,
+        result,
+        onSaved: ref.read(backupReminderProvider.notifier).markSaved,
+      );
     } catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -2473,6 +2490,55 @@ class _DemoWallBanner extends StatelessWidget {
             ),
           ),
           TextButton(onPressed: onClear, child: Text(context.l10n.clearDemo)),
+        ],
+      ),
+    );
+  }
+}
+
+class _BackupReminderBanner extends StatelessWidget {
+  const _BackupReminderBanner({
+    required this.unsavedCount,
+    required this.onBackUp,
+    required this.onLater,
+  });
+
+  final int unsavedCount;
+  final VoidCallback onBackUp;
+  final VoidCallback onLater;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+      decoration: BoxDecoration(
+        color: AppColors.wallInk.withValues(alpha: 0.84),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.gold.withValues(alpha: 0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.28),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.save_alt_rounded, color: AppColors.gold, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              context.l10n.backupReminder(unsavedCount),
+              style: const TextStyle(
+                color: AppColors.muted,
+                fontWeight: FontWeight.w800,
+                height: 1.25,
+              ),
+            ),
+          ),
+          TextButton(onPressed: onLater, child: Text(context.l10n.later)),
+          TextButton(onPressed: onBackUp, child: Text(context.l10n.backUp)),
         ],
       ),
     );

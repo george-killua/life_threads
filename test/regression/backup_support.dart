@@ -15,6 +15,9 @@ class FakePathProvider extends PathProviderPlatform
   final String root;
   @override
   Future<String?> getApplicationDocumentsPath() async => root;
+
+  @override
+  Future<String?> getTemporaryPath() async => '$root/tmp';
 }
 
 Directory installFakeDocs() {

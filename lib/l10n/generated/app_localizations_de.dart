@@ -55,7 +55,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacyBody =>
-      'LifeThreads ist lokal zuerst: kein Konto und kein öffentliches Profil. Deine Erinnerungen bleiben auf diesem Gerät, außer du wählst verschlüsseltes Cloud-Sharing, Cloud-Sync oder einen manuellen Backup-Export.';
+      'LifeThreads ist lokal zuerst: kein Konto und kein öffentliches Profil. Deine Erinnerungen bleiben auf diesem Gerät, außer du exportierst ein Backup, teilst eine verschlüsselte Kapsel oder zeigst deine Wand auf einem anderen Bildschirm.';
 
   @override
   String get viewPrivacyPolicy => 'Datenschutzerklärung ansehen';
@@ -80,11 +80,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sendFeedback => 'Feedback senden';
 
   @override
-  String get premiumArchiveTitle => 'Premium-Archiv';
+  String get backupArchiveBody =>
+      'Sichere alles – Erinnerungen, Fotos, Notizen, Fäden und Layout – in einer Datei. Bewahre sie auf deinem Computer oder in deiner eigenen Cloud auf und verschlüssle sie mit einem Passwort.';
 
   @override
-  String get premiumArchiveBody =>
-      'Verschiebe deine Erinnerungen sicher zwischen Geräten. Exportiere ein Archiv mit Erinnerungen, Fotos, Notizen, Seilen, Wandlayout und Metadaten. Schütze es bei Bedarf mit einem Passwort.';
+  String get backupArchiveTitle => 'Backup';
 
   @override
   String get premiumBadge => 'Premium';
@@ -96,9 +96,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get exportArchive => 'Archiv exportieren';
 
   @override
-  String get unlockExport => 'Export freischalten';
-
-  @override
   String get importArchive => 'Archiv importieren';
 
   @override
@@ -106,34 +103,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get moveDevices => 'Geräte wechseln';
-
-  @override
-  String get cloudSyncTitle => 'Cloud-Sync';
-
-  @override
-  String get cloudSyncBody =>
-      'Sichere ein passwortgeschütztes Archiv auf deinem VPS. Der Server speichert nur die verschlüsselte ZIP-Datei und dein privater Sync-Schlüssel steuert die Wiederherstellung.';
-
-  @override
-  String get vpsBadge => 'VPS';
-
-  @override
-  String get backUpNow => 'Jetzt sichern';
-
-  @override
-  String get unlockBackup => 'Backup freischalten';
-
-  @override
-  String get restoreLatest => 'Letztes wiederherstellen';
-
-  @override
-  String get copyKey => 'Schlüssel kopieren';
-
-  @override
-  String get useKey => 'Schlüssel verwenden';
-
-  @override
-  String get deleteCloud => 'Cloud löschen';
 
   @override
   String get themeTitle => 'Design';
@@ -153,7 +122,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get premiumLockedBody =>
-      'Monatsabo: unbegrenzte Erinnerungen, verschlüsselter Archiv-Export/Import, Gerätewechsel, Premium-Designs und erweiterte Layouts.';
+      'Monatsabo: unbegrenzte Erinnerungen, Premium-Designs und erweiterte Layouts.';
 
   @override
   String get activeBadge => 'Aktiv';
@@ -188,51 +157,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String importFailed(Object error) {
     return 'Import fehlgeschlagen: $error';
   }
-
-  @override
-  String get cloudBackupNeedsPassword => 'Cloud-Backup braucht ein Passwort.';
-
-  @override
-  String cloudBackupSaved(int memoryCount) {
-    return 'Cloud-Backup gespeichert: $memoryCount Erinnerungen.';
-  }
-
-  @override
-  String cloudBackupFailed(Object message) {
-    return 'Cloud-Backup fehlgeschlagen: $message';
-  }
-
-  @override
-  String cloudRestoreRejected(Object message) {
-    return 'Cloud-Wiederherstellung abgelehnt: $message';
-  }
-
-  @override
-  String cloudRestoreFailed(Object message) {
-    return 'Cloud-Wiederherstellung fehlgeschlagen: $message';
-  }
-
-  @override
-  String get syncKeyCopied => 'Sync-Schlüssel kopiert.';
-
-  @override
-  String get useSyncKeyTitle => 'Sync-Schlüssel verwenden';
-
-  @override
-  String get syncKeyLabel => 'Sync-Schlüssel';
-
-  @override
-  String get syncKeySaved => 'Sync-Schlüssel gespeichert.';
-
-  @override
-  String get deleteCloudBackupTitle => 'Cloud-Backup löschen?';
-
-  @override
-  String get deleteCloudBackupBody =>
-      'Das löscht das verschlüsselte Archiv von deinem VPS. Lokale Erinnerungen bleiben auf diesem Gerät.';
-
-  @override
-  String get cloudBackupDeleted => 'Cloud-Backup gelöscht.';
 
   @override
   String deleteFailed(Object message) {
@@ -436,7 +360,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tutorialBackupText =>
-      'Nutze Cloud-Sync oder Archivtransfer, bevor du das Telefon wechselst oder einen Produktionsbuild testest.';
+      'Bevor du das Handy wechselst, exportiere in den Einstellungen ein Backup und bewahre die Datei sicher auf.';
 
   @override
   String get scanDisplayQr => 'Display-QR scannen';
@@ -1023,7 +947,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get whyConnectedTitle => 'Warum sind sie verbunden?';
 
   @override
-  String get exportPremiumArchiveTitle => 'Premium-Archiv exportieren';
+  String get exportPremiumArchiveTitle => 'Backup exportieren';
 
   @override
   String get importArchiveTitle => 'Archiv importieren';
@@ -1061,20 +985,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'LifeThreads-Archiv. Importiere es in LifeThreads, um deine Erinnerungswand auf einem anderen Gerät zu öffnen.';
 
   @override
-  String get archiveReadyToSend => 'Archiv bereit zum Senden.';
+  String get archiveReadyToSend =>
+      'Backup bereit. Bewahre es sicher auf – nicht nur auf diesem Handy.';
 
   @override
-  String get archiveSavedLater =>
-      'Archiv gespeichert. Du kannst es später teilen.';
+  String get archiveNotSaved =>
+      'Backup nicht gespeichert. Exportiere es erneut, wenn du so weit bist.';
 
   @override
   String get archiveSharingUnavailable =>
-      'Archiv gespeichert, aber Teilen ist nicht verfügbar.';
-
-  @override
-  String savedToPath(Object label, Object path) {
-    return '$label Gespeichert unter $path';
-  }
+      'Teilen ist auf diesem Gerät nicht verfügbar.';
 
   @override
   String archiveShareFailed(Object error) {
@@ -1498,7 +1418,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get archiveTransferHeroBody =>
-      'Premium Archive erstellt eine portable verschlüsselte ZIP mit Erinnerungen, Fotos, Notizen, Seilen, Wandpositionen und Metadaten. Cloud Sync kann diese gesperrte ZIP auch auf deinem VPS speichern.';
+      'Ein Backup ist eine ZIP mit Erinnerungen, Fotos, Notizen, Fäden, Wandpositionen und Metadaten, auf Wunsch mit Passwort verschlüsselt. Wir behalten keine Kopie: du entscheidest, wo sie landet.';
 
   @override
   String get archiveTransferStep1Title => 'Archiv exportieren';
@@ -1508,11 +1428,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Öffne Einstellungen, wähle Archiv exportieren und füge ein Passwort hinzu, wenn du Schutz willst.';
 
   @override
-  String get archiveTransferStep2Title => 'ZIP verschieben oder syncen';
+  String get archiveTransferStep2Title => 'ZIP verschieben';
 
   @override
   String get archiveTransferStep2Body =>
-      'Übertrage sie mit AirDrop, USB, Drive, E-Mail oder nutze Cloud Sync mit privatem Sync-Schlüssel.';
+      'Übertrage sie mit AirDrop, USB, deinem eigenen Cloud-Speicher oder per E-Mail.';
 
   @override
   String get archiveTransferStep3Title => 'Sicher importieren';
@@ -1547,7 +1467,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String premiumHeroLockedBody(int limit) {
-    return 'Kostenlos enthält $limit Erinnerungen. Premium ergänzt verschlüsselten Export/Import, sicheren Gerätewechsel, Designs und erweiterte Layouts.';
+    return 'Kostenlos enthält $limit Erinnerungen und vollständige Backups. Premium ergänzt unbegrenzte Erinnerungen, Designs und erweiterte Layouts.';
   }
 
   @override
@@ -1567,20 +1487,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Kein 30-Erinnerungen-Limit. Baue die Wand weiter, während das Leben wächst.';
 
   @override
-  String get benefitArchivesTitle => 'Verschlüsselte Archive';
-
-  @override
-  String get benefitArchivesBody =>
-      'Exportiere und importiere eine passwortgeschützte ZIP mit Fotos, Notizen, Seilen, Layout und Metadaten.';
-
-  @override
-  String get benefitTransferTitle => 'Auf ein anderes Gerät wechseln';
-
-  @override
-  String get benefitTransferBody =>
-      'Nimm deine private Erinnerungswand ohne aktive Cloud-Sync auf ein neues Telefon mit.';
-
-  @override
   String get benefitThemesTitle => 'Premium-Wanddesigns';
 
   @override
@@ -1595,16 +1501,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Mehr Möglichkeiten, Fäden, Zeitleisten, Anker und Erinnerungscluster zu arrangieren.';
 
   @override
-  String get cloudSyncPlannedTitle => 'Cloud-Sync ist später geplant';
-
-  @override
-  String get cloudSyncPlannedBody =>
-      'Premium Archive ist jetzt die sichere Transferfunktion: exportieren, ZIP verschieben und auf anderem Gerät importieren.';
-
-  @override
-  String get deviceTransferHow => 'So funktioniert Gerätewechsel';
-
-  @override
   String get lifetimeUnlock => 'Premium-Abo';
 
   @override
@@ -1612,7 +1508,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get onePurchaseBody =>
-      'Monatliches Abo für unbegrenzte Erinnerungen, Backups, Premium-Designs und erweiterte Layouts. Jederzeit in Google Play oder im App Store kündbar.';
+      'Monatliches Abo für unbegrenzte Erinnerungen, Premium-Designs und erweiterte Layouts. Jederzeit in Google Play oder im App Store kündbar.';
 
   @override
   String get premiumActiveButton => 'Premium aktiv';
@@ -1667,7 +1563,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get premiumLocalFirstBody =>
-      'Premium schaltet jetzt local-first Wert frei. Cloud-Sync ist später geplant und in dieser Version nicht aktiv.';
+      'Deine Erinnerungen bleiben auf deinem Gerät, und Backups sind für alle kostenlos.';
 
   @override
   String get noMappedMemoriesBody =>
@@ -1752,4 +1648,26 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get demoConnectionWhyItMatters => 'warum es zählt';
+
+  @override
+  String savedToPath(Object label, Object path) {
+    return '$label Gespeichert unter $path';
+  }
+
+  @override
+  String backupReminder(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Erinnerungen sind noch in keinem Backup.',
+      one: '1 Erinnerung ist noch in keinem Backup.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get later => 'Später';
+
+  @override
+  String get backUp => 'Sichern';
 }

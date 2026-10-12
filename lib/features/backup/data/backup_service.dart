@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:archive/archive.dart';
+import 'package:archive/archive_io.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,155 +24,180 @@ class BackupService {
   static const encryptedManifestName = 'lifethreads-encrypted.json';
   static const encryptedPayloadName = 'lifethreads-payload.bin';
   static const formatVersion = 1;
-  static const encryptedArchiveVersion = 1;
+
+  /// Version 2 encrypts in 1 MiB chunks; version 1 (one AES-GCM pass over
+  /// the whole zip, held in memory) is still read.
+  static const encryptedArchiveVersion = 2;
+  static const _legacyEncryptedArchiveVersion = 1;
+  static const _chunkSize = 1 << 20;
+  static const _macLength = 16;
   static const _kdfIterations = 120000;
 
+  /// Writes one zip with every memory, note, thread and photo. Photos are
+  /// streamed from disk (and through the cipher when a password is set), so
+  /// memory use stays flat however large the library is. The file goes to the
+  /// temporary directory: it is handed to the share sheet and deleted with
+  /// [deleteExportedArchives]; it is never kept inside the app's backed-up
+  /// documents.
   Future<BackupExportResult> exportBackup(
     MemoryState state, {
     String? password,
   }) async {
-    final archive = Archive();
-    final localToArchivePath = <String, String>{};
-
-    for (final photo in state.photos) {
-      await _addPhotoFile(
-        archive: archive,
-        localToArchivePath: localToArchivePath,
-        localPath: photo.localPath,
-        archiveName: _photoArchiveName(photo.id, photo.localPath),
-      );
-    }
-
-    for (final event in state.events) {
-      final coverPath = event.coverPhotoPath;
-      if (coverPath == null || localToArchivePath.containsKey(coverPath)) {
-        continue;
-      }
-      await _addPhotoFile(
-        archive: archive,
-        localToArchivePath: localToArchivePath,
-        localPath: coverPath,
-        archiveName: _photoArchiveName('cover_${event.id}', coverPath),
-      );
-    }
-
-    archive.addFile(
-      ArchiveFile.string(
-        backupManifestName,
-        jsonEncode({
-          'app': 'LifeThreads',
-          'formatVersion': formatVersion,
-          'createdAt': DateTime.now().toIso8601String(),
-          'metadata': {
-            'memoryCount': state.events.length,
-            'photoCount': state.photos.length,
-            'personCount': state.people.length,
-            'wallItemCount': state.wallItems.length,
-            'connectionCount': state.connections.length,
-          },
-          'wallLayout': {
-            'kind': 'freeform',
-            'positionsIncluded': true,
-            'notesIncluded': true,
-            'connectionsIncluded': true,
-          },
-          'events': [
-            for (final event in state.events)
-              {
-                'id': event.id,
-                'title': event.title,
-                'description': event.description,
-                'category': event.category.name,
-                'memoryType': event.memoryType.name,
-                'feeling': event.feeling.name,
-                'occurredAt': event.occurredAt.millisecondsSinceEpoch,
-                'createdAt': event.createdAt.millisecondsSinceEpoch,
-                'coverColorValue': event.coverColor.toARGB32(),
-                'wallX': event.wallPosition.dx,
-                'wallY': event.wallPosition.dy,
-                'rotation': event.rotation,
-                'locationLabel': event.locationLabel,
-                'latitude': event.latitude,
-                'longitude': event.longitude,
-                'coverPhotoPath': event.coverPhotoPath == null
-                    ? null
-                    : localToArchivePath[event.coverPhotoPath],
-              },
-          ],
-          'photos': [
-            for (final photo in state.photos)
-              if (localToArchivePath[photo.localPath] != null)
-                {
-                  'id': photo.id,
-                  'eventId': photo.eventId,
-                  'localPath': localToArchivePath[photo.localPath],
-                  'originalAssetId': photo.originalAssetId,
-                  'capturedAt': photo.capturedAt.millisecondsSinceEpoch,
-                  'latitude': photo.latitude,
-                  'longitude': photo.longitude,
-                  'width': photo.width,
-                  'height': photo.height,
-                },
-          ],
-          'people': [
-            for (final person in state.people)
-              {
-                'id': person.id,
-                'eventId': person.eventId,
-                'name': person.name,
-                'relationship': person.relationship,
-                'phone': person.phone,
-                'email': person.email,
-              },
-          ],
-          'connections': [
-            for (final connection in state.connections)
-              {
-                'id': connection.id,
-                'fromEventId': connection.fromEventId,
-                'toEventId': connection.toEventId,
-                'label': connection.label,
-              },
-          ],
-          'wallItems': [
-            for (final item in state.wallItems)
-              {
-                'id': item.id,
-                'type': item.type.name,
-                'content': item.content,
-                'createdAt': item.createdAt.millisecondsSinceEpoch,
-                'wallX': item.wallPosition.dx,
-                'wallY': item.wallPosition.dy,
-                'colorValue': item.color.toARGB32(),
-              },
-          ],
-        }),
-      ),
-    );
-
-    final backupsDir = await _backupsDirectory();
+    final exportPassword = _exportPassword(password);
+    final isEncrypted = exportPassword.isNotEmpty;
+    await deleteExportedArchives();
+    final workDir = await _exportDirectory();
     final timestamp = DateTime.now()
         .toIso8601String()
         .replaceAll(':', '')
         .replaceAll('.', '-');
-    final plainBytes = ZipEncoder().encodeBytes(archive);
-    final exportPassword = _exportPassword(password);
-    final isEncrypted = exportPassword.isNotEmpty;
-    final exportBytes = isEncrypted
-        ? await _encryptArchive(plainBytes, exportPassword)
-        : plainBytes;
-    final file = File(
-      p.join(
-        backupsDir.path,
-        isEncrypted
-            ? 'lifethreads_encrypted_$timestamp.zip'
-            : 'lifethreads_$timestamp.zip',
-      ),
+    final archivePath = p.join(
+      workDir.path,
+      isEncrypted
+          ? 'lifethreads_encrypted_$timestamp.zip'
+          : 'lifethreads_$timestamp.zip',
     );
-    await file.writeAsBytes(exportBytes, flush: true);
+    final plainPath = isEncrypted
+        ? p.join(workDir.path, 'plain_$timestamp.zip')
+        : archivePath;
+
+    final localToArchivePath = <String, String>{};
+    final zip = ZipFileEncoder()
+      ..create(plainPath, level: ZipFileEncoder.store);
+    try {
+      for (final photo in state.photos) {
+        await _addPhotoFile(
+          zip: zip,
+          localToArchivePath: localToArchivePath,
+          localPath: photo.localPath,
+          archiveName: _photoArchiveName(photo.id, photo.localPath),
+        );
+      }
+
+      for (final event in state.events) {
+        final coverPath = event.coverPhotoPath;
+        if (coverPath == null || localToArchivePath.containsKey(coverPath)) {
+          continue;
+        }
+        await _addPhotoFile(
+          zip: zip,
+          localToArchivePath: localToArchivePath,
+          localPath: coverPath,
+          archiveName: _photoArchiveName('cover_${event.id}', coverPath),
+        );
+      }
+
+      zip.addArchiveFile(
+        ArchiveFile.string(
+          backupManifestName,
+          jsonEncode({
+            'app': 'LifeThreads',
+            'formatVersion': formatVersion,
+            'createdAt': DateTime.now().toIso8601String(),
+            'metadata': {
+              'memoryCount': state.events.length,
+              'photoCount': state.photos.length,
+              'personCount': state.people.length,
+              'wallItemCount': state.wallItems.length,
+              'connectionCount': state.connections.length,
+            },
+            'wallLayout': {
+              'kind': 'freeform',
+              'positionsIncluded': true,
+              'notesIncluded': true,
+              'connectionsIncluded': true,
+            },
+            'events': [
+              for (final event in state.events)
+                {
+                  'id': event.id,
+                  'title': event.title,
+                  'description': event.description,
+                  'category': event.category.name,
+                  'memoryType': event.memoryType.name,
+                  'feeling': event.feeling.name,
+                  'occurredAt': event.occurredAt.millisecondsSinceEpoch,
+                  'createdAt': event.createdAt.millisecondsSinceEpoch,
+                  'coverColorValue': event.coverColor.toARGB32(),
+                  'wallX': event.wallPosition.dx,
+                  'wallY': event.wallPosition.dy,
+                  'rotation': event.rotation,
+                  'locationLabel': event.locationLabel,
+                  'latitude': event.latitude,
+                  'longitude': event.longitude,
+                  'coverPhotoPath': event.coverPhotoPath == null
+                      ? null
+                      : localToArchivePath[event.coverPhotoPath],
+                },
+            ],
+            'photos': [
+              for (final photo in state.photos)
+                if (localToArchivePath[photo.localPath] != null)
+                  {
+                    'id': photo.id,
+                    'eventId': photo.eventId,
+                    'localPath': localToArchivePath[photo.localPath],
+                    'originalAssetId': photo.originalAssetId,
+                    'capturedAt': photo.capturedAt.millisecondsSinceEpoch,
+                    'latitude': photo.latitude,
+                    'longitude': photo.longitude,
+                    'width': photo.width,
+                    'height': photo.height,
+                  },
+            ],
+            'people': [
+              for (final person in state.people)
+                {
+                  'id': person.id,
+                  'eventId': person.eventId,
+                  'name': person.name,
+                  'relationship': person.relationship,
+                  'phone': person.phone,
+                  'email': person.email,
+                },
+            ],
+            'connections': [
+              for (final connection in state.connections)
+                {
+                  'id': connection.id,
+                  'fromEventId': connection.fromEventId,
+                  'toEventId': connection.toEventId,
+                  'label': connection.label,
+                },
+            ],
+            'wallItems': [
+              for (final item in state.wallItems)
+                {
+                  'id': item.id,
+                  'type': item.type.name,
+                  'content': item.content,
+                  'createdAt': item.createdAt.millisecondsSinceEpoch,
+                  'wallX': item.wallPosition.dx,
+                  'wallY': item.wallPosition.dy,
+                  'colorValue': item.color.toARGB32(),
+                },
+            ],
+          }),
+        ),
+      );
+    } finally {
+      await zip.close();
+    }
+
+    if (isEncrypted) {
+      try {
+        await _encryptArchiveFile(
+          plainPath: plainPath,
+          archivePath: archivePath,
+          password: exportPassword,
+        );
+      } finally {
+        await _deleteIfExists(plainPath);
+      }
+    }
 
     return BackupExportResult(
-      path: file.path,
+      path: archivePath,
       memoryCount: state.events.length,
       photoCount: state.photos
           .where((photo) => localToArchivePath.containsKey(photo.localPath))
@@ -180,6 +205,18 @@ class BackupService {
       wallItemCount: state.wallItems.length,
       isEncrypted: isEncrypted,
     );
+  }
+
+  /// Removes exported archives once they have been shared, and the copies
+  /// older versions kept in the app's documents (`backups/`), which were
+  /// included in device backups and never cleaned up.
+  Future<void> deleteExportedArchives() async {
+    for (final directory in [
+      await _exportDirectory(create: false),
+      await _legacyBackupsDirectory(),
+    ]) {
+      if (await directory.exists()) await directory.delete(recursive: true);
+    }
   }
 
   Future<BackupImportData?> pickAndPrepareImport({String? password}) async {
@@ -190,54 +227,94 @@ class BackupService {
     if (result == null || result.files.isEmpty) return null;
 
     final picked = result.files.single;
-    final bytes = await picked.readAsBytes();
-    return prepareImportBytes(bytes, password: password);
+    final path = picked.path;
+    if (path != null) return prepareImportFile(path, password: password);
+    return prepareImportBytes(await picked.readAsBytes(), password: password);
   }
 
   Future<BackupImportData> prepareImportBytes(
     List<int> bytes, {
     String? password,
   }) async {
-    final archive = await _decodeArchive(bytes, password: password);
-    final files = {
-      for (final file in archive)
-        if (file.isFile) file.name: file,
-    };
-    final manifestFile = files[backupManifestName];
-    if (manifestFile == null) {
-      throw const BackupValidationException('Backup manifest is missing.');
+    final workDir = await _importDirectory();
+    final file = File(p.join(workDir.path, 'picked_${const Uuid().v4()}.zip'));
+    await file.writeAsBytes(bytes, flush: true);
+    try {
+      return await prepareImportFile(file.path, password: password);
+    } finally {
+      await _deleteIfExists(file.path);
     }
+  }
 
-    final manifestBytes = manifestFile.readBytes();
-    if (manifestBytes == null) {
-      throw const BackupValidationException('Backup manifest is unreadable.');
+  /// Reads an archive from disk without loading it into memory: an encrypted
+  /// payload is decrypted to a temporary zip, and photos are copied straight
+  /// from the zip into the app's photo folder.
+  Future<BackupImportData> prepareImportFile(
+    String path, {
+    String? password,
+  }) async {
+    final workDir = await _importDirectory();
+    final temporaryFiles = <String>[];
+    final inputs = <InputFileStream>[];
+    try {
+      final archive = await _openArchive(
+        path,
+        password: password,
+        workDir: workDir,
+        temporaryFiles: temporaryFiles,
+        inputs: inputs,
+      );
+      final files = {
+        for (final file in archive)
+          if (file.isFile) file.name: file,
+      };
+      final manifestFile = files[backupManifestName];
+      if (manifestFile == null) {
+        throw const BackupValidationException('Backup manifest is missing.');
+      }
+
+      final manifestBytes = manifestFile.readBytes();
+      if (manifestBytes == null) {
+        throw const BackupValidationException('Backup manifest is unreadable.');
+      }
+
+      final decoded = jsonDecode(utf8.decode(manifestBytes));
+      if (decoded is! Map) {
+        throw const BackupValidationException('Backup manifest is invalid.');
+      }
+      final payload = decoded.map(
+        (key, value) => MapEntry(key.toString(), value),
+      );
+
+      final referencedPhotoPaths = validateBackupPayload(
+        payload,
+        files.keys.toSet(),
+      );
+      final restoredPhotoPaths = await _restorePhotoFiles(
+        referencedPhotoPaths,
+        files,
+      );
+
+      return BackupImportData(
+        events: _mapList(payload['events']),
+        photos: _mapList(payload['photos']),
+        people: _optionalMapList(payload['people']),
+        connections: _mapList(payload['connections']),
+        wallItems: _mapList(payload['wallItems']),
+        photoPaths: restoredPhotoPaths,
+      );
+    } on FormatException {
+      throw const BackupValidationException(
+        'This file is not a valid archive.',
+      );
+    } finally {
+      for (final input in inputs) {
+        await input.close();
+      }
+      for (final file in temporaryFiles) {
+        await _deleteIfExists(file);
+      }
     }
-
-    final decoded = jsonDecode(utf8.decode(manifestBytes));
-    if (decoded is! Map) {
-      throw const BackupValidationException('Backup manifest is invalid.');
-    }
-    final payload = decoded.map(
-      (key, value) => MapEntry(key.toString(), value),
-    );
-
-    final referencedPhotoPaths = validateBackupPayload(
-      payload,
-      files.keys.toSet(),
-    );
-    final restoredPhotoPaths = await _restorePhotoFiles(
-      referencedPhotoPaths,
-      files,
-    );
-
-    return BackupImportData(
-      events: _mapList(payload['events']),
-      photos: _mapList(payload['photos']),
-      people: _optionalMapList(payload['people']),
-      connections: _mapList(payload['connections']),
-      wallItems: _mapList(payload['wallItems']),
-      photoPaths: restoredPhotoPaths,
-    );
   }
 
   static Set<String> validateBackupPayload(
@@ -317,45 +394,133 @@ class BackupService {
     return referencedPhotoPaths;
   }
 
-  Future<List<int>> _encryptArchive(
-    List<int> plainBytes,
-    String password,
-  ) async {
+  /// Encrypts [plainPath] into a zip holding the ciphertext and a manifest
+  /// with the key derivation parameters. The payload is a series of AES-GCM
+  /// chunks (ciphertext + MAC each), so neither side needs the whole archive
+  /// in memory: the cipher package's streaming GCM keeps all input until the
+  /// end.
+  Future<void> _encryptArchiveFile({
+    required String plainPath,
+    required String archivePath,
+    required String password,
+  }) async {
     final random = Random.secure();
     final salt = _secureBytes(random, 32);
-    final nonce = _secureBytes(random, 12);
-    final algorithm = AesGcm.with256bits();
+    final noncePrefix = _secureBytes(random, 8);
     final secretKey = await _deriveKey(password, salt);
-    final box = await algorithm.encrypt(
-      plainBytes,
-      secretKey: secretKey,
-      nonce: nonce,
-    );
+    final payloadPath = '$plainPath.payload';
+    try {
+      final input = await File(plainPath).open();
+      final output = await File(payloadPath).open(mode: FileMode.write);
+      try {
+        final length = await input.length();
+        final chunks = max(1, (length + _chunkSize - 1) ~/ _chunkSize);
+        final cipher = AesGcm.with256bits();
+        for (var index = 0; index < chunks; index++) {
+          final box = await cipher.encrypt(
+            await input.read(_chunkSize),
+            secretKey: secretKey,
+            nonce: _chunkNonce(noncePrefix, index),
+            aad: _chunkAad(isLast: index == chunks - 1),
+          );
+          await output.writeFrom(box.cipherText);
+          await output.writeFrom(box.mac.bytes);
+        }
+      } finally {
+        await input.close();
+        await output.close();
+      }
 
-    final wrapper = Archive()
-      ..addFile(
-        ArchiveFile.string(
-          encryptedManifestName,
-          jsonEncode({
-            'app': 'LifeThreads',
-            'encryptedArchiveVersion': encryptedArchiveVersion,
-            'algorithm': 'AES-256-GCM',
-            'kdf': 'PBKDF2-HMAC-SHA256',
-            'iterations': _kdfIterations,
-            'salt': base64Encode(salt),
-            'nonce': base64Encode(nonce),
-            'mac': base64Encode(box.mac.bytes),
-            'createdAt': DateTime.now().toIso8601String(),
-          }),
-        ),
-      )
-      ..addFile(ArchiveFile.bytes(encryptedPayloadName, box.cipherText));
-
-    return ZipEncoder().encodeBytes(wrapper);
+      final wrapper = ZipFileEncoder()..create(archivePath);
+      try {
+        await _addStoredFile(wrapper, payloadPath, encryptedPayloadName);
+        wrapper.addArchiveFile(
+          ArchiveFile.string(
+            encryptedManifestName,
+            jsonEncode({
+              'app': 'LifeThreads',
+              'encryptedArchiveVersion': encryptedArchiveVersion,
+              'algorithm': 'AES-256-GCM, 1 MiB chunks',
+              'kdf': 'PBKDF2-HMAC-SHA256',
+              'iterations': _kdfIterations,
+              'salt': base64Encode(salt),
+              'noncePrefix': base64Encode(noncePrefix),
+              'chunkSize': _chunkSize,
+              'createdAt': DateTime.now().toIso8601String(),
+            }),
+          ),
+        );
+      } finally {
+        await wrapper.close();
+      }
+    } finally {
+      await _deleteIfExists(payloadPath);
+    }
   }
 
-  Future<Archive> _decodeArchive(List<int> bytes, {String? password}) async {
-    final archive = ZipDecoder().decodeBytes(bytes, verify: true);
+  Future<void> _decryptChunks({
+    required String payloadPath,
+    required String plainPath,
+    required SecretKey secretKey,
+    required List<int> noncePrefix,
+    required int chunkSize,
+  }) async {
+    final input = await File(payloadPath).open();
+    final output = await File(plainPath).open(mode: FileMode.write);
+    try {
+      final length = await input.length();
+      final cipher = AesGcm.with256bits();
+      var position = 0;
+      var index = 0;
+      do {
+        final stored = min(chunkSize + _macLength, length - position);
+        if (stored < _macLength) {
+          throw const BackupValidationException(
+            'Encrypted archive is damaged.',
+          );
+        }
+        final bytes = await input.read(stored);
+        position += stored;
+        final clear = await cipher.decrypt(
+          SecretBox(
+            bytes.sublist(0, stored - _macLength),
+            nonce: _chunkNonce(noncePrefix, index),
+            mac: Mac(bytes.sublist(stored - _macLength)),
+          ),
+          secretKey: secretKey,
+          aad: _chunkAad(isLast: position == length),
+        );
+        await output.writeFrom(clear);
+        index++;
+      } while (position < length);
+    } finally {
+      await input.close();
+      await output.close();
+    }
+  }
+
+  /// 8 random bytes and the chunk number: unique per chunk and archive.
+  List<int> _chunkNonce(List<int> prefix, int index) => [
+    ...prefix,
+    (index >> 24) & 0xff,
+    (index >> 16) & 0xff,
+    (index >> 8) & 0xff,
+    index & 0xff,
+  ];
+
+  /// Marks the final chunk, so a payload cut at a chunk boundary is rejected.
+  List<int> _chunkAad({required bool isLast}) => [isLast ? 1 : 0];
+
+  Future<Archive> _openArchive(
+    String path, {
+    required String? password,
+    required Directory workDir,
+    required List<String> temporaryFiles,
+    required List<InputFileStream> inputs,
+  }) async {
+    final input = InputFileStream(path);
+    inputs.add(input);
+    final archive = ZipDecoder().decodeStream(input, verify: true);
     final files = {
       for (final file in archive)
         if (file.isFile) file.name: file,
@@ -370,8 +535,8 @@ class BackupService {
     }
 
     final manifestBytes = files[encryptedManifestName]?.readBytes();
-    final payloadBytes = files[encryptedPayloadName]?.readBytes();
-    if (manifestBytes == null || payloadBytes == null) {
+    final payloadFile = files[encryptedPayloadName];
+    if (manifestBytes == null || payloadFile == null) {
       throw const BackupValidationException('Encrypted archive is incomplete.');
     }
 
@@ -382,25 +547,64 @@ class BackupService {
       );
     }
     final manifest = decoded.map((key, value) => MapEntry('$key', value));
+    final version = manifest['encryptedArchiveVersion'];
     if (manifest['app'] != 'LifeThreads' ||
-        manifest['encryptedArchiveVersion'] != encryptedArchiveVersion) {
+        (version != encryptedArchiveVersion &&
+            version != _legacyEncryptedArchiveVersion)) {
       throw const BackupValidationException(
         'Unsupported encrypted archive version.',
       );
     }
 
+    final id = const Uuid().v4();
+    final payloadPath = p.join(workDir.path, 'payload_$id.bin');
+    final plainPath = p.join(workDir.path, 'plain_$id.zip');
+    temporaryFiles.addAll([payloadPath, plainPath]);
+    final payloadOutput = OutputFileStream(payloadPath);
+    payloadFile.writeContent(payloadOutput);
+    await payloadOutput.close();
+
     try {
       final salt = base64Decode(_requiredString(manifest, 'salt'));
-      final nonce = base64Decode(_requiredString(manifest, 'nonce'));
-      final mac = Mac(base64Decode(_requiredString(manifest, 'mac')));
       final secretKey = await _deriveKey(importPassword, salt);
-      final plainBytes = await AesGcm.with256bits().decrypt(
-        SecretBox(payloadBytes, nonce: nonce, mac: mac),
-        secretKey: secretKey,
-      );
-      return ZipDecoder().decodeBytes(plainBytes, verify: true);
+      if (version == _legacyEncryptedArchiveVersion) {
+        final clear = await AesGcm.with256bits().decrypt(
+          SecretBox(
+            await File(payloadPath).readAsBytes(),
+            nonce: base64Decode(_requiredString(manifest, 'nonce')),
+            mac: Mac(base64Decode(_requiredString(manifest, 'mac'))),
+          ),
+          secretKey: secretKey,
+        );
+        await File(plainPath).writeAsBytes(clear, flush: true);
+      } else {
+        final chunkSize = manifest['chunkSize'];
+        if (chunkSize is! int || chunkSize <= 0 || chunkSize > 64 << 20) {
+          throw const BackupValidationException(
+            'Encrypted archive manifest is invalid.',
+          );
+        }
+        await _decryptChunks(
+          payloadPath: payloadPath,
+          plainPath: plainPath,
+          secretKey: secretKey,
+          noncePrefix: base64Decode(_requiredString(manifest, 'noncePrefix')),
+          chunkSize: chunkSize,
+        );
+      }
+      await _deleteIfExists(payloadPath);
     } on BackupValidationException {
       rethrow;
+    } catch (_) {
+      throw const BackupValidationException(
+        'Archive password is incorrect or the archive is damaged.',
+      );
+    }
+
+    final plainInput = InputFileStream(plainPath);
+    inputs.add(plainInput);
+    try {
+      return ZipDecoder().decodeStream(plainInput, verify: true);
     } catch (_) {
       throw const BackupValidationException(
         'Archive password is incorrect or the archive is damaged.',
@@ -421,7 +625,7 @@ class BackupService {
   }
 
   Future<void> _addPhotoFile({
-    required Archive archive,
+    required ZipFileEncoder zip,
     required Map<String, String> localToArchivePath,
     required String localPath,
     required String archiveName,
@@ -430,7 +634,28 @@ class BackupService {
     if (!await file.exists()) return;
 
     localToArchivePath[localPath] = archiveName;
-    archive.addFile(ArchiveFile.bytes(archiveName, await file.readAsBytes()));
+    await _addStoredFile(zip, localPath, archiveName);
+  }
+
+  /// Adds a file without compression. Photos and ciphertext do not shrink,
+  /// and the encoder buffers compressed entries in memory but streams stored
+  /// ones from disk.
+  Future<void> _addStoredFile(
+    ZipFileEncoder zip,
+    String path,
+    String archiveName,
+  ) async {
+    final input = InputFileStream(path);
+    try {
+      zip.addArchiveFile(
+        ArchiveFile.stream(archiveName, input)
+          ..compression = CompressionType.none
+          ..lastModTime =
+              (await File(path).lastModified()).millisecondsSinceEpoch ~/ 1000,
+      );
+    } finally {
+      await input.close();
+    }
   }
 
   Future<Map<String, String>> _restorePhotoFiles(
@@ -443,8 +668,7 @@ class BackupService {
 
     for (final archivePath in referencedPhotoPaths) {
       final archiveFile = files[archivePath];
-      final bytes = archiveFile?.readBytes();
-      if (bytes == null) {
+      if (archiveFile == null) {
         throw BackupValidationException('Photo file is missing: $archivePath.');
       }
 
@@ -454,18 +678,41 @@ class BackupService {
       final file = File(
         p.join(photosDir.path, 'restore_${uuid.v4()}$extension'),
       );
-      await file.writeAsBytes(bytes, flush: true);
+      final output = OutputFileStream(file.path);
+      archiveFile.writeContent(output);
+      await output.close();
       restored[archivePath] = file.path;
     }
 
     return restored;
   }
 
-  Future<Directory> _backupsDirectory() async {
+  /// Exports live in the temporary directory, which neither iCloud nor
+  /// Android backups include.
+  Future<Directory> _exportDirectory({bool create = true}) async {
+    final directory = await getTemporaryDirectory();
+    final exportDir = Directory(p.join(directory.path, 'lifethreads_export'));
+    if (create && !await exportDir.exists()) {
+      await exportDir.create(recursive: true);
+    }
+    return exportDir;
+  }
+
+  Future<Directory> _importDirectory() async {
+    final directory = await getTemporaryDirectory();
+    final importDir = Directory(p.join(directory.path, 'lifethreads_import'));
+    if (!await importDir.exists()) await importDir.create(recursive: true);
+    return importDir;
+  }
+
+  Future<Directory> _legacyBackupsDirectory() async {
     final directory = await getApplicationDocumentsDirectory();
-    final backupsDir = Directory(p.join(directory.path, 'backups'));
-    if (!await backupsDir.exists()) await backupsDir.create(recursive: true);
-    return backupsDir;
+    return Directory(p.join(directory.path, 'backups'));
+  }
+
+  Future<void> _deleteIfExists(String path) async {
+    final file = File(path);
+    if (await file.exists()) await file.delete();
   }
 
   Future<Directory> _memoryPhotosDirectory() async {

@@ -55,7 +55,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyBody =>
-      'LifeThreads is local-first: no account and no public profile. Your memories stay on this device unless you choose encrypted cloud share, Cloud Sync, or a manual backup export.';
+      'LifeThreads is local-first: no account and no public profile. Your memories stay on this device unless you export a backup, share an encrypted capsule, or display your wall on another screen.';
 
   @override
   String get viewPrivacyPolicy => 'View privacy policy';
@@ -80,11 +80,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sendFeedback => 'Send Feedback';
 
   @override
-  String get premiumArchiveTitle => 'Premium Archive';
+  String get backupArchiveBody =>
+      'Save everything – memories, photos, notes, threads and layout – in one file. Keep it on your computer or in your own cloud, and add a password to encrypt it.';
 
   @override
-  String get premiumArchiveBody =>
-      'Move your memories between devices safely. Export an archive with memories, photos, notes, ropes, wall layout, and metadata. Add password protection when you need it.';
+  String get backupArchiveTitle => 'Backup';
 
   @override
   String get premiumBadge => 'Premium';
@@ -96,9 +96,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportArchive => 'Export Archive';
 
   @override
-  String get unlockExport => 'Unlock Export';
-
-  @override
   String get importArchive => 'Import Archive';
 
   @override
@@ -106,34 +103,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moveDevices => 'Move Devices';
-
-  @override
-  String get cloudSyncTitle => 'Cloud Sync';
-
-  @override
-  String get cloudSyncBody =>
-      'Back up a password-protected archive to your VPS. The server stores only the locked zip and your private sync key controls restore access.';
-
-  @override
-  String get vpsBadge => 'VPS';
-
-  @override
-  String get backUpNow => 'Back Up Now';
-
-  @override
-  String get unlockBackup => 'Unlock Backup';
-
-  @override
-  String get restoreLatest => 'Restore Latest';
-
-  @override
-  String get copyKey => 'Copy Key';
-
-  @override
-  String get useKey => 'Use Key';
-
-  @override
-  String get deleteCloud => 'Delete Cloud';
 
   @override
   String get themeTitle => 'Theme';
@@ -153,7 +122,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumLockedBody =>
-      'Monthly subscription: unlimited memories, encrypted archive export/import, moving to another device, premium themes, and advanced layouts.';
+      'Monthly subscription: unlimited memories, premium themes and advanced layouts.';
 
   @override
   String get activeBadge => 'Active';
@@ -188,51 +157,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String importFailed(Object error) {
     return 'Import failed: $error';
   }
-
-  @override
-  String get cloudBackupNeedsPassword => 'Cloud backup needs a password.';
-
-  @override
-  String cloudBackupSaved(int memoryCount) {
-    return 'Cloud backup saved: $memoryCount memories.';
-  }
-
-  @override
-  String cloudBackupFailed(Object message) {
-    return 'Cloud backup failed: $message';
-  }
-
-  @override
-  String cloudRestoreRejected(Object message) {
-    return 'Cloud restore rejected: $message';
-  }
-
-  @override
-  String cloudRestoreFailed(Object message) {
-    return 'Cloud restore failed: $message';
-  }
-
-  @override
-  String get syncKeyCopied => 'Sync key copied.';
-
-  @override
-  String get useSyncKeyTitle => 'Use Sync Key';
-
-  @override
-  String get syncKeyLabel => 'Sync key';
-
-  @override
-  String get syncKeySaved => 'Sync key saved.';
-
-  @override
-  String get deleteCloudBackupTitle => 'Delete cloud backup?';
-
-  @override
-  String get deleteCloudBackupBody =>
-      'This deletes the encrypted archive from your VPS. Local memories stay on this device.';
-
-  @override
-  String get cloudBackupDeleted => 'Cloud backup deleted.';
 
   @override
   String deleteFailed(Object message) {
@@ -435,7 +359,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tutorialBackupText =>
-      'Use Cloud Sync or archive transfer before changing phone or testing a production build.';
+      'Before you change phones, export a backup in Settings and keep the file somewhere safe.';
 
   @override
   String get scanDisplayQr => 'Scan display QR';
@@ -1010,7 +934,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get whyConnectedTitle => 'Why are they connected?';
 
   @override
-  String get exportPremiumArchiveTitle => 'Export Premium Archive';
+  String get exportPremiumArchiveTitle => 'Export backup';
 
   @override
   String get importArchiveTitle => 'Import Archive';
@@ -1048,19 +972,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'LifeThreads archive. Import it in LifeThreads to open your memory wall on another device.';
 
   @override
-  String get archiveReadyToSend => 'Archive ready to send.';
+  String get archiveReadyToSend =>
+      'Backup ready. Keep it somewhere safe, off this phone.';
 
   @override
-  String get archiveSavedLater => 'Archive saved. You can share it later.';
+  String get archiveNotSaved =>
+      'Backup not saved. Export again when you are ready.';
 
   @override
   String get archiveSharingUnavailable =>
-      'Archive saved, but sharing is unavailable.';
-
-  @override
-  String savedToPath(Object label, Object path) {
-    return '$label Saved to $path';
-  }
+      'Sharing is not available on this device.';
 
   @override
   String archiveShareFailed(Object error) {
@@ -1481,7 +1402,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get archiveTransferHeroBody =>
-      'Premium Archive creates a portable encrypted zip with your memories, photos, notes, ropes, wall positions, and metadata. Cloud Sync can also store that locked zip on your VPS for restore on another device.';
+      'A backup is one zip with your memories, photos, notes, threads, wall positions and metadata, optionally locked with a password. We keep no copy: you decide where it goes.';
 
   @override
   String get archiveTransferStep1Title => 'Export an archive';
@@ -1491,11 +1412,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Open Settings, choose Export Archive, and add a password if you want password protection.';
 
   @override
-  String get archiveTransferStep2Title => 'Move or sync the zip';
+  String get archiveTransferStep2Title => 'Move the zip';
 
   @override
   String get archiveTransferStep2Body =>
-      'Transfer it with AirDrop, USB, Drive, email, or use Cloud Sync with a private sync key.';
+      'Transfer it with AirDrop, USB, your own cloud drive or email.';
 
   @override
   String get archiveTransferStep3Title => 'Import safely';
@@ -1529,7 +1450,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String premiumHeroLockedBody(int limit) {
-    return 'Free includes $limit memories. Premium adds encrypted archive export/import, safe device transfer, themes, and advanced layouts.';
+    return 'Free includes $limit memories and full backups. Premium adds unlimited memories, themes and advanced layouts.';
   }
 
   @override
@@ -1549,20 +1470,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'No 30-memory ceiling. Keep building the wall as life grows.';
 
   @override
-  String get benefitArchivesTitle => 'Encrypted archives';
-
-  @override
-  String get benefitArchivesBody =>
-      'Export and import a password-protected zip with photos, notes, ropes, layout, and metadata.';
-
-  @override
-  String get benefitTransferTitle => 'Move to another device';
-
-  @override
-  String get benefitTransferBody =>
-      'Carry your private memory wall to a new phone without active cloud sync.';
-
-  @override
   String get benefitThemesTitle => 'Premium wall themes';
 
   @override
@@ -1577,16 +1484,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'More ways to arrange threads, timelines, anchors, and memory clusters.';
 
   @override
-  String get cloudSyncPlannedTitle => 'Cloud sync is planned later';
-
-  @override
-  String get cloudSyncPlannedBody =>
-      'Premium Archive is the safe transfer feature now: export, move the zip, and import on another device.';
-
-  @override
-  String get deviceTransferHow => 'How device transfer works';
-
-  @override
   String get lifetimeUnlock => 'Premium subscription';
 
   @override
@@ -1594,7 +1491,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onePurchaseBody =>
-      'Subscribe monthly for unlimited memories, backups, premium themes, and advanced layouts. Cancel anytime in Google Play or the App Store.';
+      'Subscribe monthly for unlimited memories, premium themes and advanced layouts. Cancel anytime in Google Play or the App Store.';
 
   @override
   String get premiumActiveButton => 'Premium Active';
@@ -1649,7 +1546,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumLocalFirstBody =>
-      'Premium unlocks local-first value now. Cloud sync is planned later and is not active in this version.';
+      'Your memories stay on your device, and backups are free for everyone.';
 
   @override
   String get noMappedMemoriesBody =>
@@ -1734,4 +1631,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get demoConnectionWhyItMatters => 'why it matters';
+
+  @override
+  String savedToPath(Object label, Object path) {
+    return '$label Saved to $path';
+  }
+
+  @override
+  String backupReminder(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count memories are not in a backup yet.',
+      one: '1 memory is not in a backup yet.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get later => 'Later';
+
+  @override
+  String get backUp => 'Back up';
 }

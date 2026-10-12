@@ -37,10 +37,6 @@ class UpgradePage extends ConsumerWidget {
               const SizedBox(height: 16),
               const _BenefitGrid(),
               const SizedBox(height: 16),
-              _MoveDeviceCard(
-                onOpen: () => context.push(RouteNames.archiveTransfer),
-              ),
-              const SizedBox(height: 16),
               _SubscriptionOfferCard(
                 isPremium: isPremium,
                 purchaseState: purchaseState,
@@ -304,16 +300,6 @@ class _BenefitGrid extends StatelessWidget {
               body: context.l10n.benefitUnlimitedBody,
             ),
             _BenefitCard(
-              icon: Icons.archive_rounded,
-              title: context.l10n.benefitArchivesTitle,
-              body: context.l10n.benefitArchivesBody,
-            ),
-            _BenefitCard(
-              icon: Icons.devices_rounded,
-              title: context.l10n.benefitTransferTitle,
-              body: context.l10n.benefitTransferBody,
-            ),
-            _BenefitCard(
               icon: Icons.palette_rounded,
               title: context.l10n.benefitThemesTitle,
               body: context.l10n.benefitThemesBody,
@@ -392,64 +378,6 @@ class _BenefitCard extends StatelessWidget {
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MoveDeviceCard extends StatelessWidget {
-  const _MoveDeviceCard({required this.onOpen});
-
-  final VoidCallback onOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.panel.withValues(alpha: 0.88),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.gold.withValues(alpha: 0.16)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(
-            Icons.lock_clock_rounded,
-            color: AppColors.amber,
-            size: 28,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  context.l10n.cloudSyncPlannedTitle,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  context.l10n.cloudSyncPlannedBody,
-                  style: const TextStyle(
-                    color: AppColors.muted,
-                    height: 1.4,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                OutlinedButton.icon(
-                  onPressed: onOpen,
-                  icon: const Icon(Icons.devices_rounded),
-                  label: Text(context.l10n.deviceTransferHow),
                 ),
               ],
             ),

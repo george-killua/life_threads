@@ -55,7 +55,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get privacyBody =>
-      'LifeThreads يعمل محلياً أولاً: بلا حساب وبلا ملف عام. تبقى ذكرياتك على هذا الجهاز إلا إذا اخترت مشاركة سحابية مشفّرة أو مزامنة سحابية أو تصدير نسخة احتياطية يدوياً.';
+      'LifeThreads يعمل محلياً أولاً: بلا حساب وبلا ملف عام. تبقى ذكرياتك على هذا الجهاز إلا إذا صدّرت نسخة احتياطية أو شاركت كبسولة مشفّرة أو عرضت جدارك على شاشة أخرى.';
 
   @override
   String get viewPrivacyPolicy => 'عرض سياسة الخصوصية';
@@ -80,11 +80,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sendFeedback => 'إرسال الملاحظات';
 
   @override
-  String get premiumArchiveTitle => 'أرشيف Premium';
+  String get backupArchiveBody =>
+      'احفظ كل شيء – الذكريات والصور والملاحظات والخيوط وترتيب الجدار – في ملف واحد. احتفظ به على حاسوبك أو في سحابتك الخاصة، وأضف كلمة مرور لتشفيره.';
 
   @override
-  String get premiumArchiveBody =>
-      'انقل ذكرياتك بين الأجهزة بأمان. صدّر أرشيفاً يحتوي على الذكريات والصور والملاحظات والحبال وتخطيط الجدار والبيانات الوصفية. أضف حماية بكلمة مرور عند الحاجة.';
+  String get backupArchiveTitle => 'النسخ الاحتياطي';
 
   @override
   String get premiumBadge => 'Premium';
@@ -96,9 +96,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get exportArchive => 'تصدير الأرشيف';
 
   @override
-  String get unlockExport => 'فتح التصدير';
-
-  @override
   String get importArchive => 'استيراد أرشيف';
 
   @override
@@ -106,34 +103,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get moveDevices => 'نقل الأجهزة';
-
-  @override
-  String get cloudSyncTitle => 'المزامنة السحابية';
-
-  @override
-  String get cloudSyncBody =>
-      'انسخ أرشيفاً محمياً بكلمة مرور إلى VPS الخاص بك. الخادم يخزن ملف ZIP المقفل فقط، ومفتاح المزامنة الخاص بك يتحكم بالاستعادة.';
-
-  @override
-  String get vpsBadge => 'VPS';
-
-  @override
-  String get backUpNow => 'نسخ احتياطي الآن';
-
-  @override
-  String get unlockBackup => 'فتح النسخ الاحتياطي';
-
-  @override
-  String get restoreLatest => 'استعادة الأحدث';
-
-  @override
-  String get copyKey => 'نسخ المفتاح';
-
-  @override
-  String get useKey => 'استخدام المفتاح';
-
-  @override
-  String get deleteCloud => 'حذف السحابة';
 
   @override
   String get themeTitle => 'المظهر';
@@ -153,7 +122,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get premiumLockedBody =>
-      'اشتراك شهري: ذكريات غير محدودة، تصدير/استيراد أرشيف مشفر، نقل إلى جهاز آخر، مظاهر Premium، وتخطيطات متقدمة.';
+      'اشتراك شهري: ذكريات غير محدودة، ومظاهر Premium، وتخطيطات متقدمة.';
 
   @override
   String get activeBadge => 'مفعّل';
@@ -188,51 +157,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String importFailed(Object error) {
     return 'فشل الاستيراد: $error';
   }
-
-  @override
-  String get cloudBackupNeedsPassword => 'النسخ السحابي يحتاج كلمة مرور.';
-
-  @override
-  String cloudBackupSaved(int memoryCount) {
-    return 'تم حفظ النسخ السحابي: $memoryCount ذكريات.';
-  }
-
-  @override
-  String cloudBackupFailed(Object message) {
-    return 'فشل النسخ السحابي: $message';
-  }
-
-  @override
-  String cloudRestoreRejected(Object message) {
-    return 'تم رفض استعادة السحابة: $message';
-  }
-
-  @override
-  String cloudRestoreFailed(Object message) {
-    return 'فشلت استعادة السحابة: $message';
-  }
-
-  @override
-  String get syncKeyCopied => 'تم نسخ مفتاح المزامنة.';
-
-  @override
-  String get useSyncKeyTitle => 'استخدام مفتاح المزامنة';
-
-  @override
-  String get syncKeyLabel => 'مفتاح المزامنة';
-
-  @override
-  String get syncKeySaved => 'تم حفظ مفتاح المزامنة.';
-
-  @override
-  String get deleteCloudBackupTitle => 'حذف النسخة السحابية؟';
-
-  @override
-  String get deleteCloudBackupBody =>
-      'هذا يحذف الأرشيف المشفر من VPS الخاص بك. الذكريات المحلية تبقى على هذا الجهاز.';
-
-  @override
-  String get cloudBackupDeleted => 'تم حذف النسخة السحابية.';
 
   @override
   String deleteFailed(Object message) {
@@ -434,7 +358,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tutorialBackupText =>
-      'استخدم Cloud Sync أو نقل الأرشيف قبل تغيير الهاتف أو اختبار إصدار إنتاجي.';
+      'قبل تغيير هاتفك، صدّر نسخة احتياطية من الإعدادات واحفظ الملف في مكان آمن.';
 
   @override
   String get scanDisplayQr => 'مسح QR للعرض';
@@ -1006,7 +930,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get whyConnectedTitle => 'لماذا هما مرتبطان؟';
 
   @override
-  String get exportPremiumArchiveTitle => 'تصدير أرشيف Premium';
+  String get exportPremiumArchiveTitle => 'تصدير نسخة احتياطية';
 
   @override
   String get importArchiveTitle => 'استيراد أرشيف';
@@ -1044,19 +968,15 @@ class AppLocalizationsAr extends AppLocalizations {
       'أرشيف LifeThreads. استورده في LifeThreads لفتح جدار ذكرياتك على جهاز آخر.';
 
   @override
-  String get archiveReadyToSend => 'الأرشيف جاهز للإرسال.';
+  String get archiveReadyToSend =>
+      'النسخة الاحتياطية جاهزة. احفظها في مكان آمن خارج هذا الهاتف.';
 
   @override
-  String get archiveSavedLater => 'تم حفظ الأرشيف. يمكنك مشاركته لاحقاً.';
+  String get archiveNotSaved =>
+      'لم تُحفظ النسخة الاحتياطية. صدّرها مرة أخرى عندما تكون جاهزاً.';
 
   @override
-  String get archiveSharingUnavailable =>
-      'تم حفظ الأرشيف، لكن المشاركة غير متاحة.';
-
-  @override
-  String savedToPath(Object label, Object path) {
-    return '$label تم الحفظ في $path';
-  }
+  String get archiveSharingUnavailable => 'المشاركة غير متاحة على هذا الجهاز.';
 
   @override
   String archiveShareFailed(Object error) {
@@ -1472,7 +1392,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get archiveTransferHeroBody =>
-      'ينشئ Premium Archive ملف ZIP مشفراً قابلاً للنقل يحتوي على ذكرياتك وصورك وملاحظاتك وحبالك ومواقع الجدار والبيانات الوصفية. يمكن لـ Cloud Sync أيضاً حفظ هذا الملف المقفل على VPS للاستعادة على جهاز آخر.';
+      'النسخة الاحتياطية ملف ZIP واحد يضم ذكرياتك وصورك وملاحظاتك وخيوطك ومواقع الجدار والبيانات الوصفية، ويمكن قفله بكلمة مرور. لا نحتفظ بأي نسخة: أنت تقرر أين يذهب.';
 
   @override
   String get archiveTransferStep1Title => 'تصدير أرشيف';
@@ -1482,11 +1402,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'افتح الإعدادات، اختر تصدير الأرشيف، وأضف كلمة مرور إذا أردت الحماية.';
 
   @override
-  String get archiveTransferStep2Title => 'نقل أو مزامنة ZIP';
+  String get archiveTransferStep2Title => 'انقل ملف ZIP';
 
   @override
   String get archiveTransferStep2Body =>
-      'انقله عبر AirDrop أو USB أو Drive أو البريد، أو استخدم Cloud Sync بمفتاح مزامنة خاص.';
+      'انقله عبر AirDrop أو USB أو سحابتك الخاصة أو البريد.';
 
   @override
   String get archiveTransferStep3Title => 'استيراد بأمان';
@@ -1519,7 +1439,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String premiumHeroLockedBody(int limit) {
-    return 'المجاني يتضمن $limit ذكريات. يضيف Premium تصدير/استيراد مشفر، نقل آمن بين الأجهزة، مظاهر وتخطيطات متقدمة.';
+    return 'المجاني يتضمن $limit ذكرى ونسخاً احتياطية كاملة. يضيف Premium ذكريات غير محدودة ومظاهر وتخطيطات متقدمة.';
   }
 
   @override
@@ -1539,20 +1459,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا يوجد سقف 30 ذكرى. استمر في بناء الجدار مع نمو الحياة.';
 
   @override
-  String get benefitArchivesTitle => 'أرشيفات مشفرة';
-
-  @override
-  String get benefitArchivesBody =>
-      'صدّر واستورد ملف ZIP محمياً بكلمة مرور مع الصور والملاحظات والحبال والتخطيط والبيانات الوصفية.';
-
-  @override
-  String get benefitTransferTitle => 'النقل إلى جهاز آخر';
-
-  @override
-  String get benefitTransferBody =>
-      'انقل جدار ذكرياتك الخاص إلى هاتف جديد دون مزامنة سحابية نشطة.';
-
-  @override
   String get benefitThemesTitle => 'مظاهر جدار Premium';
 
   @override
@@ -1567,16 +1473,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'طرق أكثر لترتيب الخيوط والجداول الزمنية والمراسي ومجموعات الذكريات.';
 
   @override
-  String get cloudSyncPlannedTitle => 'المزامنة السحابية مخططة لاحقاً';
-
-  @override
-  String get cloudSyncPlannedBody =>
-      'Premium Archive هو ميزة النقل الآمنة الآن: صدّر، انقل ZIP، واستورد على جهاز آخر.';
-
-  @override
-  String get deviceTransferHow => 'كيف يعمل نقل الجهاز';
-
-  @override
   String get lifetimeUnlock => 'اشتراك Premium';
 
   @override
@@ -1584,7 +1480,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get onePurchaseBody =>
-      'اشترك شهرياً لذكريات غير محدودة ونسخ احتياطية ومظاهر وتخطيطات متقدمة. يمكنك الإلغاء في أي وقت من Google Play أو App Store.';
+      'اشترك شهرياً لذكريات غير محدودة ومظاهر Premium وتخطيطات متقدمة. يمكنك الإلغاء في أي وقت من Google Play أو App Store.';
 
   @override
   String get premiumActiveButton => 'Premium مفعّل';
@@ -1639,7 +1535,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get premiumLocalFirstBody =>
-      'يفتح Premium قيمة محلية الآن. المزامنة السحابية مخططة لاحقاً وليست نشطة في هذه النسخة.';
+      'تبقى ذكرياتك على جهازك، والنسخ الاحتياطي مجاني للجميع.';
 
   @override
   String get noMappedMemoriesBody =>
@@ -1724,4 +1620,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get demoConnectionWhyItMatters => 'لماذا يهم';
+
+  @override
+  String savedToPath(Object label, Object path) {
+    return '$label تم الحفظ في $path';
+  }
+
+  @override
+  String backupReminder(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ذكرى ليست في نسخة احتياطية بعد.',
+      few: '$count ذكريات ليست في نسخة احتياطية بعد.',
+      two: 'ذكريان ليستا في نسخة احتياطية بعد.',
+      one: 'ذكرى واحدة ليست في نسخة احتياطية بعد.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get later => 'لاحقاً';
+
+  @override
+  String get backUp => 'احفظ نسخة';
 }

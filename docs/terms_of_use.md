@@ -1,6 +1,6 @@
 # LifeThreads Terms of Use
 
-Effective date: August 4, 2026
+Effective date: October 12, 2026
 
 LifeThreads is developed by GK Coding.
 
@@ -21,18 +21,19 @@ LifeThreads is a private, local-first memory wall app. You can create memories w
 Optional features may include:
 
 - encrypted shared memory capsules
-- encrypted Cloud Sync backups
+- temporary wall displays on another screen
+- backup files you export and keep yourself
 - premium unlocks through the platform store (Google Play or Apple App Store)
 
 ## 3. No Account Required
 
-LifeThreads does not require an account or public profile. You are responsible for the content you add on your device and for any content you choose to export, share, or sync.
+LifeThreads does not require an account or public profile. You are responsible for the content you add on your device and for any content you choose to export or share.
 
 ## 4. Your Content
 
 You retain ownership of the memories, photos, stories, and other content you add.
 
-You grant GK Coding only the limited rights needed to operate optional features you choose, such as storing an encrypted capsule or encrypted Cloud Sync archive you upload.
+You grant GK Coding only the limited rights needed to operate optional features you choose, such as storing an encrypted capsule or a temporary wall display snapshot you send.
 
 Do not upload or share content you do not have the right to use.
 
@@ -53,9 +54,9 @@ Optional premium features may be sold as a monthly subscription through Google P
 
 ## 7. Local Data and Device Security
 
-Most LifeThreads data stays on your device. Device loss, OS resets, uninstalls, or clearing app data can erase local memories unless you exported a backup or used Cloud Sync.
+LifeThreads data stays on your device; GK Coding keeps no copy. Device loss, OS resets, uninstalls, or clearing app data can erase local memories unless you exported a backup and kept it somewhere else.
 
-You are responsible for protecting your device, backup files, capsule passwords, and Cloud Sync keys.
+You are responsible for protecting your device, backup files, and backup and capsule passwords.
 
 ## 8. Disclaimer
 
