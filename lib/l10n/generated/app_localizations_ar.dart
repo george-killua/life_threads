@@ -1941,4 +1941,146 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get yearThreadPause => 'إيقاف مؤقت';
+
+  @override
+  String get createStory => 'إنشاء قصة';
+
+  @override
+  String get storyPickTitle => 'اختر الذكريات';
+
+  @override
+  String storyPickBody(int max) {
+    return 'اختر حتى $max ذكريات لقصة واحدة.';
+  }
+
+  @override
+  String storyPickCount(int count, int max) {
+    return 'تم اختيار $count من $max';
+  }
+
+  @override
+  String storyPickLimit(int max) {
+    return 'تتسع القصة لـ $max ذكريات كحد أقصى.';
+  }
+
+  @override
+  String get storyPickContinue => 'متابعة';
+
+  @override
+  String get storyNoMemories => 'احفظ ذكرى أولاً، ثم حوّلها إلى قصة.';
+
+  @override
+  String get storyEditorTitle => 'قصتك';
+
+  @override
+  String get storyChangeMemories => 'تغيير الذكريات';
+
+  @override
+  String get storyTemplateSingle => 'ذكرى واحدة';
+
+  @override
+  String get storyTemplateThread => 'خيط';
+
+  @override
+  String get storyTemplateCollage => 'مجموعة صور';
+
+  @override
+  String get storyTemplateQuote => 'اقتباس';
+
+  @override
+  String get storySwipeHint => 'اسحب لشكل آخر';
+
+  @override
+  String get storyCaptionLabel => 'التعليق';
+
+  @override
+  String get storyCaptionHint => 'سطر واحد من قصتك';
+
+  @override
+  String get storyVideoSwitch => 'فيديو';
+
+  @override
+  String get storyVideoBody =>
+      'فيلم قصير للقصص والريلز: تنساب الصور، ويُرسم الخيط، وتظهر العناوين تدريجيًا.';
+
+  @override
+  String get storyMusicTitle => 'الموسيقى';
+
+  @override
+  String get storyMusicNone => 'بدون موسيقى';
+
+  @override
+  String get storyMusicNoneHint =>
+      'يمكنك إضافة أغنية من مكتبة موسيقى Instagram عند نشر القصة.';
+
+  @override
+  String get storyMoodWarm => 'دافئة';
+
+  @override
+  String get storyMoodJoyful => 'مبهجة';
+
+  @override
+  String get storyMoodCalm => 'هادئة';
+
+  @override
+  String get storyMoodNostalgic => 'حنين';
+
+  @override
+  String get storyMoodEpic => 'ملحمية';
+
+  @override
+  String get storyShare => 'مشاركة';
+
+  @override
+  String get storySaveToPhotos => 'حفظ في الصور';
+
+  @override
+  String get storySaved => 'تم الحفظ في صورك.';
+
+  @override
+  String get storySaveDenied =>
+      'لا يُسمح لـ LifeThreads بالإضافة إلى صورك. اسمح بذلك من إعدادات هاتفك.';
+
+  @override
+  String storyExportFailed(String error) {
+    return 'تعذّر إنشاء القصة: $error';
+  }
+
+  @override
+  String get storyRenderingTitle => 'جارٍ إنشاء فيلمك';
+
+  @override
+  String get storyRenderingBody =>
+      'أبقِ LifeThreads مفتوحًا، سيستغرق ذلك بضع ثوانٍ.';
+
+  @override
+  String storyRenderingPercent(int percent) {
+    return '$percent٪';
+  }
+
+  @override
+  String get storyPreviewFree =>
+      'المعاينة مجانية. مشاركة القصص وحفظها جزء من Premium.';
+
+  @override
+  String get benefitStoriesTitle => 'إنشاء قصة';
+
+  @override
+  String get benefitStoriesBody =>
+      'حوّل ذكرياتك إلى صور قصص وأفلام قصيرة مع موسيقى لـ Instagram وWhatsApp وغيرها.';
+
+  @override
+  String get musicCreditsTitle => 'حقوق الموسيقى';
+
+  @override
+  String get musicCreditsBody => 'الأغاني المرفقة لفيديوهات القصص مع تراخيصها.';
+
+  @override
+  String musicCreditLine(String title, String artist, String license) {
+    return '$title · $artist · $license';
+  }
+
+  @override
+  String get benefitYearThreadBody =>
+      'عامك في فيلم قصير: اللحظات التي صنعت فرقاً، مربوطة بالترتيب، مع موسيقى.';
 }

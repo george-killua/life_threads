@@ -10,6 +10,9 @@
          asked for only when the user turns them on; reboot restores the schedule. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Save to Photos for story images and videos (gal): only Android 10 and
+         older need a permission; newer versions add to MediaStore without one. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
 
     <application
         android:label="@string/app_name"

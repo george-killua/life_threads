@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../memories/data/memory_repository.dart';
+import '../../stories/data/music_catalog.dart';
 import '../../stories/domain/music_track.dart';
 import '../domain/year_thread.dart';
 
@@ -10,11 +11,10 @@ final yearThreadClockProvider = Provider<DateTime Function()>(
   (ref) => DateTime.now,
 );
 
-/// The songs offered for the film, besides "No music". Empty until the
-/// music library ships; return its tracks here and the screen shows a
-/// picker.
+/// The songs offered for the film, besides "No music": the bundled story
+/// music library.
 final yearThreadMusicTracksProvider = Provider<List<MusicTrack>>(
-  (ref) => const [],
+  (ref) => bundledMusicTracks,
 );
 
 /// The year whose wall card was dismissed with "Not now".

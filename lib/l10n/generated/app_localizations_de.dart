@@ -1938,4 +1938,147 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get yearThreadPause => 'Pause';
+
+  @override
+  String get createStory => 'Story erstellen';
+
+  @override
+  String get storyPickTitle => 'Erinnerungen auswählen';
+
+  @override
+  String storyPickBody(int max) {
+    return 'Wähle bis zu $max Erinnerungen für eine Story.';
+  }
+
+  @override
+  String storyPickCount(int count, int max) {
+    return '$count von $max ausgewählt';
+  }
+
+  @override
+  String storyPickLimit(int max) {
+    return 'Eine Story fasst bis zu $max Erinnerungen.';
+  }
+
+  @override
+  String get storyPickContinue => 'Weiter';
+
+  @override
+  String get storyNoMemories =>
+      'Speichere zuerst eine Erinnerung und mach dann eine Story daraus.';
+
+  @override
+  String get storyEditorTitle => 'Deine Story';
+
+  @override
+  String get storyChangeMemories => 'Erinnerungen ändern';
+
+  @override
+  String get storyTemplateSingle => 'Eine Erinnerung';
+
+  @override
+  String get storyTemplateThread => 'Faden';
+
+  @override
+  String get storyTemplateCollage => 'Collage';
+
+  @override
+  String get storyTemplateQuote => 'Zitat';
+
+  @override
+  String get storySwipeHint => 'Wische für einen anderen Look';
+
+  @override
+  String get storyCaptionLabel => 'Bildtext';
+
+  @override
+  String get storyCaptionHint => 'Eine Zeile deiner Geschichte';
+
+  @override
+  String get storyVideoSwitch => 'Video';
+
+  @override
+  String get storyVideoBody =>
+      'Ein kurzer Film für Stories und Reels: Fotos gleiten, der Faden zieht sich, Titel blenden ein.';
+
+  @override
+  String get storyMusicTitle => 'Musik';
+
+  @override
+  String get storyMusicNone => 'Keine Musik';
+
+  @override
+  String get storyMusicNoneHint =>
+      'Beim Posten kannst du in Instagram einen Song aus der Instagram-Musikbibliothek hinzufügen.';
+
+  @override
+  String get storyMoodWarm => 'Warm';
+
+  @override
+  String get storyMoodJoyful => 'Fröhlich';
+
+  @override
+  String get storyMoodCalm => 'Ruhig';
+
+  @override
+  String get storyMoodNostalgic => 'Nostalgisch';
+
+  @override
+  String get storyMoodEpic => 'Episch';
+
+  @override
+  String get storyShare => 'Teilen';
+
+  @override
+  String get storySaveToPhotos => 'In Fotos sichern';
+
+  @override
+  String get storySaved => 'In deinen Fotos gesichert.';
+
+  @override
+  String get storySaveDenied =>
+      'LifeThreads darf nichts zu deinen Fotos hinzufügen. Erlaube es in den Einstellungen deines Telefons.';
+
+  @override
+  String storyExportFailed(String error) {
+    return 'Die Story konnte nicht erstellt werden: $error';
+  }
+
+  @override
+  String get storyRenderingTitle => 'Dein Film entsteht';
+
+  @override
+  String get storyRenderingBody =>
+      'Lass LifeThreads geöffnet, das dauert ein paar Sekunden.';
+
+  @override
+  String storyRenderingPercent(int percent) {
+    return '$percent %';
+  }
+
+  @override
+  String get storyPreviewFree =>
+      'Die Vorschau ist kostenlos. Stories teilen und sichern ist Teil von Premium.';
+
+  @override
+  String get benefitStoriesTitle => 'Story erstellen';
+
+  @override
+  String get benefitStoriesBody =>
+      'Mach aus Erinnerungen Story-Bilder und kurze Filme mit Musik für Instagram, WhatsApp und mehr.';
+
+  @override
+  String get musicCreditsTitle => 'Musik-Credits';
+
+  @override
+  String get musicCreditsBody => 'Songs für Story-Videos, mit ihren Lizenzen.';
+
+  @override
+  String musicCreditLine(String title, String artist, String license) {
+    return '$title · $artist · $license';
+  }
+
+  @override
+  String get benefitYearThreadBody =>
+      'Dein Jahr als Kurzfilm: die Momente, die gezählt haben, der Reihe nach verbunden, mit Musik.';
 }

@@ -35,7 +35,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>LifeThreads uses the camera to scan a wall display QR code and take memory photos when you choose.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>LifeThreads can save exported memories if you choose to export later.</string>
+	<string>LifeThreads saves the story images and videos you create to your photo library when you choose Save to Photos.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>LifeThreads uses selected photos to build your private memory wall.</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>

@@ -25,6 +25,7 @@ import '../../../onboarding/onboarding_preferences.dart';
 import '../../../premium/data/premium_entitlement_controller.dart';
 import '../../../premium/domain/premium_feature.dart';
 import '../../../premium/presentation/premium_gate.dart';
+import '../../../stories/data/music_catalog.dart';
 import '../../../wall/data/wall_theme_controller.dart';
 import '../../../wall/domain/wall_theme.dart';
 import '../../../wall/presentation/widgets/wall_background.dart';
@@ -263,6 +264,28 @@ class SettingsPage extends ConsumerWidget {
                       ),
                     );
                   },
+                ),
+              ),
+              _SettingsCard(
+                icon: Icons.music_note_rounded,
+                title: l10n.musicCreditsTitle,
+                body: l10n.musicCreditsBody,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final track in bundledMusicTracks)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Text(
+                          l10n.musicCreditLine(
+                            track.title,
+                            track.artist,
+                            track.license,
+                          ),
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                  ],
                 ),
               ),
               _SettingsCard(

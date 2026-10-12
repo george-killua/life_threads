@@ -862,5 +862,97 @@
   "yearThreadSaved": "Saved to your photos.",
   "yearThreadExportFailed": "That did not work. Please try again.",
   "yearThreadPlay": "Play",
-  "yearThreadPause": "Pause"
+  "yearThreadPause": "Pause",
+  "createStory": "Create story",
+  "storyPickTitle": "Choose memories",
+  "storyPickBody": "Pick up to {max} memories for one story.",
+  "@storyPickBody": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "storyPickCount": "{count} of {max} chosen",
+  "@storyPickCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "storyPickLimit": "A story holds up to {max} memories.",
+  "@storyPickLimit": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "storyPickContinue": "Continue",
+  "storyNoMemories": "Save a memory first, then turn it into a story.",
+  "storyEditorTitle": "Your story",
+  "storyChangeMemories": "Change memories",
+  "storyTemplateSingle": "Single memory",
+  "storyTemplateThread": "Thread",
+  "storyTemplateCollage": "Collage",
+  "storyTemplateQuote": "Quote",
+  "storySwipeHint": "Swipe for another look",
+  "storyCaptionLabel": "Caption",
+  "storyCaptionHint": "One line of your story",
+  "storyVideoSwitch": "Video",
+  "storyVideoBody": "A short film for Stories and Reels: photos drift, the thread draws itself, titles fade in.",
+  "storyMusicTitle": "Music",
+  "storyMusicNone": "No music",
+  "storyMusicNoneHint": "You can add a song from Instagram's music library when you post the story.",
+  "storyMoodWarm": "Warm",
+  "storyMoodJoyful": "Joyful",
+  "storyMoodCalm": "Calm",
+  "storyMoodNostalgic": "Nostalgic",
+  "storyMoodEpic": "Epic",
+  "storyShare": "Share",
+  "storySaveToPhotos": "Save to Photos",
+  "storySaved": "Saved to your photos.",
+  "storySaveDenied": "LifeThreads may not add to your photos. Allow it in your phone's settings.",
+  "storyExportFailed": "The story could not be created: {error}",
+  "@storyExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "storyRenderingTitle": "Making your film",
+  "storyRenderingBody": "Keep LifeThreads open, this takes a few seconds.",
+  "storyRenderingPercent": "{percent} %",
+  "@storyRenderingPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "storyPreviewFree": "The preview is free. Sharing and saving stories are part of Premium.",
+  "benefitStoriesTitle": "Create Story",
+  "benefitStoriesBody": "Turn memories into story images and short films with music for Instagram, WhatsApp and more.",
+  "musicCreditsTitle": "Music credits",
+  "musicCreditsBody": "Songs bundled for story videos, with their licences.",
+  "musicCreditLine": "{title} · {artist} · {license}",
+  "@musicCreditLine": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artist": {
+        "type": "String"
+      },
+      "license": {
+        "type": "String"
+      }
+    }
+  },
+  "benefitYearThreadBody": "Your year as a short film: the moments that mattered, threaded in order, with music."
 }

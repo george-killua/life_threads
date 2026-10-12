@@ -347,6 +347,16 @@ class _BenefitGrid extends StatelessWidget {
               title: context.l10n.onThisDayTitle,
               body: context.l10n.benefitOnThisDayBody,
             ),
+            _BenefitCard(
+              icon: Icons.auto_stories_rounded,
+              title: context.l10n.benefitStoriesTitle,
+              body: context.l10n.benefitStoriesBody,
+            ),
+            _BenefitCard(
+              icon: Icons.movie_filter_rounded,
+              title: context.l10n.yearThreadTitle,
+              body: context.l10n.benefitYearThreadBody,
+            ),
           ],
         );
       },

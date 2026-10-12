@@ -5,11 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/music_track.dart';
 import '../domain/story_film.dart';
+import 'local_story_exporter.dart';
 
 /// Turns stories into files and hands them to the user. Shared by Create
 /// Story and Thread of the Year.
 final storyExporterProvider = Provider<StoryExporter>(
-  (ref) => throw UnimplementedError('StoryExporter is not implemented yet.'),
+  (ref) => LocalStoryExporter(),
 );
 
 abstract interface class StoryExporter {
@@ -31,7 +32,8 @@ abstract interface class StoryExporter {
   /// Returns true when the user picked a target.
   Future<bool> share(BuildContext context, File file, {String? text});
 
-  /// Saves an exported image or video to the photo library.
+  /// Saves an exported image or video to the photo library. Throws
+  /// [StoryGalleryAccessDenied] when the user does not allow it.
   Future<void> saveToGallery(File file);
 }
 
@@ -45,4 +47,9 @@ class StoryExportCancel {
 
 class StoryExportCancelled implements Exception {
   const StoryExportCancelled();
+}
+
+/// The user did not allow LifeThreads to add to the photo library.
+class StoryGalleryAccessDenied implements Exception {
+  const StoryGalleryAccessDenied();
 }

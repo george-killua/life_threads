@@ -1920,4 +1920,148 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yearThreadPause => 'Pause';
+
+  @override
+  String get createStory => 'Create story';
+
+  @override
+  String get storyPickTitle => 'Choose memories';
+
+  @override
+  String storyPickBody(int max) {
+    return 'Pick up to $max memories for one story.';
+  }
+
+  @override
+  String storyPickCount(int count, int max) {
+    return '$count of $max chosen';
+  }
+
+  @override
+  String storyPickLimit(int max) {
+    return 'A story holds up to $max memories.';
+  }
+
+  @override
+  String get storyPickContinue => 'Continue';
+
+  @override
+  String get storyNoMemories =>
+      'Save a memory first, then turn it into a story.';
+
+  @override
+  String get storyEditorTitle => 'Your story';
+
+  @override
+  String get storyChangeMemories => 'Change memories';
+
+  @override
+  String get storyTemplateSingle => 'Single memory';
+
+  @override
+  String get storyTemplateThread => 'Thread';
+
+  @override
+  String get storyTemplateCollage => 'Collage';
+
+  @override
+  String get storyTemplateQuote => 'Quote';
+
+  @override
+  String get storySwipeHint => 'Swipe for another look';
+
+  @override
+  String get storyCaptionLabel => 'Caption';
+
+  @override
+  String get storyCaptionHint => 'One line of your story';
+
+  @override
+  String get storyVideoSwitch => 'Video';
+
+  @override
+  String get storyVideoBody =>
+      'A short film for Stories and Reels: photos drift, the thread draws itself, titles fade in.';
+
+  @override
+  String get storyMusicTitle => 'Music';
+
+  @override
+  String get storyMusicNone => 'No music';
+
+  @override
+  String get storyMusicNoneHint =>
+      'You can add a song from Instagram\'s music library when you post the story.';
+
+  @override
+  String get storyMoodWarm => 'Warm';
+
+  @override
+  String get storyMoodJoyful => 'Joyful';
+
+  @override
+  String get storyMoodCalm => 'Calm';
+
+  @override
+  String get storyMoodNostalgic => 'Nostalgic';
+
+  @override
+  String get storyMoodEpic => 'Epic';
+
+  @override
+  String get storyShare => 'Share';
+
+  @override
+  String get storySaveToPhotos => 'Save to Photos';
+
+  @override
+  String get storySaved => 'Saved to your photos.';
+
+  @override
+  String get storySaveDenied =>
+      'LifeThreads may not add to your photos. Allow it in your phone\'s settings.';
+
+  @override
+  String storyExportFailed(String error) {
+    return 'The story could not be created: $error';
+  }
+
+  @override
+  String get storyRenderingTitle => 'Making your film';
+
+  @override
+  String get storyRenderingBody =>
+      'Keep LifeThreads open, this takes a few seconds.';
+
+  @override
+  String storyRenderingPercent(int percent) {
+    return '$percent %';
+  }
+
+  @override
+  String get storyPreviewFree =>
+      'The preview is free. Sharing and saving stories are part of Premium.';
+
+  @override
+  String get benefitStoriesTitle => 'Create Story';
+
+  @override
+  String get benefitStoriesBody =>
+      'Turn memories into story images and short films with music for Instagram, WhatsApp and more.';
+
+  @override
+  String get musicCreditsTitle => 'Music credits';
+
+  @override
+  String get musicCreditsBody =>
+      'Songs bundled for story videos, with their licences.';
+
+  @override
+  String musicCreditLine(String title, String artist, String license) {
+    return '$title · $artist · $license';
+  }
+
+  @override
+  String get benefitYearThreadBody =>
+      'Your year as a short film: the moments that mattered, threaded in order, with music.';
 }

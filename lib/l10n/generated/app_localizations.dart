@@ -3404,6 +3404,252 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pause'**
   String get yearThreadPause;
+
+  /// No description provided for @createStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Create story'**
+  String get createStory;
+
+  /// No description provided for @storyPickTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose memories'**
+  String get storyPickTitle;
+
+  /// No description provided for @storyPickBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick up to {max} memories for one story.'**
+  String storyPickBody(int max);
+
+  /// No description provided for @storyPickCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of {max} chosen'**
+  String storyPickCount(int count, int max);
+
+  /// No description provided for @storyPickLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'A story holds up to {max} memories.'**
+  String storyPickLimit(int max);
+
+  /// No description provided for @storyPickContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get storyPickContinue;
+
+  /// No description provided for @storyNoMemories.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a memory first, then turn it into a story.'**
+  String get storyNoMemories;
+
+  /// No description provided for @storyEditorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your story'**
+  String get storyEditorTitle;
+
+  /// No description provided for @storyChangeMemories.
+  ///
+  /// In en, this message translates to:
+  /// **'Change memories'**
+  String get storyChangeMemories;
+
+  /// No description provided for @storyTemplateSingle.
+  ///
+  /// In en, this message translates to:
+  /// **'Single memory'**
+  String get storyTemplateSingle;
+
+  /// No description provided for @storyTemplateThread.
+  ///
+  /// In en, this message translates to:
+  /// **'Thread'**
+  String get storyTemplateThread;
+
+  /// No description provided for @storyTemplateCollage.
+  ///
+  /// In en, this message translates to:
+  /// **'Collage'**
+  String get storyTemplateCollage;
+
+  /// No description provided for @storyTemplateQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'Quote'**
+  String get storyTemplateQuote;
+
+  /// No description provided for @storySwipeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe for another look'**
+  String get storySwipeHint;
+
+  /// No description provided for @storyCaptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Caption'**
+  String get storyCaptionLabel;
+
+  /// No description provided for @storyCaptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'One line of your story'**
+  String get storyCaptionHint;
+
+  /// No description provided for @storyVideoSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get storyVideoSwitch;
+
+  /// No description provided for @storyVideoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A short film for Stories and Reels: photos drift, the thread draws itself, titles fade in.'**
+  String get storyVideoBody;
+
+  /// No description provided for @storyMusicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Music'**
+  String get storyMusicTitle;
+
+  /// No description provided for @storyMusicNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No music'**
+  String get storyMusicNone;
+
+  /// No description provided for @storyMusicNoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You can add a song from Instagram\'s music library when you post the story.'**
+  String get storyMusicNoneHint;
+
+  /// No description provided for @storyMoodWarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Warm'**
+  String get storyMoodWarm;
+
+  /// No description provided for @storyMoodJoyful.
+  ///
+  /// In en, this message translates to:
+  /// **'Joyful'**
+  String get storyMoodJoyful;
+
+  /// No description provided for @storyMoodCalm.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm'**
+  String get storyMoodCalm;
+
+  /// No description provided for @storyMoodNostalgic.
+  ///
+  /// In en, this message translates to:
+  /// **'Nostalgic'**
+  String get storyMoodNostalgic;
+
+  /// No description provided for @storyMoodEpic.
+  ///
+  /// In en, this message translates to:
+  /// **'Epic'**
+  String get storyMoodEpic;
+
+  /// No description provided for @storyShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get storyShare;
+
+  /// No description provided for @storySaveToPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to Photos'**
+  String get storySaveToPhotos;
+
+  /// No description provided for @storySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to your photos.'**
+  String get storySaved;
+
+  /// No description provided for @storySaveDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'LifeThreads may not add to your photos. Allow it in your phone\'s settings.'**
+  String get storySaveDenied;
+
+  /// No description provided for @storyExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The story could not be created: {error}'**
+  String storyExportFailed(String error);
+
+  /// No description provided for @storyRenderingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Making your film'**
+  String get storyRenderingTitle;
+
+  /// No description provided for @storyRenderingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep LifeThreads open, this takes a few seconds.'**
+  String get storyRenderingBody;
+
+  /// No description provided for @storyRenderingPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent} %'**
+  String storyRenderingPercent(int percent);
+
+  /// No description provided for @storyPreviewFree.
+  ///
+  /// In en, this message translates to:
+  /// **'The preview is free. Sharing and saving stories are part of Premium.'**
+  String get storyPreviewFree;
+
+  /// No description provided for @benefitStoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Story'**
+  String get benefitStoriesTitle;
+
+  /// No description provided for @benefitStoriesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn memories into story images and short films with music for Instagram, WhatsApp and more.'**
+  String get benefitStoriesBody;
+
+  /// No description provided for @musicCreditsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Music credits'**
+  String get musicCreditsTitle;
+
+  /// No description provided for @musicCreditsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Songs bundled for story videos, with their licences.'**
+  String get musicCreditsBody;
+
+  /// No description provided for @musicCreditLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} · {artist} · {license}'**
+  String musicCreditLine(String title, String artist, String license);
+
+  /// No description provided for @benefitYearThreadBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your year as a short film: the moments that mattered, threaded in order, with music.'**
+  String get benefitYearThreadBody;
 }
 
 class _AppLocalizationsDelegate
