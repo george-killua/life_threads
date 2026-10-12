@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:photo_manager/photo_manager.dart' hide LatLng;
 
@@ -1430,7 +1431,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                 SwitchListTile(
                   value: selectedIds.contains(event.id),
                   title: Text(event.title),
-                  subtitle: Text(_eventLocationSubtitle(event)),
+                  subtitle: Text(_eventLocationSubtitle(context, event)),
                   onChanged: (value) {
                     setModalState(() {
                       if (value) {
@@ -1577,7 +1578,7 @@ class _TimelineMemoryTile extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _formatTimelineDate(event.occurredAt),
+                              _formatTimelineDate(context, event.occurredAt),
                               style: const TextStyle(
                                 color: AppColors.gold,
                                 fontWeight: FontWeight.w900,
@@ -3070,27 +3071,14 @@ enum _TextAction { edit, delete }
 
 enum _NailAction { connect, delete }
 
-String _formatTimelineDate(DateTime date) {
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  return '${months[date.month - 1]} ${date.day}, ${date.year}';
+String _formatTimelineDate(BuildContext context, DateTime date) {
+  final locale = Localizations.localeOf(context).toLanguageTag();
+  return DateFormat.yMMMd(locale).format(date);
 }
 
-String _eventLocationSubtitle(MemoryEvent event) {
+String _eventLocationSubtitle(BuildContext context, MemoryEvent event) {
   if (event.hasGeoPoint) return event.locationDisplayLabel;
-  return _formatTimelineDate(event.occurredAt);
+  return _formatTimelineDate(context, event.occurredAt);
 }
 
 String _eventTimelineSubtitle(BuildContext context, MemoryEvent event) {
