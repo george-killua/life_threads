@@ -123,39 +123,45 @@ Avoid:
 - claims like "best", "#1", "award-winning", or "most secure"
 - fake reviews or testimonials
 - repeated keyword lists
-- saying account-based multi-user sync or social sharing exists before it is implemented
+- saying family walls (accounts, shared walls) exist in a listing before the release that ships them
 
 ## Data Safety Draft
 
-Recommended Play Console answers for the current release:
+Recommended Play Console answers once family walls ship (the release that contains the family wall screens and the `family-data` service). For a release without family walls, use the answers marked "without family walls".
 
-- Data collected by developer: Yes, only when the user chooses cloud memory sharing or a wall display. Backup files never go to GK Coding servers; Android cloud backup is turned off for the app (device-to-device transfer only).
-- Data shared by developer: No advertising or analytics sharing.
+- Data collected by developer: Yes. Without family walls: only when the user chooses cloud memory sharing or a wall display. With family walls: also the account identifier, family wall membership, end-to-end encrypted family wall content, reports, and the owner's subscription status. Backup files never go to GK Coding servers; Android cloud backup is turned off for the app (device-to-device transfer only).
+- Data shared by developer: No. No advertising or analytics sharing. (Sign-in is processed by Google as a service provider; reports stay with GK Coding.)
 - Data encrypted in transit: Yes.
+- Account creation: Yes, optional, only for family walls (Google Sign-In on Android). My wall needs no account.
+- Account deletion: Yes, in the app (Family walls > Account > Delete account) and on the web at `https://gkcoding.dev/lifethreads/delete-data`. Deleting the account deletes the owned family walls with all their memories and photos, the user's memories on other walls, and the account.
 - Data deletion request: Yes. Use `https://gkcoding.dev/lifethreads/delete-data`.
-- Photos and videos: User-selected photos are used for app functionality. They stay local unless the user exports a backup (saved where the user chooses), shares an encrypted memory capsule, or displays the wall on another screen. Declare Photos as collected (not shared), user-initiated, for app functionality: the wall display snapshot is stored unencrypted on GK Coding servers until the session expires (at most 60 minutes).
-- Location: Optional photo metadata location is used for app functionality. Place names may be included in a shared capsule or a wall display snapshot if the user chooses those features. Map tile requests are sent to OpenFreeMap when map features are opened and may reveal the viewed map area to the tile provider.
-- App activity / analytics: Not collected in the current version.
-- Account info: Not collected.
-- Financial info: Not collected by the app. Google Play Billing purchases are processed by Google Play.
+- Personal info > User IDs: Collected (with family walls). The account identifier from Google Sign-In. Required for family walls, optional for the app. Purpose: app functionality, account management, fraud prevention/security (moderation). Not shared.
+- Personal info > Name: Collected (with family walls), optional. The display name a member chooses for a family wall. It is end-to-end encrypted: Play's guidance lets end-to-end encrypted data that the developer cannot read be left out; if in doubt, declare it as collected for app functionality.
+- Photos and videos: User-selected photos are used for app functionality. They stay local unless the user exports a backup (saved where the user chooses), shares an encrypted memory capsule, displays the wall on another screen, or adds them to a family wall. Declare Photos as collected (not shared), user-initiated, for app functionality: the wall display snapshot is stored unencrypted on GK Coding servers until the session expires (at most 60 minutes). Family wall photos are resized and end-to-end encrypted on the device; GK Coding stores only ciphertext and never receives the key, and photos are never included in reports.
+- Messages / Other user-generated content: Collected (with family walls). Memory titles and stories on a family wall are end-to-end encrypted (GK Coding cannot read them), except when a user reports a memory: the report sends that memory's decrypted title and story, the chosen reason, and an optional note to GK Coding for review. Declare "Other user-generated content" as collected, user-initiated, for app functionality and fraud prevention/security (moderation).
+- Location: Optional photo metadata location is used for app functionality. Place names may be included in a shared capsule, a wall display snapshot, or (end-to-end encrypted) a family wall memory if the user chooses those features. Map tile requests are sent to OpenFreeMap when map features are opened and may reveal the viewed map area to the tile provider.
+- App activity / analytics: Not collected in the current version. Family wall servers do see metadata needed to run the feature (membership, roles, sizes and timestamps of encrypted items, which account added each item, blocks); it is used only for app functionality and moderation, not analytics.
+- App info and performance: Not collected.
+- Account info: Without family walls: not collected. With family walls: User IDs as above.
+- Financial info > Purchase history: With family walls, the owner's store purchase token is sent to GK Coding to verify the Premium subscription with Google Play; GK Coding stores whether it is active and when it ends. Declare as collected for app functionality. Payments themselves are processed by Google Play.
 
 ## User Content Sharing / Safety Answers
 
-Use these answers for the Play Console user-content sharing questions:
+Use these answers for the Play Console user-content sharing questions once family walls ship (without family walls, keep block/report at `No`):
 
 - Does the app natively allow users to interact or exchange content with other users through voice, text, images, or audio? `Yes`
 - Is shared, user-generated content the primary source of content in the app? `No`
 - Does the app permit public sharing of nudity? `No`
 - Does the app permit public sharing of real-world graphic violence outside newsworthy context? `No`
-- Does the app include the ability to block users or user-generated content? `No`
-- Does the app include the ability to report users or user-generated content? `No`
+- Does the app include the ability to block users or user-generated content? `Yes` (block a family wall member; owners remove members and memories)
+- Does the app include the ability to report users or user-generated content? `Yes` (report a memory or member; reviewed within 24 hours)
 - Does the app include chat moderation? `No`
 - Can interactions in the app be limited to invited friends only? `Yes`
 
 Explanation:
 
 ```text
-LifeThreads has no public feed, no profiles, no comments, no chat, and no user discovery. Users can optionally share one encrypted memory capsule through a private link. The recipient needs the link and the password. Links expire automatically and can be revoked/deleted after creation.
+LifeThreads has no public feed, no profiles, no comments, no chat, and no user discovery. Users can optionally share one encrypted memory capsule through a private link; the recipient needs the link and the password, and links expire automatically and can be revoked. Family walls are private, end-to-end encrypted walls shared only with people invited by a one-time link that expires within 7 days. Before posting, users accept terms with zero tolerance for objectionable content. Any member can report a memory or a member and block a member; GK Coding reviews reports within 24 hours and removes content and accounts that break the rules. The owner of a family wall can remove members and their memories.
 ```
 
 ## Screenshot Plan
