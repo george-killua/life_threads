@@ -11,8 +11,8 @@ None of these is a secret; they are public identifiers.
 | Define | Default | What |
 | --- | --- | --- |
 | `LIFETHREADS_FAMILY_API_URL` | `https://lifethreads.gkcoding.dev/api/lifethreads/family` | Family API base URL (point it at a local server for testing). |
-| `LIFETHREADS_GOOGLE_SERVER_CLIENT_ID` | empty | Google OAuth client id of type **Web application**. Required on Android: Credential Manager issues the ID token for this audience. |
-| `LIFETHREADS_GOOGLE_IOS_CLIENT_ID` | empty | Google OAuth client id of type **iOS**. Alternatively put it in `Info.plist` as `GIDClientID`. |
+| `LIFETHREADS_GOOGLE_SERVER_CLIENT_ID` | `554492641328-8srq0kkllt1h9qtk26uotm0p02r79n3n` | Google OAuth client id of type **Web application**. Required on Android: Credential Manager issues the ID token for this audience. |
+| `LIFETHREADS_GOOGLE_IOS_CLIENT_ID` | `554492641328-cmg57621uhqkl4khrbkvsmvcghqe9v4b` | Google OAuth client id of type **iOS**. |
 
 Example:
 
@@ -24,10 +24,26 @@ flutter build appbundle \
 
 ## Google sign-in (Android and iOS)
 
+Set up on 2026-10-12 in the Google Cloud project `life-threads-504503` (consent screen
+"LifeThreads"). All ids end in `.apps.googleusercontent.com`:
+
+| Client | Type | Id |
+| --- | --- | --- |
+| LifeThreads server | Web application | `554492641328-8srq0kkllt1h9qtk26uotm0p02r79n3n` |
+| LifeThreads iOS | iOS (`dev.gkcoding.lifeThreads`, team `443GVR9G8M`) | `554492641328-cmg57621uhqkl4khrbkvsmvcghqe9v4b` |
+| LifeThreads Android (upload key) | Android, SHA-1 `C5:81:4D:…:D3:16` | `554492641328-sp8u9gaosd5jg2rkjhugm7t4flslufkk` |
+| LifeThreads Android (debug) | Android, SHA-1 `34:99:49:…:00:77` | `554492641328-2q65hd05b70htcdpvjr6d8vh6285v7u4` |
+| LifeThreads Android (Play App Signing) | Android, SHA-1 `7D:13:FD:…:40:08` | `554492641328-eb2r7q02nu5h5e4aj4p4iu6ff5l33sfl` |
+
+The consent screen is published (In production). Its home page, privacy policy and terms are
+`https://gkcoding.dev/lifethreads/`, `…/privacy/` and `…/terms/`; authorised domain `gkcoding.dev`.
+The steps below describe how these were created.
+
+
 In Google Cloud Console (APIs & Services, same project for all three):
 
 1. **OAuth consent screen**: app name LifeThreads, support email, privacy policy
-   `https://lifethreads.gkcoding.dev/privacy`. Scopes: only `openid` (the app requests no
+   `https://gkcoding.dev/lifethreads/privacy/`. Scopes: only `openid` (the app requests no
    others; no verification needed).
 2. **Credentials, OAuth client id, Web application**: name "LifeThreads server". No redirect
    URIs. This id is `LIFETHREADS_GOOGLE_SERVER_CLIENT_ID`.
@@ -52,8 +68,7 @@ In Google Cloud Console (APIs & Services, same project for all three):
    </array>
    ```
 
-   (It is not in the repo yet because the id does not exist yet; Google sign-in on iOS fails
-   without it.)
+   (Done in the repo for the client above.)
 6. Server: `LIFETHREADS_GOOGLE_SIGNIN_CLIENT_IDS=<web id>,<ios id>` (add the Android ids too
    if in doubt; the server only compares the token audience against this list).
 

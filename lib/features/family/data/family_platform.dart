@@ -33,11 +33,13 @@ abstract interface class FamilyIdentityProvider {
 
 /// Sign in with Apple (iOS, native) and Google (Android and iOS).
 ///
-/// Client ids come from `--dart-define`s; none is a secret:
+/// Client ids default to the LifeThreads clients in the `life-threads-504503`
+/// Google Cloud project and can be overridden with `--dart-define`s; none is
+/// a secret:
 /// - `LIFETHREADS_GOOGLE_SERVER_CLIENT_ID`: the Google "Web application"
 ///   OAuth client id. Android needs it (it becomes the ID token audience).
-/// - `LIFETHREADS_GOOGLE_IOS_CLIENT_ID`: the Google "iOS" OAuth client id
-///   (or `GIDClientID` in Info.plist).
+/// - `LIFETHREADS_GOOGLE_IOS_CLIENT_ID`: the Google "iOS" OAuth client id.
+///   Its reversed form is the URL scheme in `ios/Runner/Info.plist`.
 ///
 /// Apple sign-in needs no client id on iOS (the bundle id is the audience).
 /// Android has no native Apple sign-in; the web flow would need a server
@@ -46,9 +48,13 @@ class PlatformFamilyIdentityProvider implements FamilyIdentityProvider {
   PlatformFamilyIdentityProvider({
     this.googleServerClientId = const String.fromEnvironment(
       'LIFETHREADS_GOOGLE_SERVER_CLIENT_ID',
+      defaultValue:
+          '554492641328-8srq0kkllt1h9qtk26uotm0p02r79n3n.apps.googleusercontent.com',
     ),
     this.googleIosClientId = const String.fromEnvironment(
       'LIFETHREADS_GOOGLE_IOS_CLIENT_ID',
+      defaultValue:
+          '554492641328-cmg57621uhqkl4khrbkvsmvcghqe9v4b.apps.googleusercontent.com',
     ),
   });
 
