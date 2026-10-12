@@ -2083,4 +2083,715 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get benefitYearThreadBody =>
       'عامك في فيلم قصير: اللحظات التي صنعت فرقاً، مربوطة بالترتيب، مع موسيقى.';
+
+  @override
+  String get myWall => 'جداري';
+
+  @override
+  String get myWallSubtitle => 'خاص، على هذا الجهاز';
+
+  @override
+  String get switchWall => 'تبديل الجدار';
+
+  @override
+  String get familyWallsTitle => 'جدران العائلة';
+
+  @override
+  String get familyWallsSettingsBody =>
+      'شارك جداراً واحداً مع العائلة أو الأصدقاء: يضيف الجميع ذكريات مشفّرة من طرف إلى طرف. يبقى جداري خاصاً على هذا الجهاز.';
+
+  @override
+  String get familyWallsOpen => 'فتح جدران العائلة';
+
+  @override
+  String get familyWallsManage => 'إدارة جدران العائلة';
+
+  @override
+  String get familyWallsHeadline => 'جدار واحد للعائلة كلها';
+
+  @override
+  String get familyWallsIntro =>
+      'جدار العائلة مشترك مع الأشخاص الذين تدعوهم. تُشفَّر الذكريات والصور على هاتفك قبل رفعها، ولا يستطيع فتحها إلا الأعضاء. جداري لا يُشارَك ويبقى على هذا الجهاز.';
+
+  @override
+  String get familyUnavailableTitle => 'غير متاح بعد';
+
+  @override
+  String get familyUnavailable =>
+      'جدران العائلة غير متاحة بعد في هذا الإصدار من LifeThreads.';
+
+  @override
+  String get familySignInNeededTitle => 'سجّل الدخول لاستخدام جدران العائلة';
+
+  @override
+  String get familySignInNeededBody =>
+      'يحتاج الجدار المشترك إلى حساب لتعرف العائلة من أضاف ماذا. يعمل جداري من دون حساب.';
+
+  @override
+  String get familySignIn => 'تسجيل الدخول';
+
+  @override
+  String get familyLoadFailed => 'تعذّر التحميل';
+
+  @override
+  String get familyRetry => 'إعادة المحاولة';
+
+  @override
+  String get familyNoWallsYet =>
+      'لا توجد جدران عائلة بعد. أنشئ جداراً أو انضم برابط دعوة.';
+
+  @override
+  String get familyStartTitle => 'إنشاء أو انضمام';
+
+  @override
+  String get familyStartBody =>
+      'إنشاء جدار عائلة يتطلب Premium. الانضمام مجاني: اشتراك Premium لمالك الجدار يغطي العائلة.';
+
+  @override
+  String get familyCreateAction => 'إنشاء جدار عائلة';
+
+  @override
+  String get familyCreateTitle => 'جدار عائلة جديد';
+
+  @override
+  String get familyNameLabel => 'اسم الجدار';
+
+  @override
+  String get familyNameHint => 'مثلاً: عائلة الأحمد';
+
+  @override
+  String get familyMyNameLabel => 'اسمك على هذا الجدار';
+
+  @override
+  String get familyMyNameHelper =>
+      'يراه الأعضاء على ذكرياتك، وهو مشفّر مثل كل ما على الجدار.';
+
+  @override
+  String get familyMyNameSaved => 'تم حفظ الاسم.';
+
+  @override
+  String get familySetMyName => 'اسمي';
+
+  @override
+  String get familyCheckingSubscription => 'جارٍ التحقق من Premium…';
+
+  @override
+  String get familyCreating => 'جارٍ إنشاء الجدار…';
+
+  @override
+  String get familyJoinWithLink => 'الانضمام برابط';
+
+  @override
+  String get familyInviteLinkLabel => 'رابط الدعوة';
+
+  @override
+  String get familyJoinTitle => 'الانضمام إلى جدار العائلة هذا؟';
+
+  @override
+  String get familyJoinBody =>
+      'سيرى الأعضاء اسمك والذكريات التي تضيفها، وسترى ذكرياتهم. يمكنك المغادرة في أي وقت.';
+
+  @override
+  String get familyJoinAction => 'انضمام';
+
+  @override
+  String get familyJoining => 'جارٍ الانضمام…';
+
+  @override
+  String familyJoined(String family) {
+    return 'انضممت إلى $family.';
+  }
+
+  @override
+  String get familyRoleOwner => 'المالك';
+
+  @override
+  String get familyRoleMember => 'عضو';
+
+  @override
+  String familyMemberCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count عضو',
+      many: '$count عضواً',
+      few: '$count أعضاء',
+      two: 'عضوان',
+      one: 'عضو واحد',
+      zero: 'لا أعضاء',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familySettingsTitle => 'إعدادات الجدار';
+
+  @override
+  String familyStorageUsed(String used, String total) {
+    return 'المستخدم $used من $total';
+  }
+
+  @override
+  String get familyRename => 'إعادة التسمية';
+
+  @override
+  String get familyInviteTitle => 'دعوة';
+
+  @override
+  String get familyInviteBody =>
+      'أرسل رابطاً إلى شخص تثق به. كل رابط يعمل مرة واحدة وتنتهي صلاحيته بعد 7 أيام.';
+
+  @override
+  String get familyInviteAction => 'إنشاء رابط دعوة';
+
+  @override
+  String get familyCreatingInvite => 'جارٍ إنشاء الدعوة…';
+
+  @override
+  String get familyInviteReady => 'رابط الدعوة جاهز';
+
+  @override
+  String get familyInviteValidity =>
+      'يعمل مرة واحدة وتنتهي صلاحيته بعد 7 أيام على الأكثر.';
+
+  @override
+  String get familyInviteKeyWarning =>
+      'يحمل الرابط مفتاح الجدار: من يفتحه يمكنه الانضمام وقراءة الجدار. أرسله فقط إلى الشخص الذي تدعوه.';
+
+  @override
+  String get familyInviteShare => 'مشاركة الرابط';
+
+  @override
+  String get familyInviteCopy => 'نسخ الرابط';
+
+  @override
+  String get familyInviteCopied => 'تم نسخ الرابط.';
+
+  @override
+  String get familyInviteShareFailed =>
+      'المشاركة غير متاحة. انسخ الرابط بدلاً من ذلك.';
+
+  @override
+  String familyInviteSubject(String family) {
+    return 'انضم إلى $family على LifeThreads';
+  }
+
+  @override
+  String familyInviteText(String family, String link) {
+    return 'انضم إلى جدار عائلتنا «$family» على LifeThreads: $link';
+  }
+
+  @override
+  String get familyMembersTitle => 'الأعضاء';
+
+  @override
+  String get familyMemberActions => 'إجراءات العضو';
+
+  @override
+  String get familyYou => 'أنت';
+
+  @override
+  String familyYouNamed(String name) {
+    return '$name (أنت)';
+  }
+
+  @override
+  String get familyAMember => 'أحد الأعضاء';
+
+  @override
+  String get familyFormerMember => 'عضو سابق';
+
+  @override
+  String get familyBlocked => 'محظور';
+
+  @override
+  String get familyBlock => 'حظر';
+
+  @override
+  String get familyUnblock => 'إلغاء الحظر';
+
+  @override
+  String familyBlockAuthor(String name) {
+    return 'حظر $name';
+  }
+
+  @override
+  String familyBlockQuestion(String name) {
+    return 'حظر $name؟';
+  }
+
+  @override
+  String get familyBlockBody =>
+      'لن ترى ذكرياته على أي جدار عائلة بعد الآن، ولن يتم إعلامه. يمكنك إلغاء الحظر من قائمة الأعضاء.';
+
+  @override
+  String get familyReport => 'إبلاغ';
+
+  @override
+  String get familyRemoveMember => 'إزالة من الجدار';
+
+  @override
+  String familyRemoveQuestion(String name) {
+    return 'إزالة $name؟';
+  }
+
+  @override
+  String get familyRemoveBody =>
+      'سيفقد الوصول إلى هذا الجدار. ادعُه مجدداً لإعادته.';
+
+  @override
+  String get familyRemoveDeleteContent => 'احذف أيضاً الذكريات التي أضافها';
+
+  @override
+  String get familyDeleteTitle => 'حذف جدار العائلة';
+
+  @override
+  String get familyDeleteBody =>
+      'بصفتك المالك لا يمكنك مغادرة الجدار، ويمكنك حذفه للجميع.';
+
+  @override
+  String get familyDeleteAction => 'حذف الجدار';
+
+  @override
+  String familyDeleteQuestion(String family) {
+    return 'حذف $family؟';
+  }
+
+  @override
+  String get familyDeleteConfirmBody =>
+      'تُحذف كل الذكريات والصور على هذا الجدار من خوادمنا لكل الأعضاء. لا يمكن التراجع عن ذلك. لا تتأثر الذكريات على جداري.';
+
+  @override
+  String get familyDeleting => 'جارٍ الحذف…';
+
+  @override
+  String get familyLeaveTitle => 'مغادرة جدار العائلة';
+
+  @override
+  String get familyLeaveBody =>
+      'لن ترى هذا الجدار بعد الآن. يمكنك الإبقاء على الذكريات التي أضفتها أو حذفها.';
+
+  @override
+  String get familyLeaveAction => 'مغادرة';
+
+  @override
+  String familyLeaveQuestion(String family) {
+    return 'مغادرة $family؟';
+  }
+
+  @override
+  String get familyLeaveConfirmBody => 'للعودة ستحتاج إلى دعوة جديدة.';
+
+  @override
+  String get familyLeaveDeleteMine => 'احذف أيضاً الذكريات التي أضفتها';
+
+  @override
+  String get familyLeaving => 'جارٍ المغادرة…';
+
+  @override
+  String get familySignInTitle => 'تسجيل الدخول';
+
+  @override
+  String get familySignInHeadline => 'حساب لجدران العائلة';
+
+  @override
+  String get familySignInWhy =>
+      'جدار العائلة مشترك، لذلك يحتاج إلى حساب: يرى الأعضاء من أضاف كل ذكرى، ولا يفتح الجدار إلا الأعضاء.';
+
+  @override
+  String get familySignInMyWallStays =>
+      'جداري لا يحتاج إلى حساب. يبقى خاصاً على هذا الجهاز ولا يُرفع أبداً.';
+
+  @override
+  String get familySignInEncrypted =>
+      'ذكريات العائلة وصورها مشفّرة من طرف إلى طرف. تخزّنها GK Coding لكنها لا تستطيع قراءتها.';
+
+  @override
+  String get familySignInWhatWeGet =>
+      'لا نستخدم من Apple أو Google إلا معرّف الحساب، وليس جهات اتصالك أو صورك.';
+
+  @override
+  String get familySignInApple => 'تسجيل الدخول باستخدام Apple';
+
+  @override
+  String get familySignInGoogle => 'تسجيل الدخول باستخدام Google';
+
+  @override
+  String get familySignInFinePrint =>
+      'بتسجيل الدخول توافق على شروط الاستخدام وسياسة الخصوصية. يمكنك حذف حسابك من التطبيق في أي وقت.';
+
+  @override
+  String get familyAccountTitle => 'الحساب';
+
+  @override
+  String get familySignedOutTitle => 'لم تسجّل الدخول';
+
+  @override
+  String get familySignedOutBody =>
+      'سجّل الدخول لرؤية جدران عائلتك. يعمل جداري من دون حساب.';
+
+  @override
+  String get familySignedInTitle => 'تم تسجيل الدخول';
+
+  @override
+  String get familySignedInBody => 'يُستخدم حسابك لجدران العائلة فقط.';
+
+  @override
+  String familyAccountId(String id) {
+    return 'معرّف الحساب: $id';
+  }
+
+  @override
+  String get familySignOut => 'تسجيل الخروج';
+
+  @override
+  String get familySignOutQuestion => 'تسجيل الخروج؟';
+
+  @override
+  String get familySignOutBody =>
+      'تُزال جدران العائلة ومفاتيحها من هذا الجهاز حتى تسجّل الدخول مجدداً. لا يُحذف شيء من الخادم. لا يتأثر جداري.';
+
+  @override
+  String get familySigningOut => 'جارٍ تسجيل الخروج…';
+
+  @override
+  String get familyDeleteAccountTitle => 'حذف الحساب';
+
+  @override
+  String get familyDeleteAccountBody =>
+      'يحذف حسابك وبيانات جدران العائلة الخاصة بك من خوادمنا. يبقى جداري على هذا الجهاز.';
+
+  @override
+  String get familyDeleteAccount => 'حذف الحساب';
+
+  @override
+  String get familyDeleteAccountQuestion => 'حذف حسابك؟';
+
+  @override
+  String familyDeleteAccountOwned(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'تُحذف جدران العائلة الـ$count التي تملكها لكل أعضائها مع كل الذكريات والصور.',
+      many:
+          'تُحذف جدران العائلة الـ$count التي تملكها لكل أعضائها مع كل الذكريات والصور.',
+      few:
+          'تُحذف جدران العائلة الـ$count التي تملكها لكل أعضائها مع كل الذكريات والصور.',
+      two:
+          'يُحذف جدارا العائلة اللذان تملكهما لكل أعضائهما مع كل الذكريات والصور.',
+      one: 'يُحذف جدار العائلة الذي تملكه لكل أعضائه مع كل ذكرياته وصوره.',
+      zero: 'لا تملك أي جدار عائلة.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familyDeleteAccountPosts =>
+      'تُحذف الذكريات والصور التي أضفتها إلى جدران العائلات الأخرى، وتغادر تلك الجدران.';
+
+  @override
+  String get familyDeleteAccountKeys =>
+      'تُزال مفاتيح جدران العائلة والصور المخزنة مؤقتاً من هذا الجهاز. لا يمكن التراجع عن ذلك.';
+
+  @override
+  String get familyDeleteAccountMyWall =>
+      'لا يتأثر جداري: تبقى ذكرياته على هذا الجهاز.';
+
+  @override
+  String get familyDeleteAccountSubscription =>
+      'لا يُلغى اشتراك Premium بذلك؛ أدِره من App Store أو Google Play.';
+
+  @override
+  String get familyDeleteAccountUnderstood => 'أفهم أن هذا يحذف حسابي نهائياً.';
+
+  @override
+  String get familyDeletingAccount => 'جارٍ حذف حسابك…';
+
+  @override
+  String get familyAccountDeleted => 'تم حذف حسابك.';
+
+  @override
+  String get familyTermsTitle => 'قواعد جدار العائلة';
+
+  @override
+  String get familyTermsHeadline => 'قبل أن تشارك';
+
+  @override
+  String get familyTermsIntro =>
+      'جدران العائلة للأشخاص الذين تدعوهم. وللحفاظ على أمانها، يقبل الجميع هذه القواعد:';
+
+  @override
+  String get familyTermsZeroTolerance =>
+      'لا تسامح مطلقاً مع المحتوى المسيء: لا تحرّش ولا كراهية ولا محتوى جنسي ولا عنف ولا إيذاء للنفس ولا محتوى غير قانوني ولا معلومات خاصة بالآخرين دون موافقتهم.';
+
+  @override
+  String get familyTermsOwnContent =>
+      'شارك فقط الصور والقصص التي يحق لك مشاركتها.';
+
+  @override
+  String get familyTermsReport =>
+      'أبلغ عن أي ذكرى أو عضو من الجدار. تراجع GK Coding البلاغات خلال 24 ساعة.';
+
+  @override
+  String get familyTermsBlock => 'احظر عضواً لتتوقف عن رؤية ذكرياته.';
+
+  @override
+  String get familyTermsOwner => 'يمكن لمالك الجدار إزالة الأعضاء وذكرياتهم.';
+
+  @override
+  String get familyTermsConsequences =>
+      'يُزال المحتوى المخالف لهذه القواعد، ويمكن تعليق الحسابات التي نشرته أو حذفها.';
+
+  @override
+  String get familyTermsReadFull => 'قراءة الشروط كاملة';
+
+  @override
+  String get familyTermsAgree => 'أوافق على شروط الاستخدام وهذه القواعد.';
+
+  @override
+  String get familyTermsAccept => 'قبول ومتابعة';
+
+  @override
+  String familyTermsVersion(String version) {
+    return 'إصدار الشروط $version';
+  }
+
+  @override
+  String get familyWallEmptyTitle => 'الجدار ينتظر';
+
+  @override
+  String get familyWallEmptyBody =>
+      'أضف الذكرى الأولى، وسيراها كل من على هذا الجدار.';
+
+  @override
+  String get familyWallGoneBody =>
+      'لم يعد جدار العائلة هذا متاحاً لك. ربما حُذف أو أُزلت منه.';
+
+  @override
+  String get familyAddMemory => 'إضافة ذكرى';
+
+  @override
+  String get familyRefresh => 'تحديث';
+
+  @override
+  String get familySyncing => 'جارٍ المزامنة…';
+
+  @override
+  String get familyOffline => 'غير متصل: عرض الذكريات المحفوظة';
+
+  @override
+  String get familySyncFailed => 'فشلت المزامنة';
+
+  @override
+  String get familyMemoryTitle => 'ذكرى';
+
+  @override
+  String get familyMemoryGone => 'لم تعد هذه الذكرى على الجدار.';
+
+  @override
+  String get familyMemoryActions => 'إجراءات الذكرى';
+
+  @override
+  String familyAddedBy(String name) {
+    return 'أضافها $name';
+  }
+
+  @override
+  String get familyDeleteMemoryQuestion => 'حذف هذه الذكرى؟';
+
+  @override
+  String get familyDeleteMemoryBody => 'ستُزال من الجدار للجميع مع صورها.';
+
+  @override
+  String familyDeleteMemoryAsOwnerBody(String name) {
+    return 'بصفتك المالك يمكنك إزالة الذكريات من هذا الجدار. ستُزال هذه الذكرى التي أضافها $name للجميع مع صورها.';
+  }
+
+  @override
+  String get familyDeletingMemory => 'جارٍ حذف الذكرى…';
+
+  @override
+  String get familyNoPhotosYet => 'لا صور بعد';
+
+  @override
+  String get familyPostNote =>
+      'سيرى كل من على هذا الجدار هذه الذكرى. تُصغَّر الصور وتُشفَّر على هاتفك قبل رفعها.';
+
+  @override
+  String get familyPostMemory => 'نشر على الجدار';
+
+  @override
+  String get familyUploading => 'جارٍ التشفير والرفع…';
+
+  @override
+  String get familyMemorySaved => 'تم الحفظ على جدار العائلة.';
+
+  @override
+  String get familyConflictTitle => 'غيّرها شخص آخر';
+
+  @override
+  String get familyConflictBody =>
+      'تغيّرت هذه الذكرى على جهاز آخر أثناء تعديلك لها. هل تريد تحميل أحدث نسخة وحفظ تغييراتك فوقها؟';
+
+  @override
+  String get familyConflictRetry => 'تحديث وحفظ';
+
+  @override
+  String get familyQuotaTitle => 'الجدار ممتلئ';
+
+  @override
+  String get familyReportMemoryTitle => 'الإبلاغ عن ذكرى';
+
+  @override
+  String get familyReportPhotoTitle => 'الإبلاغ عن صورة';
+
+  @override
+  String get familyReportMemberTitle => 'الإبلاغ عن عضو';
+
+  @override
+  String get familyReportIntro =>
+      'أخبرنا بما هو خطأ. يذهب بلاغك إلى GK Coding وليس إلى الشخص الذي تبلّغ عنه.';
+
+  @override
+  String get familyReportSpam => 'رسائل مزعجة أو احتيال';
+
+  @override
+  String get familyReportHarassment => 'تحرّش أو تنمّر';
+
+  @override
+  String get familyReportHate => 'خطاب كراهية';
+
+  @override
+  String get familyReportSexual => 'محتوى جنسي أو عُري';
+
+  @override
+  String get familyReportViolence => 'عنف أو تهديد';
+
+  @override
+  String get familyReportSelfHarm => 'إيذاء النفس أو الانتحار';
+
+  @override
+  String get familyReportIllegal => 'محتوى غير قانوني';
+
+  @override
+  String get familyReportPrivacy => 'معلومات خاصة نُشرت دون موافقة';
+
+  @override
+  String get familyReportOther => 'شيء آخر';
+
+  @override
+  String get familyReportDetailsLabel => 'تفاصيل (اختياري)';
+
+  @override
+  String get familyReportDetailsHint => 'ما الذي يجب أن نعرفه؟';
+
+  @override
+  String familyReportAlsoBlock(String name) {
+    return 'حظر $name أيضاً';
+  }
+
+  @override
+  String get familyReportSend => 'إرسال البلاغ';
+
+  @override
+  String get familyReportReviewNote =>
+      'تراجع GK Coding كل بلاغ خلال 24 ساعة وتزيل المحتوى والأعضاء المخالفين للقواعد.';
+
+  @override
+  String get familyReportSentTitle => 'شكراً لك';
+
+  @override
+  String get familyReportSentBody =>
+      'تم إرسال بلاغك. تراجعه GK Coding خلال 24 ساعة وتتخذ إجراءً بحق المحتوى المخالف للقواعد.';
+
+  @override
+  String get familyErrorGeneric => 'حدث خطأ ما. يُرجى المحاولة مجدداً.';
+
+  @override
+  String get familyErrorOffline =>
+      'يبدو أنك غير متصل. تحقّق من اتصالك وحاول مجدداً.';
+
+  @override
+  String get familyErrorSubscriptionRequired =>
+      'يتطلب هذا اشتراك Premium فعّالاً لمالك الجدار.';
+
+  @override
+  String get familyErrorInviteExpired =>
+      'انتهت صلاحية هذه الدعوة. اطلب رابطاً جديداً.';
+
+  @override
+  String get familyErrorInviteUsed =>
+      'استُخدمت هذه الدعوة من قبل. كل رابط يعمل مرة واحدة؛ اطلب رابطاً جديداً.';
+
+  @override
+  String get familyErrorInviteInvalid =>
+      'هذا ليس رابط دعوة صالحاً من LifeThreads.';
+
+  @override
+  String get familyErrorAlreadyMember => 'أنت عضو في جدار العائلة هذا بالفعل.';
+
+  @override
+  String get familyErrorFamilyFull =>
+      'وصل جدار العائلة هذا إلى الحد الأقصى للأعضاء.';
+
+  @override
+  String get familyErrorQuotaExceeded =>
+      'لم تعد هناك مساحة تخزين في جدار العائلة هذا. احذف بعض الذكريات أو الصور لإفساح المجال.';
+
+  @override
+  String get familyErrorVersionConflict =>
+      'غيّر شخص آخر هذه الذكرى أولاً. حدّث وحاول مجدداً.';
+
+  @override
+  String get familyErrorTermsRequired => 'يُرجى قبول قواعد جدار العائلة أولاً.';
+
+  @override
+  String get familyErrorSignedOut =>
+      'تم تسجيل خروجك. يُرجى تسجيل الدخول مجدداً.';
+
+  @override
+  String get familyErrorNotAllowed => 'غير مسموح لك بذلك على هذا الجدار.';
+
+  @override
+  String get familyErrorNotFound => 'لم يُعثر على جدار العائلة';
+
+  @override
+  String get familyErrorOwnerCannotLeave =>
+      'لا يمكن للمالك مغادرة الجدار، لكن يمكنه حذفه.';
+
+  @override
+  String get familyPaste => 'لصق';
+
+  @override
+  String get familyErrorInviteRevoked =>
+      'تم سحب هذه الدعوة. اطلب رابطاً جديداً.';
+
+  @override
+  String get familyErrorKeyMissing =>
+      'لا يملك هذا الجهاز مفتاح جدار العائلة هذا (مثلاً بعد إعادة التثبيت أو على هاتف جديد). اطلب من أحد الأعضاء رابط دعوة جديداً، فبفتحه يُستعاد الوصول.';
+
+  @override
+  String get familyErrorSignInUnavailable =>
+      'تسجيل الدخول غير متاح على هذا الجهاز حالياً.';
+
+  @override
+  String get familyErrorNoPurchase =>
+      'لم يُعثر على شراء Premium لحساب App Store أو Google Play هذا. احصل على Premium أولاً ثم حاول مجدداً.';
+
+  @override
+  String get familyErrorNameTooLong =>
+      'هذا الاسم طويل جداً. يُرجى استخدام اسم أقصر.';
+
+  @override
+  String get familyErrorPhotoUnreadable =>
+      'تعذّرت قراءة إحدى الصور. أزلها وحاول مجدداً.';
+
+  @override
+  String get familyErrorTooLarge =>
+      'هذا كبير جداً للرفع. جرّب صوراً أقل أو أصغر.';
+
+  @override
+  String get familyReportEvidenceNote =>
+      'لمراجعة البلاغ تتلقى GK Coding عنوان هذه الذكرى وقصتها مع بلاغك. لا تُرسل صورها أبداً.';
 }

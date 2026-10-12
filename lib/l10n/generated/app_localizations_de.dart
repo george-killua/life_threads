@@ -2081,4 +2081,721 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get benefitYearThreadBody =>
       'Dein Jahr als Kurzfilm: die Momente, die gezählt haben, der Reihe nach verbunden, mit Musik.';
+
+  @override
+  String get myWall => 'Meine Wand';
+
+  @override
+  String get myWallSubtitle => 'Privat, auf diesem Gerät';
+
+  @override
+  String get switchWall => 'Wand wechseln';
+
+  @override
+  String get familyWallsTitle => 'Familienwände';
+
+  @override
+  String get familyWallsSettingsBody =>
+      'Teile eine Wand mit Familie oder Freunden: Alle fügen Erinnerungen hinzu, Ende-zu-Ende-verschlüsselt. Meine Wand bleibt privat auf diesem Gerät.';
+
+  @override
+  String get familyWallsOpen => 'Familienwände öffnen';
+
+  @override
+  String get familyWallsManage => 'Familienwände verwalten';
+
+  @override
+  String get familyWallsHeadline => 'Eine Wand für die ganze Familie';
+
+  @override
+  String get familyWallsIntro =>
+      'Eine Familienwand teilst du mit den Menschen, die du einlädst. Erinnerungen und Fotos werden auf deinem Handy verschlüsselt, bevor sie hochgeladen werden; nur Mitglieder können sie öffnen. Meine Wand wird nicht geteilt und bleibt auf diesem Gerät.';
+
+  @override
+  String get familyUnavailableTitle => 'Noch nicht verfügbar';
+
+  @override
+  String get familyUnavailable =>
+      'Familienwände sind in dieser Version von LifeThreads noch nicht verfügbar.';
+
+  @override
+  String get familySignInNeededTitle =>
+      'Melde dich an, um Familienwände zu nutzen';
+
+  @override
+  String get familySignInNeededBody =>
+      'Eine geteilte Wand braucht ein Konto, damit die Familie weiß, wer was hinzugefügt hat. Meine Wand funktioniert ohne.';
+
+  @override
+  String get familySignIn => 'Anmelden';
+
+  @override
+  String get familyLoadFailed => 'Konnte nicht geladen werden';
+
+  @override
+  String get familyRetry => 'Erneut versuchen';
+
+  @override
+  String get familyNoWallsYet =>
+      'Noch keine Familienwände. Starte eine oder tritt mit einem Einladungslink bei.';
+
+  @override
+  String get familyStartTitle => 'Starten oder beitreten';
+
+  @override
+  String get familyStartBody =>
+      'Eine Familienwand zu starten braucht Premium. Beitreten ist kostenlos: Das Premium der Person, der die Wand gehört, deckt die Familie ab.';
+
+  @override
+  String get familyCreateAction => 'Familienwand erstellen';
+
+  @override
+  String get familyCreateTitle => 'Neue Familienwand';
+
+  @override
+  String get familyNameLabel => 'Name der Wand';
+
+  @override
+  String get familyNameHint => 'z. B. Familie Müller';
+
+  @override
+  String get familyMyNameLabel => 'Dein Name auf dieser Wand';
+
+  @override
+  String get familyMyNameHelper =>
+      'Mitglieder sehen ihn bei deinen Erinnerungen. Er ist verschlüsselt wie alles auf der Wand.';
+
+  @override
+  String get familyMyNameSaved => 'Name gespeichert.';
+
+  @override
+  String get familySetMyName => 'Mein Name';
+
+  @override
+  String get familyCheckingSubscription => 'Premium wird geprüft …';
+
+  @override
+  String get familyCreating => 'Wand wird erstellt …';
+
+  @override
+  String get familyJoinWithLink => 'Mit Link beitreten';
+
+  @override
+  String get familyInviteLinkLabel => 'Einladungslink';
+
+  @override
+  String get familyJoinTitle => 'Dieser Familienwand beitreten?';
+
+  @override
+  String get familyJoinBody =>
+      'Mitglieder sehen deinen Namen und die Erinnerungen, die du hinzufügst, und du ihre. Du kannst jederzeit austreten.';
+
+  @override
+  String get familyJoinAction => 'Beitreten';
+
+  @override
+  String get familyJoining => 'Beitreten …';
+
+  @override
+  String familyJoined(String family) {
+    return 'Du bist $family beigetreten.';
+  }
+
+  @override
+  String get familyRoleOwner => 'Inhaber';
+
+  @override
+  String get familyRoleMember => 'Mitglied';
+
+  @override
+  String familyMemberCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Mitglieder',
+      one: '1 Mitglied',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familySettingsTitle => 'Wand-Einstellungen';
+
+  @override
+  String familyStorageUsed(String used, String total) {
+    return '$used von $total belegt';
+  }
+
+  @override
+  String get familyRename => 'Umbenennen';
+
+  @override
+  String get familyInviteTitle => 'Einladen';
+
+  @override
+  String get familyInviteBody =>
+      'Schicke einen Link an jemanden, dem du vertraust. Jeder Link funktioniert einmal und läuft nach 7 Tagen ab.';
+
+  @override
+  String get familyInviteAction => 'Einladungslink erstellen';
+
+  @override
+  String get familyCreatingInvite => 'Einladung wird erstellt …';
+
+  @override
+  String get familyInviteReady => 'Einladungslink bereit';
+
+  @override
+  String get familyInviteValidity =>
+      'Funktioniert einmal und läuft spätestens nach 7 Tagen ab.';
+
+  @override
+  String get familyInviteKeyWarning =>
+      'Der Link enthält den Schlüssel der Wand: Wer ihn öffnet, kann beitreten und die Wand lesen. Schicke ihn nur an die eingeladene Person.';
+
+  @override
+  String get familyInviteShare => 'Link teilen';
+
+  @override
+  String get familyInviteCopy => 'Link kopieren';
+
+  @override
+  String get familyInviteCopied => 'Link kopiert.';
+
+  @override
+  String get familyInviteShareFailed =>
+      'Teilen ist nicht verfügbar. Kopiere stattdessen den Link.';
+
+  @override
+  String familyInviteSubject(String family) {
+    return 'Tritt $family auf LifeThreads bei';
+  }
+
+  @override
+  String familyInviteText(String family, String link) {
+    return 'Tritt unserer Familienwand „$family“ auf LifeThreads bei: $link';
+  }
+
+  @override
+  String get familyMembersTitle => 'Mitglieder';
+
+  @override
+  String get familyMemberActions => 'Aktionen für Mitglied';
+
+  @override
+  String get familyYou => 'Du';
+
+  @override
+  String familyYouNamed(String name) {
+    return '$name (du)';
+  }
+
+  @override
+  String get familyAMember => 'Ein Mitglied';
+
+  @override
+  String get familyFormerMember => 'Ehemaliges Mitglied';
+
+  @override
+  String get familyBlocked => 'Blockiert';
+
+  @override
+  String get familyBlock => 'Blockieren';
+
+  @override
+  String get familyUnblock => 'Blockierung aufheben';
+
+  @override
+  String familyBlockAuthor(String name) {
+    return '$name blockieren';
+  }
+
+  @override
+  String familyBlockQuestion(String name) {
+    return '$name blockieren?';
+  }
+
+  @override
+  String get familyBlockBody =>
+      'Du siehst ihre Erinnerungen auf keiner Familienwand mehr. Die Person wird nicht benachrichtigt. Du kannst die Blockierung in der Mitgliederliste aufheben.';
+
+  @override
+  String get familyReport => 'Melden';
+
+  @override
+  String get familyRemoveMember => 'Von der Wand entfernen';
+
+  @override
+  String familyRemoveQuestion(String name) {
+    return '$name entfernen?';
+  }
+
+  @override
+  String get familyRemoveBody =>
+      'Die Person verliert den Zugang zu dieser Wand. Lade sie erneut ein, um sie zurückzuholen.';
+
+  @override
+  String get familyRemoveDeleteContent =>
+      'Auch die Erinnerungen löschen, die die Person hinzugefügt hat';
+
+  @override
+  String get familyDeleteTitle => 'Familienwand löschen';
+
+  @override
+  String get familyDeleteBody =>
+      'Als Inhaber kannst du die Wand nicht verlassen; du kannst sie für alle löschen.';
+
+  @override
+  String get familyDeleteAction => 'Wand löschen';
+
+  @override
+  String familyDeleteQuestion(String family) {
+    return '$family löschen?';
+  }
+
+  @override
+  String get familyDeleteConfirmBody =>
+      'Alle Erinnerungen und Fotos dieser Wand werden für alle Mitglieder von unseren Servern gelöscht. Das lässt sich nicht rückgängig machen. Erinnerungen auf Meine Wand sind nicht betroffen.';
+
+  @override
+  String get familyDeleting => 'Wird gelöscht …';
+
+  @override
+  String get familyLeaveTitle => 'Familienwand verlassen';
+
+  @override
+  String get familyLeaveBody =>
+      'Du siehst diese Wand nicht mehr. Deine Erinnerungen kannst du behalten oder löschen.';
+
+  @override
+  String get familyLeaveAction => 'Verlassen';
+
+  @override
+  String familyLeaveQuestion(String family) {
+    return '$family verlassen?';
+  }
+
+  @override
+  String get familyLeaveConfirmBody =>
+      'Um zurückzukommen, brauchst du eine neue Einladung.';
+
+  @override
+  String get familyLeaveDeleteMine =>
+      'Auch meine hinzugefügten Erinnerungen löschen';
+
+  @override
+  String get familyLeaving => 'Wird verlassen …';
+
+  @override
+  String get familySignInTitle => 'Anmelden';
+
+  @override
+  String get familySignInHeadline => 'Ein Konto für Familienwände';
+
+  @override
+  String get familySignInWhy =>
+      'Eine Familienwand wird geteilt und braucht daher ein Konto: Mitglieder sehen, wer welche Erinnerung hinzugefügt hat, und nur Mitglieder können die Wand öffnen.';
+
+  @override
+  String get familySignInMyWallStays =>
+      'Meine Wand braucht kein Konto. Sie bleibt privat auf diesem Gerät und wird nie hochgeladen.';
+
+  @override
+  String get familySignInEncrypted =>
+      'Familienerinnerungen und -fotos sind Ende-zu-Ende-verschlüsselt. GK Coding speichert sie, kann sie aber nicht lesen.';
+
+  @override
+  String get familySignInWhatWeGet =>
+      'Von Apple oder Google nutzen wir nur eine Konto-ID, nicht deine Kontakte oder Fotos.';
+
+  @override
+  String get familySignInApple => 'Mit Apple anmelden';
+
+  @override
+  String get familySignInGoogle => 'Mit Google anmelden';
+
+  @override
+  String get familySignInFinePrint =>
+      'Mit der Anmeldung stimmst du den Nutzungsbedingungen und der Datenschutzerklärung zu. Du kannst dein Konto jederzeit in der App löschen.';
+
+  @override
+  String get familyAccountTitle => 'Konto';
+
+  @override
+  String get familySignedOutTitle => 'Nicht angemeldet';
+
+  @override
+  String get familySignedOutBody =>
+      'Melde dich an, um deine Familienwände zu sehen. Meine Wand funktioniert ohne Konto.';
+
+  @override
+  String get familySignedInTitle => 'Angemeldet';
+
+  @override
+  String get familySignedInBody =>
+      'Dein Konto wird nur für Familienwände genutzt.';
+
+  @override
+  String familyAccountId(String id) {
+    return 'Konto-ID: $id';
+  }
+
+  @override
+  String get familySignOut => 'Abmelden';
+
+  @override
+  String get familySignOutQuestion => 'Abmelden?';
+
+  @override
+  String get familySignOutBody =>
+      'Familienwände und ihre Schlüssel werden von diesem Gerät entfernt, bis du dich wieder anmeldest. Auf dem Server wird nichts gelöscht. Meine Wand ist nicht betroffen.';
+
+  @override
+  String get familySigningOut => 'Abmelden …';
+
+  @override
+  String get familyDeleteAccountTitle => 'Konto löschen';
+
+  @override
+  String get familyDeleteAccountBody =>
+      'Löscht dein Konto und deine Familienwand-Daten von unseren Servern. Meine Wand bleibt auf diesem Gerät.';
+
+  @override
+  String get familyDeleteAccount => 'Konto löschen';
+
+  @override
+  String get familyDeleteAccountQuestion => 'Konto löschen?';
+
+  @override
+  String familyDeleteAccountOwned(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Die $count Familienwände, die dir gehören, werden für alle Mitglieder gelöscht, mit allen Erinnerungen und Fotos.',
+      one:
+          'Die Familienwand, die dir gehört, wird für alle Mitglieder gelöscht, mit allen Erinnerungen und Fotos.',
+      zero: 'Dir gehört keine Familienwand.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familyDeleteAccountPosts =>
+      'Die Erinnerungen und Fotos, die du auf Wänden anderer Familien hinzugefügt hast, werden gelöscht, und du verlässt diese Wände.';
+
+  @override
+  String get familyDeleteAccountKeys =>
+      'Schlüssel und zwischengespeicherte Fotos der Familienwände werden von diesem Gerät entfernt. Das lässt sich nicht rückgängig machen.';
+
+  @override
+  String get familyDeleteAccountMyWall =>
+      'Meine Wand ist nicht betroffen: Ihre Erinnerungen bleiben auf diesem Gerät.';
+
+  @override
+  String get familyDeleteAccountSubscription =>
+      'Ein Premium-Abo wird dadurch nicht gekündigt; verwalte es im App Store oder bei Google Play.';
+
+  @override
+  String get familyDeleteAccountUnderstood =>
+      'Mir ist klar, dass mein Konto endgültig gelöscht wird.';
+
+  @override
+  String get familyDeletingAccount => 'Konto wird gelöscht …';
+
+  @override
+  String get familyAccountDeleted => 'Dein Konto wurde gelöscht.';
+
+  @override
+  String get familyTermsTitle => 'Regeln für Familienwände';
+
+  @override
+  String get familyTermsHeadline => 'Bevor du teilst';
+
+  @override
+  String get familyTermsIntro =>
+      'Familienwände sind für die Menschen, die du einlädst. Damit sie sicher bleiben, akzeptieren alle diese Regeln:';
+
+  @override
+  String get familyTermsZeroTolerance =>
+      'Null Toleranz für anstößige Inhalte: keine Belästigung, kein Hass, keine sexuellen Inhalte, keine Gewalt, keine Selbstverletzung, keine illegalen Inhalte und keine privaten Informationen anderer ohne deren Zustimmung.';
+
+  @override
+  String get familyTermsOwnContent =>
+      'Teile nur Fotos und Geschichten, die du teilen darfst.';
+
+  @override
+  String get familyTermsReport =>
+      'Melde jede Erinnerung oder jedes Mitglied direkt auf der Wand. GK Coding prüft Meldungen innerhalb von 24 Stunden.';
+
+  @override
+  String get familyTermsBlock =>
+      'Blockiere ein Mitglied, um seine Erinnerungen nicht mehr zu sehen.';
+
+  @override
+  String get familyTermsOwner =>
+      'Die Person, der eine Wand gehört, kann Mitglieder und ihre Erinnerungen entfernen.';
+
+  @override
+  String get familyTermsConsequences =>
+      'Inhalte, die gegen diese Regeln verstoßen, werden entfernt, und die Konten, die sie gepostet haben, können gesperrt oder gelöscht werden.';
+
+  @override
+  String get familyTermsReadFull => 'Vollständige Bedingungen lesen';
+
+  @override
+  String get familyTermsAgree =>
+      'Ich stimme den Nutzungsbedingungen und diesen Regeln zu.';
+
+  @override
+  String get familyTermsAccept => 'Akzeptieren und weiter';
+
+  @override
+  String familyTermsVersion(String version) {
+    return 'Version der Bedingungen $version';
+  }
+
+  @override
+  String get familyWallEmptyTitle => 'Die Wand wartet';
+
+  @override
+  String get familyWallEmptyBody =>
+      'Füge die erste Erinnerung hinzu. Alle auf dieser Wand sehen sie.';
+
+  @override
+  String get familyWallGoneBody =>
+      'Diese Familienwand ist für dich nicht mehr verfügbar. Vielleicht wurde sie gelöscht oder du wurdest entfernt.';
+
+  @override
+  String get familyAddMemory => 'Erinnerung hinzufügen';
+
+  @override
+  String get familyRefresh => 'Aktualisieren';
+
+  @override
+  String get familySyncing => 'Wird synchronisiert …';
+
+  @override
+  String get familyOffline => 'Offline: gespeicherte Erinnerungen';
+
+  @override
+  String get familySyncFailed => 'Synchronisierung fehlgeschlagen';
+
+  @override
+  String get familyMemoryTitle => 'Erinnerung';
+
+  @override
+  String get familyMemoryGone =>
+      'Diese Erinnerung ist nicht mehr auf der Wand.';
+
+  @override
+  String get familyMemoryActions => 'Aktionen für Erinnerung';
+
+  @override
+  String familyAddedBy(String name) {
+    return 'Hinzugefügt von $name';
+  }
+
+  @override
+  String get familyDeleteMemoryQuestion => 'Diese Erinnerung löschen?';
+
+  @override
+  String get familyDeleteMemoryBody =>
+      'Sie wird mit ihren Fotos für alle von der Wand entfernt.';
+
+  @override
+  String familyDeleteMemoryAsOwnerBody(String name) {
+    return 'Als Inhaber kannst du Erinnerungen von dieser Wand entfernen. Diese Erinnerung von $name wird mit ihren Fotos für alle entfernt.';
+  }
+
+  @override
+  String get familyDeletingMemory => 'Erinnerung wird gelöscht …';
+
+  @override
+  String get familyNoPhotosYet => 'Noch keine Fotos';
+
+  @override
+  String get familyPostNote =>
+      'Alle auf dieser Wand sehen diese Erinnerung. Fotos werden auf deinem Handy verkleinert und verschlüsselt, bevor sie hochgeladen werden.';
+
+  @override
+  String get familyPostMemory => 'Auf die Wand posten';
+
+  @override
+  String get familyUploading => 'Wird verschlüsselt und hochgeladen …';
+
+  @override
+  String get familyMemorySaved => 'Auf der Familienwand gespeichert.';
+
+  @override
+  String get familyConflictTitle => 'Von jemand anderem geändert';
+
+  @override
+  String get familyConflictBody =>
+      'Diese Erinnerung wurde auf einem anderen Gerät geändert, während du sie bearbeitet hast. Neueste Version laden und deine Änderungen darüber speichern?';
+
+  @override
+  String get familyConflictRetry => 'Aktualisieren und speichern';
+
+  @override
+  String get familyQuotaTitle => 'Die Wand ist voll';
+
+  @override
+  String get familyReportMemoryTitle => 'Erinnerung melden';
+
+  @override
+  String get familyReportPhotoTitle => 'Foto melden';
+
+  @override
+  String get familyReportMemberTitle => 'Mitglied melden';
+
+  @override
+  String get familyReportIntro =>
+      'Sag uns, was nicht stimmt. Deine Meldung geht an GK Coding, nicht an die gemeldete Person.';
+
+  @override
+  String get familyReportSpam => 'Spam oder Betrug';
+
+  @override
+  String get familyReportHarassment => 'Belästigung oder Mobbing';
+
+  @override
+  String get familyReportHate => 'Hassrede';
+
+  @override
+  String get familyReportSexual => 'Sexuelle Inhalte oder Nacktheit';
+
+  @override
+  String get familyReportViolence => 'Gewalt oder Drohungen';
+
+  @override
+  String get familyReportSelfHarm => 'Selbstverletzung oder Suizid';
+
+  @override
+  String get familyReportIllegal => 'Illegale Inhalte';
+
+  @override
+  String get familyReportPrivacy =>
+      'Private Informationen ohne Zustimmung geteilt';
+
+  @override
+  String get familyReportOther => 'Etwas anderes';
+
+  @override
+  String get familyReportDetailsLabel => 'Details (optional)';
+
+  @override
+  String get familyReportDetailsHint => 'Was sollten wir wissen?';
+
+  @override
+  String familyReportAlsoBlock(String name) {
+    return 'Auch $name blockieren';
+  }
+
+  @override
+  String get familyReportSend => 'Meldung senden';
+
+  @override
+  String get familyReportReviewNote =>
+      'GK Coding prüft jede Meldung innerhalb von 24 Stunden und entfernt Inhalte und Mitglieder, die gegen die Regeln verstoßen.';
+
+  @override
+  String get familyReportSentTitle => 'Danke';
+
+  @override
+  String get familyReportSentBody =>
+      'Deine Meldung wurde gesendet. GK Coding prüft sie innerhalb von 24 Stunden und geht gegen Inhalte vor, die gegen die Regeln verstoßen.';
+
+  @override
+  String get familyErrorGeneric =>
+      'Etwas ist schiefgelaufen. Bitte versuche es erneut.';
+
+  @override
+  String get familyErrorOffline =>
+      'Du scheinst offline zu sein. Prüfe deine Verbindung und versuche es erneut.';
+
+  @override
+  String get familyErrorSubscriptionRequired =>
+      'Dafür braucht die Person, der die Wand gehört, ein aktives Premium-Abo.';
+
+  @override
+  String get familyErrorInviteExpired =>
+      'Diese Einladung ist abgelaufen. Bitte um einen neuen Link.';
+
+  @override
+  String get familyErrorInviteUsed =>
+      'Diese Einladung wurde schon verwendet. Jeder Link funktioniert einmal; bitte um einen neuen.';
+
+  @override
+  String get familyErrorInviteInvalid =>
+      'Das ist kein gültiger LifeThreads-Einladungslink.';
+
+  @override
+  String get familyErrorAlreadyMember =>
+      'Du bist bereits Mitglied dieser Familienwand.';
+
+  @override
+  String get familyErrorFamilyFull =>
+      'Diese Familienwand hat die maximale Mitgliederzahl erreicht.';
+
+  @override
+  String get familyErrorQuotaExceeded =>
+      'Diese Familienwand hat keinen Speicher mehr frei. Lösche einige Erinnerungen oder Fotos, um Platz zu schaffen.';
+
+  @override
+  String get familyErrorVersionConflict =>
+      'Jemand hat diese Erinnerung zuerst geändert. Aktualisiere und versuche es erneut.';
+
+  @override
+  String get familyErrorTermsRequired =>
+      'Bitte akzeptiere zuerst die Regeln für Familienwände.';
+
+  @override
+  String get familyErrorSignedOut =>
+      'Du wurdest abgemeldet. Bitte melde dich erneut an.';
+
+  @override
+  String get familyErrorNotAllowed => 'Das darfst du auf dieser Wand nicht.';
+
+  @override
+  String get familyErrorNotFound => 'Familienwand nicht gefunden';
+
+  @override
+  String get familyErrorOwnerCannotLeave =>
+      'Der Inhaber kann die Wand nicht verlassen, aber löschen.';
+
+  @override
+  String get familyPaste => 'Einfügen';
+
+  @override
+  String get familyErrorInviteRevoked =>
+      'Diese Einladung wurde zurückgezogen. Bitte um einen neuen Link.';
+
+  @override
+  String get familyErrorKeyMissing =>
+      'Dieses Gerät hat den Schlüssel für diese Familienwand nicht (zum Beispiel nach einer Neuinstallation oder auf einem neuen Handy). Bitte ein Mitglied um einen neuen Einladungslink: Ihn zu öffnen stellt den Zugang wieder her.';
+
+  @override
+  String get familyErrorSignInUnavailable =>
+      'Die Anmeldung ist auf diesem Gerät gerade nicht verfügbar.';
+
+  @override
+  String get familyErrorNoPurchase =>
+      'Für dieses App-Store- oder Google-Play-Konto wurde kein Premium-Kauf gefunden. Hol dir zuerst Premium und versuche es dann erneut.';
+
+  @override
+  String get familyErrorNameTooLong =>
+      'Dieser Name ist zu lang. Bitte nimm einen kürzeren.';
+
+  @override
+  String get familyErrorPhotoUnreadable =>
+      'Eines der Fotos konnte nicht gelesen werden. Entferne es und versuche es erneut.';
+
+  @override
+  String get familyErrorTooLarge =>
+      'Das ist zu groß zum Hochladen. Versuche es mit weniger oder kleineren Fotos.';
+
+  @override
+  String get familyReportEvidenceNote =>
+      'Zur Prüfung erhält GK Coding mit deiner Meldung den Titel und die Geschichte dieser Erinnerung. Ihre Fotos werden nie gesendet.';
 }

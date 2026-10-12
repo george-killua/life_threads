@@ -229,6 +229,19 @@ class SettingsPage extends ConsumerWidget {
                 ],
               ),
               _SettingsCard(
+                key: const ValueKey('settings-family-walls'),
+                icon: Icons.diversity_1_rounded,
+                title: l10n.familyWallsTitle,
+                body: l10n.familyWallsSettingsBody,
+                actions: [
+                  _SettingsAction(
+                    label: l10n.familyWallsOpen,
+                    icon: Icons.family_restroom_rounded,
+                    onTap: () => context.push(RouteNames.familyWalls),
+                  ),
+                ],
+              ),
+              _SettingsCard(
                 icon: Icons.workspace_premium_rounded,
                 title: l10n.premiumTitle,
                 body: entitlement?.isPremium == true
@@ -1109,6 +1122,7 @@ class _DisplayNameEditorState extends State<_DisplayNameEditor> {
 
 class _SettingsCard extends StatelessWidget {
   const _SettingsCard({
+    super.key,
     required this.icon,
     required this.title,
     required this.body,

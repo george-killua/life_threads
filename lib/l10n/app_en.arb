@@ -954,5 +954,328 @@
       }
     }
   },
-  "benefitYearThreadBody": "Your year as a short film: the moments that mattered, threaded in order, with music."
+  "benefitYearThreadBody": "Your year as a short film: the moments that mattered, threaded in order, with music.",
+  "myWall": "My wall",
+  "myWallSubtitle": "Private, on this device",
+  "switchWall": "Switch wall",
+  "familyWallsTitle": "Family walls",
+  "familyWallsSettingsBody": "Share one wall with family or friends: everyone adds memories, end-to-end encrypted. My wall stays private on this device.",
+  "familyWallsOpen": "Open family walls",
+  "familyWallsManage": "Manage family walls",
+  "familyWallsHeadline": "One wall, the whole family",
+  "familyWallsIntro": "A family wall is shared with the people you invite. Memories and photos are encrypted on your phone before they are uploaded; only members can open them. My wall is not shared and stays on this device.",
+  "familyUnavailableTitle": "Not available yet",
+  "familyUnavailable": "Family walls are not available in this version of LifeThreads yet.",
+  "familySignInNeededTitle": "Sign in to use family walls",
+  "familySignInNeededBody": "A shared wall needs an account so the family knows who added what. My wall works without one.",
+  "familySignIn": "Sign in",
+  "familyLoadFailed": "Could not load",
+  "familyRetry": "Try again",
+  "familyNoWallsYet": "No family walls yet. Start one or join with an invite link.",
+  "familyStartTitle": "Start or join",
+  "familyStartBody": "Starting a family wall needs Premium. Joining one is free: the owner's Premium covers the family.",
+  "familyCreateAction": "Create family wall",
+  "familyCreateTitle": "New family wall",
+  "familyNameLabel": "Name of the wall",
+  "familyNameHint": "e.g. The Millers",
+  "familyMyNameLabel": "Your name on this wall",
+  "familyMyNameHelper": "Members see it on your memories. It is encrypted like everything on the wall.",
+  "familyMyNameSaved": "Name saved.",
+  "familySetMyName": "My name",
+  "familyCheckingSubscription": "Checking your Premium…",
+  "familyCreating": "Creating the wall…",
+  "familyJoinWithLink": "Join with link",
+  "familyInviteLinkLabel": "Invite link",
+  "familyJoinTitle": "Join this family wall?",
+  "familyJoinBody": "Members will see your name and the memories you add, and you will see theirs. You can leave at any time.",
+  "familyJoinAction": "Join",
+  "familyJoining": "Joining…",
+  "familyJoined": "You joined {family}.",
+  "@familyJoined": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      }
+    }
+  },
+  "familyRoleOwner": "Owner",
+  "familyRoleMember": "Member",
+  "familyMemberCount": "{count, plural, =1{1 member} other{{count} members}}",
+  "@familyMemberCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "familySettingsTitle": "Wall settings",
+  "familyStorageUsed": "{used} of {total} used",
+  "@familyStorageUsed": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "familyRename": "Rename",
+  "familyInviteTitle": "Invite",
+  "familyInviteBody": "Send a link to someone you trust. Each link works once and expires after 7 days.",
+  "familyInviteAction": "Create invite link",
+  "familyCreatingInvite": "Creating the invite…",
+  "familyInviteReady": "Invite link ready",
+  "familyInviteValidity": "Works once and expires after 7 days at the latest.",
+  "familyInviteKeyWarning": "The link carries the wall's key: whoever opens it can join and read the wall. Send it only to the person you invite.",
+  "familyInviteShare": "Share link",
+  "familyInviteCopy": "Copy link",
+  "familyInviteCopied": "Link copied.",
+  "familyInviteShareFailed": "Sharing is not available. Copy the link instead.",
+  "familyInviteSubject": "Join {family} on LifeThreads",
+  "@familyInviteSubject": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      }
+    }
+  },
+  "familyInviteText": "Join our family wall \"{family}\" on LifeThreads: {link}",
+  "@familyInviteText": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "familyMembersTitle": "Members",
+  "familyMemberActions": "Member actions",
+  "familyYou": "You",
+  "familyYouNamed": "{name} (you)",
+  "@familyYouNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "familyAMember": "A member",
+  "familyFormerMember": "Former member",
+  "familyBlocked": "Blocked",
+  "familyBlock": "Block",
+  "familyUnblock": "Unblock",
+  "familyBlockAuthor": "Block {name}",
+  "@familyBlockAuthor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "familyBlockQuestion": "Block {name}?",
+  "@familyBlockQuestion": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "familyBlockBody": "You will no longer see their memories on any family wall. They are not told. You can unblock them in the members list.",
+  "familyReport": "Report",
+  "familyRemoveMember": "Remove from wall",
+  "familyRemoveQuestion": "Remove {name}?",
+  "@familyRemoveQuestion": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "familyRemoveBody": "They lose access to this wall. Invite them again to bring them back.",
+  "familyRemoveDeleteContent": "Also delete the memories they added",
+  "familyDeleteTitle": "Delete family wall",
+  "familyDeleteBody": "As the owner you cannot leave the wall; you can delete it for everyone.",
+  "familyDeleteAction": "Delete wall",
+  "familyDeleteQuestion": "Delete {family}?",
+  "@familyDeleteQuestion": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      }
+    }
+  },
+  "familyDeleteConfirmBody": "All memories and photos on this wall are deleted from our servers for every member. This cannot be undone. Memories on My wall are not affected.",
+  "familyDeleting": "Deleting…",
+  "familyLeaveTitle": "Leave family wall",
+  "familyLeaveBody": "You stop seeing this wall. You can keep or delete the memories you added.",
+  "familyLeaveAction": "Leave",
+  "familyLeaveQuestion": "Leave {family}?",
+  "@familyLeaveQuestion": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      }
+    }
+  },
+  "familyLeaveConfirmBody": "To come back you need a new invite.",
+  "familyLeaveDeleteMine": "Also delete the memories I added",
+  "familyLeaving": "Leaving…",
+  "familySignInTitle": "Sign in",
+  "familySignInHeadline": "An account for family walls",
+  "familySignInWhy": "A family wall is shared, so it needs an account: members see who added each memory, and only members can open the wall.",
+  "familySignInMyWallStays": "My wall needs no account. It stays private on this device and is never uploaded.",
+  "familySignInEncrypted": "Family memories and photos are end-to-end encrypted. GK Coding stores them but cannot read them.",
+  "familySignInWhatWeGet": "From Apple or Google we only use an account ID, not your contacts or photos.",
+  "familySignInApple": "Sign in with Apple",
+  "familySignInGoogle": "Sign in with Google",
+  "familySignInFinePrint": "By signing in you agree to the Terms of Use and the Privacy Policy. You can delete your account in the app at any time.",
+  "familyAccountTitle": "Account",
+  "familySignedOutTitle": "Not signed in",
+  "familySignedOutBody": "Sign in to see your family walls. My wall works without an account.",
+  "familySignedInTitle": "Signed in",
+  "familySignedInBody": "Your account is used only for family walls.",
+  "familyAccountId": "Account ID: {id}",
+  "@familyAccountId": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "familySignOut": "Sign out",
+  "familySignOutQuestion": "Sign out?",
+  "familySignOutBody": "Family walls and their keys are removed from this device until you sign in again. Nothing is deleted on the server. My wall is not affected.",
+  "familySigningOut": "Signing out…",
+  "familyDeleteAccountTitle": "Delete account",
+  "familyDeleteAccountBody": "Deletes your account and your family wall data from our servers. My wall stays on this device.",
+  "familyDeleteAccount": "Delete account",
+  "familyDeleteAccountQuestion": "Delete your account?",
+  "familyDeleteAccountOwned": "{count, plural, =0{You own no family wall.} =1{The family wall you own is deleted for all its members, with every memory and photo on it.} other{The {count} family walls you own are deleted for all their members, with every memory and photo on them.}}",
+  "@familyDeleteAccountOwned": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "familyDeleteAccountPosts": "The memories and photos you added to other families' walls are deleted, and you leave those walls.",
+  "familyDeleteAccountKeys": "Family wall keys and cached photos are removed from this device. This cannot be undone.",
+  "familyDeleteAccountMyWall": "My wall is not affected: its memories stay on this device.",
+  "familyDeleteAccountSubscription": "A Premium subscription is not cancelled by this; manage it in the App Store or Google Play.",
+  "familyDeleteAccountUnderstood": "I understand that this deletes my account for good.",
+  "familyDeletingAccount": "Deleting your account…",
+  "familyAccountDeleted": "Your account was deleted.",
+  "familyTermsTitle": "Family wall rules",
+  "familyTermsHeadline": "Before you share",
+  "familyTermsIntro": "Family walls are for the people you invite. To keep them safe, everyone accepts these rules:",
+  "familyTermsZeroTolerance": "Zero tolerance for objectionable content: no harassment, hate, sexual content, violence, self-harm, illegal content, or other people's private information without their consent.",
+  "familyTermsOwnContent": "Share only photos and stories you are allowed to share.",
+  "familyTermsReport": "Report any memory or member from the wall. GK Coding reviews reports within 24 hours.",
+  "familyTermsBlock": "Block a member to stop seeing their memories.",
+  "familyTermsOwner": "The owner of a wall can remove members and their memories.",
+  "familyTermsConsequences": "Content that breaks these rules is removed, and the accounts that posted it can be suspended or deleted.",
+  "familyTermsReadFull": "Read the full terms",
+  "familyTermsAgree": "I agree to the Terms of Use and these rules.",
+  "familyTermsAccept": "Accept and continue",
+  "familyTermsVersion": "Terms version {version}",
+  "@familyTermsVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "familyWallEmptyTitle": "The wall is waiting",
+  "familyWallEmptyBody": "Add the first memory. Everyone on this wall will see it.",
+  "familyWallGoneBody": "This family wall is no longer available to you. It may have been deleted, or you were removed.",
+  "familyAddMemory": "Add memory",
+  "familyRefresh": "Refresh",
+  "familySyncing": "Syncing…",
+  "familyOffline": "Offline: showing saved memories",
+  "familySyncFailed": "Sync failed",
+  "familyMemoryTitle": "Memory",
+  "familyMemoryGone": "This memory is no longer on the wall.",
+  "familyMemoryActions": "Memory actions",
+  "familyAddedBy": "Added by {name}",
+  "@familyAddedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "familyDeleteMemoryQuestion": "Delete this memory?",
+  "familyDeleteMemoryBody": "It is removed from the wall for everyone, with its photos.",
+  "familyDeleteMemoryAsOwnerBody": "As the owner you can remove memories from this wall. This memory by {name} is removed for everyone, with its photos.",
+  "@familyDeleteMemoryAsOwnerBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "familyDeletingMemory": "Deleting the memory…",
+  "familyNoPhotosYet": "No photos yet",
+  "familyPostNote": "Everyone on this wall will see this memory. Photos are resized and encrypted on your phone before upload.",
+  "familyPostMemory": "Post to the wall",
+  "familyUploading": "Encrypting and uploading…",
+  "familyMemorySaved": "Saved to the family wall.",
+  "familyConflictTitle": "Changed by someone else",
+  "familyConflictBody": "This memory changed on another device while you were editing. Load the latest version and save your changes over it?",
+  "familyConflictRetry": "Refresh and save",
+  "familyQuotaTitle": "The wall is full",
+  "familyReportMemoryTitle": "Report memory",
+  "familyReportPhotoTitle": "Report photo",
+  "familyReportMemberTitle": "Report member",
+  "familyReportIntro": "Tell us what is wrong. Your report goes to GK Coding, not to the person you report.",
+  "familyReportSpam": "Spam or scam",
+  "familyReportHarassment": "Harassment or bullying",
+  "familyReportHate": "Hate speech",
+  "familyReportSexual": "Sexual content or nudity",
+  "familyReportViolence": "Violence or threats",
+  "familyReportSelfHarm": "Self-harm or suicide",
+  "familyReportIllegal": "Illegal content",
+  "familyReportPrivacy": "Private information shared without consent",
+  "familyReportOther": "Something else",
+  "familyReportDetailsLabel": "Details (optional)",
+  "familyReportDetailsHint": "What should we know?",
+  "familyReportAlsoBlock": "Also block {name}",
+  "@familyReportAlsoBlock": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "familyReportSend": "Send report",
+  "familyReportReviewNote": "GK Coding reviews every report within 24 hours and removes content and members that break the rules.",
+  "familyReportSentTitle": "Thank you",
+  "familyReportSentBody": "Your report was sent. GK Coding reviews it within 24 hours and acts on content that breaks the rules.",
+  "familyErrorGeneric": "Something went wrong. Please try again.",
+  "familyErrorOffline": "You appear to be offline. Check your connection and try again.",
+  "familyErrorSubscriptionRequired": "This needs an active Premium subscription of the wall's owner.",
+  "familyErrorInviteExpired": "This invite has expired. Ask for a new link.",
+  "familyErrorInviteUsed": "This invite was already used. Each link works once; ask for a new one.",
+  "familyErrorInviteInvalid": "This is not a valid LifeThreads invite link.",
+  "familyErrorAlreadyMember": "You are already a member of this family wall.",
+  "familyErrorFamilyFull": "This family wall has reached its member limit.",
+  "familyErrorQuotaExceeded": "This family wall has no storage left. Delete some memories or photos to make room.",
+  "familyErrorVersionConflict": "Someone changed this memory first. Refresh and try again.",
+  "familyErrorTermsRequired": "Please accept the family wall rules first.",
+  "familyErrorSignedOut": "You were signed out. Please sign in again.",
+  "familyErrorNotAllowed": "You are not allowed to do this on this wall.",
+  "familyErrorNotFound": "Family wall not found",
+  "familyErrorOwnerCannotLeave": "The owner cannot leave the wall, but can delete it.",
+  "familyPaste": "Paste",
+  "familyErrorInviteRevoked": "This invite was withdrawn. Ask for a new link.",
+  "familyErrorKeyMissing": "This device does not have the key for this family wall (for example after a reinstall or on a new phone). Ask a member for a new invite link: opening it restores access.",
+  "familyErrorSignInUnavailable": "Sign-in is not available on this device right now.",
+  "familyErrorNoPurchase": "No Premium purchase was found for this App Store or Google Play account. Get Premium first, then try again.",
+  "familyErrorNameTooLong": "That name is too long. Please use a shorter one.",
+  "familyErrorPhotoUnreadable": "One of the photos could not be read. Remove it and try again.",
+  "familyErrorTooLarge": "This is too large to upload. Try fewer or smaller photos.",
+  "familyReportEvidenceNote": "To review it, GK Coding receives this memory's title and story with your report. Its photos are never sent."
 }

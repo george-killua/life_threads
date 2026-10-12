@@ -20,6 +20,8 @@ import '../../../backup/presentation/widgets/archive_feedback.dart';
 import '../../../backup/presentation/widgets/archive_password_dialog.dart';
 import '../../../display/data/wall_display_service.dart';
 import '../../../display/presentation/pages/wall_display_scanner_page.dart';
+import '../../../family/presentation/family_providers.dart';
+import '../../../family/presentation/widgets/wall_switcher.dart';
 import '../../../map/presentation/widgets/lifethreads_map_provider.dart';
 import '../../../media/data/photo_library_service.dart';
 import '../../../media/data/picked_memory_photo.dart';
@@ -45,6 +47,7 @@ import '../widgets/wall_background.dart';
 import '../widgets/wall_empty_state.dart';
 import '../widgets/wall_filter.dart';
 import '../widgets/wall_nail.dart';
+import '../widgets/wall_pan_surface.dart';
 import '../widgets/wall_text_note.dart';
 
 class MemoryWallPage extends ConsumerStatefulWidget {
@@ -110,6 +113,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     final repository = ref.read(memoryRepositoryProvider.notifier);
     final backupReminder = ref.watch(backupReminderProvider).asData?.value;
     final onThisDay = ref.watch(onThisDayMatchesProvider).firstOrNull;
+    // Only once family walls were used on this device; otherwise the wall
+    // never touches the family service.
+    final showWallSwitcher = ref.watch(switchableFamiliesProvider).isNotEmpty;
 
     return Scaffold(
       body: WallBackground(
@@ -194,7 +200,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                           clipBehavior: Clip.none,
                           minScale: 0.5,
                           maxScale: 2.1,
-                          // Pan is handled by [_WallPanSurface] behind nodes so
+                          // Pan is handled by [WallPanSurface] behind nodes so
                           // card/nail/note drags never fight InteractiveViewer.
                           panEnabled: false,
                           scaleEnabled:
@@ -210,7 +216,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                   clipBehavior: Clip.none,
                                   children: [
                                     Positioned.fill(
-                                      child: _WallPanSurface(
+                                      child: WallPanSurface(
                                         controller: _wallController,
                                         enabled: _draggingNodeId == null &&
                                             !_nodePointerIsDown,
@@ -391,17 +397,40 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                     _pushRoute(RouteNames.settings),
                                 onCollapse: () =>
                                     setState(() => _controlsExpanded = false),
+                                wallSwitcher: showWallSwitcher
+                                    ? const WallSwitcherButton()
+                                    : null,
                               )
                             : Align(
                                 alignment: Alignment.centerLeft,
-                                child: _CollapsedWallControlsButton(
-                                  key: const ValueKey(
-                                    'collapsed-wall-controls',
-                                  ),
-                                  selectedMode: _mode,
-                                  onTap: () =>
-                                      setState(() => _controlsExpanded = true),
-                                ),
+                                child: showWallSwitcher
+                                    ? Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          _CollapsedWallControlsButton(
+                                            key: const ValueKey(
+                                              'collapsed-wall-controls',
+                                            ),
+                                            selectedMode: _mode,
+                                            onTap: () => setState(
+                                              () => _controlsExpanded = true,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          const Flexible(
+                                            child: WallSwitcherButton(),
+                                          ),
+                                        ],
+                                      )
+                                    : _CollapsedWallControlsButton(
+                                        key: const ValueKey(
+                                          'collapsed-wall-controls',
+                                        ),
+                                        selectedMode: _mode,
+                                        onTap: () => setState(
+                                          () => _controlsExpanded = true,
+                                        ),
+                                      ),
                               ),
                       ),
                     ),
@@ -1953,6 +1982,7 @@ class _WallHeader extends StatelessWidget {
     required this.onCreateStory,
     required this.onOpenSettings,
     required this.onCollapse,
+    this.wallSwitcher,
   });
 
   final String? greetingName;
@@ -1969,6 +1999,10 @@ class _WallHeader extends StatelessWidget {
   final VoidCallback onCreateStory;
   final VoidCallback onOpenSettings;
   final VoidCallback onCollapse;
+
+  /// "My wall" / family walls, before the view modes once family walls
+  /// are in use.
+  final Widget? wallSwitcher;
 
   @override
   Widget build(BuildContext context) {
@@ -2101,6 +2135,7 @@ class _WallHeader extends StatelessWidget {
                 const SizedBox(height: 9),
                 _HeaderScrollRow(
                   children: [
+                    ?wallSwitcher,
                     for (final mode in _WallViewMode.values)
                       _WallHeaderPill(
                         selected: selectedMode == mode,
@@ -3128,60 +3163,6 @@ enum _WallViewMode {
   const _WallViewMode(this.icon);
 
   final IconData icon;
-}
-
-/// Pans the wall via [TransformationController] on empty canvas hits only.
-/// Nodes sit above this in the stack, so their drags never compete with pan.
-class _WallPanSurface extends StatefulWidget {
-  const _WallPanSurface({
-    required this.controller,
-    required this.enabled,
-  });
-
-  final TransformationController controller;
-  final bool enabled;
-
-  @override
-  State<_WallPanSurface> createState() => _WallPanSurfaceState();
-}
-
-class _WallPanSurfaceState extends State<_WallPanSurface> {
-  Offset? _lastGlobal;
-  int? _pointer;
-
-  @override
-  Widget build(BuildContext context) {
-    return Listener(
-      behavior: HitTestBehavior.opaque,
-      onPointerDown: (event) {
-        if (!widget.enabled || _pointer != null) return;
-        _pointer = event.pointer;
-        _lastGlobal = event.position;
-      },
-      onPointerMove: (event) {
-        if (!widget.enabled || event.pointer != _pointer) return;
-        final last = _lastGlobal;
-        if (last == null) return;
-        final delta = event.position - last;
-        _lastGlobal = event.position;
-        if (delta == Offset.zero) return;
-        // Pre-multiply so the translation is in screen pixels and the wall
-        // moves 1:1 with the finger at any zoom.
-        final next = Matrix4.translationValues(delta.dx, delta.dy, 0)
-          ..multiply(widget.controller.value);
-        widget.controller.value = next;
-      },
-      onPointerUp: (event) => _release(event.pointer),
-      onPointerCancel: (event) => _release(event.pointer),
-      child: const SizedBox.expand(),
-    );
-  }
-
-  void _release(int pointer) {
-    if (pointer != _pointer) return;
-    _pointer = null;
-    _lastGlobal = null;
-  }
 }
 
 enum _DragTargetKind { memory, wallItem }

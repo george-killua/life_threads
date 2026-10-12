@@ -12,9 +12,11 @@ Public policy URL: `https://gkcoding.dev/lifethreads/privacy`
 
 LifeThreads is a local-first private memory wall app. It helps you create memories with photos, titles, stories, dates, feelings, categories, locations, notes, people, and visual connections between moments.
 
-LifeThreads does not require an account, does not provide a public profile, does not include advertising, and does not include in-app chat.
+Your own wall ("My wall") needs no account. LifeThreads does not provide a public profile, does not include advertising, and does not include in-app chat.
 
-Your LifeThreads data stays on your device. GK Coding does not keep a copy of your memories. Data leaves your device only when you choose to: an exported backup file goes wherever you send it, a shared memory capsule is uploaded encrypted to GK Coding servers for a limited time, and a wall display sends a temporary snapshot to the browser screen you scanned.
+Your LifeThreads data stays on your device. GK Coding does not keep a copy of the memories on My wall. Data leaves your device only when you choose to: an exported backup file goes wherever you send it, a shared memory capsule is uploaded encrypted to GK Coding servers for a limited time, a wall display sends a temporary snapshot to the browser screen you scanned, and memories you add to a family wall are stored end-to-end encrypted on GK Coding servers for as long as they are on that wall (see section 8c).
+
+Family walls are optional. Using one requires an account through Sign in with Apple or Google Sign-In.
 
 ## 2. Information You Add to LifeThreads
 
@@ -42,7 +44,7 @@ LifeThreads may also request camera access when you choose to take a new memory 
 
 When you select or capture photos, LifeThreads may copy those files into the app's private local storage. This lets the app show your memories later even if the original photo is moved or no longer available through the photo picker.
 
-LifeThreads does not upload selected or captured photos to GK Coding unless you choose to create a shared memory capsule or another export/share action.
+LifeThreads does not upload selected or captured photos to GK Coding unless you choose to create a shared memory capsule, add them to a family wall, or use another export/share action.
 
 ## 3a. Contacts Access
 
@@ -112,13 +114,41 @@ If you scan a display QR code shown on `lifethreads.gkcoding.dev/display`, LifeT
 
 Earlier versions of LifeThreads offered Cloud Sync, which uploaded a password-protected encrypted backup archive to GK Coding servers. Cloud Sync has been retired and accepts no new backups. Archives uploaded before can still be restored or deleted from an older app version until GK Coding deletes all remaining archives. GK Coding cannot read these archives without the password you chose.
 
+## 8c. Family Walls
+
+Family walls are optional shared walls for people you invite, for example your family or friends. My wall is never part of a family wall.
+
+**Account.** To use family walls you sign in with Sign in with Apple (on iPhone and iPad) or Google Sign-In. GK Coding receives an account identifier from Apple or Google to recognise your account. We do not receive your contacts, your photo library, or your Apple or Google password.
+
+**End-to-end encryption.** Each family wall has its own key. The key is created on the device of the person who starts the wall, kept in your device's secure storage (Keychain on iPhone, Keystore on Android), and passed to new members only inside the invite link. The part of the link that carries the key is never sent to GK Coding servers. Before anything is uploaded, your device encrypts it with that key: the memories you add (title, story, date, place, feeling, category), their photos (resized before upload), the family wall's name, and the display name you choose for that wall. GK Coding stores only the encrypted data and cannot read it.
+
+**What GK Coding servers can see.** To run family walls, GK Coding processes data that is not end-to-end encrypted:
+
+- your account identifier and when the account was created
+- which family walls you belong to, your role (owner or member), and which invite you joined with
+- the number, size, and timestamps of encrypted memories and photos, and which account added each one
+- invite links' expiry and whether they were used (not the key)
+- accepted terms version, blocks you set, and reports you submit
+- whether the family wall owner has an active Premium subscription (see section 9)
+- technical data needed to deliver requests, such as your IP address
+
+**Reports.** You can report a memory or a member. A report contains the reason you pick, your optional note, which memory or member it concerns, and, for a memory, its decrypted title and story so that GK Coding can review it. Photos are never sent with a report. Reports are sent to GK Coding and reviewed within 24 hours. GK Coding may remove reported content and suspend or delete accounts that break the Terms of Use.
+
+**Blocking.** If you block a member, LifeThreads hides their memories from you. The blocked member is not told.
+
+**Leaving, removal, and deletion.** You can leave a family wall and choose to delete the memories you added. The owner can remove members and their memories, and can delete the whole family wall, which deletes all of its memories and photos from GK Coding servers. Deleting your account (section 13) deletes the family walls you own and the memories you added to other walls.
+
+**Photos on your device.** Family wall photos you open are decrypted and kept in the app's private cache on your device so the wall can be shown offline. Signing out or deleting your account removes family wall data and keys from the device.
+
 ## 9. Purchases and Premium Unlock
 
-LifeThreads may offer an optional monthly Premium subscription through Google Play Billing.
+LifeThreads may offer an optional monthly Premium subscription through Google Play Billing or the Apple App Store.
 
-Purchases are processed by Google Play. GK Coding does not receive or store your payment card details.
+Purchases are processed by Google Play or Apple. GK Coding does not receive or store your payment card details.
 
-The app may store a local premium entitlement flag after a successful purchase or restore. Google Play may process purchase-related information according to Google's own terms and privacy policy.
+The app may store a local premium entitlement flag after a successful purchase or restore. Google Play and Apple may process purchase-related information according to their own terms and privacy policies.
+
+Starting a family wall needs an active Premium subscription of its owner. When you start one, the app sends your store purchase token or receipt to GK Coding, and GK Coding checks it with Google Play or Apple and stores whether the subscription is active and when it ends. Members who join a family wall do not need Premium.
 
 ## 10. Internet Access
 
@@ -129,6 +159,7 @@ LifeThreads uses internet access for:
 - uploading encrypted shared memory capsules when you choose cloud sharing
 - downloading shared memory capsules when you open a LifeThreads share link
 - sending a temporary wall snapshot when you choose to display your wall on another screen
+- signing in, syncing encrypted family wall memories and photos, invites, reports, and subscription checks when you use family walls
 
 LifeThreads does not use internet access for advertising or analytics.
 
@@ -143,14 +174,17 @@ The current version does not include advertising SDKs or analytics SDKs.
 Third-party services may process limited technical data when their features are used:
 
 - OpenFreeMap may receive map tile requests when map views are opened.
-- Google Play may process purchase-related information when you buy or restore premium unlocks.
-- GK Coding infrastructure processes encrypted memory capsule uploads and downloads, and temporary wall display snapshots, only when you choose those features.
+- Google Play or Apple may process purchase-related information when you buy or restore premium unlocks.
+- Apple (Sign in with Apple) or Google (Google Sign-In) process your sign-in when you use family walls.
+- GK Coding infrastructure processes encrypted memory capsule uploads and downloads, temporary wall display snapshots, and encrypted family wall data only when you choose those features.
+
+Members of a family wall see the memories, photos, and display names that other members add to it. That is the purpose of a family wall.
 
 ## 12. Data Security
 
 LifeThreads is designed to minimize data transmission by keeping memories local-first.
 
-Cloud-shared memory capsules are encrypted before upload. Share links are not public listings and expire automatically, but anyone with a capsule link can access the encrypted capsule file until it expires or is deleted. Anyone who has a password-protected backup file and its password can restore it, so keep both private.
+Cloud-shared memory capsules and family wall memories and photos are encrypted on your device before upload. Anyone who has a family wall's invite link can use it once to join that wall before it expires (at most 7 days), so send invite links only to the people you invite. Share links are not public listings and expire automatically, but anyone with a capsule link can access the encrypted capsule file until it expires or is deleted. Anyone who has a password-protected backup file and its password can restore it, so keep both private.
 
 Because your memories are stored on your device, device security matters. Use a secure device passcode, keep your operating system updated, protect exported backup files, and share capsule passwords carefully.
 
@@ -164,9 +198,11 @@ You can remove local LifeThreads data by using the app's clear-data option where
 
 You can delete a shared memory capsule link from the app immediately after creating it when the delete action is shown. Shared capsule links and wall display sessions also expire automatically.
 
+You can delete your family wall account in the app at any time (Settings > Family walls > Account > Delete account). This deletes your account, the family walls you own with all of their memories and photos (for every member), and the memories and photos you added to other family walls, from GK Coding servers. It also removes family wall data and keys from your device. My wall stays on your device. Deleting the account does not cancel a Premium subscription; manage that in Google Play or the App Store. Reports about content that broke the rules may be kept as long as needed to handle them and to meet legal obligations.
+
 For help with deletion requests, use: `https://gkcoding.dev/lifethreads/delete-data` or contact `info@gkcoding.dev`.
 
-GK Coding cannot remotely delete data stored only on your device. GK Coding can only help with server-side data that was uploaded through cloud memory sharing, a wall display, or the earlier Cloud Sync and can be identified.
+GK Coding cannot remotely delete data stored only on your device. GK Coding can only help with server-side data that was uploaded through cloud memory sharing, a wall display, family walls, or the earlier Cloud Sync and can be identified. If you can no longer open the app, you can request deletion of your family wall account through the page above.
 
 ## 14. Children's Privacy
 
@@ -174,7 +210,7 @@ LifeThreads is not directed to children. If a child or minor uses LifeThreads, a
 
 ## 15. Future Features
 
-If LifeThreads later adds shared walls, accounts, analytics, crash reporting, family collaboration, or other online services, this policy will be updated before those features are released.
+If LifeThreads later adds analytics, crash reporting, or other online services, this policy will be updated before those features are released.
 
 ## 16. Changes to This Policy
 

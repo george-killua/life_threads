@@ -26,6 +26,8 @@ class MemoryCard extends StatefulWidget {
     required this.onDragStart,
     required this.onDragUpdate,
     required this.onDragEnd,
+    this.showActions = true,
+    this.footnote,
   });
 
   final MemoryEvent event;
@@ -41,6 +43,13 @@ class MemoryCard extends StatefulWidget {
   final VoidCallback onDragStart;
   final ValueChanged<Offset> onDragUpdate;
   final VoidCallback onDragEnd;
+
+  /// The edit and connect buttons; off where the viewer may not use them
+  /// (e.g. someone else's memory on a family wall).
+  final bool showActions;
+
+  /// An extra line under the title, e.g. who added it to a family wall.
+  final String? footnote;
 
   static const Size visualSize = Size(190, 236);
   static const Offset pinHeadOffset = Offset(89.5, 1.5);
@@ -111,6 +120,7 @@ class _MemoryCardState extends State<MemoryCard> {
                               _PhotoPaper(
                                 event: widget.event,
                                 isDragging: widget.isDragging,
+                                footnote: widget.footnote,
                               ),
                               _Tape(isDragging: widget.isDragging),
                               if (widget.hasConnection)
@@ -119,25 +129,26 @@ class _MemoryCardState extends State<MemoryCard> {
                           ),
                         ),
                       ),
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: Row(
-                          children: [
-                            _CardActionButton(
-                              icon: Icons.edit_rounded,
-                              onTap: widget.onEdit,
-                              tooltip: context.l10n.editMemoryTooltip,
-                            ),
-                            const SizedBox(width: 7),
-                            _CardActionButton(
-                              icon: Icons.hub_rounded,
-                              onTap: widget.onConnect,
-                              tooltip: context.l10n.connectMemoryTooltip,
-                            ),
-                          ],
+                      if (widget.showActions)
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: Row(
+                            children: [
+                              _CardActionButton(
+                                icon: Icons.edit_rounded,
+                                onTap: widget.onEdit,
+                                tooltip: context.l10n.editMemoryTooltip,
+                              ),
+                              const SizedBox(width: 7),
+                              _CardActionButton(
+                                icon: Icons.hub_rounded,
+                                onTap: widget.onConnect,
+                                tooltip: context.l10n.connectMemoryTooltip,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -223,10 +234,15 @@ class _HangingThread extends StatelessWidget {
 }
 
 class _PhotoPaper extends StatelessWidget {
-  const _PhotoPaper({required this.event, required this.isDragging});
+  const _PhotoPaper({
+    required this.event,
+    required this.isDragging,
+    this.footnote,
+  });
 
   final MemoryEvent event;
   final bool isDragging;
+  final String? footnote;
 
   @override
   Widget build(BuildContext context) {
@@ -299,6 +315,19 @@ class _PhotoPaper extends StatelessWidget {
                 fontSize: 12.5,
               ),
             ),
+            if (footnote != null) ...[
+              const SizedBox(height: 3),
+              Text(
+                footnote!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: AppColors.rope.withValues(alpha: 0.9),
+                  fontWeight: FontWeight.w800,
+                  fontSize: 12,
+                ),
+              ),
+            ],
           ],
         ),
       ),

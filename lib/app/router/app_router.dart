@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/backup/presentation/pages/archive_transfer_page.dart';
 import '../../features/capsule/domain/memory_capsule_models.dart';
 import '../../features/capsule/presentation/pages/capsule_cinema_page.dart';
+import '../../features/family/presentation/family_routes.dart';
 import '../../features/media/data/picked_memory_photo.dart';
 import '../../features/memories/presentation/pages/add_memory_page.dart';
 import '../../features/memories/presentation/pages/edit_memory_page.dart';
@@ -103,6 +104,7 @@ class AppRouter {
               : null,
         ),
       ),
+      ...familyRoutes,
     ],
   );
 }

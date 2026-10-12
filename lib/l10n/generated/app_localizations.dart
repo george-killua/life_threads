@@ -3650,6 +3650,1194 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your year as a short film: the moments that mattered, threaded in order, with music.'**
   String get benefitYearThreadBody;
+
+  /// No description provided for @myWall.
+  ///
+  /// In en, this message translates to:
+  /// **'My wall'**
+  String get myWall;
+
+  /// No description provided for @myWallSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Private, on this device'**
+  String get myWallSubtitle;
+
+  /// No description provided for @switchWall.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch wall'**
+  String get switchWall;
+
+  /// No description provided for @familyWallsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family walls'**
+  String get familyWallsTitle;
+
+  /// No description provided for @familyWallsSettingsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Share one wall with family or friends: everyone adds memories, end-to-end encrypted. My wall stays private on this device.'**
+  String get familyWallsSettingsBody;
+
+  /// No description provided for @familyWallsOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open family walls'**
+  String get familyWallsOpen;
+
+  /// No description provided for @familyWallsManage.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage family walls'**
+  String get familyWallsManage;
+
+  /// No description provided for @familyWallsHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'One wall, the whole family'**
+  String get familyWallsHeadline;
+
+  /// No description provided for @familyWallsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'A family wall is shared with the people you invite. Memories and photos are encrypted on your phone before they are uploaded; only members can open them. My wall is not shared and stays on this device.'**
+  String get familyWallsIntro;
+
+  /// No description provided for @familyUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available yet'**
+  String get familyUnavailableTitle;
+
+  /// No description provided for @familyUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Family walls are not available in this version of LifeThreads yet.'**
+  String get familyUnavailable;
+
+  /// No description provided for @familySignInNeededTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to use family walls'**
+  String get familySignInNeededTitle;
+
+  /// No description provided for @familySignInNeededBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A shared wall needs an account so the family knows who added what. My wall works without one.'**
+  String get familySignInNeededBody;
+
+  /// No description provided for @familySignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get familySignIn;
+
+  /// No description provided for @familyLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load'**
+  String get familyLoadFailed;
+
+  /// No description provided for @familyRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get familyRetry;
+
+  /// No description provided for @familyNoWallsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No family walls yet. Start one or join with an invite link.'**
+  String get familyNoWallsYet;
+
+  /// No description provided for @familyStartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start or join'**
+  String get familyStartTitle;
+
+  /// No description provided for @familyStartBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting a family wall needs Premium. Joining one is free: the owner\'s Premium covers the family.'**
+  String get familyStartBody;
+
+  /// No description provided for @familyCreateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create family wall'**
+  String get familyCreateAction;
+
+  /// No description provided for @familyCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New family wall'**
+  String get familyCreateTitle;
+
+  /// No description provided for @familyNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name of the wall'**
+  String get familyNameLabel;
+
+  /// No description provided for @familyNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. The Millers'**
+  String get familyNameHint;
+
+  /// No description provided for @familyMyNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name on this wall'**
+  String get familyMyNameLabel;
+
+  /// No description provided for @familyMyNameHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Members see it on your memories. It is encrypted like everything on the wall.'**
+  String get familyMyNameHelper;
+
+  /// No description provided for @familyMyNameSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Name saved.'**
+  String get familyMyNameSaved;
+
+  /// No description provided for @familySetMyName.
+  ///
+  /// In en, this message translates to:
+  /// **'My name'**
+  String get familySetMyName;
+
+  /// No description provided for @familyCheckingSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking your Premium…'**
+  String get familyCheckingSubscription;
+
+  /// No description provided for @familyCreating.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating the wall…'**
+  String get familyCreating;
+
+  /// No description provided for @familyJoinWithLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Join with link'**
+  String get familyJoinWithLink;
+
+  /// No description provided for @familyInviteLinkLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite link'**
+  String get familyInviteLinkLabel;
+
+  /// No description provided for @familyJoinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join this family wall?'**
+  String get familyJoinTitle;
+
+  /// No description provided for @familyJoinBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Members will see your name and the memories you add, and you will see theirs. You can leave at any time.'**
+  String get familyJoinBody;
+
+  /// No description provided for @familyJoinAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Join'**
+  String get familyJoinAction;
+
+  /// No description provided for @familyJoining.
+  ///
+  /// In en, this message translates to:
+  /// **'Joining…'**
+  String get familyJoining;
+
+  /// No description provided for @familyJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'You joined {family}.'**
+  String familyJoined(String family);
+
+  /// No description provided for @familyRoleOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get familyRoleOwner;
+
+  /// No description provided for @familyRoleMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Member'**
+  String get familyRoleMember;
+
+  /// No description provided for @familyMemberCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 member} other{{count} members}}'**
+  String familyMemberCount(int count);
+
+  /// No description provided for @familySettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wall settings'**
+  String get familySettingsTitle;
+
+  /// No description provided for @familyStorageUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'{used} of {total} used'**
+  String familyStorageUsed(String used, String total);
+
+  /// No description provided for @familyRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get familyRename;
+
+  /// No description provided for @familyInviteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite'**
+  String get familyInviteTitle;
+
+  /// No description provided for @familyInviteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a link to someone you trust. Each link works once and expires after 7 days.'**
+  String get familyInviteBody;
+
+  /// No description provided for @familyInviteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create invite link'**
+  String get familyInviteAction;
+
+  /// No description provided for @familyCreatingInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating the invite…'**
+  String get familyCreatingInvite;
+
+  /// No description provided for @familyInviteReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite link ready'**
+  String get familyInviteReady;
+
+  /// No description provided for @familyInviteValidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Works once and expires after 7 days at the latest.'**
+  String get familyInviteValidity;
+
+  /// No description provided for @familyInviteKeyWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'The link carries the wall\'s key: whoever opens it can join and read the wall. Send it only to the person you invite.'**
+  String get familyInviteKeyWarning;
+
+  /// No description provided for @familyInviteShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share link'**
+  String get familyInviteShare;
+
+  /// No description provided for @familyInviteCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get familyInviteCopy;
+
+  /// No description provided for @familyInviteCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied.'**
+  String get familyInviteCopied;
+
+  /// No description provided for @familyInviteShareFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing is not available. Copy the link instead.'**
+  String get familyInviteShareFailed;
+
+  /// No description provided for @familyInviteSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Join {family} on LifeThreads'**
+  String familyInviteSubject(String family);
+
+  /// No description provided for @familyInviteText.
+  ///
+  /// In en, this message translates to:
+  /// **'Join our family wall \"{family}\" on LifeThreads: {link}'**
+  String familyInviteText(String family, String link);
+
+  /// No description provided for @familyMembersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get familyMembersTitle;
+
+  /// No description provided for @familyMemberActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Member actions'**
+  String get familyMemberActions;
+
+  /// No description provided for @familyYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get familyYou;
+
+  /// No description provided for @familyYouNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} (you)'**
+  String familyYouNamed(String name);
+
+  /// No description provided for @familyAMember.
+  ///
+  /// In en, this message translates to:
+  /// **'A member'**
+  String get familyAMember;
+
+  /// No description provided for @familyFormerMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Former member'**
+  String get familyFormerMember;
+
+  /// No description provided for @familyBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked'**
+  String get familyBlocked;
+
+  /// No description provided for @familyBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Block'**
+  String get familyBlock;
+
+  /// No description provided for @familyUnblock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock'**
+  String get familyUnblock;
+
+  /// No description provided for @familyBlockAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'Block {name}'**
+  String familyBlockAuthor(String name);
+
+  /// No description provided for @familyBlockQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Block {name}?'**
+  String familyBlockQuestion(String name);
+
+  /// No description provided for @familyBlockBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You will no longer see their memories on any family wall. They are not told. You can unblock them in the members list.'**
+  String get familyBlockBody;
+
+  /// No description provided for @familyReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get familyReport;
+
+  /// No description provided for @familyRemoveMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from wall'**
+  String get familyRemoveMember;
+
+  /// No description provided for @familyRemoveQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name}?'**
+  String familyRemoveQuestion(String name);
+
+  /// No description provided for @familyRemoveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'They lose access to this wall. Invite them again to bring them back.'**
+  String get familyRemoveBody;
+
+  /// No description provided for @familyRemoveDeleteContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Also delete the memories they added'**
+  String get familyRemoveDeleteContent;
+
+  /// No description provided for @familyDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete family wall'**
+  String get familyDeleteTitle;
+
+  /// No description provided for @familyDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'As the owner you cannot leave the wall; you can delete it for everyone.'**
+  String get familyDeleteBody;
+
+  /// No description provided for @familyDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete wall'**
+  String get familyDeleteAction;
+
+  /// No description provided for @familyDeleteQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {family}?'**
+  String familyDeleteQuestion(String family);
+
+  /// No description provided for @familyDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'All memories and photos on this wall are deleted from our servers for every member. This cannot be undone. Memories on My wall are not affected.'**
+  String get familyDeleteConfirmBody;
+
+  /// No description provided for @familyDeleting.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting…'**
+  String get familyDeleting;
+
+  /// No description provided for @familyLeaveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave family wall'**
+  String get familyLeaveTitle;
+
+  /// No description provided for @familyLeaveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You stop seeing this wall. You can keep or delete the memories you added.'**
+  String get familyLeaveBody;
+
+  /// No description provided for @familyLeaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave'**
+  String get familyLeaveAction;
+
+  /// No description provided for @familyLeaveQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave {family}?'**
+  String familyLeaveQuestion(String family);
+
+  /// No description provided for @familyLeaveConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'To come back you need a new invite.'**
+  String get familyLeaveConfirmBody;
+
+  /// No description provided for @familyLeaveDeleteMine.
+  ///
+  /// In en, this message translates to:
+  /// **'Also delete the memories I added'**
+  String get familyLeaveDeleteMine;
+
+  /// No description provided for @familyLeaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaving…'**
+  String get familyLeaving;
+
+  /// No description provided for @familySignInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get familySignInTitle;
+
+  /// No description provided for @familySignInHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'An account for family walls'**
+  String get familySignInHeadline;
+
+  /// No description provided for @familySignInWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'A family wall is shared, so it needs an account: members see who added each memory, and only members can open the wall.'**
+  String get familySignInWhy;
+
+  /// No description provided for @familySignInMyWallStays.
+  ///
+  /// In en, this message translates to:
+  /// **'My wall needs no account. It stays private on this device and is never uploaded.'**
+  String get familySignInMyWallStays;
+
+  /// No description provided for @familySignInEncrypted.
+  ///
+  /// In en, this message translates to:
+  /// **'Family memories and photos are end-to-end encrypted. GK Coding stores them but cannot read them.'**
+  String get familySignInEncrypted;
+
+  /// No description provided for @familySignInWhatWeGet.
+  ///
+  /// In en, this message translates to:
+  /// **'From Apple or Google we only use an account ID, not your contacts or photos.'**
+  String get familySignInWhatWeGet;
+
+  /// No description provided for @familySignInApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Apple'**
+  String get familySignInApple;
+
+  /// No description provided for @familySignInGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get familySignInGoogle;
+
+  /// No description provided for @familySignInFinePrint.
+  ///
+  /// In en, this message translates to:
+  /// **'By signing in you agree to the Terms of Use and the Privacy Policy. You can delete your account in the app at any time.'**
+  String get familySignInFinePrint;
+
+  /// No description provided for @familyAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get familyAccountTitle;
+
+  /// No description provided for @familySignedOutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not signed in'**
+  String get familySignedOutTitle;
+
+  /// No description provided for @familySignedOutBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to see your family walls. My wall works without an account.'**
+  String get familySignedOutBody;
+
+  /// No description provided for @familySignedInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in'**
+  String get familySignedInTitle;
+
+  /// No description provided for @familySignedInBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is used only for family walls.'**
+  String get familySignedInBody;
+
+  /// No description provided for @familyAccountId.
+  ///
+  /// In en, this message translates to:
+  /// **'Account ID: {id}'**
+  String familyAccountId(String id);
+
+  /// No description provided for @familySignOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get familySignOut;
+
+  /// No description provided for @familySignOutQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out?'**
+  String get familySignOutQuestion;
+
+  /// No description provided for @familySignOutBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Family walls and their keys are removed from this device until you sign in again. Nothing is deleted on the server. My wall is not affected.'**
+  String get familySignOutBody;
+
+  /// No description provided for @familySigningOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing out…'**
+  String get familySigningOut;
+
+  /// No description provided for @familyDeleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get familyDeleteAccountTitle;
+
+  /// No description provided for @familyDeleteAccountBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Deletes your account and your family wall data from our servers. My wall stays on this device.'**
+  String get familyDeleteAccountBody;
+
+  /// No description provided for @familyDeleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get familyDeleteAccount;
+
+  /// No description provided for @familyDeleteAccountQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your account?'**
+  String get familyDeleteAccountQuestion;
+
+  /// No description provided for @familyDeleteAccountOwned.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{You own no family wall.} =1{The family wall you own is deleted for all its members, with every memory and photo on it.} other{The {count} family walls you own are deleted for all their members, with every memory and photo on them.}}'**
+  String familyDeleteAccountOwned(int count);
+
+  /// No description provided for @familyDeleteAccountPosts.
+  ///
+  /// In en, this message translates to:
+  /// **'The memories and photos you added to other families\' walls are deleted, and you leave those walls.'**
+  String get familyDeleteAccountPosts;
+
+  /// No description provided for @familyDeleteAccountKeys.
+  ///
+  /// In en, this message translates to:
+  /// **'Family wall keys and cached photos are removed from this device. This cannot be undone.'**
+  String get familyDeleteAccountKeys;
+
+  /// No description provided for @familyDeleteAccountMyWall.
+  ///
+  /// In en, this message translates to:
+  /// **'My wall is not affected: its memories stay on this device.'**
+  String get familyDeleteAccountMyWall;
+
+  /// No description provided for @familyDeleteAccountSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'A Premium subscription is not cancelled by this; manage it in the App Store or Google Play.'**
+  String get familyDeleteAccountSubscription;
+
+  /// No description provided for @familyDeleteAccountUnderstood.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand that this deletes my account for good.'**
+  String get familyDeleteAccountUnderstood;
+
+  /// No description provided for @familyDeletingAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting your account…'**
+  String get familyDeletingAccount;
+
+  /// No description provided for @familyAccountDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account was deleted.'**
+  String get familyAccountDeleted;
+
+  /// No description provided for @familyTermsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family wall rules'**
+  String get familyTermsTitle;
+
+  /// No description provided for @familyTermsHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Before you share'**
+  String get familyTermsHeadline;
+
+  /// No description provided for @familyTermsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Family walls are for the people you invite. To keep them safe, everyone accepts these rules:'**
+  String get familyTermsIntro;
+
+  /// No description provided for @familyTermsZeroTolerance.
+  ///
+  /// In en, this message translates to:
+  /// **'Zero tolerance for objectionable content: no harassment, hate, sexual content, violence, self-harm, illegal content, or other people\'s private information without their consent.'**
+  String get familyTermsZeroTolerance;
+
+  /// No description provided for @familyTermsOwnContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Share only photos and stories you are allowed to share.'**
+  String get familyTermsOwnContent;
+
+  /// No description provided for @familyTermsReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Report any memory or member from the wall. GK Coding reviews reports within 24 hours.'**
+  String get familyTermsReport;
+
+  /// No description provided for @familyTermsBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Block a member to stop seeing their memories.'**
+  String get familyTermsBlock;
+
+  /// No description provided for @familyTermsOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'The owner of a wall can remove members and their memories.'**
+  String get familyTermsOwner;
+
+  /// No description provided for @familyTermsConsequences.
+  ///
+  /// In en, this message translates to:
+  /// **'Content that breaks these rules is removed, and the accounts that posted it can be suspended or deleted.'**
+  String get familyTermsConsequences;
+
+  /// No description provided for @familyTermsReadFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Read the full terms'**
+  String get familyTermsReadFull;
+
+  /// No description provided for @familyTermsAgree.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree to the Terms of Use and these rules.'**
+  String get familyTermsAgree;
+
+  /// No description provided for @familyTermsAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept and continue'**
+  String get familyTermsAccept;
+
+  /// No description provided for @familyTermsVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms version {version}'**
+  String familyTermsVersion(String version);
+
+  /// No description provided for @familyWallEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The wall is waiting'**
+  String get familyWallEmptyTitle;
+
+  /// No description provided for @familyWallEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the first memory. Everyone on this wall will see it.'**
+  String get familyWallEmptyBody;
+
+  /// No description provided for @familyWallGoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This family wall is no longer available to you. It may have been deleted, or you were removed.'**
+  String get familyWallGoneBody;
+
+  /// No description provided for @familyAddMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add memory'**
+  String get familyAddMemory;
+
+  /// No description provided for @familyRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get familyRefresh;
+
+  /// No description provided for @familySyncing.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing…'**
+  String get familySyncing;
+
+  /// No description provided for @familyOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline: showing saved memories'**
+  String get familyOffline;
+
+  /// No description provided for @familySyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync failed'**
+  String get familySyncFailed;
+
+  /// No description provided for @familyMemoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get familyMemoryTitle;
+
+  /// No description provided for @familyMemoryGone.
+  ///
+  /// In en, this message translates to:
+  /// **'This memory is no longer on the wall.'**
+  String get familyMemoryGone;
+
+  /// No description provided for @familyMemoryActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory actions'**
+  String get familyMemoryActions;
+
+  /// No description provided for @familyAddedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Added by {name}'**
+  String familyAddedBy(String name);
+
+  /// No description provided for @familyDeleteMemoryQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this memory?'**
+  String get familyDeleteMemoryQuestion;
+
+  /// No description provided for @familyDeleteMemoryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It is removed from the wall for everyone, with its photos.'**
+  String get familyDeleteMemoryBody;
+
+  /// No description provided for @familyDeleteMemoryAsOwnerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'As the owner you can remove memories from this wall. This memory by {name} is removed for everyone, with its photos.'**
+  String familyDeleteMemoryAsOwnerBody(String name);
+
+  /// No description provided for @familyDeletingMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting the memory…'**
+  String get familyDeletingMemory;
+
+  /// No description provided for @familyNoPhotosYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No photos yet'**
+  String get familyNoPhotosYet;
+
+  /// No description provided for @familyPostNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone on this wall will see this memory. Photos are resized and encrypted on your phone before upload.'**
+  String get familyPostNote;
+
+  /// No description provided for @familyPostMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Post to the wall'**
+  String get familyPostMemory;
+
+  /// No description provided for @familyUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypting and uploading…'**
+  String get familyUploading;
+
+  /// No description provided for @familyMemorySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to the family wall.'**
+  String get familyMemorySaved;
+
+  /// No description provided for @familyConflictTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Changed by someone else'**
+  String get familyConflictTitle;
+
+  /// No description provided for @familyConflictBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This memory changed on another device while you were editing. Load the latest version and save your changes over it?'**
+  String get familyConflictBody;
+
+  /// No description provided for @familyConflictRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh and save'**
+  String get familyConflictRetry;
+
+  /// No description provided for @familyQuotaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The wall is full'**
+  String get familyQuotaTitle;
+
+  /// No description provided for @familyReportMemoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report memory'**
+  String get familyReportMemoryTitle;
+
+  /// No description provided for @familyReportPhotoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report photo'**
+  String get familyReportPhotoTitle;
+
+  /// No description provided for @familyReportMemberTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report member'**
+  String get familyReportMemberTitle;
+
+  /// No description provided for @familyReportIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us what is wrong. Your report goes to GK Coding, not to the person you report.'**
+  String get familyReportIntro;
+
+  /// No description provided for @familyReportSpam.
+  ///
+  /// In en, this message translates to:
+  /// **'Spam or scam'**
+  String get familyReportSpam;
+
+  /// No description provided for @familyReportHarassment.
+  ///
+  /// In en, this message translates to:
+  /// **'Harassment or bullying'**
+  String get familyReportHarassment;
+
+  /// No description provided for @familyReportHate.
+  ///
+  /// In en, this message translates to:
+  /// **'Hate speech'**
+  String get familyReportHate;
+
+  /// No description provided for @familyReportSexual.
+  ///
+  /// In en, this message translates to:
+  /// **'Sexual content or nudity'**
+  String get familyReportSexual;
+
+  /// No description provided for @familyReportViolence.
+  ///
+  /// In en, this message translates to:
+  /// **'Violence or threats'**
+  String get familyReportViolence;
+
+  /// No description provided for @familyReportSelfHarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Self-harm or suicide'**
+  String get familyReportSelfHarm;
+
+  /// No description provided for @familyReportIllegal.
+  ///
+  /// In en, this message translates to:
+  /// **'Illegal content'**
+  String get familyReportIllegal;
+
+  /// No description provided for @familyReportPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Private information shared without consent'**
+  String get familyReportPrivacy;
+
+  /// No description provided for @familyReportOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Something else'**
+  String get familyReportOther;
+
+  /// No description provided for @familyReportDetailsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Details (optional)'**
+  String get familyReportDetailsLabel;
+
+  /// No description provided for @familyReportDetailsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What should we know?'**
+  String get familyReportDetailsHint;
+
+  /// No description provided for @familyReportAlsoBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Also block {name}'**
+  String familyReportAlsoBlock(String name);
+
+  /// No description provided for @familyReportSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send report'**
+  String get familyReportSend;
+
+  /// No description provided for @familyReportReviewNote.
+  ///
+  /// In en, this message translates to:
+  /// **'GK Coding reviews every report within 24 hours and removes content and members that break the rules.'**
+  String get familyReportReviewNote;
+
+  /// No description provided for @familyReportSentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you'**
+  String get familyReportSentTitle;
+
+  /// No description provided for @familyReportSentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your report was sent. GK Coding reviews it within 24 hours and acts on content that breaks the rules.'**
+  String get familyReportSentBody;
+
+  /// No description provided for @familyErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get familyErrorGeneric;
+
+  /// No description provided for @familyErrorOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'You appear to be offline. Check your connection and try again.'**
+  String get familyErrorOffline;
+
+  /// No description provided for @familyErrorSubscriptionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This needs an active Premium subscription of the wall\'s owner.'**
+  String get familyErrorSubscriptionRequired;
+
+  /// No description provided for @familyErrorInviteExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This invite has expired. Ask for a new link.'**
+  String get familyErrorInviteExpired;
+
+  /// No description provided for @familyErrorInviteUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'This invite was already used. Each link works once; ask for a new one.'**
+  String get familyErrorInviteUsed;
+
+  /// No description provided for @familyErrorInviteInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This is not a valid LifeThreads invite link.'**
+  String get familyErrorInviteInvalid;
+
+  /// No description provided for @familyErrorAlreadyMember.
+  ///
+  /// In en, this message translates to:
+  /// **'You are already a member of this family wall.'**
+  String get familyErrorAlreadyMember;
+
+  /// No description provided for @familyErrorFamilyFull.
+  ///
+  /// In en, this message translates to:
+  /// **'This family wall has reached its member limit.'**
+  String get familyErrorFamilyFull;
+
+  /// No description provided for @familyErrorQuotaExceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'This family wall has no storage left. Delete some memories or photos to make room.'**
+  String get familyErrorQuotaExceeded;
+
+  /// No description provided for @familyErrorVersionConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone changed this memory first. Refresh and try again.'**
+  String get familyErrorVersionConflict;
+
+  /// No description provided for @familyErrorTermsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please accept the family wall rules first.'**
+  String get familyErrorTermsRequired;
+
+  /// No description provided for @familyErrorSignedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'You were signed out. Please sign in again.'**
+  String get familyErrorSignedOut;
+
+  /// No description provided for @familyErrorNotAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not allowed to do this on this wall.'**
+  String get familyErrorNotAllowed;
+
+  /// No description provided for @familyErrorNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Family wall not found'**
+  String get familyErrorNotFound;
+
+  /// No description provided for @familyErrorOwnerCannotLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'The owner cannot leave the wall, but can delete it.'**
+  String get familyErrorOwnerCannotLeave;
+
+  /// No description provided for @familyPaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste'**
+  String get familyPaste;
+
+  /// No description provided for @familyErrorInviteRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'This invite was withdrawn. Ask for a new link.'**
+  String get familyErrorInviteRevoked;
+
+  /// No description provided for @familyErrorKeyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'This device does not have the key for this family wall (for example after a reinstall or on a new phone). Ask a member for a new invite link: opening it restores access.'**
+  String get familyErrorKeyMissing;
+
+  /// No description provided for @familyErrorSignInUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in is not available on this device right now.'**
+  String get familyErrorSignInUnavailable;
+
+  /// No description provided for @familyErrorNoPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'No Premium purchase was found for this App Store or Google Play account. Get Premium first, then try again.'**
+  String get familyErrorNoPurchase;
+
+  /// No description provided for @familyErrorNameTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'That name is too long. Please use a shorter one.'**
+  String get familyErrorNameTooLong;
+
+  /// No description provided for @familyErrorPhotoUnreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'One of the photos could not be read. Remove it and try again.'**
+  String get familyErrorPhotoUnreadable;
+
+  /// No description provided for @familyErrorTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'This is too large to upload. Try fewer or smaller photos.'**
+  String get familyErrorTooLarge;
+
+  /// No description provided for @familyReportEvidenceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'To review it, GK Coding receives this memory\'s title and story with your report. Its photos are never sent.'**
+  String get familyReportEvidenceNote;
 }
 
 class _AppLocalizationsDelegate
