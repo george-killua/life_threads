@@ -13,7 +13,7 @@ Suggested start price: €2.99 / month
 
 ## Why Subscription
 
-Premium unlocks ongoing value (unlimited memories, backups, themes, layouts). A monthly subscription matches that ongoing access and keeps the price low at the free-limit conversion moment.
+Premium unlocks ongoing value (unlimited memories, themes, layouts). A monthly subscription matches that ongoing access and keeps the price low at the free-limit conversion moment.
 
 ## Free Tier
 
@@ -24,13 +24,13 @@ Free includes:
 - basic wall theme
 - memory detail pages
 - wall, timeline, and map modes
+- backup and restore (export/import with photos, optional password)
 
 ## Premium Tier
 
 Premium includes while subscribed:
 
 - unlimited memories
-- export/import backups
 - premium wall themes
 - advanced layouts
 - future photo book/export tools
@@ -56,6 +56,10 @@ Keep every memory without hitting a wall.
 1. Create an auto-renewable subscription with the same product ID when shipping iOS
 2. Put it in a subscription group (e.g. LifeThreads Premium)
 
+## Why Backups Are Free
+
+The backup file is the only full copy of a user's memories that leaves the phone (GK Coding keeps none). Locking it behind Premium would leave free users with no way to protect their data, so export and import stay free for everyone.
+
 ## Upgrade Timing
 
 Show upgrade prompts when:
@@ -64,7 +68,6 @@ Show upgrade prompts when:
 - user reaches 30 memories: hard limit
 - user taps premium theme
 - user taps advanced layout
-- user taps export if export is premium-gated
 
 ## Copy
 

@@ -38,7 +38,7 @@ What you can do:
 - View memories as a wall, timeline, or map.
 - Open a cinematic memory chapter with photos, story, metadata, connected notes, and related moments.
 - Keep your memories local-first on your device.
-- Export and restore your local memory archive.
+- Back up everything – photos included – into one file, free, and keep it wherever you like.
 - Share one encrypted memory capsule by private link when you choose.
 - Choose wall themes and layouts as the app grows.
 
@@ -50,7 +50,7 @@ A trip, a person, a place, a first launch, a birthday, a quiet evening, or a sma
 
 Privacy-first:
 
-LifeThreads is local-first. There is no account, no social feed, no public profile, and no advertising system. Optional memory capsule sharing uploads only the one encrypted memory package you choose to share. Optional Cloud Sync stores only a password-protected encrypted backup archive on GK Coding servers. Your memories are created for you, not for an algorithm.
+LifeThreads is local-first. There is no account, no social feed, no public profile, and no advertising system. We keep no copy of your memories: your backup is one file you save wherever you like. Optional memory capsule sharing uploads only the one encrypted memory you choose to share, for a limited time. Your memories are created for you, not for an algorithm.
 
 Use LifeThreads for:
 
@@ -79,8 +79,8 @@ LifeThreads is still growing. The first release focuses on the core experience: 
 - Fullscreen photo preview
 - Edit memories after creation
 - Manage memory connections
-- Export and import local backups
-- Optional encrypted Cloud Sync backup and restore
+- Free backup and restore in one file (optionally password-encrypted)
+- Backup reminder when new memories are not in a backup yet
 - Optional encrypted memory capsule sharing
 - Shared links expire and can be deleted/revoked
 - Premium-ready structure for future unlocks
@@ -129,12 +129,12 @@ Avoid:
 
 Recommended Play Console answers for the current release:
 
-- Data collected by developer: Yes, only when the user chooses cloud memory sharing, Cloud Sync, or uses online services such as map tiles / Play Billing.
+- Data collected by developer: Yes, only when the user chooses cloud memory sharing or a wall display. Backup files never go to GK Coding servers; Android cloud backup is turned off for the app (device-to-device transfer only).
 - Data shared by developer: No advertising or analytics sharing.
 - Data encrypted in transit: Yes.
 - Data deletion request: Yes. Use `https://gkcoding.dev/lifethreads/delete-data`.
-- Photos and videos: User-selected photos are used for app functionality. They stay local unless the user exports, shares an encrypted memory capsule, or creates an encrypted Cloud Sync backup.
-- Location: Optional photo metadata location is used for app functionality. Location metadata may be included in an encrypted shared capsule or encrypted Cloud Sync backup if the user chooses those features. Production map tile requests are sent to MapTiler when map features are opened and may reveal viewed map area to the map tile provider.
+- Photos and videos: User-selected photos are used for app functionality. They stay local unless the user exports a backup (saved where the user chooses), shares an encrypted memory capsule, or displays the wall on another screen. Declare Photos as collected (not shared), user-initiated, for app functionality: the wall display snapshot is stored unencrypted on GK Coding servers until the session expires (at most 60 minutes).
+- Location: Optional photo metadata location is used for app functionality. Place names may be included in a shared capsule or a wall display snapshot if the user chooses those features. Map tile requests are sent to OpenFreeMap when map features are opened and may reveal the viewed map area to the tile provider.
 - App activity / analytics: Not collected in the current version.
 - Account info: Not collected.
 - Financial info: Not collected by the app. Google Play Billing purchases are processed by Google Play.

@@ -4,13 +4,13 @@ import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../app/theme/app_colors.dart';
 import '../../../core/database/app_database.dart' as db;
 import '../../../core/database/database_provider.dart';
 import '../../../core/storage/app_storage_paths.dart';
-import '../../backup/data/cloud_sync_service.dart';
 import '../../backup/domain/backup_models.dart';
 import '../../onboarding/onboarding_preferences.dart';
 import '../../wall/domain/wall_item.dart';
@@ -495,11 +495,14 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       await photosDir.delete(recursive: true);
     }
 
-    // "All local data" includes the profile name and the cloud sync key.
+    // "All local data" includes the profile name, and the sync key older
+    // versions kept for the removed Cloud Sync.
     final preferences = ref.read(onboardingPreferencesProvider);
     await preferences.disableDemoWall();
     await preferences.setDisplayName('');
-    await ref.read(cloudSyncServiceProvider).forgetSyncKey();
+    await (await SharedPreferences.getInstance()).remove(
+      'lifethreads.cloud_sync_key',
+    );
     ref.invalidate(userDisplayNameProvider);
     state = await AsyncValue.guard(_loadState);
   }

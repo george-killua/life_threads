@@ -10,9 +10,8 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/localization/locale_controller.dart';
 import '../../../../core/logging/app_logger.dart';
-import '../../../../core/widgets/dispose_on_unmount.dart';
+import '../../../backup/data/backup_reminder.dart';
 import '../../../backup/data/backup_service.dart';
-import '../../../backup/data/cloud_sync_service.dart';
 import '../../../backup/domain/backup_models.dart';
 import '../../../backup/presentation/widgets/archive_feedback.dart';
 import '../../../backup/presentation/widgets/archive_password_dialog.dart';
@@ -136,12 +135,11 @@ class SettingsPage extends ConsumerWidget {
               ),
               _SettingsCard(
                 icon: Icons.enhanced_encryption_rounded,
-                title: l10n.premiumArchiveTitle,
-                body: l10n.premiumArchiveBody,
-                badge: isPremium ? l10n.premiumBadge : l10n.unlockBadge,
+                title: l10n.backupArchiveTitle,
+                body: l10n.backupArchiveBody,
                 actions: [
                   _SettingsAction(
-                    label: isPremium ? l10n.exportArchive : l10n.unlockExport,
+                    label: l10n.exportArchive,
                     icon: Icons.ios_share_rounded,
                     onTap: memoryState.asData == null
                         ? null
@@ -161,46 +159,6 @@ class SettingsPage extends ConsumerWidget {
                     label: l10n.moveDevices,
                     icon: Icons.devices_rounded,
                     onTap: () => context.push(RouteNames.archiveTransfer),
-                  ),
-                ],
-              ),
-              _SettingsCard(
-                icon: Icons.cloud_done_rounded,
-                title: l10n.cloudSyncTitle,
-                body: l10n.cloudSyncBody,
-                badge: l10n.vpsBadge,
-                actions: [
-                  _SettingsAction(
-                    label: isPremium ? l10n.backUpNow : l10n.unlockBackup,
-                    icon: Icons.cloud_upload_rounded,
-                    onTap: memoryState.asData == null
-                        ? null
-                        : () => _uploadCloudBackup(
-                            context,
-                            ref,
-                            memoryState.value!,
-                          ),
-                  ),
-                  _SettingsAction(
-                    label: l10n.restoreLatest,
-                    icon: Icons.cloud_download_rounded,
-                    onTap: () => _restoreCloudBackup(context, ref),
-                  ),
-                  _SettingsAction(
-                    label: l10n.copyKey,
-                    icon: Icons.key_rounded,
-                    onTap: () => _copyCloudSyncKey(context, ref),
-                  ),
-                  _SettingsAction(
-                    label: l10n.useKey,
-                    icon: Icons.login_rounded,
-                    onTap: () => _useCloudSyncKey(context, ref),
-                  ),
-                  _SettingsAction(
-                    label: l10n.deleteCloud,
-                    icon: Icons.delete_outline_rounded,
-                    danger: true,
-                    onTap: () => _deleteCloudBackup(context, ref),
                   ),
                 ],
               ),
@@ -326,13 +284,6 @@ class SettingsPage extends ConsumerWidget {
     MemoryState state,
   ) async {
     final l10n = context.l10n;
-    final isPremium =
-        ref.read(premiumEntitlementProvider).asData?.value.isPremium ?? false;
-    if (!isPremium) {
-      await context.push(RouteNames.upgrade);
-      return;
-    }
-
     final password = await showArchivePasswordDialog(
       context,
       purpose: ArchivePasswordPurpose.export,
@@ -344,7 +295,11 @@ class SettingsPage extends ConsumerWidget {
           .read(backupServiceProvider)
           .exportBackup(state, password: password);
       if (!context.mounted) return;
-      await shareExportedArchive(context, result);
+      await shareExportedArchive(
+        context,
+        result,
+        onSaved: ref.read(backupReminderProvider.notifier).markSaved,
+      );
     } catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
@@ -381,192 +336,6 @@ class SettingsPage extends ConsumerWidget {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.importFailed('$error'))));
-    }
-  }
-
-  Future<void> _uploadCloudBackup(
-    BuildContext context,
-    WidgetRef ref,
-    MemoryState state,
-  ) async {
-    final l10n = context.l10n;
-    final isPremium =
-        ref.read(premiumEntitlementProvider).asData?.value.isPremium ?? false;
-    if (!isPremium) {
-      await context.push(RouteNames.upgrade);
-      return;
-    }
-
-    final password = await showArchivePasswordDialog(
-      context,
-      purpose: ArchivePasswordPurpose.export,
-    );
-    if (!context.mounted || password == null) return;
-    if (password.trim().isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.cloudBackupNeedsPassword)));
-      return;
-    }
-
-    try {
-      final sync = await ref
-          .read(cloudSyncServiceProvider)
-          .uploadBackup(state: state, password: password);
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.cloudBackupSaved(sync.memoryCount ?? state.events.length),
-          ),
-        ),
-      );
-    } on CloudSyncException catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.cloudBackupFailed(error.message))),
-      );
-    } catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.cloudBackupFailed('$error'))));
-    }
-  }
-
-  Future<void> _restoreCloudBackup(BuildContext context, WidgetRef ref) async {
-    final l10n = context.l10n;
-    final password = await showArchivePasswordDialog(
-      context,
-      purpose: ArchivePasswordPurpose.import,
-    );
-    if (!context.mounted || password == null) return;
-
-    try {
-      final backup = await ref
-          .read(cloudSyncServiceProvider)
-          .downloadAndPrepareImport(password: password);
-      final result = await ref
-          .read(memoryRepositoryProvider.notifier)
-          .importBackup(backup);
-      if (!context.mounted) return;
-      await showArchiveImportSummary(context, result);
-    } on BackupValidationException catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.cloudRestoreRejected(error.message))),
-      );
-    } on CloudSyncException catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.cloudRestoreFailed(error.message))),
-      );
-    } catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.cloudRestoreFailed('$error'))),
-      );
-    }
-  }
-
-  Future<void> _copyCloudSyncKey(BuildContext context, WidgetRef ref) async {
-    final key = await ref.read(cloudSyncServiceProvider).ensureSyncKey();
-    await Clipboard.setData(ClipboardData(text: key));
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(context.l10n.syncKeyCopied)));
-  }
-
-  Future<void> _useCloudSyncKey(BuildContext context, WidgetRef ref) async {
-    final l10n = context.l10n;
-    final service = ref.read(cloudSyncServiceProvider);
-    final controller = TextEditingController(
-      text: await service.ensureSyncKey(),
-    );
-    if (!context.mounted) {
-      controller.dispose();
-      return;
-    }
-
-    final key = await showDialog<String>(
-      context: context,
-      builder: (_) => DisposeOnUnmount(
-        disposables: [controller],
-        child: AlertDialog(
-        title: Text(l10n.useSyncKeyTitle),
-        content: TextField(
-          controller: controller,
-          minLines: 3,
-          maxLines: 4,
-          decoration: InputDecoration(
-            labelText: l10n.syncKeyLabel,
-            alignLabelWithHint: true,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton.icon(
-            onPressed: () => Navigator.of(context).pop(controller.text),
-            icon: const Icon(Icons.login_rounded),
-            label: Text(l10n.useKey),
-          ),
-        ],
-      ),
-      ),
-    );
-    if (!context.mounted || key == null) return;
-
-    try {
-      await service.setSyncKey(key);
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.syncKeySaved)));
-    } on CloudSyncException catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(error.message)));
-    }
-  }
-
-  Future<void> _deleteCloudBackup(BuildContext context, WidgetRef ref) async {
-    final l10n = context.l10n;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(l10n.deleteCloudBackupTitle),
-        content: Text(l10n.deleteCloudBackupBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.delete),
-          ),
-        ],
-      ),
-    );
-    if (!context.mounted || confirmed != true) return;
-
-    try {
-      await ref.read(cloudSyncServiceProvider).deleteRemoteBackup();
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.cloudBackupDeleted)));
-    } on CloudSyncException catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.deleteFailed(error.message))));
     }
   }
 

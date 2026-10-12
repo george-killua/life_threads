@@ -187,7 +187,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyBody.
   ///
   /// In en, this message translates to:
-  /// **'LifeThreads is local-first: no account and no public profile. Your memories stay on this device unless you choose encrypted cloud share, Cloud Sync, or a manual backup export.'**
+  /// **'LifeThreads is local-first: no account and no public profile. Your memories stay on this device unless you export a backup, share an encrypted capsule, or display your wall on another screen.'**
   String get privacyBody;
 
   /// No description provided for @viewPrivacyPolicy.
@@ -232,17 +232,17 @@ abstract class AppLocalizations {
   /// **'Send Feedback'**
   String get sendFeedback;
 
-  /// No description provided for @premiumArchiveTitle.
+  /// No description provided for @backupArchiveBody.
   ///
   /// In en, this message translates to:
-  /// **'Premium Archive'**
-  String get premiumArchiveTitle;
+  /// **'Save everything – memories, photos, notes, threads and layout – in one file. Keep it on your computer or in your own cloud, and add a password to encrypt it.'**
+  String get backupArchiveBody;
 
-  /// No description provided for @premiumArchiveBody.
+  /// No description provided for @backupArchiveTitle.
   ///
   /// In en, this message translates to:
-  /// **'Move your memories between devices safely. Export an archive with memories, photos, notes, ropes, wall layout, and metadata. Add password protection when you need it.'**
-  String get premiumArchiveBody;
+  /// **'Backup'**
+  String get backupArchiveTitle;
 
   /// No description provided for @premiumBadge.
   ///
@@ -262,12 +262,6 @@ abstract class AppLocalizations {
   /// **'Export Archive'**
   String get exportArchive;
 
-  /// No description provided for @unlockExport.
-  ///
-  /// In en, this message translates to:
-  /// **'Unlock Export'**
-  String get unlockExport;
-
   /// No description provided for @importArchive.
   ///
   /// In en, this message translates to:
@@ -285,60 +279,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Move Devices'**
   String get moveDevices;
-
-  /// No description provided for @cloudSyncTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud Sync'**
-  String get cloudSyncTitle;
-
-  /// No description provided for @cloudSyncBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Back up a password-protected archive to your VPS. The server stores only the locked zip and your private sync key controls restore access.'**
-  String get cloudSyncBody;
-
-  /// No description provided for @vpsBadge.
-  ///
-  /// In en, this message translates to:
-  /// **'VPS'**
-  String get vpsBadge;
-
-  /// No description provided for @backUpNow.
-  ///
-  /// In en, this message translates to:
-  /// **'Back Up Now'**
-  String get backUpNow;
-
-  /// No description provided for @unlockBackup.
-  ///
-  /// In en, this message translates to:
-  /// **'Unlock Backup'**
-  String get unlockBackup;
-
-  /// No description provided for @restoreLatest.
-  ///
-  /// In en, this message translates to:
-  /// **'Restore Latest'**
-  String get restoreLatest;
-
-  /// No description provided for @copyKey.
-  ///
-  /// In en, this message translates to:
-  /// **'Copy Key'**
-  String get copyKey;
-
-  /// No description provided for @useKey.
-  ///
-  /// In en, this message translates to:
-  /// **'Use Key'**
-  String get useKey;
-
-  /// No description provided for @deleteCloud.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Cloud'**
-  String get deleteCloud;
 
   /// No description provided for @themeTitle.
   ///
@@ -373,7 +313,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumLockedBody.
   ///
   /// In en, this message translates to:
-  /// **'Monthly subscription: unlimited memories, encrypted archive export/import, moving to another device, premium themes, and advanced layouts.'**
+  /// **'Monthly subscription: unlimited memories, premium themes and advanced layouts.'**
   String get premiumLockedBody;
 
   /// No description provided for @activeBadge.
@@ -429,78 +369,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Import failed: {error}'**
   String importFailed(Object error);
-
-  /// No description provided for @cloudBackupNeedsPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud backup needs a password.'**
-  String get cloudBackupNeedsPassword;
-
-  /// No description provided for @cloudBackupSaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud backup saved: {memoryCount} memories.'**
-  String cloudBackupSaved(int memoryCount);
-
-  /// No description provided for @cloudBackupFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud backup failed: {message}'**
-  String cloudBackupFailed(Object message);
-
-  /// No description provided for @cloudRestoreRejected.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud restore rejected: {message}'**
-  String cloudRestoreRejected(Object message);
-
-  /// No description provided for @cloudRestoreFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud restore failed: {message}'**
-  String cloudRestoreFailed(Object message);
-
-  /// No description provided for @syncKeyCopied.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync key copied.'**
-  String get syncKeyCopied;
-
-  /// No description provided for @useSyncKeyTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Use Sync Key'**
-  String get useSyncKeyTitle;
-
-  /// No description provided for @syncKeyLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync key'**
-  String get syncKeyLabel;
-
-  /// No description provided for @syncKeySaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync key saved.'**
-  String get syncKeySaved;
-
-  /// No description provided for @deleteCloudBackupTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete cloud backup?'**
-  String get deleteCloudBackupTitle;
-
-  /// No description provided for @deleteCloudBackupBody.
-  ///
-  /// In en, this message translates to:
-  /// **'This deletes the encrypted archive from your VPS. Local memories stay on this device.'**
-  String get deleteCloudBackupBody;
-
-  /// No description provided for @cloudBackupDeleted.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud backup deleted.'**
-  String get cloudBackupDeleted;
 
   /// No description provided for @deleteFailed.
   ///
@@ -847,7 +715,7 @@ abstract class AppLocalizations {
   /// No description provided for @tutorialBackupText.
   ///
   /// In en, this message translates to:
-  /// **'Use Cloud Sync or archive transfer before changing phone or testing a production build.'**
+  /// **'Before you change phones, export a backup in Settings and keep the file somewhere safe.'**
   String get tutorialBackupText;
 
   /// No description provided for @scanDisplayQr.
@@ -1902,7 +1770,7 @@ abstract class AppLocalizations {
   /// No description provided for @exportPremiumArchiveTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export Premium Archive'**
+  /// **'Export backup'**
   String get exportPremiumArchiveTitle;
 
   /// No description provided for @importArchiveTitle.
@@ -1968,26 +1836,20 @@ abstract class AppLocalizations {
   /// No description provided for @archiveReadyToSend.
   ///
   /// In en, this message translates to:
-  /// **'Archive ready to send.'**
+  /// **'Backup ready. Keep it somewhere safe, off this phone.'**
   String get archiveReadyToSend;
 
-  /// No description provided for @archiveSavedLater.
+  /// No description provided for @archiveNotSaved.
   ///
   /// In en, this message translates to:
-  /// **'Archive saved. You can share it later.'**
-  String get archiveSavedLater;
+  /// **'Backup not saved. Export again when you are ready.'**
+  String get archiveNotSaved;
 
   /// No description provided for @archiveSharingUnavailable.
   ///
   /// In en, this message translates to:
-  /// **'Archive saved, but sharing is unavailable.'**
+  /// **'Sharing is not available on this device.'**
   String get archiveSharingUnavailable;
-
-  /// No description provided for @savedToPath.
-  ///
-  /// In en, this message translates to:
-  /// **'{label} Saved to {path}'**
-  String savedToPath(Object label, Object path);
 
   /// No description provided for @archiveShareFailed.
   ///
@@ -2760,7 +2622,7 @@ abstract class AppLocalizations {
   /// No description provided for @archiveTransferHeroBody.
   ///
   /// In en, this message translates to:
-  /// **'Premium Archive creates a portable encrypted zip with your memories, photos, notes, ropes, wall positions, and metadata. Cloud Sync can also store that locked zip on your VPS for restore on another device.'**
+  /// **'A backup is one zip with your memories, photos, notes, threads, wall positions and metadata, optionally locked with a password. We keep no copy: you decide where it goes.'**
   String get archiveTransferHeroBody;
 
   /// No description provided for @archiveTransferStep1Title.
@@ -2778,13 +2640,13 @@ abstract class AppLocalizations {
   /// No description provided for @archiveTransferStep2Title.
   ///
   /// In en, this message translates to:
-  /// **'Move or sync the zip'**
+  /// **'Move the zip'**
   String get archiveTransferStep2Title;
 
   /// No description provided for @archiveTransferStep2Body.
   ///
   /// In en, this message translates to:
-  /// **'Transfer it with AirDrop, USB, Drive, email, or use Cloud Sync with a private sync key.'**
+  /// **'Transfer it with AirDrop, USB, your own cloud drive or email.'**
   String get archiveTransferStep2Body;
 
   /// No description provided for @archiveTransferStep3Title.
@@ -2844,7 +2706,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumHeroLockedBody.
   ///
   /// In en, this message translates to:
-  /// **'Free includes {limit} memories. Premium adds encrypted archive export/import, safe device transfer, themes, and advanced layouts.'**
+  /// **'Free includes {limit} memories and full backups. Premium adds unlimited memories, themes and advanced layouts.'**
   String premiumHeroLockedBody(int limit);
 
   /// No description provided for @premiumMemories.
@@ -2877,30 +2739,6 @@ abstract class AppLocalizations {
   /// **'No 30-memory ceiling. Keep building the wall as life grows.'**
   String get benefitUnlimitedBody;
 
-  /// No description provided for @benefitArchivesTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Encrypted archives'**
-  String get benefitArchivesTitle;
-
-  /// No description provided for @benefitArchivesBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Export and import a password-protected zip with photos, notes, ropes, layout, and metadata.'**
-  String get benefitArchivesBody;
-
-  /// No description provided for @benefitTransferTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Move to another device'**
-  String get benefitTransferTitle;
-
-  /// No description provided for @benefitTransferBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Carry your private memory wall to a new phone without active cloud sync.'**
-  String get benefitTransferBody;
-
   /// No description provided for @benefitThemesTitle.
   ///
   /// In en, this message translates to:
@@ -2925,24 +2763,6 @@ abstract class AppLocalizations {
   /// **'More ways to arrange threads, timelines, anchors, and memory clusters.'**
   String get benefitLayoutsBody;
 
-  /// No description provided for @cloudSyncPlannedTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud sync is planned later'**
-  String get cloudSyncPlannedTitle;
-
-  /// No description provided for @cloudSyncPlannedBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Premium Archive is the safe transfer feature now: export, move the zip, and import on another device.'**
-  String get cloudSyncPlannedBody;
-
-  /// No description provided for @deviceTransferHow.
-  ///
-  /// In en, this message translates to:
-  /// **'How device transfer works'**
-  String get deviceTransferHow;
-
   /// No description provided for @lifetimeUnlock.
   ///
   /// In en, this message translates to:
@@ -2958,7 +2778,7 @@ abstract class AppLocalizations {
   /// No description provided for @onePurchaseBody.
   ///
   /// In en, this message translates to:
-  /// **'Subscribe monthly for unlimited memories, backups, premium themes, and advanced layouts. Cancel anytime in Google Play or the App Store.'**
+  /// **'Subscribe monthly for unlimited memories, premium themes and advanced layouts. Cancel anytime in Google Play or the App Store.'**
   String get onePurchaseBody;
 
   /// No description provided for @premiumActiveButton.
@@ -3060,7 +2880,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumLocalFirstBody.
   ///
   /// In en, this message translates to:
-  /// **'Premium unlocks local-first value now. Cloud sync is planned later and is not active in this version.'**
+  /// **'Your memories stay on your device, and backups are free for everyone.'**
   String get premiumLocalFirstBody;
 
   /// No description provided for @noMappedMemoriesBody.
@@ -3212,6 +3032,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'why it matters'**
   String get demoConnectionWhyItMatters;
+
+  /// No description provided for @savedToPath.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} Saved to {path}'**
+  String savedToPath(Object label, Object path);
+
+  /// No description provided for @backupReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 memory is not in a backup yet.} other{{count} memories are not in a backup yet.}}'**
+  String backupReminder(int count);
+
+  /// No description provided for @later.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get later;
+
+  /// No description provided for @backUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Back up'**
+  String get backUp;
 }
 
 class _AppLocalizationsDelegate

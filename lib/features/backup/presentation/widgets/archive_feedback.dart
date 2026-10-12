@@ -7,8 +7,9 @@ import '../../domain/backup_models.dart';
 
 Future<void> shareExportedArchive(
   BuildContext context,
-  BackupExportResult result,
-) async {
+  BackupExportResult result, {
+  Future<void> Function()? onSaved,
+}) async {
   final l10n = context.l10n;
   try {
     final shareResult = await SharePlus.instance.share(
@@ -21,17 +22,17 @@ Future<void> shareExportedArchive(
         files: [XFile(result.path, mimeType: 'application/zip')],
       ),
     );
+    if (shareResult.status == ShareResultStatus.success) await onSaved?.call();
     if (!context.mounted) return;
+    // The archive sits in the temporary directory; it is removed on the next
+    // export or app start, once the receiving app has its copy.
     final label = switch (shareResult.status) {
       ShareResultStatus.success => l10n.archiveReadyToSend,
-      ShareResultStatus.dismissed => l10n.archiveSavedLater,
+      ShareResultStatus.dismissed => l10n.archiveNotSaved,
       ShareResultStatus.unavailable => l10n.archiveSharingUnavailable,
     };
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 5),
-        content: Text(l10n.savedToPath(label, result.path)),
-      ),
+      SnackBar(duration: const Duration(seconds: 5), content: Text(label)),
     );
   } catch (error) {
     if (!context.mounted) return;

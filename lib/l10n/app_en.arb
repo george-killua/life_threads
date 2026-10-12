@@ -18,7 +18,7 @@
     }
   },
   "privacyTitle": "Privacy",
-  "privacyBody": "LifeThreads is local-first: no account and no public profile. Your memories stay on this device unless you choose encrypted cloud share, Cloud Sync, or a manual backup export.",
+  "privacyBody": "LifeThreads is local-first: no account and no public profile. Your memories stay on this device unless you export a backup, share an encrypted capsule, or display your wall on another screen.",
   "viewPrivacyPolicy": "View privacy policy",
   "termsTitle": "Terms of use",
   "viewTerms": "View terms",
@@ -26,30 +26,20 @@
   "betaFeedbackBody": "Send beta feedback with safe diagnostics. Logs include app events and crash types only, never memory text, photo paths, backups, or exact locations.",
   "closedBetaBadge": "Closed beta",
   "sendFeedback": "Send Feedback",
-  "premiumArchiveTitle": "Premium Archive",
-  "premiumArchiveBody": "Move your memories between devices safely. Export an archive with memories, photos, notes, ropes, wall layout, and metadata. Add password protection when you need it.",
+  "backupArchiveBody": "Save everything – memories, photos, notes, threads and layout – in one file. Keep it on your computer or in your own cloud, and add a password to encrypt it.",
+  "backupArchiveTitle": "Backup",
   "premiumBadge": "Premium",
   "unlockBadge": "Unlock",
   "exportArchive": "Export Archive",
-  "unlockExport": "Unlock Export",
   "importArchive": "Import Archive",
   "importCapsule": "Import Capsule",
   "moveDevices": "Move Devices",
-  "cloudSyncTitle": "Cloud Sync",
-  "cloudSyncBody": "Back up a password-protected archive to your VPS. The server stores only the locked zip and your private sync key controls restore access.",
-  "vpsBadge": "VPS",
-  "backUpNow": "Back Up Now",
-  "unlockBackup": "Unlock Backup",
-  "restoreLatest": "Restore Latest",
-  "copyKey": "Copy Key",
-  "useKey": "Use Key",
-  "deleteCloud": "Delete Cloud",
   "themeTitle": "Theme",
   "themeBody": "Choose how your private wall should feel. Free users get Warm Memory Room. Premium unlocks every wall mood.",
   "oneFreeBadge": "1 free",
   "premiumTitle": "Premium",
   "premiumActiveBody": "Premium subscription is active.",
-  "premiumLockedBody": "Monthly subscription: unlimited memories, encrypted archive export/import, moving to another device, premium themes, and advanced layouts.",
+  "premiumLockedBody": "Monthly subscription: unlimited memories, premium themes and advanced layouts.",
   "activeBadge": "Active",
   "openPremium": "Open Premium",
   "appVersionTitle": "App version",
@@ -74,40 +64,6 @@
       "error": {}
     }
   },
-  "cloudBackupNeedsPassword": "Cloud backup needs a password.",
-  "cloudBackupSaved": "Cloud backup saved: {memoryCount} memories.",
-  "@cloudBackupSaved": {
-    "placeholders": {
-      "memoryCount": {
-        "type": "int"
-      }
-    }
-  },
-  "cloudBackupFailed": "Cloud backup failed: {message}",
-  "@cloudBackupFailed": {
-    "placeholders": {
-      "message": {}
-    }
-  },
-  "cloudRestoreRejected": "Cloud restore rejected: {message}",
-  "@cloudRestoreRejected": {
-    "placeholders": {
-      "message": {}
-    }
-  },
-  "cloudRestoreFailed": "Cloud restore failed: {message}",
-  "@cloudRestoreFailed": {
-    "placeholders": {
-      "message": {}
-    }
-  },
-  "syncKeyCopied": "Sync key copied.",
-  "useSyncKeyTitle": "Use Sync Key",
-  "syncKeyLabel": "Sync key",
-  "syncKeySaved": "Sync key saved.",
-  "deleteCloudBackupTitle": "Delete cloud backup?",
-  "deleteCloudBackupBody": "This deletes the encrypted archive from your VPS. Local memories stay on this device.",
-  "cloudBackupDeleted": "Cloud backup deleted.",
   "deleteFailed": "Delete failed: {message}",
   "@deleteFailed": {
     "placeholders": {
@@ -199,7 +155,7 @@
   "tutorialShowBoardTitle": "Show the board",
   "tutorialShowBoardText": "Open lifethreads.gkcoding.dev/display on another screen, tap the QR button in Wall Controls, and scan the code to show a temporary read-only board.",
   "tutorialBackupTitle": "Keep a backup",
-  "tutorialBackupText": "Use Cloud Sync or archive transfer before changing phone or testing a production build.",
+  "tutorialBackupText": "Before you change phones, export a backup in Settings and keep the file somewhere safe.",
   "scanDisplayQr": "Scan display QR",
   "scannerHintTitle": "Open lifethreads.gkcoding.dev/display on another screen.",
   "scannerHintBody": "Scan the QR code from that page. LifeThreads sends a temporary read-only board snapshot to that browser session.",
@@ -396,7 +352,7 @@
   "connectionHeaderBody": "Connect memories with a reason. The rope should explain why two moments belong together.",
   "connectedMemory": "connected memory",
   "whyConnectedTitle": "Why are they connected?",
-  "exportPremiumArchiveTitle": "Export Premium Archive",
+  "exportPremiumArchiveTitle": "Export backup",
   "importArchiveTitle": "Import Archive",
   "archiveExportBody": "Add a password to encrypt the archive. Leave empty for a normal local zip.",
   "archiveImportBody": "If this archive is encrypted, enter its password. Leave empty for older or unprotected backups.",
@@ -407,10 +363,9 @@
   "sendArchiveSubject": "LifeThreads memory archive",
   "sendEncryptedArchiveText": "LifeThreads encrypted archive. Use the password you chose to import it on another device.",
   "sendArchiveText": "LifeThreads archive. Import it in LifeThreads to open your memory wall on another device.",
-  "archiveReadyToSend": "Archive ready to send.",
-  "archiveSavedLater": "Archive saved. You can share it later.",
-  "archiveSharingUnavailable": "Archive saved, but sharing is unavailable.",
-  "savedToPath": "{label} Saved to {path}",
+  "archiveReadyToSend": "Backup ready. Keep it somewhere safe, off this phone.",
+  "archiveNotSaved": "Backup not saved. Export again when you are ready.",
+  "archiveSharingUnavailable": "Sharing is not available on this device.",
   "archiveShareFailed": "Archive saved, but sharing failed: {error}",
   "archiveImportedTitle": "Archive imported",
   "memoriesLabel": "Memories",
@@ -539,11 +494,11 @@
   "connectMemoryTooltip": "Connect memory",
   "archiveTransferTitle": "Open on another device",
   "archiveTransferHeroTitle": "Move your memories between devices safely.",
-  "archiveTransferHeroBody": "Premium Archive creates a portable encrypted zip with your memories, photos, notes, ropes, wall positions, and metadata. Cloud Sync can also store that locked zip on your VPS for restore on another device.",
+  "archiveTransferHeroBody": "A backup is one zip with your memories, photos, notes, threads, wall positions and metadata, optionally locked with a password. We keep no copy: you decide where it goes.",
   "archiveTransferStep1Title": "Export an archive",
   "archiveTransferStep1Body": "Open Settings, choose Export Archive, and add a password if you want password protection.",
-  "archiveTransferStep2Title": "Move or sync the zip",
-  "archiveTransferStep2Body": "Transfer it with AirDrop, USB, Drive, email, or use Cloud Sync with a private sync key.",
+  "archiveTransferStep2Title": "Move the zip",
+  "archiveTransferStep2Body": "Transfer it with AirDrop, USB, your own cloud drive or email.",
   "archiveTransferStep3Title": "Import safely",
   "archiveTransferStep3Body": "Install LifeThreads on the other device, choose Import Archive, enter the password if needed, and restore without deleting existing data.",
   "premiumPageTitle": "LifeThreads Premium",
@@ -553,26 +508,19 @@
   "premiumHeroActiveTitle": "Your memory wall is unlimited.",
   "premiumHeroLockedTitle": "Move your memories between devices safely.",
   "premiumHeroActiveBody": "Your Premium subscription is active. Encrypted archive export, premium themes, and advanced layouts are available.",
-  "premiumHeroLockedBody": "Free includes {limit} memories. Premium adds encrypted archive export/import, safe device transfer, themes, and advanced layouts.",
+  "premiumHeroLockedBody": "Free includes {limit} memories and full backups. Premium adds unlimited memories, themes and advanced layouts.",
   "premiumMemories": "Premium memories",
   "freeMemories": "Free memories",
   "unlimited": "unlimited",
   "benefitUnlimitedTitle": "Unlimited memories",
   "benefitUnlimitedBody": "No 30-memory ceiling. Keep building the wall as life grows.",
-  "benefitArchivesTitle": "Encrypted archives",
-  "benefitArchivesBody": "Export and import a password-protected zip with photos, notes, ropes, layout, and metadata.",
-  "benefitTransferTitle": "Move to another device",
-  "benefitTransferBody": "Carry your private memory wall to a new phone without active cloud sync.",
   "benefitThemesTitle": "Premium wall themes",
   "benefitThemesBody": "Unlock richer wall moods for family, travel, archive, and gallery styles.",
   "benefitLayoutsTitle": "Advanced layouts",
   "benefitLayoutsBody": "More ways to arrange threads, timelines, anchors, and memory clusters.",
-  "cloudSyncPlannedTitle": "Cloud sync is planned later",
-  "cloudSyncPlannedBody": "Premium Archive is the safe transfer feature now: export, move the zip, and import on another device.",
-  "deviceTransferHow": "How device transfer works",
   "lifetimeUnlock": "Premium subscription",
   "premiumActiveOnDevice": "Premium is active on this device.",
-  "onePurchaseBody": "Subscribe monthly for unlimited memories, backups, premium themes, and advanced layouts. Cancel anytime in Google Play or the App Store.",
+  "onePurchaseBody": "Subscribe monthly for unlimited memories, premium themes and advanced layouts. Cancel anytime in Google Play or the App Store.",
   "premiumActiveButton": "Premium Active",
   "processing": "Processing...",
   "unlockPremium": "Subscribe to Premium",
@@ -589,7 +537,7 @@
   "purchaseFailed": "Purchase failed",
   "preparingCheckout": "Preparing checkout...",
   "premiumLocalFirstTitle": "Premium is local-first",
-  "premiumLocalFirstBody": "Premium unlocks local-first value now. Cloud sync is planned later and is not active in this version.",
+  "premiumLocalFirstBody": "Your memories stay on your device, and backups are free for everyone.",
   "@photoGpsDetected": {
     "placeholders": {
       "latitude": {},
@@ -648,12 +596,6 @@
       "count": {
         "type": "int"
       }
-    }
-  },
-  "@savedToPath": {
-    "placeholders": {
-      "label": {},
-      "path": {}
     }
   },
   "@archiveShareFailed": {
@@ -724,5 +666,22 @@
   "demoLaunchDescription": "The night an idea finally became something real on a screen.",
   "demoConnectionQuietDays": "quiet days",
   "demoConnectionHomeFocus": "home focus",
-  "demoConnectionWhyItMatters": "why it matters"
+  "demoConnectionWhyItMatters": "why it matters",
+  "savedToPath": "{label} Saved to {path}",
+  "@savedToPath": {
+    "placeholders": {
+      "label": {},
+      "path": {}
+    }
+  },
+  "backupReminder": "{count, plural, =1{1 memory is not in a backup yet.} other{{count} memories are not in a backup yet.}}",
+  "@backupReminder": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "later": "Later",
+  "backUp": "Back up"
 }
