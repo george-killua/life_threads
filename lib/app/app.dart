@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/localization/locale_controller.dart';
 import '../features/capsule/presentation/widgets/memory_capsule_deep_link_listener.dart';
+import '../features/on_this_day/data/on_this_day_scheduler.dart';
 import '../features/premium/data/premium_billing_controller.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'router/app_router.dart';
@@ -18,6 +19,8 @@ class LifeThreadsApp extends ConsumerWidget {
     // be delivered at any time (approved pending payments, interrupted
     // checkouts) and must be acknowledged even if the upgrade page is closed.
     ref.listen(premiumBillingProvider, (_, _) {});
+    // Reschedules On this day reminders as settings and memories change.
+    ref.listen(onThisDaySchedulerProvider, (_, _) {});
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,

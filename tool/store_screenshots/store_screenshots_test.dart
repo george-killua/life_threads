@@ -12,6 +12,7 @@ import 'package:life_threads/app/router/app_router.dart';
 import 'package:life_threads/app/theme/app_theme.dart';
 import 'package:life_threads/features/media/data/picked_memory_photo.dart';
 import 'package:life_threads/features/memories/data/memory_repository.dart';
+import 'package:life_threads/features/on_this_day/data/on_this_day_providers.dart';
 import 'package:life_threads/features/premium/data/premium_entitlement_controller.dart';
 import 'package:life_threads/features/premium/domain/premium_entitlement.dart';
 import 'package:life_threads/l10n/generated/app_localizations.dart';
@@ -323,6 +324,11 @@ void main() {
                               ),
                               premiumEntitlementProvider.overrideWith(
                                 _PremiumController.new,
+                              ),
+                              // Same wall card and memory hero on any run
+                              // date (no On this day memory).
+                              onThisDayMatchesProvider.overrideWithValue(
+                                const [],
                               ),
                             ],
                             child: MaterialApp.router(

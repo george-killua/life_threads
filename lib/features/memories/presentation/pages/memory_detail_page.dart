@@ -15,6 +15,8 @@ import '../../../../features/capsule/data/memory_capsule_cloud_share_service.dar
 import '../../../../features/capsule/data/memory_capsule_service.dart';
 import '../../../../features/capsule/presentation/widgets/memory_capsule_dialogs.dart';
 import '../../../../features/map/presentation/widgets/memory_map_preview.dart';
+import '../../../../features/on_this_day/data/on_this_day_providers.dart';
+import '../../../../features/premium/presentation/premium_gate.dart';
 import '../../data/memory_repository.dart';
 import '../../domain/memory_event.dart';
 import '../../domain/memory_photo.dart';
@@ -45,6 +47,15 @@ class MemoryDetailPage extends ConsumerWidget {
           final people = state.peopleForEvent(memoryId);
           final attachedNotes = state.attachedTextNotes(memoryId);
           final heroPhotos = _heroPreviewPhotos(event, photos);
+          // On its anniversary a memory opens as an On this day chapter
+          // (Premium; free users see the usual page).
+          final onThisDayYears = ref.watch(premiumActiveProvider)
+              ? ref
+                    .watch(onThisDayMatchesProvider)
+                    .where((match) => match.memory.id == memoryId)
+                    .firstOrNull
+                    ?.yearsAgo
+              : null;
           final galleryPhotos = _galleryPreviewPhotos(photos);
 
           return CustomScrollView(
@@ -53,6 +64,7 @@ class MemoryDetailPage extends ConsumerWidget {
                 child: _CinematicHero(
                   event: event,
                   previewPhotos: heroPhotos,
+                  onThisDayYears: onThisDayYears,
                   onBack: () => _backToWall(context),
                   onEdit: () => context.push('/memories/$memoryId/edit'),
                   onConnect: () =>
@@ -261,10 +273,12 @@ class _CinematicHero extends StatelessWidget {
     required this.onEdit,
     required this.onConnect,
     required this.onShareCapsule,
+    this.onThisDayYears,
   });
 
   final MemoryEvent event;
   final List<_PreviewPhoto> previewPhotos;
+  final int? onThisDayYears;
   final VoidCallback onBack;
   final VoidCallback onEdit;
   final VoidCallback onConnect;
@@ -367,6 +381,10 @@ class _CinematicHero extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (onThisDayYears != null) ...[
+                  _OnThisDayHeader(yearsAgo: onThisDayYears!),
+                  const SizedBox(height: 10),
+                ],
                 _FeelingBadge(event: event),
                 const SizedBox(height: 14),
                 Text(
@@ -437,6 +455,44 @@ class _HeroPlaceholder extends StatelessWidget {
           size: 96,
           color: Colors.white.withValues(alpha: 0.62),
         ),
+      ),
+    );
+  }
+}
+
+class _OnThisDayHeader extends StatelessWidget {
+  const _OnThisDayHeader({required this.yearsAgo});
+
+  final int yearsAgo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+      decoration: BoxDecoration(
+        color: AppColors.gold.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppColors.gold.withValues(alpha: 0.56)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.event_repeat_rounded,
+            color: AppColors.amber,
+            size: 18,
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              context.l10n.onThisDayHeader(yearsAgo),
+              style: const TextStyle(
+                color: AppColors.amber,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -29,6 +29,7 @@ import '../../../memories/domain/memory_category.dart';
 import '../../../memories/domain/memory_event.dart';
 import '../../../memories/domain/memory_feeling.dart';
 import '../../../memories/domain/memory_type.dart';
+import '../../../on_this_day/data/on_this_day_providers.dart';
 import '../../../onboarding/onboarding_preferences.dart';
 import '../../../onboarding/presentation/widgets/lifethreads_tutorial.dart';
 import '../../../premium/data/premium_entitlement_controller.dart';
@@ -107,6 +108,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     final entitlement = ref.watch(premiumEntitlementProvider).asData?.value;
     final repository = ref.read(memoryRepositoryProvider.notifier);
     final backupReminder = ref.watch(backupReminderProvider).asData?.value;
+    final onThisDay = ref.watch(onThisDayMatchesProvider).firstOrNull;
 
     return Scaffold(
       body: WallBackground(
@@ -448,7 +450,12 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                           children: [
                             Expanded(
                               child: _MemoryRitualCard(
-                                event: _memoryToRevisit(state.events),
+                                // A memory from this day in an earlier year
+                                // comes first.
+                                event:
+                                    onThisDay?.memory ??
+                                    _memoryToRevisit(state.events),
+                                yearsAgo: onThisDay?.yearsAgo,
                                 onSave: () => _guardMemoryCreation(
                                   canCreateMemory,
                                   () => _pushRoute(RouteNames.addMemory),
@@ -2228,15 +2235,20 @@ class _MemoryRitualCard extends StatelessWidget {
     required this.event,
     required this.onSave,
     required this.onOpen,
+    this.yearsAgo,
   });
 
   final MemoryEvent? event;
+
+  /// Set when [event] happened on this day [yearsAgo] years ago.
+  final int? yearsAgo;
   final VoidCallback onSave;
   final ValueChanged<MemoryEvent> onOpen;
 
   @override
   Widget build(BuildContext context) {
     final memory = event;
+    final years = yearsAgo;
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.wallInk.withValues(alpha: 0.78),
@@ -2257,6 +2269,8 @@ class _MemoryRitualCard extends StatelessWidget {
             Icon(
               memory == null
                   ? Icons.edit_note_rounded
+                  : years != null
+                  ? Icons.event_repeat_rounded
                   : Icons.history_edu_rounded,
               color: AppColors.gold,
               size: 22,
@@ -2273,6 +2287,8 @@ class _MemoryRitualCard extends StatelessWidget {
                     Text(
                       memory == null
                           ? context.l10n.saveToday
+                          : years != null
+                          ? context.l10n.onThisDayYearsAgoToday(years)
                           : context.l10n.rememberThis,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

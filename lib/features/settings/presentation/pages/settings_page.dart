@@ -19,8 +19,12 @@ import '../../../capsule/data/memory_capsule_service.dart';
 import '../../../capsule/domain/memory_capsule_models.dart';
 import '../../../capsule/presentation/widgets/memory_capsule_dialogs.dart';
 import '../../../memories/data/memory_repository.dart';
+import '../../../on_this_day/data/on_this_day_notifications.dart';
+import '../../../on_this_day/data/on_this_day_settings.dart';
 import '../../../onboarding/onboarding_preferences.dart';
 import '../../../premium/data/premium_entitlement_controller.dart';
+import '../../../premium/domain/premium_feature.dart';
+import '../../../premium/presentation/premium_gate.dart';
 import '../../../wall/data/wall_theme_controller.dart';
 import '../../../wall/domain/wall_theme.dart';
 import '../../../wall/presentation/widgets/wall_background.dart';
@@ -42,6 +46,11 @@ class SettingsPage extends ConsumerWidget {
     final effectiveTheme = selectedTheme.isPremium && !isPremium
         ? WallThemePreset.warmMemoryRoom
         : selectedTheme;
+    final onThisDay =
+        ref.watch(onThisDaySettingsProvider).asData?.value ??
+        const OnThisDaySettings();
+    // Reminders only run with Premium; after it ends the switch shows off.
+    final remindersOn = onThisDay.remindersEnabled && isPremium;
 
     return Scaffold(
       body: WallBackground(
@@ -171,6 +180,38 @@ class SettingsPage extends ConsumerWidget {
                   selectedTheme: effectiveTheme,
                   isPremium: isPremium,
                   onSelect: (theme) => _selectTheme(context, ref, theme),
+                ),
+              ),
+              _SettingsCard(
+                icon: Icons.event_repeat_rounded,
+                title: l10n.onThisDayTitle,
+                body: l10n.onThisDaySettingsBody,
+                badge: isPremium ? null : l10n.premiumBadge,
+                actions: [
+                  _SettingsAction(
+                    label: l10n.onThisDayReminderAt(
+                      onThisDay.time.format(context),
+                    ),
+                    icon: Icons.schedule_rounded,
+                    onTap: remindersOn
+                        ? () => _pickOnThisDayTime(context, ref, onThisDay)
+                        : null,
+                  ),
+                ],
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n.onThisDayReminderSwitch,
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                    Switch.adaptive(
+                      value: remindersOn,
+                      onChanged: (value) =>
+                          _setOnThisDayReminders(context, ref, value),
+                    ),
+                  ],
                 ),
               ),
               _SettingsCard(
@@ -448,6 +489,52 @@ class SettingsPage extends ConsumerWidget {
         content: Text(context.l10n.themeSelected(_themeLabel(context, theme))),
       ),
     );
+  }
+
+  Future<void> _setOnThisDayReminders(
+    BuildContext context,
+    WidgetRef ref,
+    bool enabled,
+  ) async {
+    final settings = ref.read(onThisDaySettingsProvider.notifier);
+    if (!enabled) {
+      await settings.setRemindersEnabled(false);
+      return;
+    }
+    if (!await requirePremium(context, PremiumFeature.onThisDay)) return;
+
+    // Permission is asked here, when the user turns reminders on.
+    bool granted;
+    try {
+      granted = await ref
+          .read(onThisDayNotificationsProvider)
+          .requestPermission();
+    } catch (error, stackTrace) {
+      AppLogger.recordCrash(error, stackTrace);
+      granted = false;
+    }
+    if (!context.mounted) return;
+    if (!granted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.onThisDayNotificationsDenied)),
+      );
+      return;
+    }
+    AppLogger.event('on_this_day_reminders_on');
+    await settings.setRemindersEnabled(true);
+  }
+
+  Future<void> _pickOnThisDayTime(
+    BuildContext context,
+    WidgetRef ref,
+    OnThisDaySettings current,
+  ) async {
+    final time = await showTimePicker(
+      context: context,
+      initialTime: current.time,
+    );
+    if (time == null) return;
+    await ref.read(onThisDaySettingsProvider.notifier).setTime(time);
   }
 }
 

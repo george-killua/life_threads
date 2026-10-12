@@ -37,7 +37,7 @@ Current Android release setup:
 - App name: `LifeThreads`
 - Package: `dev.gkcoding.lifethreads`
 - Version: see `pubspec.yaml` (currently `0.1.4+6`)
-- Permissions: internet, camera (QR + optional memory photos), contacts (optional person import), selected photo/media access, optional EXIF media location. No background location, microphone, or account permissions.
+- Permissions: internet, camera (QR + optional memory photos), contacts (optional person import), selected photo/media access, optional EXIF media location, notifications (optional On this day reminders, asked when turned on; boot-completed to restore them). No background location, microphone, or account permissions.
 - Release signing reads `android/key.properties` when available. Use `android/key.properties.example` as the template.
 - Production maps require `--dart-define=MAPTILER_KEY=...`.
 
