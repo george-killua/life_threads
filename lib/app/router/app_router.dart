@@ -10,6 +10,7 @@ import '../../features/memories/presentation/pages/edit_memory_page.dart';
 import '../../features/memories/presentation/pages/manage_connections_page.dart';
 import '../../features/memories/presentation/pages/memory_detail_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_gate.dart';
+import '../../features/premium/domain/premium_feature.dart';
 import '../../features/premium/presentation/pages/upgrade_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/wall/presentation/pages/memory_wall_page.dart';
@@ -42,7 +43,11 @@ class AppRouter {
       ),
       GoRoute(
         path: RouteNames.upgrade,
-        builder: (context, state) => const UpgradePage(),
+        builder: (context, state) => UpgradePage(
+          feature: state.extra is PremiumFeature
+              ? state.extra! as PremiumFeature
+              : null,
+        ),
       ),
       GoRoute(
         path: RouteNames.archiveTransfer,

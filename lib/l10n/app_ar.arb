@@ -504,5 +504,69 @@
     }
   },
   "later": "لاحقاً",
-  "backUp": "احفظ نسخة"
+  "backUp": "احفظ نسخة",
+  "onThisDayTitle": "في مثل هذا اليوم",
+  "onThisDayYearsAgoToday": "{years, plural, =1{في مثل هذا اليوم قبل سنة} =2{في مثل هذا اليوم قبل سنتين} few{في مثل هذا اليوم قبل {years} سنوات} many{في مثل هذا اليوم قبل {years} سنة} other{في مثل هذا اليوم قبل {years} سنة}}",
+  "@onThisDayYearsAgoToday": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+  "onThisDayHeader": "في مثل هذا اليوم · {years, plural, =1{قبل سنة} =2{قبل سنتين} few{قبل {years} سنوات} many{قبل {years} سنة} other{قبل {years} سنة}}",
+  "@onThisDayHeader": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+  "onThisDaySettingsBody": "في الأيام التي تعود فيها ذكرى من سنة سابقة، يرسل LifeThreads تذكيراً هادئاً واحداً.",
+  "onThisDayReminderSwitch": "تذكير يومي",
+  "onThisDayReminderAt": "عند {time}",
+  "@onThisDayReminderAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "onThisDayNotificationsDenied": "الإشعارات متوقفة لـ LifeThreads. فعّلها من إعدادات هاتفك.",
+  "onThisDayNotificationBody": "{years, plural, =1{في مثل هذا اليوم قبل سنة: {title}} =2{في مثل هذا اليوم قبل سنتين: {title}} few{في مثل هذا اليوم قبل {years} سنوات: {title}} many{في مثل هذا اليوم قبل {years} سنة: {title}} other{في مثل هذا اليوم قبل {years} سنة: {title}}}",
+  "@onThisDayNotificationBody": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "onThisDayNotificationBodyMany": "{title} و{count, plural, =1{ذكرى أخرى} =2{ذكريان أخريان} few{{count} ذكريات أخرى} many{{count} ذكرى أخرى} other{{count} ذكرى أخرى}} من هذا اليوم",
+  "@onThisDayNotificationBodyMany": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "onThisDayChannelDescription": "ذكرى من هذا اليوم في سنة سابقة.",
+  "benefitOnThisDayBody": "تذكير حين تعود ذكرى من سنة سابقة، تُفتح كفصل خاص بها.",
+  "premiumFeatureStoryImage": "صور القصص",
+  "premiumFeatureStoryVideo": "فيديوهات القصص",
+  "premiumFeatureThreadOfTheYear": "خيط السنة",
+  "premiumFeatureFamilyWall": "جدار العائلة",
+  "premiumFeatureNotice": "{feature} جزء من Premium.",
+  "@premiumFeatureNotice": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  }
 }

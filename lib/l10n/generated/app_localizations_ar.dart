@@ -1644,4 +1644,103 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get backUp => 'احفظ نسخة';
+
+  @override
+  String get onThisDayTitle => 'في مثل هذا اليوم';
+
+  @override
+  String onThisDayYearsAgoToday(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: 'في مثل هذا اليوم قبل $years سنة',
+      many: 'في مثل هذا اليوم قبل $years سنة',
+      few: 'في مثل هذا اليوم قبل $years سنوات',
+      two: 'في مثل هذا اليوم قبل سنتين',
+      one: 'في مثل هذا اليوم قبل سنة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String onThisDayHeader(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: 'قبل $years سنة',
+      many: 'قبل $years سنة',
+      few: 'قبل $years سنوات',
+      two: 'قبل سنتين',
+      one: 'قبل سنة',
+    );
+    return 'في مثل هذا اليوم · $_temp0';
+  }
+
+  @override
+  String get onThisDaySettingsBody =>
+      'في الأيام التي تعود فيها ذكرى من سنة سابقة، يرسل LifeThreads تذكيراً هادئاً واحداً.';
+
+  @override
+  String get onThisDayReminderSwitch => 'تذكير يومي';
+
+  @override
+  String onThisDayReminderAt(String time) {
+    return 'عند $time';
+  }
+
+  @override
+  String get onThisDayNotificationsDenied =>
+      'الإشعارات متوقفة لـ LifeThreads. فعّلها من إعدادات هاتفك.';
+
+  @override
+  String onThisDayNotificationBody(int years, String title) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: 'في مثل هذا اليوم قبل $years سنة: $title',
+      many: 'في مثل هذا اليوم قبل $years سنة: $title',
+      few: 'في مثل هذا اليوم قبل $years سنوات: $title',
+      two: 'في مثل هذا اليوم قبل سنتين: $title',
+      one: 'في مثل هذا اليوم قبل سنة: $title',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String onThisDayNotificationBodyMany(int count, String title) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ذكرى أخرى',
+      many: '$count ذكرى أخرى',
+      few: '$count ذكريات أخرى',
+      two: 'ذكريان أخريان',
+      one: 'ذكرى أخرى',
+    );
+    return '$title و$_temp0 من هذا اليوم';
+  }
+
+  @override
+  String get onThisDayChannelDescription => 'ذكرى من هذا اليوم في سنة سابقة.';
+
+  @override
+  String get benefitOnThisDayBody =>
+      'تذكير حين تعود ذكرى من سنة سابقة، تُفتح كفصل خاص بها.';
+
+  @override
+  String get premiumFeatureStoryImage => 'صور القصص';
+
+  @override
+  String get premiumFeatureStoryVideo => 'فيديوهات القصص';
+
+  @override
+  String get premiumFeatureThreadOfTheYear => 'خيط السنة';
+
+  @override
+  String get premiumFeatureFamilyWall => 'جدار العائلة';
+
+  @override
+  String premiumFeatureNotice(String feature) {
+    return '$feature جزء من Premium.';
+  }
 }

@@ -683,5 +683,69 @@
     }
   },
   "later": "Later",
-  "backUp": "Back up"
+  "backUp": "Back up",
+  "onThisDayTitle": "On this day",
+  "onThisDayYearsAgoToday": "{years, plural, =1{1 year ago today} other{{years} years ago today}}",
+  "@onThisDayYearsAgoToday": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+  "onThisDayHeader": "On this day · {years, plural, =1{1 year ago} other{{years} years ago}}",
+  "@onThisDayHeader": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+  "onThisDaySettingsBody": "On days when a memory from an earlier year comes back, LifeThreads sends one quiet reminder.",
+  "onThisDayReminderSwitch": "Daily reminder",
+  "onThisDayReminderAt": "At {time}",
+  "@onThisDayReminderAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "onThisDayNotificationsDenied": "Notifications are off for LifeThreads. Allow them in your phone's settings.",
+  "onThisDayNotificationBody": "{years, plural, =1{1 year ago today: {title}} other{{years} years ago today: {title}}}",
+  "@onThisDayNotificationBody": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "onThisDayNotificationBodyMany": "{title} and {count, plural, =1{1 more memory} other{{count} more memories}} from this day",
+  "@onThisDayNotificationBodyMany": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "onThisDayChannelDescription": "A memory from this day in an earlier year.",
+  "benefitOnThisDayBody": "A reminder when a memory from an earlier year comes back, opened as its own chapter.",
+  "premiumFeatureStoryImage": "Story images",
+  "premiumFeatureStoryVideo": "Story videos",
+  "premiumFeatureThreadOfTheYear": "Thread of the Year",
+  "premiumFeatureFamilyWall": "Family wall",
+  "premiumFeatureNotice": "{feature} is part of Premium.",
+  "@premiumFeatureNotice": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  }
 }

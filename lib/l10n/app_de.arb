@@ -504,5 +504,69 @@
     }
   },
   "later": "Später",
-  "backUp": "Sichern"
+  "backUp": "Sichern",
+  "onThisDayTitle": "An diesem Tag",
+  "onThisDayYearsAgoToday": "{years, plural, =1{Heute vor einem Jahr} other{Heute vor {years} Jahren}}",
+  "@onThisDayYearsAgoToday": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+  "onThisDayHeader": "An diesem Tag · {years, plural, =1{vor einem Jahr} other{vor {years} Jahren}}",
+  "@onThisDayHeader": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+  "onThisDaySettingsBody": "An Tagen, an denen eine Erinnerung aus einem früheren Jahr zurückkommt, schickt LifeThreads eine leise Erinnerung.",
+  "onThisDayReminderSwitch": "Tägliche Erinnerung",
+  "onThisDayReminderAt": "Um {time}",
+  "@onThisDayReminderAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "onThisDayNotificationsDenied": "Mitteilungen sind für LifeThreads aus. Erlaube sie in den Einstellungen deines Handys.",
+  "onThisDayNotificationBody": "{years, plural, =1{Heute vor einem Jahr: {title}} other{Heute vor {years} Jahren: {title}}}",
+  "@onThisDayNotificationBody": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "onThisDayNotificationBodyMany": "{title} und {count, plural, =1{eine weitere Erinnerung} other{{count} weitere Erinnerungen}} von diesem Tag",
+  "@onThisDayNotificationBodyMany": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "onThisDayChannelDescription": "Eine Erinnerung von diesem Tag aus einem früheren Jahr.",
+  "benefitOnThisDayBody": "Eine Erinnerung, wenn ein Moment aus einem früheren Jahr zurückkommt, geöffnet als eigenes Kapitel.",
+  "premiumFeatureStoryImage": "Story-Bilder",
+  "premiumFeatureStoryVideo": "Story-Videos",
+  "premiumFeatureThreadOfTheYear": "Faden des Jahres",
+  "premiumFeatureFamilyWall": "Familienwand",
+  "premiumFeatureNotice": "{feature} ist Teil von Premium.",
+  "@premiumFeatureNotice": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  }
 }

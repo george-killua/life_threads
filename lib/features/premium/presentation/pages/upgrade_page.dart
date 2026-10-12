@@ -11,10 +11,14 @@ import '../../../wall/presentation/widgets/wall_background.dart';
 import '../../data/premium_billing_controller.dart';
 import '../../data/premium_entitlement_controller.dart';
 import '../../domain/premium_entitlement.dart';
+import '../../domain/premium_feature.dart';
 import '../../domain/premium_purchase_state.dart';
 
 class UpgradePage extends ConsumerWidget {
-  const UpgradePage({super.key});
+  const UpgradePage({super.key, this.feature});
+
+  /// The Premium feature that opened this page, if any.
+  final PremiumFeature? feature;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,6 +37,10 @@ class UpgradePage extends ConsumerWidget {
             children: [
               _UpgradeTopBar(onBack: () => _leave(context)),
               const SizedBox(height: 18),
+              if (feature != null && !isPremium) ...[
+                _FeatureNotice(feature: feature!),
+                const SizedBox(height: 14),
+              ],
               _SubscriptionHero(isPremium: isPremium, memoryCount: memoryCount),
               const SizedBox(height: 16),
               const _BenefitGrid(),
@@ -99,6 +107,31 @@ class _UpgradeTopBar extends StatelessWidget {
               fontSize: 28,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.8,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FeatureNotice extends StatelessWidget {
+  const _FeatureNotice({required this.feature});
+
+  final PremiumFeature feature;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Icon(Icons.lock_rounded, color: AppColors.amber, size: 18),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            context.l10n.premiumFeatureNotice(feature.label(context.l10n)),
+            style: const TextStyle(
+              color: AppColors.amber,
+              fontWeight: FontWeight.w900,
             ),
           ),
         ),
@@ -308,6 +341,11 @@ class _BenefitGrid extends StatelessWidget {
               icon: Icons.dashboard_customize_rounded,
               title: context.l10n.benefitLayoutsTitle,
               body: context.l10n.benefitLayoutsBody,
+            ),
+            _BenefitCard(
+              icon: Icons.event_repeat_rounded,
+              title: context.l10n.onThisDayTitle,
+              body: context.l10n.benefitOnThisDayBody,
             ),
           ],
         );

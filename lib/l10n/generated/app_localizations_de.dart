@@ -1670,4 +1670,92 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get backUp => 'Sichern';
+
+  @override
+  String get onThisDayTitle => 'An diesem Tag';
+
+  @override
+  String onThisDayYearsAgoToday(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: 'Heute vor $years Jahren',
+      one: 'Heute vor einem Jahr',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String onThisDayHeader(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: 'vor $years Jahren',
+      one: 'vor einem Jahr',
+    );
+    return 'An diesem Tag · $_temp0';
+  }
+
+  @override
+  String get onThisDaySettingsBody =>
+      'An Tagen, an denen eine Erinnerung aus einem früheren Jahr zurückkommt, schickt LifeThreads eine leise Erinnerung.';
+
+  @override
+  String get onThisDayReminderSwitch => 'Tägliche Erinnerung';
+
+  @override
+  String onThisDayReminderAt(String time) {
+    return 'Um $time';
+  }
+
+  @override
+  String get onThisDayNotificationsDenied =>
+      'Mitteilungen sind für LifeThreads aus. Erlaube sie in den Einstellungen deines Handys.';
+
+  @override
+  String onThisDayNotificationBody(int years, String title) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: 'Heute vor $years Jahren: $title',
+      one: 'Heute vor einem Jahr: $title',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String onThisDayNotificationBodyMany(int count, String title) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count weitere Erinnerungen',
+      one: 'eine weitere Erinnerung',
+    );
+    return '$title und $_temp0 von diesem Tag';
+  }
+
+  @override
+  String get onThisDayChannelDescription =>
+      'Eine Erinnerung von diesem Tag aus einem früheren Jahr.';
+
+  @override
+  String get benefitOnThisDayBody =>
+      'Eine Erinnerung, wenn ein Moment aus einem früheren Jahr zurückkommt, geöffnet als eigenes Kapitel.';
+
+  @override
+  String get premiumFeatureStoryImage => 'Story-Bilder';
+
+  @override
+  String get premiumFeatureStoryVideo => 'Story-Videos';
+
+  @override
+  String get premiumFeatureThreadOfTheYear => 'Faden des Jahres';
+
+  @override
+  String get premiumFeatureFamilyWall => 'Familienwand';
+
+  @override
+  String premiumFeatureNotice(String feature) {
+    return '$feature ist Teil von Premium.';
+  }
 }

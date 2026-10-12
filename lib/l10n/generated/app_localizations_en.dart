@@ -1653,4 +1653,92 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backUp => 'Back up';
+
+  @override
+  String get onThisDayTitle => 'On this day';
+
+  @override
+  String onThisDayYearsAgoToday(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: '$years years ago today',
+      one: '1 year ago today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String onThisDayHeader(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: '$years years ago',
+      one: '1 year ago',
+    );
+    return 'On this day · $_temp0';
+  }
+
+  @override
+  String get onThisDaySettingsBody =>
+      'On days when a memory from an earlier year comes back, LifeThreads sends one quiet reminder.';
+
+  @override
+  String get onThisDayReminderSwitch => 'Daily reminder';
+
+  @override
+  String onThisDayReminderAt(String time) {
+    return 'At $time';
+  }
+
+  @override
+  String get onThisDayNotificationsDenied =>
+      'Notifications are off for LifeThreads. Allow them in your phone\'s settings.';
+
+  @override
+  String onThisDayNotificationBody(int years, String title) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: '$years years ago today: $title',
+      one: '1 year ago today: $title',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String onThisDayNotificationBodyMany(int count, String title) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count more memories',
+      one: '1 more memory',
+    );
+    return '$title and $_temp0 from this day';
+  }
+
+  @override
+  String get onThisDayChannelDescription =>
+      'A memory from this day in an earlier year.';
+
+  @override
+  String get benefitOnThisDayBody =>
+      'A reminder when a memory from an earlier year comes back, opened as its own chapter.';
+
+  @override
+  String get premiumFeatureStoryImage => 'Story images';
+
+  @override
+  String get premiumFeatureStoryVideo => 'Story videos';
+
+  @override
+  String get premiumFeatureThreadOfTheYear => 'Thread of the Year';
+
+  @override
+  String get premiumFeatureFamilyWall => 'Family wall';
+
+  @override
+  String premiumFeatureNotice(String feature) {
+    return '$feature is part of Premium.';
+  }
 }

@@ -3056,6 +3056,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back up'**
   String get backUp;
+
+  /// No description provided for @onThisDayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'On this day'**
+  String get onThisDayTitle;
+
+  /// No description provided for @onThisDayYearsAgoToday.
+  ///
+  /// In en, this message translates to:
+  /// **'{years, plural, =1{1 year ago today} other{{years} years ago today}}'**
+  String onThisDayYearsAgoToday(int years);
+
+  /// No description provided for @onThisDayHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'On this day · {years, plural, =1{1 year ago} other{{years} years ago}}'**
+  String onThisDayHeader(int years);
+
+  /// No description provided for @onThisDaySettingsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'On days when a memory from an earlier year comes back, LifeThreads sends one quiet reminder.'**
+  String get onThisDaySettingsBody;
+
+  /// No description provided for @onThisDayReminderSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reminder'**
+  String get onThisDayReminderSwitch;
+
+  /// No description provided for @onThisDayReminderAt.
+  ///
+  /// In en, this message translates to:
+  /// **'At {time}'**
+  String onThisDayReminderAt(String time);
+
+  /// No description provided for @onThisDayNotificationsDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are off for LifeThreads. Allow them in your phone\'s settings.'**
+  String get onThisDayNotificationsDenied;
+
+  /// No description provided for @onThisDayNotificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{years, plural, =1{1 year ago today: {title}} other{{years} years ago today: {title}}}'**
+  String onThisDayNotificationBody(int years, String title);
+
+  /// No description provided for @onThisDayNotificationBodyMany.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} and {count, plural, =1{1 more memory} other{{count} more memories}} from this day'**
+  String onThisDayNotificationBodyMany(int count, String title);
+
+  /// No description provided for @onThisDayChannelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A memory from this day in an earlier year.'**
+  String get onThisDayChannelDescription;
+
+  /// No description provided for @benefitOnThisDayBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A reminder when a memory from an earlier year comes back, opened as its own chapter.'**
+  String get benefitOnThisDayBody;
+
+  /// No description provided for @premiumFeatureStoryImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Story images'**
+  String get premiumFeatureStoryImage;
+
+  /// No description provided for @premiumFeatureStoryVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Story videos'**
+  String get premiumFeatureStoryVideo;
+
+  /// No description provided for @premiumFeatureThreadOfTheYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Thread of the Year'**
+  String get premiumFeatureThreadOfTheYear;
+
+  /// No description provided for @premiumFeatureFamilyWall.
+  ///
+  /// In en, this message translates to:
+  /// **'Family wall'**
+  String get premiumFeatureFamilyWall;
+
+  /// No description provided for @premiumFeatureNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'{feature} is part of Premium.'**
+  String premiumFeatureNotice(String feature);
 }
 
 class _AppLocalizationsDelegate
