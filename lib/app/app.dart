@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/localization/locale_controller.dart';
 import '../features/capsule/presentation/widgets/memory_capsule_deep_link_listener.dart';
+import '../features/family/presentation/widgets/family_invite_link_listener.dart';
 import '../features/on_this_day/data/on_this_day_scheduler.dart';
 import '../features/premium/data/premium_billing_controller.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -32,7 +33,9 @@ class LifeThreadsApp extends ConsumerWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       routerConfig: AppRouter.router,
       builder: (context, child) => MemoryCapsuleDeepLinkListener(
-        child: child ?? const SizedBox.shrink(),
+        child: FamilyInviteLinkListener(
+          child: child ?? const SizedBox.shrink(),
+        ),
       ),
     );
   }

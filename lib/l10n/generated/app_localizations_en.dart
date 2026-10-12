@@ -2064,4 +2064,715 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get benefitYearThreadBody =>
       'Your year as a short film: the moments that mattered, threaded in order, with music.';
+
+  @override
+  String get myWall => 'My wall';
+
+  @override
+  String get myWallSubtitle => 'Private, on this device';
+
+  @override
+  String get switchWall => 'Switch wall';
+
+  @override
+  String get familyWallsTitle => 'Family walls';
+
+  @override
+  String get familyWallsSettingsBody =>
+      'Share one wall with family or friends: everyone adds memories, end-to-end encrypted. My wall stays private on this device.';
+
+  @override
+  String get familyWallsOpen => 'Open family walls';
+
+  @override
+  String get familyWallsManage => 'Manage family walls';
+
+  @override
+  String get familyWallsHeadline => 'One wall, the whole family';
+
+  @override
+  String get familyWallsIntro =>
+      'A family wall is shared with the people you invite. Memories and photos are encrypted on your phone before they are uploaded; only members can open them. My wall is not shared and stays on this device.';
+
+  @override
+  String get familyUnavailableTitle => 'Not available yet';
+
+  @override
+  String get familyUnavailable =>
+      'Family walls are not available in this version of LifeThreads yet.';
+
+  @override
+  String get familySignInNeededTitle => 'Sign in to use family walls';
+
+  @override
+  String get familySignInNeededBody =>
+      'A shared wall needs an account so the family knows who added what. My wall works without one.';
+
+  @override
+  String get familySignIn => 'Sign in';
+
+  @override
+  String get familyLoadFailed => 'Could not load';
+
+  @override
+  String get familyRetry => 'Try again';
+
+  @override
+  String get familyNoWallsYet =>
+      'No family walls yet. Start one or join with an invite link.';
+
+  @override
+  String get familyStartTitle => 'Start or join';
+
+  @override
+  String get familyStartBody =>
+      'Starting a family wall needs Premium. Joining one is free: the owner\'s Premium covers the family.';
+
+  @override
+  String get familyCreateAction => 'Create family wall';
+
+  @override
+  String get familyCreateTitle => 'New family wall';
+
+  @override
+  String get familyNameLabel => 'Name of the wall';
+
+  @override
+  String get familyNameHint => 'e.g. The Millers';
+
+  @override
+  String get familyMyNameLabel => 'Your name on this wall';
+
+  @override
+  String get familyMyNameHelper =>
+      'Members see it on your memories. It is encrypted like everything on the wall.';
+
+  @override
+  String get familyMyNameSaved => 'Name saved.';
+
+  @override
+  String get familySetMyName => 'My name';
+
+  @override
+  String get familyCheckingSubscription => 'Checking your Premium…';
+
+  @override
+  String get familyCreating => 'Creating the wall…';
+
+  @override
+  String get familyJoinWithLink => 'Join with link';
+
+  @override
+  String get familyInviteLinkLabel => 'Invite link';
+
+  @override
+  String get familyJoinTitle => 'Join this family wall?';
+
+  @override
+  String get familyJoinBody =>
+      'Members will see your name and the memories you add, and you will see theirs. You can leave at any time.';
+
+  @override
+  String get familyJoinAction => 'Join';
+
+  @override
+  String get familyJoining => 'Joining…';
+
+  @override
+  String familyJoined(String family) {
+    return 'You joined $family.';
+  }
+
+  @override
+  String get familyRoleOwner => 'Owner';
+
+  @override
+  String get familyRoleMember => 'Member';
+
+  @override
+  String familyMemberCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count members',
+      one: '1 member',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familySettingsTitle => 'Wall settings';
+
+  @override
+  String familyStorageUsed(String used, String total) {
+    return '$used of $total used';
+  }
+
+  @override
+  String get familyRename => 'Rename';
+
+  @override
+  String get familyInviteTitle => 'Invite';
+
+  @override
+  String get familyInviteBody =>
+      'Send a link to someone you trust. Each link works once and expires after 7 days.';
+
+  @override
+  String get familyInviteAction => 'Create invite link';
+
+  @override
+  String get familyCreatingInvite => 'Creating the invite…';
+
+  @override
+  String get familyInviteReady => 'Invite link ready';
+
+  @override
+  String get familyInviteValidity =>
+      'Works once and expires after 7 days at the latest.';
+
+  @override
+  String get familyInviteKeyWarning =>
+      'The link carries the wall\'s key: whoever opens it can join and read the wall. Send it only to the person you invite.';
+
+  @override
+  String get familyInviteShare => 'Share link';
+
+  @override
+  String get familyInviteCopy => 'Copy link';
+
+  @override
+  String get familyInviteCopied => 'Link copied.';
+
+  @override
+  String get familyInviteShareFailed =>
+      'Sharing is not available. Copy the link instead.';
+
+  @override
+  String familyInviteSubject(String family) {
+    return 'Join $family on LifeThreads';
+  }
+
+  @override
+  String familyInviteText(String family, String link) {
+    return 'Join our family wall \"$family\" on LifeThreads: $link';
+  }
+
+  @override
+  String get familyMembersTitle => 'Members';
+
+  @override
+  String get familyMemberActions => 'Member actions';
+
+  @override
+  String get familyYou => 'You';
+
+  @override
+  String familyYouNamed(String name) {
+    return '$name (you)';
+  }
+
+  @override
+  String get familyAMember => 'A member';
+
+  @override
+  String get familyFormerMember => 'Former member';
+
+  @override
+  String get familyBlocked => 'Blocked';
+
+  @override
+  String get familyBlock => 'Block';
+
+  @override
+  String get familyUnblock => 'Unblock';
+
+  @override
+  String familyBlockAuthor(String name) {
+    return 'Block $name';
+  }
+
+  @override
+  String familyBlockQuestion(String name) {
+    return 'Block $name?';
+  }
+
+  @override
+  String get familyBlockBody =>
+      'You will no longer see their memories on any family wall. They are not told. You can unblock them in the members list.';
+
+  @override
+  String get familyReport => 'Report';
+
+  @override
+  String get familyRemoveMember => 'Remove from wall';
+
+  @override
+  String familyRemoveQuestion(String name) {
+    return 'Remove $name?';
+  }
+
+  @override
+  String get familyRemoveBody =>
+      'They lose access to this wall. Invite them again to bring them back.';
+
+  @override
+  String get familyRemoveDeleteContent => 'Also delete the memories they added';
+
+  @override
+  String get familyDeleteTitle => 'Delete family wall';
+
+  @override
+  String get familyDeleteBody =>
+      'As the owner you cannot leave the wall; you can delete it for everyone.';
+
+  @override
+  String get familyDeleteAction => 'Delete wall';
+
+  @override
+  String familyDeleteQuestion(String family) {
+    return 'Delete $family?';
+  }
+
+  @override
+  String get familyDeleteConfirmBody =>
+      'All memories and photos on this wall are deleted from our servers for every member. This cannot be undone. Memories on My wall are not affected.';
+
+  @override
+  String get familyDeleting => 'Deleting…';
+
+  @override
+  String get familyLeaveTitle => 'Leave family wall';
+
+  @override
+  String get familyLeaveBody =>
+      'You stop seeing this wall. You can keep or delete the memories you added.';
+
+  @override
+  String get familyLeaveAction => 'Leave';
+
+  @override
+  String familyLeaveQuestion(String family) {
+    return 'Leave $family?';
+  }
+
+  @override
+  String get familyLeaveConfirmBody => 'To come back you need a new invite.';
+
+  @override
+  String get familyLeaveDeleteMine => 'Also delete the memories I added';
+
+  @override
+  String get familyLeaving => 'Leaving…';
+
+  @override
+  String get familySignInTitle => 'Sign in';
+
+  @override
+  String get familySignInHeadline => 'An account for family walls';
+
+  @override
+  String get familySignInWhy =>
+      'A family wall is shared, so it needs an account: members see who added each memory, and only members can open the wall.';
+
+  @override
+  String get familySignInMyWallStays =>
+      'My wall needs no account. It stays private on this device and is never uploaded.';
+
+  @override
+  String get familySignInEncrypted =>
+      'Family memories and photos are end-to-end encrypted. GK Coding stores them but cannot read them.';
+
+  @override
+  String get familySignInWhatWeGet =>
+      'From Apple or Google we only use an account ID, not your contacts or photos.';
+
+  @override
+  String get familySignInApple => 'Sign in with Apple';
+
+  @override
+  String get familySignInGoogle => 'Sign in with Google';
+
+  @override
+  String get familySignInFinePrint =>
+      'By signing in you agree to the Terms of Use and the Privacy Policy. You can delete your account in the app at any time.';
+
+  @override
+  String get familyAccountTitle => 'Account';
+
+  @override
+  String get familySignedOutTitle => 'Not signed in';
+
+  @override
+  String get familySignedOutBody =>
+      'Sign in to see your family walls. My wall works without an account.';
+
+  @override
+  String get familySignedInTitle => 'Signed in';
+
+  @override
+  String get familySignedInBody =>
+      'Your account is used only for family walls.';
+
+  @override
+  String familyAccountId(String id) {
+    return 'Account ID: $id';
+  }
+
+  @override
+  String get familySignOut => 'Sign out';
+
+  @override
+  String get familySignOutQuestion => 'Sign out?';
+
+  @override
+  String get familySignOutBody =>
+      'Family walls and their keys are removed from this device until you sign in again. Nothing is deleted on the server. My wall is not affected.';
+
+  @override
+  String get familySigningOut => 'Signing out…';
+
+  @override
+  String get familyDeleteAccountTitle => 'Delete account';
+
+  @override
+  String get familyDeleteAccountBody =>
+      'Deletes your account and your family wall data from our servers. My wall stays on this device.';
+
+  @override
+  String get familyDeleteAccount => 'Delete account';
+
+  @override
+  String get familyDeleteAccountQuestion => 'Delete your account?';
+
+  @override
+  String familyDeleteAccountOwned(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'The $count family walls you own are deleted for all their members, with every memory and photo on them.',
+      one:
+          'The family wall you own is deleted for all its members, with every memory and photo on it.',
+      zero: 'You own no family wall.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familyDeleteAccountPosts =>
+      'The memories and photos you added to other families\' walls are deleted, and you leave those walls.';
+
+  @override
+  String get familyDeleteAccountKeys =>
+      'Family wall keys and cached photos are removed from this device. This cannot be undone.';
+
+  @override
+  String get familyDeleteAccountMyWall =>
+      'My wall is not affected: its memories stay on this device.';
+
+  @override
+  String get familyDeleteAccountSubscription =>
+      'A Premium subscription is not cancelled by this; manage it in the App Store or Google Play.';
+
+  @override
+  String get familyDeleteAccountUnderstood =>
+      'I understand that this deletes my account for good.';
+
+  @override
+  String get familyDeletingAccount => 'Deleting your account…';
+
+  @override
+  String get familyAccountDeleted => 'Your account was deleted.';
+
+  @override
+  String get familyTermsTitle => 'Family wall rules';
+
+  @override
+  String get familyTermsHeadline => 'Before you share';
+
+  @override
+  String get familyTermsIntro =>
+      'Family walls are for the people you invite. To keep them safe, everyone accepts these rules:';
+
+  @override
+  String get familyTermsZeroTolerance =>
+      'Zero tolerance for objectionable content: no harassment, hate, sexual content, violence, self-harm, illegal content, or other people\'s private information without their consent.';
+
+  @override
+  String get familyTermsOwnContent =>
+      'Share only photos and stories you are allowed to share.';
+
+  @override
+  String get familyTermsReport =>
+      'Report any memory or member from the wall. GK Coding reviews reports within 24 hours.';
+
+  @override
+  String get familyTermsBlock =>
+      'Block a member to stop seeing their memories.';
+
+  @override
+  String get familyTermsOwner =>
+      'The owner of a wall can remove members and their memories.';
+
+  @override
+  String get familyTermsConsequences =>
+      'Content that breaks these rules is removed, and the accounts that posted it can be suspended or deleted.';
+
+  @override
+  String get familyTermsReadFull => 'Read the full terms';
+
+  @override
+  String get familyTermsAgree => 'I agree to the Terms of Use and these rules.';
+
+  @override
+  String get familyTermsAccept => 'Accept and continue';
+
+  @override
+  String familyTermsVersion(String version) {
+    return 'Terms version $version';
+  }
+
+  @override
+  String get familyWallEmptyTitle => 'The wall is waiting';
+
+  @override
+  String get familyWallEmptyBody =>
+      'Add the first memory. Everyone on this wall will see it.';
+
+  @override
+  String get familyWallGoneBody =>
+      'This family wall is no longer available to you. It may have been deleted, or you were removed.';
+
+  @override
+  String get familyAddMemory => 'Add memory';
+
+  @override
+  String get familyRefresh => 'Refresh';
+
+  @override
+  String get familySyncing => 'Syncing…';
+
+  @override
+  String get familyOffline => 'Offline: showing saved memories';
+
+  @override
+  String get familySyncFailed => 'Sync failed';
+
+  @override
+  String get familyMemoryTitle => 'Memory';
+
+  @override
+  String get familyMemoryGone => 'This memory is no longer on the wall.';
+
+  @override
+  String get familyMemoryActions => 'Memory actions';
+
+  @override
+  String familyAddedBy(String name) {
+    return 'Added by $name';
+  }
+
+  @override
+  String get familyDeleteMemoryQuestion => 'Delete this memory?';
+
+  @override
+  String get familyDeleteMemoryBody =>
+      'It is removed from the wall for everyone, with its photos.';
+
+  @override
+  String familyDeleteMemoryAsOwnerBody(String name) {
+    return 'As the owner you can remove memories from this wall. This memory by $name is removed for everyone, with its photos.';
+  }
+
+  @override
+  String get familyDeletingMemory => 'Deleting the memory…';
+
+  @override
+  String get familyNoPhotosYet => 'No photos yet';
+
+  @override
+  String get familyPostNote =>
+      'Everyone on this wall will see this memory. Photos are resized and encrypted on your phone before upload.';
+
+  @override
+  String get familyPostMemory => 'Post to the wall';
+
+  @override
+  String get familyUploading => 'Encrypting and uploading…';
+
+  @override
+  String get familyMemorySaved => 'Saved to the family wall.';
+
+  @override
+  String get familyConflictTitle => 'Changed by someone else';
+
+  @override
+  String get familyConflictBody =>
+      'This memory changed on another device while you were editing. Load the latest version and save your changes over it?';
+
+  @override
+  String get familyConflictRetry => 'Refresh and save';
+
+  @override
+  String get familyQuotaTitle => 'The wall is full';
+
+  @override
+  String get familyReportMemoryTitle => 'Report memory';
+
+  @override
+  String get familyReportPhotoTitle => 'Report photo';
+
+  @override
+  String get familyReportMemberTitle => 'Report member';
+
+  @override
+  String get familyReportIntro =>
+      'Tell us what is wrong. Your report goes to GK Coding, not to the person you report.';
+
+  @override
+  String get familyReportSpam => 'Spam or scam';
+
+  @override
+  String get familyReportHarassment => 'Harassment or bullying';
+
+  @override
+  String get familyReportHate => 'Hate speech';
+
+  @override
+  String get familyReportSexual => 'Sexual content or nudity';
+
+  @override
+  String get familyReportViolence => 'Violence or threats';
+
+  @override
+  String get familyReportSelfHarm => 'Self-harm or suicide';
+
+  @override
+  String get familyReportIllegal => 'Illegal content';
+
+  @override
+  String get familyReportPrivacy =>
+      'Private information shared without consent';
+
+  @override
+  String get familyReportOther => 'Something else';
+
+  @override
+  String get familyReportDetailsLabel => 'Details (optional)';
+
+  @override
+  String get familyReportDetailsHint => 'What should we know?';
+
+  @override
+  String familyReportAlsoBlock(String name) {
+    return 'Also block $name';
+  }
+
+  @override
+  String get familyReportSend => 'Send report';
+
+  @override
+  String get familyReportReviewNote =>
+      'GK Coding reviews every report within 24 hours and removes content and members that break the rules.';
+
+  @override
+  String get familyReportSentTitle => 'Thank you';
+
+  @override
+  String get familyReportSentBody =>
+      'Your report was sent. GK Coding reviews it within 24 hours and acts on content that breaks the rules.';
+
+  @override
+  String get familyErrorGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get familyErrorOffline =>
+      'You appear to be offline. Check your connection and try again.';
+
+  @override
+  String get familyErrorSubscriptionRequired =>
+      'This needs an active Premium subscription of the wall\'s owner.';
+
+  @override
+  String get familyErrorInviteExpired =>
+      'This invite has expired. Ask for a new link.';
+
+  @override
+  String get familyErrorInviteUsed =>
+      'This invite was already used. Each link works once; ask for a new one.';
+
+  @override
+  String get familyErrorInviteInvalid =>
+      'This is not a valid LifeThreads invite link.';
+
+  @override
+  String get familyErrorAlreadyMember =>
+      'You are already a member of this family wall.';
+
+  @override
+  String get familyErrorFamilyFull =>
+      'This family wall has reached its member limit.';
+
+  @override
+  String get familyErrorQuotaExceeded =>
+      'This family wall has no storage left. Delete some memories or photos to make room.';
+
+  @override
+  String get familyErrorVersionConflict =>
+      'Someone changed this memory first. Refresh and try again.';
+
+  @override
+  String get familyErrorTermsRequired =>
+      'Please accept the family wall rules first.';
+
+  @override
+  String get familyErrorSignedOut =>
+      'You were signed out. Please sign in again.';
+
+  @override
+  String get familyErrorNotAllowed =>
+      'You are not allowed to do this on this wall.';
+
+  @override
+  String get familyErrorNotFound => 'Family wall not found';
+
+  @override
+  String get familyErrorOwnerCannotLeave =>
+      'The owner cannot leave the wall, but can delete it.';
+
+  @override
+  String get familyPaste => 'Paste';
+
+  @override
+  String get familyErrorInviteRevoked =>
+      'This invite was withdrawn. Ask for a new link.';
+
+  @override
+  String get familyErrorKeyMissing =>
+      'This device does not have the key for this family wall (for example after a reinstall or on a new phone). Ask a member for a new invite link: opening it restores access.';
+
+  @override
+  String get familyErrorSignInUnavailable =>
+      'Sign-in is not available on this device right now.';
+
+  @override
+  String get familyErrorNoPurchase =>
+      'No Premium purchase was found for this App Store or Google Play account. Get Premium first, then try again.';
+
+  @override
+  String get familyErrorNameTooLong =>
+      'That name is too long. Please use a shorter one.';
+
+  @override
+  String get familyErrorPhotoUnreadable =>
+      'One of the photos could not be read. Remove it and try again.';
+
+  @override
+  String get familyErrorTooLarge =>
+      'This is too large to upload. Try fewer or smaller photos.';
+
+  @override
+  String get familyReportEvidenceNote =>
+      'To review it, GK Coding receives this memory\'s title and story with your report. Its photos are never sent.';
 }
