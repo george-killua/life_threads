@@ -15,6 +15,7 @@ import 'package:life_threads/features/memories/data/memory_repository.dart';
 import 'package:life_threads/features/on_this_day/data/on_this_day_providers.dart';
 import 'package:life_threads/features/premium/data/premium_entitlement_controller.dart';
 import 'package:life_threads/features/premium/domain/premium_entitlement.dart';
+import 'package:life_threads/features/year_thread/data/year_thread_providers.dart';
 import 'package:life_threads/l10n/generated/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -330,6 +331,10 @@ void main() {
                               onThisDayMatchesProvider.overrideWithValue(
                                 const [],
                               ),
+                              // No Thread of the Year card in December
+                              // and January runs.
+                              yearThreadWallCardYearProvider
+                                  .overrideWithValue(null),
                             ],
                             child: MaterialApp.router(
                               debugShowCheckedModeBanner: false,

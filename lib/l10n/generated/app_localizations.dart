@@ -3152,6 +3152,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{feature} is part of Premium.'**
   String premiumFeatureNotice(String feature);
+
+  /// No description provided for @yearThreadTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thread of the Year'**
+  String get yearThreadTitle;
+
+  /// No description provided for @yearThreadMemories.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 memory} other{{count} memories}}'**
+  String yearThreadMemories(int count);
+
+  /// No description provided for @yearThreadPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 place} other{{count} places}}'**
+  String yearThreadPlaces(int count);
+
+  /// No description provided for @yearThreadPeople.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 person} other{{count} people}}'**
+  String yearThreadPeople(int count);
+
+  /// No description provided for @yearThreadMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 month} other{{count} months}}'**
+  String yearThreadMonths(int count);
+
+  /// No description provided for @yearThreadMostFelt.
+  ///
+  /// In en, this message translates to:
+  /// **'Most felt: {feeling}'**
+  String yearThreadMostFelt(String feeling);
+
+  /// No description provided for @yearThreadClosingLine.
+  ///
+  /// In en, this message translates to:
+  /// **'A year, threaded.'**
+  String get yearThreadClosingLine;
+
+  /// No description provided for @yearThreadMyYear.
+  ///
+  /// In en, this message translates to:
+  /// **'My year'**
+  String get yearThreadMyYear;
+
+  /// No description provided for @yearThreadWallCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your year in memories'**
+  String get yearThreadWallCardTitle;
+
+  /// No description provided for @yearThreadWallCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn {year} into a short film.'**
+  String yearThreadWallCardBody(String year);
+
+  /// No description provided for @yearThreadDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get yearThreadDismiss;
+
+  /// No description provided for @yearThreadSettingsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn any year with at least 3 memories into a short film, told in order and joined by the thread.'**
+  String get yearThreadSettingsBody;
+
+  /// No description provided for @yearThreadOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Make the film'**
+  String get yearThreadOpen;
+
+  /// No description provided for @yearThreadNoYears.
+  ///
+  /// In en, this message translates to:
+  /// **'Thread of the Year needs a year with at least 3 memories. Keep saving moments and come back.'**
+  String get yearThreadNoYears;
+
+  /// No description provided for @yearThreadYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get yearThreadYear;
+
+  /// No description provided for @yearThreadLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Length'**
+  String get yearThreadLength;
+
+  /// No description provided for @yearThreadLengthFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Film · {seconds} s'**
+  String yearThreadLengthFull(int seconds);
+
+  /// No description provided for @yearThreadLengthStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Story · 20 s'**
+  String get yearThreadLengthStory;
+
+  /// No description provided for @yearThreadMusic.
+  ///
+  /// In en, this message translates to:
+  /// **'Music'**
+  String get yearThreadMusic;
+
+  /// No description provided for @yearThreadNoMusic.
+  ///
+  /// In en, this message translates to:
+  /// **'No music'**
+  String get yearThreadNoMusic;
+
+  /// No description provided for @yearThreadInFilm.
+  ///
+  /// In en, this message translates to:
+  /// **'In the film'**
+  String get yearThreadInFilm;
+
+  /// No description provided for @yearThreadInFilmCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of {max}'**
+  String yearThreadInFilmCount(int count, int max);
+
+  /// No description provided for @yearThreadAddMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a memory'**
+  String get yearThreadAddMemory;
+
+  /// No description provided for @yearThreadSwap.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap'**
+  String get yearThreadSwap;
+
+  /// No description provided for @yearThreadRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get yearThreadRemove;
+
+  /// No description provided for @yearThreadUseSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Use suggestions'**
+  String get yearThreadUseSuggestions;
+
+  /// No description provided for @yearThreadPickTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a memory from {year}'**
+  String yearThreadPickTitle(String year);
+
+  /// No description provided for @yearThreadNoOthers.
+  ///
+  /// In en, this message translates to:
+  /// **'Every memory from this year is already in the film.'**
+  String get yearThreadNoOthers;
+
+  /// No description provided for @yearThreadNeedMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose at least {count, plural, =1{1 memory} other{{count} memories}}.'**
+  String yearThreadNeedMore(int count);
+
+  /// No description provided for @yearThreadPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get yearThreadPreview;
+
+  /// No description provided for @yearThreadExportVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Export video'**
+  String get yearThreadExportVideo;
+
+  /// No description provided for @yearThreadExportImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Export image'**
+  String get yearThreadExportImage;
+
+  /// No description provided for @yearThreadShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get yearThreadShare;
+
+  /// No description provided for @yearThreadSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to Photos'**
+  String get yearThreadSave;
+
+  /// No description provided for @yearThreadMakingFilm.
+  ///
+  /// In en, this message translates to:
+  /// **'Making your film…'**
+  String get yearThreadMakingFilm;
+
+  /// No description provided for @yearThreadMakingImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Making your image…'**
+  String get yearThreadMakingImage;
+
+  /// No description provided for @yearThreadFilmReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Your film is ready'**
+  String get yearThreadFilmReady;
+
+  /// No description provided for @yearThreadImageReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Your image is ready'**
+  String get yearThreadImageReady;
+
+  /// No description provided for @yearThreadSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to your photos.'**
+  String get yearThreadSaved;
+
+  /// No description provided for @yearThreadExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'That did not work. Please try again.'**
+  String get yearThreadExportFailed;
+
+  /// No description provided for @yearThreadPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get yearThreadPlay;
+
+  /// No description provided for @yearThreadPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get yearThreadPause;
 }
 
 class _AppLocalizationsDelegate

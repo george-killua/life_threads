@@ -34,6 +34,7 @@ import '../../../onboarding/onboarding_preferences.dart';
 import '../../../onboarding/presentation/widgets/lifethreads_tutorial.dart';
 import '../../../premium/data/premium_entitlement_controller.dart';
 import '../../../premium/domain/premium_entitlement.dart';
+import '../../../year_thread/presentation/widgets/year_thread_wall_card.dart';
 import '../../domain/wall_attachment_layout.dart';
 import '../../domain/wall_item.dart';
 import '../../domain/wall_layout.dart';
@@ -439,6 +440,16 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                               .read(backupReminderProvider.notifier)
                               .snooze(),
                         ),
+                      ),
+                    if (hasWallContent &&
+                        _mode == _WallViewMode.wall &&
+                        !_controlsExpanded)
+                      // Thread of the Year, in December and January.
+                      const Positioned(
+                        left: 20,
+                        right: 20,
+                        bottom: 100,
+                        child: YearThreadWallCard(),
                       ),
                     if (hasWallContent && !_controlsExpanded)
                       Positioned(

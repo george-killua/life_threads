@@ -11,4 +11,7 @@ class RouteNames {
   static const editMemory = '/memories/:id/edit';
   static const manageConnections = '/memories/:id/connections';
   static const capsuleCinema = '/capsule/cinema';
+  static const yearThread = '/year-thread';
+
+  static String yearThreadFor(int year) => '$yearThread?year=$year';
 }

@@ -747,5 +747,120 @@
         "type": "String"
       }
     }
-  }
+  },
+  "yearThreadTitle": "Thread of the Year",
+  "yearThreadMemories": "{count, plural, =1{1 memory} other{{count} memories}}",
+  "@yearThreadMemories": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yearThreadPlaces": "{count, plural, =1{1 place} other{{count} places}}",
+  "@yearThreadPlaces": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yearThreadPeople": "{count, plural, =1{1 person} other{{count} people}}",
+  "@yearThreadPeople": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yearThreadMonths": "{count, plural, =1{1 month} other{{count} months}}",
+  "@yearThreadMonths": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yearThreadMostFelt": "Most felt: {feeling}",
+  "@yearThreadMostFelt": {
+    "placeholders": {
+      "feeling": {
+        "type": "String"
+      }
+    }
+  },
+  "yearThreadClosingLine": "A year, threaded.",
+  "yearThreadMyYear": "My year",
+  "yearThreadWallCardTitle": "Your year in memories",
+  "yearThreadWallCardBody": "Turn {year} into a short film.",
+  "@yearThreadWallCardBody": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "yearThreadDismiss": "Not now",
+  "yearThreadSettingsBody": "Turn any year with at least 3 memories into a short film, told in order and joined by the thread.",
+  "yearThreadOpen": "Make the film",
+  "yearThreadNoYears": "Thread of the Year needs a year with at least 3 memories. Keep saving moments and come back.",
+  "yearThreadYear": "Year",
+  "yearThreadLength": "Length",
+  "yearThreadLengthFull": "Film · {seconds} s",
+  "@yearThreadLengthFull": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "yearThreadLengthStory": "Story · 20 s",
+  "yearThreadMusic": "Music",
+  "yearThreadNoMusic": "No music",
+  "yearThreadInFilm": "In the film",
+  "yearThreadInFilmCount": "{count} of {max}",
+  "@yearThreadInFilmCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "yearThreadAddMemory": "Add a memory",
+  "yearThreadSwap": "Swap",
+  "yearThreadRemove": "Remove",
+  "yearThreadUseSuggestions": "Use suggestions",
+  "yearThreadPickTitle": "Choose a memory from {year}",
+  "@yearThreadPickTitle": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "yearThreadNoOthers": "Every memory from this year is already in the film.",
+  "yearThreadNeedMore": "Choose at least {count, plural, =1{1 memory} other{{count} memories}}.",
+  "@yearThreadNeedMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yearThreadPreview": "Preview",
+  "yearThreadExportVideo": "Export video",
+  "yearThreadExportImage": "Export image",
+  "yearThreadShare": "Share",
+  "yearThreadSave": "Save to Photos",
+  "yearThreadMakingFilm": "Making your film…",
+  "yearThreadMakingImage": "Making your image…",
+  "yearThreadFilmReady": "Your film is ready",
+  "yearThreadImageReady": "Your image is ready",
+  "yearThreadSaved": "Saved to your photos.",
+  "yearThreadExportFailed": "That did not work. Please try again.",
+  "yearThreadPlay": "Play",
+  "yearThreadPause": "Pause"
 }

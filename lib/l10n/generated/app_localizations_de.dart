@@ -1758,4 +1758,184 @@ class AppLocalizationsDe extends AppLocalizations {
   String premiumFeatureNotice(String feature) {
     return '$feature ist Teil von Premium.';
   }
+
+  @override
+  String get yearThreadTitle => 'Faden des Jahres';
+
+  @override
+  String yearThreadMemories(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Erinnerungen',
+      one: '1 Erinnerung',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yearThreadPlaces(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Orte',
+      one: '1 Ort',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yearThreadPeople(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Personen',
+      one: '1 Person',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yearThreadMonths(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Monate',
+      one: '1 Monat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yearThreadMostFelt(String feeling) {
+    return 'Am meisten gefühlt: $feeling';
+  }
+
+  @override
+  String get yearThreadClosingLine => 'Ein Jahr, verbunden.';
+
+  @override
+  String get yearThreadMyYear => 'Mein Jahr';
+
+  @override
+  String get yearThreadWallCardTitle => 'Dein Jahr in Erinnerungen';
+
+  @override
+  String yearThreadWallCardBody(String year) {
+    return 'Mach aus $year einen kurzen Film.';
+  }
+
+  @override
+  String get yearThreadDismiss => 'Nicht jetzt';
+
+  @override
+  String get yearThreadSettingsBody =>
+      'Mach aus jedem Jahr mit mindestens 3 Erinnerungen einen kurzen Film – in der richtigen Reihenfolge und durch den Faden verbunden.';
+
+  @override
+  String get yearThreadOpen => 'Film erstellen';
+
+  @override
+  String get yearThreadNoYears =>
+      'Für den Faden des Jahres braucht ein Jahr mindestens 3 Erinnerungen. Halte weiter Momente fest und schau dann wieder vorbei.';
+
+  @override
+  String get yearThreadYear => 'Jahr';
+
+  @override
+  String get yearThreadLength => 'Länge';
+
+  @override
+  String yearThreadLengthFull(int seconds) {
+    return 'Film · $seconds s';
+  }
+
+  @override
+  String get yearThreadLengthStory => 'Story · 20 s';
+
+  @override
+  String get yearThreadMusic => 'Musik';
+
+  @override
+  String get yearThreadNoMusic => 'Keine Musik';
+
+  @override
+  String get yearThreadInFilm => 'Im Film';
+
+  @override
+  String yearThreadInFilmCount(int count, int max) {
+    return '$count von $max';
+  }
+
+  @override
+  String get yearThreadAddMemory => 'Erinnerung hinzufügen';
+
+  @override
+  String get yearThreadSwap => 'Tauschen';
+
+  @override
+  String get yearThreadRemove => 'Entfernen';
+
+  @override
+  String get yearThreadUseSuggestions => 'Vorschläge verwenden';
+
+  @override
+  String yearThreadPickTitle(String year) {
+    return 'Wähle eine Erinnerung aus $year';
+  }
+
+  @override
+  String get yearThreadNoOthers =>
+      'Alle Erinnerungen aus diesem Jahr sind schon im Film.';
+
+  @override
+  String yearThreadNeedMore(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Erinnerungen',
+      one: '1 Erinnerung',
+    );
+    return 'Wähle mindestens $_temp0.';
+  }
+
+  @override
+  String get yearThreadPreview => 'Vorschau';
+
+  @override
+  String get yearThreadExportVideo => 'Video exportieren';
+
+  @override
+  String get yearThreadExportImage => 'Bild exportieren';
+
+  @override
+  String get yearThreadShare => 'Teilen';
+
+  @override
+  String get yearThreadSave => 'In Fotos sichern';
+
+  @override
+  String get yearThreadMakingFilm => 'Dein Film entsteht …';
+
+  @override
+  String get yearThreadMakingImage => 'Dein Bild entsteht …';
+
+  @override
+  String get yearThreadFilmReady => 'Dein Film ist fertig';
+
+  @override
+  String get yearThreadImageReady => 'Dein Bild ist fertig';
+
+  @override
+  String get yearThreadSaved => 'In deinen Fotos gesichert.';
+
+  @override
+  String get yearThreadExportFailed =>
+      'Das hat nicht geklappt. Bitte versuche es noch einmal.';
+
+  @override
+  String get yearThreadPlay => 'Abspielen';
+
+  @override
+  String get yearThreadPause => 'Pause';
 }

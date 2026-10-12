@@ -1743,4 +1743,202 @@ class AppLocalizationsAr extends AppLocalizations {
   String premiumFeatureNotice(String feature) {
     return '$feature جزء من Premium.';
   }
+
+  @override
+  String get yearThreadTitle => 'خيط السنة';
+
+  @override
+  String yearThreadMemories(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ذكرى',
+      many: '$count ذكرى',
+      few: '$count ذكريات',
+      two: 'ذكريان',
+      one: 'ذكرى واحدة',
+      zero: 'لا ذكريات',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yearThreadPlaces(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مكان',
+      many: '$count مكانًا',
+      few: '$count أماكن',
+      two: 'مكانان',
+      one: 'مكان واحد',
+      zero: 'لا أماكن',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yearThreadPeople(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count شخص',
+      many: '$count شخصًا',
+      few: '$count أشخاص',
+      two: 'شخصان',
+      one: 'شخص واحد',
+      zero: 'لا أشخاص',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yearThreadMonths(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count شهر',
+      many: '$count شهرًا',
+      few: '$count أشهر',
+      two: 'شهران',
+      one: 'شهر واحد',
+      zero: 'لا أشهر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yearThreadMostFelt(String feeling) {
+    return 'الشعور الأكثر حضورًا: $feeling';
+  }
+
+  @override
+  String get yearThreadClosingLine => 'عامٌ في خيطٍ واحد.';
+
+  @override
+  String get yearThreadMyYear => 'عامي';
+
+  @override
+  String get yearThreadWallCardTitle => 'عامك في ذكريات';
+
+  @override
+  String yearThreadWallCardBody(String year) {
+    return 'حوِّل عام $year إلى فيلم قصير.';
+  }
+
+  @override
+  String get yearThreadDismiss => 'ليس الآن';
+
+  @override
+  String get yearThreadSettingsBody =>
+      'حوِّل أي عام فيه 3 ذكريات على الأقل إلى فيلم قصير يروي لحظاته بالترتيب ويربطها الخيط.';
+
+  @override
+  String get yearThreadOpen => 'أنشئ الفيلم';
+
+  @override
+  String get yearThreadNoYears =>
+      'يحتاج خيط السنة إلى عام فيه 3 ذكريات على الأقل. واصل حفظ لحظاتك ثم عُد إلينا.';
+
+  @override
+  String get yearThreadYear => 'العام';
+
+  @override
+  String get yearThreadLength => 'المدة';
+
+  @override
+  String yearThreadLengthFull(int seconds) {
+    return 'فيلم · $seconds ث';
+  }
+
+  @override
+  String get yearThreadLengthStory => 'قصة · 20 ث';
+
+  @override
+  String get yearThreadMusic => 'الموسيقى';
+
+  @override
+  String get yearThreadNoMusic => 'بدون موسيقى';
+
+  @override
+  String get yearThreadInFilm => 'في الفيلم';
+
+  @override
+  String yearThreadInFilmCount(int count, int max) {
+    return '$count من $max';
+  }
+
+  @override
+  String get yearThreadAddMemory => 'أضف ذكرى';
+
+  @override
+  String get yearThreadSwap => 'استبدل';
+
+  @override
+  String get yearThreadRemove => 'أزل';
+
+  @override
+  String get yearThreadUseSuggestions => 'استخدم الاقتراحات';
+
+  @override
+  String yearThreadPickTitle(String year) {
+    return 'اختر ذكرى من عام $year';
+  }
+
+  @override
+  String get yearThreadNoOthers =>
+      'كل ذكريات هذا العام موجودة في الفيلم بالفعل.';
+
+  @override
+  String yearThreadNeedMore(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ذكرى',
+      many: '$count ذكرى',
+      few: '$count ذكريات',
+      two: 'ذكريين',
+      one: 'ذكرى واحدة',
+    );
+    return 'اختر $_temp0 على الأقل.';
+  }
+
+  @override
+  String get yearThreadPreview => 'معاينة';
+
+  @override
+  String get yearThreadExportVideo => 'صدِّر الفيديو';
+
+  @override
+  String get yearThreadExportImage => 'صدِّر الصورة';
+
+  @override
+  String get yearThreadShare => 'شارك';
+
+  @override
+  String get yearThreadSave => 'احفظ في الصور';
+
+  @override
+  String get yearThreadMakingFilm => 'جارٍ إعداد فيلمك…';
+
+  @override
+  String get yearThreadMakingImage => 'جارٍ إعداد صورتك…';
+
+  @override
+  String get yearThreadFilmReady => 'فيلمك جاهز';
+
+  @override
+  String get yearThreadImageReady => 'صورتك جاهزة';
+
+  @override
+  String get yearThreadSaved => 'حُفظ في صورك.';
+
+  @override
+  String get yearThreadExportFailed => 'لم ينجح ذلك. يُرجى المحاولة مرة أخرى.';
+
+  @override
+  String get yearThreadPlay => 'تشغيل';
+
+  @override
+  String get yearThreadPause => 'إيقاف مؤقت';
 }

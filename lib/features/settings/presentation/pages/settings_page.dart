@@ -215,6 +215,19 @@ class SettingsPage extends ConsumerWidget {
                 ),
               ),
               _SettingsCard(
+                icon: Icons.movie_filter_rounded,
+                title: l10n.yearThreadTitle,
+                body: l10n.yearThreadSettingsBody,
+                badge: isPremium ? null : l10n.premiumBadge,
+                actions: [
+                  _SettingsAction(
+                    label: l10n.yearThreadOpen,
+                    icon: Icons.movie_filter_rounded,
+                    onTap: () => context.push(RouteNames.yearThread),
+                  ),
+                ],
+              ),
+              _SettingsCard(
                 icon: Icons.workspace_premium_rounded,
                 title: l10n.premiumTitle,
                 body: entitlement?.isPremium == true

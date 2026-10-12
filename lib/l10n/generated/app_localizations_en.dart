@@ -1741,4 +1741,183 @@ class AppLocalizationsEn extends AppLocalizations {
   String premiumFeatureNotice(String feature) {
     return '$feature is part of Premium.';
   }
+
+  @override
+  String get yearThreadTitle => 'Thread of the Year';
+
+  @override
+  String yearThreadMemories(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count memories',
+      one: '1 memory',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yearThreadPlaces(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count places',
+      one: '1 place',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yearThreadPeople(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count people',
+      one: '1 person',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yearThreadMonths(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count months',
+      one: '1 month',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yearThreadMostFelt(String feeling) {
+    return 'Most felt: $feeling';
+  }
+
+  @override
+  String get yearThreadClosingLine => 'A year, threaded.';
+
+  @override
+  String get yearThreadMyYear => 'My year';
+
+  @override
+  String get yearThreadWallCardTitle => 'Your year in memories';
+
+  @override
+  String yearThreadWallCardBody(String year) {
+    return 'Turn $year into a short film.';
+  }
+
+  @override
+  String get yearThreadDismiss => 'Not now';
+
+  @override
+  String get yearThreadSettingsBody =>
+      'Turn any year with at least 3 memories into a short film, told in order and joined by the thread.';
+
+  @override
+  String get yearThreadOpen => 'Make the film';
+
+  @override
+  String get yearThreadNoYears =>
+      'Thread of the Year needs a year with at least 3 memories. Keep saving moments and come back.';
+
+  @override
+  String get yearThreadYear => 'Year';
+
+  @override
+  String get yearThreadLength => 'Length';
+
+  @override
+  String yearThreadLengthFull(int seconds) {
+    return 'Film · $seconds s';
+  }
+
+  @override
+  String get yearThreadLengthStory => 'Story · 20 s';
+
+  @override
+  String get yearThreadMusic => 'Music';
+
+  @override
+  String get yearThreadNoMusic => 'No music';
+
+  @override
+  String get yearThreadInFilm => 'In the film';
+
+  @override
+  String yearThreadInFilmCount(int count, int max) {
+    return '$count of $max';
+  }
+
+  @override
+  String get yearThreadAddMemory => 'Add a memory';
+
+  @override
+  String get yearThreadSwap => 'Swap';
+
+  @override
+  String get yearThreadRemove => 'Remove';
+
+  @override
+  String get yearThreadUseSuggestions => 'Use suggestions';
+
+  @override
+  String yearThreadPickTitle(String year) {
+    return 'Choose a memory from $year';
+  }
+
+  @override
+  String get yearThreadNoOthers =>
+      'Every memory from this year is already in the film.';
+
+  @override
+  String yearThreadNeedMore(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count memories',
+      one: '1 memory',
+    );
+    return 'Choose at least $_temp0.';
+  }
+
+  @override
+  String get yearThreadPreview => 'Preview';
+
+  @override
+  String get yearThreadExportVideo => 'Export video';
+
+  @override
+  String get yearThreadExportImage => 'Export image';
+
+  @override
+  String get yearThreadShare => 'Share';
+
+  @override
+  String get yearThreadSave => 'Save to Photos';
+
+  @override
+  String get yearThreadMakingFilm => 'Making your film…';
+
+  @override
+  String get yearThreadMakingImage => 'Making your image…';
+
+  @override
+  String get yearThreadFilmReady => 'Your film is ready';
+
+  @override
+  String get yearThreadImageReady => 'Your image is ready';
+
+  @override
+  String get yearThreadSaved => 'Saved to your photos.';
+
+  @override
+  String get yearThreadExportFailed => 'That did not work. Please try again.';
+
+  @override
+  String get yearThreadPlay => 'Play';
+
+  @override
+  String get yearThreadPause => 'Pause';
 }

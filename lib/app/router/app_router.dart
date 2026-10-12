@@ -14,6 +14,7 @@ import '../../features/premium/domain/premium_feature.dart';
 import '../../features/premium/presentation/pages/upgrade_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/wall/presentation/pages/memory_wall_page.dart';
+import '../../features/year_thread/presentation/pages/year_thread_page.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -85,6 +86,12 @@ class AppRouter {
             state.extra is MemoryCapsuleImportDraft ? null : RouteNames.home,
         builder: (context, state) =>
             CapsuleCinemaPage(draft: state.extra! as MemoryCapsuleImportDraft),
+      ),
+      GoRoute(
+        path: RouteNames.yearThread,
+        builder: (context, state) => YearThreadPage(
+          initialYear: int.tryParse(state.uri.queryParameters['year'] ?? ''),
+        ),
       ),
     ],
   );
