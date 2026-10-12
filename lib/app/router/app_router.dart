@@ -13,6 +13,7 @@ import '../../features/onboarding/presentation/pages/onboarding_gate.dart';
 import '../../features/premium/domain/premium_feature.dart';
 import '../../features/premium/presentation/pages/upgrade_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/stories/presentation/pages/create_story_page.dart';
 import '../../features/wall/presentation/pages/memory_wall_page.dart';
 import 'route_names.dart';
 
@@ -85,6 +86,15 @@ class AppRouter {
             state.extra is MemoryCapsuleImportDraft ? null : RouteNames.home,
         builder: (context, state) =>
             CapsuleCinemaPage(draft: state.extra! as MemoryCapsuleImportDraft),
+      ),
+      GoRoute(
+        path: RouteNames.createStory,
+        // extra: the id of the memory the story starts from, if any.
+        builder: (context, state) => CreateStoryPage(
+          initialMemoryId: state.extra is String
+              ? state.extra! as String
+              : null,
+        ),
       ),
     ],
   );

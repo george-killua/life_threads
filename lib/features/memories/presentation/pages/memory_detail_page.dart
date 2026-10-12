@@ -83,6 +83,10 @@ class MemoryDetailPage extends ConsumerWidget {
                         onEdit: () => context.push('/memories/$memoryId/edit'),
                         onConnect: () =>
                             context.push('/memories/$memoryId/connections'),
+                        onCreateStory: () => context.push(
+                          RouteNames.createStory,
+                          extra: memoryId,
+                        ),
                         onShareCapsule: () =>
                             _shareCloudCapsule(context, ref, state, memoryId),
                       ),
@@ -560,11 +564,13 @@ class _ChapterActions extends StatelessWidget {
   const _ChapterActions({
     required this.onEdit,
     required this.onConnect,
+    required this.onCreateStory,
     required this.onShareCapsule,
   });
 
   final VoidCallback onEdit;
   final VoidCallback onConnect;
+  final VoidCallback onCreateStory;
   final VoidCallback onShareCapsule;
 
   @override
@@ -608,6 +614,20 @@ class _ChapterActions extends StatelessWidget {
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: onCreateStory,
+            icon: const Icon(Icons.auto_stories_rounded),
+            label: Text(context.l10n.createStory),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.amber,
+              side: const BorderSide(color: AppColors.line),
+              padding: const EdgeInsets.symmetric(vertical: 15),
+            ),
+          ),
         ),
       ],
     );

@@ -384,6 +384,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                     _displayWall(context, state),
                                 onShowTutorial: () =>
                                     showLifeThreadsTutorialSheet(context),
+                                onCreateStory: () =>
+                                    _pushRoute(RouteNames.createStory),
                                 onOpenSettings: () =>
                                     _pushRoute(RouteNames.settings),
                                 onCollapse: () =>
@@ -1272,6 +1274,11 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
               onTap: () => Navigator.of(context).pop(_MemoryAction.connect),
             ),
             ListTile(
+              leading: const Icon(Icons.auto_stories_rounded),
+              title: Text(context.l10n.createStory),
+              onTap: () => Navigator.of(context).pop(_MemoryAction.story),
+            ),
+            ListTile(
               leading: const Icon(
                 Icons.delete_outline_rounded,
                 color: Colors.redAccent,
@@ -1296,6 +1303,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
         await _pushRoute('/memories/$memoryId/edit');
       case _MemoryAction.connect:
         await _pushRoute('/memories/$memoryId/connections');
+      case _MemoryAction.story:
+        await _pushRoute(RouteNames.createStory, extra: memoryId);
       case _MemoryAction.delete:
         final confirmed = await showDialog<bool>(
           context: context,
@@ -1930,6 +1939,7 @@ class _WallHeader extends StatelessWidget {
     required this.onImportBackup,
     required this.onDisplayWall,
     required this.onShowTutorial,
+    required this.onCreateStory,
     required this.onOpenSettings,
     required this.onCollapse,
   });
@@ -1945,6 +1955,7 @@ class _WallHeader extends StatelessWidget {
   final VoidCallback onImportBackup;
   final VoidCallback onDisplayWall;
   final VoidCallback onShowTutorial;
+  final VoidCallback onCreateStory;
   final VoidCallback onOpenSettings;
   final VoidCallback onCollapse;
 
@@ -1953,6 +1964,8 @@ class _WallHeader extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxWidth < 390;
+        // Seven actions: narrower buttons leave the title room on phones.
+        final denseActions = constraints.maxWidth < 440;
         final name = greetingName?.trim();
         final subtitle = (name != null && name.isNotEmpty)
             ? context.l10n.wallWelcome(name)
@@ -2024,36 +2037,49 @@ class _WallHeader extends StatelessWidget {
                       ),
                     ),
                     _HeaderIconButton(
+                      dense: denseActions,
+                      tooltip: context.l10n.createStory,
+                      onPressed: onCreateStory,
+                      icon: Icons.auto_stories_rounded,
+                      color: AppColors.amber,
+                    ),
+                    _HeaderIconButton(
+                      dense: denseActions,
                       tooltip: context.l10n.importBackupTooltip,
                       onPressed: onImportBackup,
                       icon: Icons.restore_rounded,
                       color: AppColors.muted,
                     ),
                     _HeaderIconButton(
+                      dense: denseActions,
                       tooltip: context.l10n.exportBackupTooltip,
                       onPressed: onExportBackup,
                       icon: Icons.ios_share_rounded,
                       color: AppColors.gold,
                     ),
                     _HeaderIconButton(
+                      dense: denseActions,
                       tooltip: context.l10n.displayWallTooltip,
                       onPressed: onDisplayWall,
                       icon: Icons.qr_code_scanner_rounded,
                       color: AppColors.amber,
                     ),
                     _HeaderIconButton(
+                      dense: denseActions,
                       tooltip: context.l10n.tutorialTooltip,
                       onPressed: onShowTutorial,
                       icon: Icons.help_outline_rounded,
                       color: AppColors.muted,
                     ),
                     _HeaderIconButton(
+                      dense: denseActions,
                       tooltip: context.l10n.settingsTooltip,
                       onPressed: onOpenSettings,
                       icon: Icons.settings_rounded,
                       color: AppColors.muted,
                     ),
                     _HeaderIconButton(
+                      dense: denseActions,
                       tooltip: context.l10n.hideControlsTooltip,
                       onPressed: onCollapse,
                       icon: Icons.keyboard_arrow_up_rounded,
@@ -2142,12 +2168,14 @@ class _HeaderIconButton extends StatelessWidget {
     required this.onPressed,
     required this.icon,
     required this.color,
+    this.dense = false,
   });
 
   final String tooltip;
   final VoidCallback onPressed;
   final IconData icon;
   final Color color;
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {
@@ -2156,9 +2184,9 @@ class _HeaderIconButton extends StatelessWidget {
       onPressed: onPressed,
       icon: Icon(icon),
       color: color,
-      iconSize: 23,
+      iconSize: dense ? 21 : 23,
       visualDensity: VisualDensity.compact,
-      constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+      constraints: BoxConstraints.tightFor(width: dense ? 31 : 36, height: 36),
       padding: EdgeInsets.zero,
     );
   }
@@ -3147,7 +3175,7 @@ class _WallPanSurfaceState extends State<_WallPanSurface> {
 
 enum _DragTargetKind { memory, wallItem }
 
-enum _MemoryAction { open, edit, connect, delete }
+enum _MemoryAction { open, edit, connect, story, delete }
 
 enum _TextAction { edit, delete }
 
