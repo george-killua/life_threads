@@ -20,7 +20,7 @@
 ## Local Upload
 
 ```bash
-cd /Users/georgekassih/development/Projects/life_threads
+cd ~/Developer/life_threads
 bundle install
 
 export MAPTILER_KEY="your-rotated-maptiler-key"

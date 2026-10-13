@@ -49,3 +49,13 @@ store_listing_assets/device_backup/
 
 # Store screenshots are rebuilt by tool/store_screenshots/run.sh
 /store_listing_assets/store_screenshots/
+
+# Editor and assistant settings
+.claude/
+.cursor/
+
+# Rendered social posts (large; kept locally)
+/store_listing_assets/social/instagram_story/
+
+# Misplaced exports of another app
+/ios/Wandvue */

@@ -75,9 +75,9 @@ final List<_Scene> _scenes = [
       // A memory without a map pin, scrolled to its story, people and the
       // memories it is threaded to (the vector map does not render in tests).
       await _go(tester, '/memories/demo-garden-dinner');
-      final story = storeMemoryState(
-        _lang,
-      ).events.firstWhere((event) => event.id == 'demo-garden-dinner').description;
+      final story = storeMemoryState(_lang).events
+          .firstWhere((event) => event.id == 'demo-garden-dinner')
+          .description;
       await tester.runAsync(() async {});
       Scrollable.ensureVisible(
         tester.element(find.text(story)),
