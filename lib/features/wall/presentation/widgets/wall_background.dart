@@ -24,11 +24,15 @@ class WallBackground extends ConsumerWidget {
         ? WallThemePreset.warmMemoryRoom
         : selectedTheme;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(color: theme.background),
-      child: CustomPaint(
-        painter: _MemoryRoomPainter(theme: theme),
-        child: child,
+    // Scaffold gives its body loose constraints: without the expand, the
+    // wall ends where a short page's content ends.
+    return SizedBox.expand(
+      child: DecoratedBox(
+        decoration: BoxDecoration(color: theme.background),
+        child: CustomPaint(
+          painter: _MemoryRoomPainter(theme: theme),
+          child: child,
+        ),
       ),
     );
   }

@@ -1356,6 +1356,8 @@
   "familyErrorKeyMissing": "This device does not have the key for this family wall (for example after a reinstall or on a new phone). Ask a member for a new invite link: opening it restores access.",
   "familyErrorSignInUnavailable": "Sign-in is not available on this device right now.",
   "familyErrorNoPurchase": "No Premium purchase was found for this App Store or Google Play account. Get Premium first, then try again.",
+  "familyErrorVerificationUnavailable": "Your Premium could not be checked right now. Please try again later.",
+  "familyErrorPurchaseLinkedElsewhere": "This Premium purchase is already linked to another family wall account. Sign in with that account, or contact info@gkcoding.dev.",
   "familyErrorNameTooLong": "That name is too long. Please use a shorter one.",
   "familyErrorPhotoUnreadable": "One of the photos could not be read. Remove it and try again.",
   "familyErrorTooLarge": "This is too large to upload. Try fewer or smaller photos.",

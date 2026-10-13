@@ -2936,6 +2936,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'No Premium purchase was found for this App Store or Google Play account. Get Premium first, then try again.';
 
   @override
+  String get familyErrorVerificationUnavailable =>
+      'Your Premium could not be checked right now. Please try again later.';
+
+  @override
+  String get familyErrorPurchaseLinkedElsewhere =>
+      'This Premium purchase is already linked to another family wall account. Sign in with that account, or contact info@gkcoding.dev.';
+
+  @override
   String get familyErrorNameTooLong =>
       'That name is too long. Please use a shorter one.';
 

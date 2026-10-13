@@ -54,6 +54,11 @@ String familyErrorMessage(AppLocalizations l10n, Object error) {
     'family_key_missing' => l10n.familyErrorKeyMissing,
     'sign_in_unavailable' => l10n.familyErrorSignInUnavailable,
     'no_purchase_found' => l10n.familyErrorNoPurchase,
+    'subscription_verification_not_configured' ||
+    'subscription_verification_failed' =>
+      l10n.familyErrorVerificationUnavailable,
+    'purchase_linked_to_other_account' =>
+      l10n.familyErrorPurchaseLinkedElsewhere,
     'name_too_long' => l10n.familyErrorNameTooLong,
     'photo_unreadable' => l10n.familyErrorPhotoUnreadable,
     'too_large' => l10n.familyErrorTooLarge,

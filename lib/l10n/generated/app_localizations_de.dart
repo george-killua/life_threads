@@ -2964,6 +2964,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Für dieses App-Store- oder Google-Play-Konto wurde kein Premium-Kauf gefunden. Hol dir zuerst Premium und versuche es dann erneut.';
 
   @override
+  String get familyErrorVerificationUnavailable =>
+      'Dein Premium konnte gerade nicht geprüft werden. Bitte versuche es später erneut.';
+
+  @override
+  String get familyErrorPurchaseLinkedElsewhere =>
+      'Dieser Premium-Kauf ist schon mit einem anderen Familienwand-Konto verknüpft. Melde dich mit diesem Konto an oder schreib an info@gkcoding.dev.';
+
+  @override
   String get familyErrorNameTooLong =>
       'Dieser Name ist zu lang. Bitte nimm einen kürzeren.';
 

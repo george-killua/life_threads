@@ -5127,6 +5127,18 @@ abstract class AppLocalizations {
   /// **'No Premium purchase was found for this App Store or Google Play account. Get Premium first, then try again.'**
   String get familyErrorNoPurchase;
 
+  /// No description provided for @familyErrorVerificationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Premium could not be checked right now. Please try again later.'**
+  String get familyErrorVerificationUnavailable;
+
+  /// No description provided for @familyErrorPurchaseLinkedElsewhere.
+  ///
+  /// In en, this message translates to:
+  /// **'This Premium purchase is already linked to another family wall account. Sign in with that account, or contact info@gkcoding.dev.'**
+  String get familyErrorPurchaseLinkedElsewhere;
+
   /// No description provided for @familyErrorNameTooLong.
   ///
   /// In en, this message translates to:

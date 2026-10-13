@@ -898,6 +898,8 @@
   "familyErrorKeyMissing": "لا يملك هذا الجهاز مفتاح جدار العائلة هذا (مثلاً بعد إعادة التثبيت أو على هاتف جديد). اطلب من أحد الأعضاء رابط دعوة جديداً، فبفتحه يُستعاد الوصول.",
   "familyErrorSignInUnavailable": "تسجيل الدخول غير متاح على هذا الجهاز حالياً.",
   "familyErrorNoPurchase": "لم يُعثر على شراء Premium لحساب App Store أو Google Play هذا. احصل على Premium أولاً ثم حاول مجدداً.",
+  "familyErrorVerificationUnavailable": "تعذّر التحقق من اشتراك Premium الآن. حاول مجدداً لاحقاً.",
+  "familyErrorPurchaseLinkedElsewhere": "شراء Premium هذا مرتبط بالفعل بحساب آخر لجدران العائلة. سجّل الدخول بذلك الحساب أو راسلنا على info@gkcoding.dev.",
   "familyErrorNameTooLong": "هذا الاسم طويل جداً. يُرجى استخدام اسم أقصر.",
   "familyErrorPhotoUnreadable": "تعذّرت قراءة إحدى الصور. أزلها وحاول مجدداً.",
   "familyErrorTooLarge": "هذا كبير جداً للرفع. جرّب صوراً أقل أو أصغر.",

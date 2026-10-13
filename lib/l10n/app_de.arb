@@ -898,6 +898,8 @@
   "familyErrorKeyMissing": "Dieses Gerät hat den Schlüssel für diese Familienwand nicht (zum Beispiel nach einer Neuinstallation oder auf einem neuen Handy). Bitte ein Mitglied um einen neuen Einladungslink: Ihn zu öffnen stellt den Zugang wieder her.",
   "familyErrorSignInUnavailable": "Die Anmeldung ist auf diesem Gerät gerade nicht verfügbar.",
   "familyErrorNoPurchase": "Für dieses App-Store- oder Google-Play-Konto wurde kein Premium-Kauf gefunden. Hol dir zuerst Premium und versuche es dann erneut.",
+  "familyErrorVerificationUnavailable": "Dein Premium konnte gerade nicht geprüft werden. Bitte versuche es später erneut.",
+  "familyErrorPurchaseLinkedElsewhere": "Dieser Premium-Kauf ist schon mit einem anderen Familienwand-Konto verknüpft. Melde dich mit diesem Konto an oder schreib an info@gkcoding.dev.",
   "familyErrorNameTooLong": "Dieser Name ist zu lang. Bitte nimm einen kürzeren.",
   "familyErrorPhotoUnreadable": "Eines der Fotos konnte nicht gelesen werden. Entferne es und versuche es erneut.",
   "familyErrorTooLarge": "Das ist zu groß zum Hochladen. Versuche es mit weniger oder kleineren Fotos.",

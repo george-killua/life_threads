@@ -2955,6 +2955,14 @@ class AppLocalizationsAr extends AppLocalizations {
       'لم يُعثر على شراء Premium لحساب App Store أو Google Play هذا. احصل على Premium أولاً ثم حاول مجدداً.';
 
   @override
+  String get familyErrorVerificationUnavailable =>
+      'تعذّر التحقق من اشتراك Premium الآن. حاول مجدداً لاحقاً.';
+
+  @override
+  String get familyErrorPurchaseLinkedElsewhere =>
+      'شراء Premium هذا مرتبط بالفعل بحساب آخر لجدران العائلة. سجّل الدخول بذلك الحساب أو راسلنا على info@gkcoding.dev.';
+
+  @override
   String get familyErrorNameTooLong =>
       'هذا الاسم طويل جداً. يُرجى استخدام اسم أقصر.';
 
