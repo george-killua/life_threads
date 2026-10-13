@@ -1,3 +1,21 @@
+/// What the Premium page tells the user about the store; translated there.
+enum PremiumPurchaseMessage {
+  billingUpdateFailed,
+  storeUnavailable,
+  productUnavailable,
+  loadFailed,
+  openingCheckout,
+  checkoutFailed,
+  checking,
+  restoreFailed,
+  noSubscriptionFound,
+  pending,
+  purchaseFailed,
+  canceled,
+  restored,
+  active,
+}
+
 enum PremiumPurchaseStatus {
   idle,
   loading,
@@ -25,7 +43,7 @@ class PremiumPurchaseState {
   final PremiumPurchaseStatus status;
   final String? productId;
   final String? price;
-  final String? message;
+  final PremiumPurchaseMessage? message;
   final bool canBuy;
   final bool isRestoring;
 
@@ -38,7 +56,7 @@ class PremiumPurchaseState {
     PremiumPurchaseStatus? status,
     String? productId,
     String? price,
-    String? message,
+    PremiumPurchaseMessage? message,
     bool? canBuy,
     bool? isRestoring,
   }) {

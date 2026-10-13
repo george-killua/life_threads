@@ -34,7 +34,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
       onError: (Object error) {
         state = PremiumPurchaseState(
           status: PremiumPurchaseStatus.failed,
-          message: 'Billing update failed. Please try again.',
+          message: PremiumPurchaseMessage.billingUpdateFailed,
           canBuy: _subscriptionProduct != null,
           productId: _subscriptionProduct?.id,
           price: _subscriptionProduct?.price,
@@ -54,7 +54,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
       if (!available) {
         state = const PremiumPurchaseState(
           status: PremiumPurchaseStatus.storeUnavailable,
-          message: 'Store billing is not available on this device.',
+          message: PremiumPurchaseMessage.storeUnavailable,
         );
         return;
       }
@@ -64,7 +64,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
       if (response.error != null) {
         state = PremiumPurchaseState(
           status: PremiumPurchaseStatus.failed,
-          message: response.error!.message,
+          message: PremiumPurchaseMessage.loadFailed,
         );
         return;
       }
@@ -72,8 +72,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
       if (response.productDetails.isEmpty) {
         state = const PremiumPurchaseState(
           status: PremiumPurchaseStatus.productUnavailable,
-          message:
-              'Premium subscription is not available yet. Check the store product setup.',
+          message: PremiumPurchaseMessage.productUnavailable,
         );
         return;
       }
@@ -91,7 +90,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
     } catch (_) {
       state = const PremiumPurchaseState(
         status: PremiumPurchaseStatus.failed,
-        message: 'Could not load Premium from the store. Please try again.',
+        message: PremiumPurchaseMessage.loadFailed,
       );
     }
   }
@@ -105,7 +104,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
 
     state = state.copyWith(
       status: PremiumPurchaseStatus.pending,
-      message: 'Opening store checkout.',
+      message: PremiumPurchaseMessage.openingCheckout,
       canBuy: false,
     );
 
@@ -121,7 +120,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
           productId: product.id,
           price: product.price,
           canBuy: true,
-          message: 'Could not start checkout. Please try again.',
+          message: PremiumPurchaseMessage.checkoutFailed,
         );
       }
     } catch (_) {
@@ -130,7 +129,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
         productId: product.id,
         price: product.price,
         canBuy: true,
-        message: 'Checkout failed to open. Please try again.',
+        message: PremiumPurchaseMessage.checkoutFailed,
       );
     }
   }
@@ -139,7 +138,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
     if (!silent) {
       state = state.copyWith(
         isRestoring: true,
-        message: 'Checking your subscription.',
+        message: PremiumPurchaseMessage.checking,
       );
     }
 
@@ -157,7 +156,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
         state = state.copyWith(
           status: PremiumPurchaseStatus.failed,
           isRestoring: false,
-          message: 'Restore failed. Please try again.',
+          message: PremiumPurchaseMessage.restoreFailed,
         );
       }
     }
@@ -253,7 +252,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
             : PremiumPurchaseStatus.ready,
         isRestoring: false,
         canBuy: _subscriptionProduct != null,
-        message: 'No active Premium subscription was found.',
+        message: PremiumPurchaseMessage.noSubscriptionFound,
       );
     } else if (_subscriptionProduct != null &&
         state.status == PremiumPurchaseStatus.ready) {
@@ -264,7 +263,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
   void _markPending() {
     state = state.copyWith(
       status: PremiumPurchaseStatus.pending,
-      message: 'Purchase is pending. Premium unlocks after approval.',
+      message: PremiumPurchaseMessage.pending,
       canBuy: false,
     );
   }
@@ -298,8 +297,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
           productId: _subscriptionProduct?.id,
           price: _subscriptionProduct?.price,
           canBuy: _subscriptionProduct != null,
-          message:
-              purchase.error?.message ?? 'Purchase failed. Please try again.',
+          message: PremiumPurchaseMessage.purchaseFailed,
         );
       case PurchaseStatus.canceled:
         state = PremiumPurchaseState(
@@ -307,7 +305,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
           productId: _subscriptionProduct?.id,
           price: _subscriptionProduct?.price,
           canBuy: _subscriptionProduct != null,
-          message: 'Purchase canceled.',
+          message: PremiumPurchaseMessage.canceled,
         );
     }
   }
@@ -330,8 +328,8 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
       canBuy: true,
       isRestoring: false,
       message: status == PremiumPurchaseStatus.restored
-          ? 'Premium subscription restored.'
-          : 'Premium subscription is active.',
+          ? PremiumPurchaseMessage.restored
+          : PremiumPurchaseMessage.active,
     );
   }
 

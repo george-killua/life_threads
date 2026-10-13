@@ -1514,6 +1514,57 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get premiumMessageBillingUpdateFailed =>
+      'The store update failed. Please try again.';
+
+  @override
+  String get premiumMessageStoreUnavailable =>
+      'Purchases are not available on this device.';
+
+  @override
+  String get premiumMessageProductUnavailable =>
+      'Premium is not available in the store yet. Please try again later.';
+
+  @override
+  String get premiumMessageLoadFailed =>
+      'Premium could not be loaded from the store. Please try again.';
+
+  @override
+  String get premiumMessageOpeningCheckout => 'Opening the checkout…';
+
+  @override
+  String get premiumMessageCheckoutFailed =>
+      'The checkout could not be opened. Please try again.';
+
+  @override
+  String get premiumMessageChecking => 'Checking your subscription…';
+
+  @override
+  String get premiumMessageRestoreFailed =>
+      'Restoring failed. Please try again.';
+
+  @override
+  String get premiumMessageNoSubscriptionFound =>
+      'No active Premium subscription was found.';
+
+  @override
+  String get premiumMessagePending =>
+      'Your purchase is pending. Premium unlocks once it is approved.';
+
+  @override
+  String get premiumMessagePurchaseFailed =>
+      'The purchase did not go through. Please try again.';
+
+  @override
+  String get premiumMessageCanceled => 'Purchase canceled.';
+
+  @override
+  String get premiumMessageRestored => 'Your Premium subscription is restored.';
+
+  @override
+  String get premiumMessageActive => 'Your Premium subscription is active.';
+
+  @override
   String lifetimeUnlockWithPrice(Object price) {
     return 'Premium • $price/month';
   }

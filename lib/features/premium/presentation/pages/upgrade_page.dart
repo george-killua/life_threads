@@ -516,6 +516,8 @@ class _SubscriptionOfferCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
+              key: const ValueKey('premium-subscribe'),
+              style: _cardFilled,
               onPressed: isPremium
                   ? onContinue
                   : canBuy
@@ -538,14 +540,20 @@ class _SubscriptionOfferCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          OutlinedButton.icon(
-            onPressed: purchaseState.isBusy ? null : onRestore,
-            icon: const Icon(Icons.restore_rounded),
-            label: Text(context.l10n.restorePurchase),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              key: const ValueKey('premium-restore'),
+              style: _cardOutlined,
+              onPressed: purchaseState.isBusy ? null : onRestore,
+              icon: const Icon(Icons.restore_rounded),
+              label: Text(context.l10n.restorePurchase),
+            ),
           ),
           if (onMockUnlock != null && !isPremium) ...[
             const SizedBox(height: 10),
             TextButton.icon(
+              style: TextButton.styleFrom(foregroundColor: _cardBody),
               onPressed: onMockUnlock,
               icon: const Icon(Icons.science_rounded),
               label: Text(context.l10n.enableDebugMockUnlock),
@@ -570,6 +578,49 @@ class _SubscriptionOfferCard extends StatelessWidget {
     );
   }
 }
+
+/// Text on the light offer card.
+const _cardBody = Color(0xFF6D5741);
+
+/// Buttons made for the light offer card: the dark app theme's defaults
+/// (light text, dark outline) disappear on cream.
+final _cardFilled = ButtonStyle(
+  backgroundColor: WidgetStateProperty.resolveWith(
+    (states) => states.contains(WidgetState.disabled)
+        ? AppColors.gold.withValues(alpha: 0.38)
+        : AppColors.gold,
+  ),
+  foregroundColor: WidgetStateProperty.resolveWith(
+    (states) => states.contains(WidgetState.disabled)
+        ? AppColors.paperInk.withValues(alpha: 0.55)
+        : AppColors.paperInk,
+  ),
+  iconColor: WidgetStateProperty.resolveWith(
+    (states) => states.contains(WidgetState.disabled)
+        ? AppColors.paperInk.withValues(alpha: 0.55)
+        : AppColors.paperInk,
+  ),
+  padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 16)),
+  elevation: const WidgetStatePropertyAll(0),
+);
+
+final _cardOutlined = ButtonStyle(
+  foregroundColor: WidgetStateProperty.resolveWith(
+    (states) => states.contains(WidgetState.disabled)
+        ? _cardBody.withValues(alpha: 0.45)
+        : _cardBody,
+  ),
+  iconColor: WidgetStateProperty.resolveWith(
+    (states) => states.contains(WidgetState.disabled)
+        ? _cardBody.withValues(alpha: 0.45)
+        : AppColors.gold,
+  ),
+  side: WidgetStatePropertyAll(
+    BorderSide(color: AppColors.paperInk.withValues(alpha: 0.22), width: 1.4),
+  ),
+  backgroundColor: WidgetStatePropertyAll(Colors.white.withValues(alpha: 0.35)),
+  padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 14)),
+);
 
 class _PricePill extends StatelessWidget {
   const _PricePill({required this.price, required this.purchaseState});
@@ -636,27 +687,80 @@ class _PurchaseMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isError =
-        state.status == PremiumPurchaseStatus.failed ||
-        state.status == PremiumPurchaseStatus.storeUnavailable ||
-        state.status == PremiumPurchaseStatus.productUnavailable;
-
+    final l10n = context.l10n;
+    final message = state.message;
+    if (message == null) return const SizedBox.shrink();
+    final text = switch (message) {
+      PremiumPurchaseMessage.billingUpdateFailed =>
+        l10n.premiumMessageBillingUpdateFailed,
+      PremiumPurchaseMessage.storeUnavailable =>
+        l10n.premiumMessageStoreUnavailable,
+      PremiumPurchaseMessage.productUnavailable =>
+        l10n.premiumMessageProductUnavailable,
+      PremiumPurchaseMessage.loadFailed => l10n.premiumMessageLoadFailed,
+      PremiumPurchaseMessage.openingCheckout =>
+        l10n.premiumMessageOpeningCheckout,
+      PremiumPurchaseMessage.checkoutFailed =>
+        l10n.premiumMessageCheckoutFailed,
+      PremiumPurchaseMessage.checking => l10n.premiumMessageChecking,
+      PremiumPurchaseMessage.restoreFailed => l10n.premiumMessageRestoreFailed,
+      PremiumPurchaseMessage.noSubscriptionFound =>
+        l10n.premiumMessageNoSubscriptionFound,
+      PremiumPurchaseMessage.pending => l10n.premiumMessagePending,
+      PremiumPurchaseMessage.purchaseFailed =>
+        l10n.premiumMessagePurchaseFailed,
+      PremiumPurchaseMessage.canceled => l10n.premiumMessageCanceled,
+      PremiumPurchaseMessage.restored => l10n.premiumMessageRestored,
+      PremiumPurchaseMessage.active => l10n.premiumMessageActive,
+    };
+    final (
+      Color background,
+      Color foreground,
+      IconData icon,
+    ) = switch (message) {
+      PremiumPurchaseMessage.restored || PremiumPurchaseMessage.active => (
+        AppColors.sage.withValues(alpha: 0.22),
+        const Color(0xFF38512D),
+        Icons.check_circle_rounded,
+      ),
+      PremiumPurchaseMessage.openingCheckout ||
+      PremiumPurchaseMessage.checking ||
+      PremiumPurchaseMessage.pending ||
+      PremiumPurchaseMessage.noSubscriptionFound ||
+      PremiumPurchaseMessage.canceled => (
+        AppColors.paperInk.withValues(alpha: 0.06),
+        _cardBody,
+        Icons.info_outline_rounded,
+      ),
+      _ => (
+        AppColors.rose.withValues(alpha: 0.18),
+        const Color(0xFF7A2B24),
+        Icons.error_outline_rounded,
+      ),
+    };
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: (isError ? AppColors.rose : AppColors.sage).withValues(
-          alpha: 0.18,
-        ),
+        color: background,
         borderRadius: BorderRadius.circular(18),
       ),
-      child: Text(
-        state.message ?? '',
-        style: TextStyle(
-          color: isError ? const Color(0xFF7A2B24) : const Color(0xFF38512D),
-          height: 1.35,
-          fontWeight: FontWeight.w800,
-        ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: foreground),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: foreground,
+                height: 1.35,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

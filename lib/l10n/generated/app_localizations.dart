@@ -2817,6 +2817,90 @@ abstract class AppLocalizations {
   /// **'Payment is charged to your {store} account. The subscription renews automatically every month unless you cancel it at least 24 hours before the current period ends. Manage or cancel it in your {store} account settings.'**
   String purchasesHandledByGooglePlay(String store);
 
+  /// No description provided for @premiumMessageBillingUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The store update failed. Please try again.'**
+  String get premiumMessageBillingUpdateFailed;
+
+  /// No description provided for @premiumMessageStoreUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchases are not available on this device.'**
+  String get premiumMessageStoreUnavailable;
+
+  /// No description provided for @premiumMessageProductUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium is not available in the store yet. Please try again later.'**
+  String get premiumMessageProductUnavailable;
+
+  /// No description provided for @premiumMessageLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium could not be loaded from the store. Please try again.'**
+  String get premiumMessageLoadFailed;
+
+  /// No description provided for @premiumMessageOpeningCheckout.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening the checkout…'**
+  String get premiumMessageOpeningCheckout;
+
+  /// No description provided for @premiumMessageCheckoutFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The checkout could not be opened. Please try again.'**
+  String get premiumMessageCheckoutFailed;
+
+  /// No description provided for @premiumMessageChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking your subscription…'**
+  String get premiumMessageChecking;
+
+  /// No description provided for @premiumMessageRestoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring failed. Please try again.'**
+  String get premiumMessageRestoreFailed;
+
+  /// No description provided for @premiumMessageNoSubscriptionFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No active Premium subscription was found.'**
+  String get premiumMessageNoSubscriptionFound;
+
+  /// No description provided for @premiumMessagePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Your purchase is pending. Premium unlocks once it is approved.'**
+  String get premiumMessagePending;
+
+  /// No description provided for @premiumMessagePurchaseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The purchase did not go through. Please try again.'**
+  String get premiumMessagePurchaseFailed;
+
+  /// No description provided for @premiumMessageCanceled.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase canceled.'**
+  String get premiumMessageCanceled;
+
+  /// No description provided for @premiumMessageRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Premium subscription is restored.'**
+  String get premiumMessageRestored;
+
+  /// No description provided for @premiumMessageActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Premium subscription is active.'**
+  String get premiumMessageActive;
+
   /// No description provided for @lifetimeUnlockWithPrice.
   ///
   /// In en, this message translates to:

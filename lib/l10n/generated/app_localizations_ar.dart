@@ -1504,6 +1504,56 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get premiumMessageBillingUpdateFailed =>
+      'فشل تحديث المتجر. حاول مرة أخرى.';
+
+  @override
+  String get premiumMessageStoreUnavailable =>
+      'عمليات الشراء غير متاحة على هذا الجهاز.';
+
+  @override
+  String get premiumMessageProductUnavailable =>
+      'Premium غير متاح في المتجر بعد. حاول لاحقاً.';
+
+  @override
+  String get premiumMessageLoadFailed =>
+      'تعذّر تحميل Premium من المتجر. حاول مرة أخرى.';
+
+  @override
+  String get premiumMessageOpeningCheckout => 'جارٍ فتح صفحة الشراء…';
+
+  @override
+  String get premiumMessageCheckoutFailed =>
+      'تعذّر فتح صفحة الشراء. حاول مرة أخرى.';
+
+  @override
+  String get premiumMessageChecking => 'جارٍ التحقق من اشتراكك…';
+
+  @override
+  String get premiumMessageRestoreFailed => 'فشلت الاستعادة. حاول مرة أخرى.';
+
+  @override
+  String get premiumMessageNoSubscriptionFound =>
+      'لم يتم العثور على اشتراك Premium فعّال.';
+
+  @override
+  String get premiumMessagePending =>
+      'عملية الشراء قيد الانتظار. سيتم تفعيل Premium بعد الموافقة.';
+
+  @override
+  String get premiumMessagePurchaseFailed =>
+      'لم تكتمل عملية الشراء. حاول مرة أخرى.';
+
+  @override
+  String get premiumMessageCanceled => 'تم إلغاء الشراء.';
+
+  @override
+  String get premiumMessageRestored => 'تمت استعادة اشتراك Premium.';
+
+  @override
+  String get premiumMessageActive => 'اشتراك Premium مفعّل.';
+
+  @override
   String lifetimeUnlockWithPrice(Object price) {
     return 'Premium • $price/شهر';
   }
