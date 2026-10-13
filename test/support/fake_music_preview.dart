@@ -5,8 +5,18 @@ import 'package:life_threads/features/stories/domain/music_track.dart';
 class FakeMusicPreview implements MusicPreview {
   final calls = <String>[];
 
+  /// Where each play started and how long its loop was.
+  final parts = <({Duration start, Duration? length})>[];
+
   @override
-  Future<void> play(MusicTrack track) async => calls.add('play:${track.id}');
+  Future<void> play(
+    MusicTrack track, {
+    Duration start = Duration.zero,
+    Duration? length,
+  }) async {
+    calls.add('play:${track.id}');
+    parts.add((start: start, length: length));
+  }
 
   @override
   Future<void> stop() async => calls.add('stop');

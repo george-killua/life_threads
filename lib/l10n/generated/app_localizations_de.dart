@@ -2113,6 +2113,39 @@ class AppLocalizationsDe extends AppLocalizations {
   String get storyMoodEmotional => 'Gefühlvoll';
 
   @override
+  String get storyMusicTrimHint => 'Ziehen, um den Teil zu wählen';
+
+  @override
+  String get storySearchHint => 'Erinnerungen, Orte, Jahre suchen';
+
+  @override
+  String storySearchEmpty(String query) {
+    return 'Keine Erinnerung passt zu „$query“.';
+  }
+
+  @override
+  String get storyMemoriesInStory => 'In deiner Story';
+
+  @override
+  String get storyMemoriesReorderHint =>
+      'Gedrückt halten und ziehen, um die Reihenfolge zu ändern';
+
+  @override
+  String get storyAddMemory => 'Hinzufügen';
+
+  @override
+  String get storyAddMemoryTitle => 'Erinnerung hinzufügen';
+
+  @override
+  String storyRemoveMemory(String title) {
+    return '$title aus der Story entfernen';
+  }
+
+  @override
+  String get storyAllMemoriesAdded =>
+      'Alle Erinnerungen sind schon in dieser Story.';
+
+  @override
   String get storyShare => 'Teilen';
 
   @override

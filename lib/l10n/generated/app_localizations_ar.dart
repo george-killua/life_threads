@@ -2114,6 +2114,37 @@ class AppLocalizationsAr extends AppLocalizations {
   String get storyMoodEmotional => 'مؤثرة';
 
   @override
+  String get storyMusicTrimHint => 'اسحب لاختيار الجزء الذي يُعزف';
+
+  @override
+  String get storySearchHint => 'ابحث في الذكريات والأماكن والسنوات';
+
+  @override
+  String storySearchEmpty(String query) {
+    return 'لا توجد ذكرى تطابق «$query».';
+  }
+
+  @override
+  String get storyMemoriesInStory => 'في قصتك';
+
+  @override
+  String get storyMemoriesReorderHint => 'اضغط مطولاً واسحب لتغيير الترتيب';
+
+  @override
+  String get storyAddMemory => 'إضافة';
+
+  @override
+  String get storyAddMemoryTitle => 'أضف ذكرى';
+
+  @override
+  String storyRemoveMemory(String title) {
+    return 'إزالة $title من القصة';
+  }
+
+  @override
+  String get storyAllMemoriesAdded => 'كل الذكريات موجودة في هذه القصة بالفعل.';
+
+  @override
   String get storyShare => 'مشاركة';
 
   @override

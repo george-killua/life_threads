@@ -14,14 +14,20 @@ final musicPreviewProvider = Provider<MusicPreview>((ref) {
 });
 
 abstract interface class MusicPreview {
-  /// Plays [track] from the start, replacing what is playing.
-  Future<void> play(MusicTrack track);
+  /// Plays [track] from [start], replacing what is playing. With [length],
+  /// only that part plays, over and over (the part the film will use).
+  Future<void> play(
+    MusicTrack track, {
+    Duration start = Duration.zero,
+    Duration? length,
+  });
 
   Future<void> stop();
 }
 
 class AudioplayersMusicPreview implements MusicPreview {
   AudioPlayer? _player;
+  StreamSubscription<Duration>? _loop;
 
   /// Created on first use, so screens that never play music never touch the
   /// platform player.
@@ -41,14 +47,34 @@ class AudioplayersMusicPreview implements MusicPreview {
   }
 
   @override
-  Future<void> play(MusicTrack track) async {
+  Future<void> play(
+    MusicTrack track, {
+    Duration start = Duration.zero,
+    Duration? length,
+  }) async {
     final player = await _ensurePlayer();
+    await _loop?.cancel();
+    _loop = null;
     await player.stop();
-    await player.play(AssetSource(track.assetPath));
+    await player.setSource(AssetSource(track.assetPath));
+    if (start > Duration.zero) await player.seek(start);
+    await player.resume();
+    if (length == null) return;
+    final end = start + length;
+    _loop = player.onPositionChanged.listen((position) {
+      if (position >= end) unawaited(player.seek(start));
+    });
   }
 
   @override
-  Future<void> stop() async => _player?.stop();
+  Future<void> stop() async {
+    await _loop?.cancel();
+    _loop = null;
+    await _player?.stop();
+  }
 
-  void dispose() => unawaited(_player?.dispose());
+  void dispose() {
+    unawaited(_loop?.cancel());
+    unawaited(_player?.dispose());
+  }
 }

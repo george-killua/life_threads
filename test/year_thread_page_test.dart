@@ -59,6 +59,7 @@ class FakeExporter implements StoryExporter {
     BuildContext context,
     StoryFilm film, {
     MusicTrack? music,
+    Duration musicStart = Duration.zero,
     void Function(double progress)? onProgress,
     StoryExportCancel? cancel,
   }) async {

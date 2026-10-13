@@ -18,12 +18,14 @@ abstract interface class StoryExporter {
   Future<File> exportImage(BuildContext context, Widget page);
 
   /// Renders [film] as a 1080×1920 MP4 in the temporary directory, with
-  /// [music] trimmed to the film and faded out. [onProgress] gets 0..1.
+  /// [music] played from [musicStart], trimmed to the film and faded out.
+  /// [onProgress] gets 0..1.
   /// Throws [StoryExportCancelled] after [cancel] is triggered.
   Future<File> exportVideo(
     BuildContext context,
     StoryFilm film, {
     MusicTrack? music,
+    Duration musicStart = Duration.zero,
     void Function(double progress)? onProgress,
     StoryExportCancel? cancel,
   });

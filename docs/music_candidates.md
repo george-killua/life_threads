@@ -2,13 +2,13 @@
 
 Proposed 2026-10-12 for Create Story videos (plan session 3).
 
-**Update 2026-10-13:** the placeholder is gone. The app now ships 13 tracks, listed with their
-sources in `assets/music/LICENSES.md`: from this list 1, 2, 3, 4, 6, 8 (Musopen / CC0 recordings
-on Wikimedia Commons), plus more emotional pieces found on Commons with the same licence rules:
-Chopin's Nocturne in C-sharp minor (B. 49) and Étude "Tristesse", Schumann's Träumerei, Grieg's
-"The Death of Åse" and "Morning Mood" (Musopen), and Komiku's CC0 "Dreaming of you" and "Sad walk
-with sad piano". Not taken: 5 (unclear Musopen note), 7 (the theme starts late), 9–12 (not on
-Commons; OpenGameArt pages need a separate check).
+**Update 2026-10-13 (second):** the classical set felt like restaurant music, so the app now
+ships 17 modern CC0 songs instead: 15 by HoliznaCC0 (lo-fi, ambient, nostalgic; every release on
+the Free Music Archive is CC0) and Komiku's "Dreaming of you" and "Sad walk with sad piano". The
+first 2 minutes of each are bundled and users drag a window to choose which part plays (the
+film's length). Sources and licence copies: `assets/music/LICENSES.md`. Other HoliznaCC0 albums
+worth a listen for more songs: Waves Of Nostalgia 2, Lo-fi And Chill, Summer Air, Ocean Memory,
+Be Happy With Who You Are.
 
 ## What a track must allow
 

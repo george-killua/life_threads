@@ -15,6 +15,7 @@ import '../../../premium/presentation/premium_gate.dart';
 import '../../../stories/data/music_preview.dart';
 import '../../../stories/data/story_exporter.dart';
 import '../../../stories/domain/music_track.dart';
+import '../../../stories/presentation/widgets/music_trimmer.dart';
 import '../../../wall/presentation/widgets/wall_background.dart';
 import '../../data/year_thread_providers.dart';
 import '../../domain/year_thread.dart';
@@ -42,6 +43,9 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
   List<String>? _chosen;
   var _cut = YearThreadCut.full;
   MusicTrack? _music;
+
+  /// Where the chosen song starts in the film (see [MusicTrimmer]).
+  var _musicStart = Duration.zero;
   late final MusicPreview _musicPreview;
   var _exporting = false;
 
@@ -58,9 +62,19 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
   }
 
   /// Picks [track] (or no music) and plays it so the user hears it.
-  void _selectMusic(MusicTrack? track) {
-    setState(() => _music = track);
-    unawaited(track == null ? _musicPreview.stop() : _musicPreview.play(track));
+  void _selectMusic(MusicTrack? track, {Duration? window}) {
+    if (track == null) {
+      setState(() => _music = null);
+      unawaited(_musicPreview.stop());
+      return;
+    }
+    final length = window ?? track.length;
+    final start = MusicTrimmer.suggestedStart(track, length);
+    setState(() {
+      _music = track;
+      _musicStart = start;
+    });
+    unawaited(_musicPreview.play(track, start: start, length: length));
   }
 
   @override
@@ -284,12 +298,26 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
                             child: Text('${track.title} · ${track.artist}'),
                           ),
                       ],
-                      onChanged: _selectMusic,
+                      onChanged: (track) =>
+                          _selectMusic(track, window: film?.duration),
                     ),
             ),
           ],
         ),
       ),
+      if (_music case final music? when film != null) ...[
+        const SizedBox(height: 12),
+        MusicTrimmer(
+          key: ValueKey('music-trimmer-${music.id}'),
+          track: music,
+          window: film.duration,
+          start: MusicTrimmer.clampStart(music, film.duration, _musicStart),
+          onChanged: (start) => setState(() => _musicStart = start),
+          onChangeEnd: (start) => unawaited(
+            _musicPreview.play(music, start: start, length: film.duration),
+          ),
+        ),
+      ],
       const SizedBox(height: 18),
       Row(
         children: [
@@ -379,9 +407,17 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
     for (final image in film.images) {
       unawaited(precacheImage(image, context, onError: (_, _) {}));
     }
-    // The chosen song plays from the start with the preview.
+    // The chosen part of the song plays with the preview.
     final music = _music;
-    if (music != null) unawaited(_musicPreview.play(music));
+    if (music != null) {
+      unawaited(
+        _musicPreview.play(
+          music,
+          start: MusicTrimmer.clampStart(music, film.duration, _musicStart),
+          length: film.duration,
+        ),
+      );
+    }
     await showDialog<void>(
       context: context,
       builder: (context) => Dialog(
@@ -492,6 +528,9 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
         context,
         film,
         music: _music,
+        musicStart: _music == null
+            ? Duration.zero
+            : MusicTrimmer.clampStart(_music!, film.duration, _musicStart),
         onProgress: (value) => progress.value = value,
         cancel: cancel,
       ),

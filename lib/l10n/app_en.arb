@@ -940,6 +940,29 @@
   "storyMoodNostalgic": "Nostalgic",
   "storyMoodEpic": "Epic",
   "storyMoodEmotional": "Emotional",
+  "storyMusicTrimHint": "Drag to choose which part plays",
+  "storySearchHint": "Search memories, places, years",
+  "storySearchEmpty": "No memory matches “{query}”.",
+  "@storySearchEmpty": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "storyMemoriesInStory": "In your story",
+  "storyMemoriesReorderHint": "Hold and drag to change the order",
+  "storyAddMemory": "Add",
+  "storyAddMemoryTitle": "Add a memory",
+  "storyRemoveMemory": "Remove {title} from the story",
+  "@storyRemoveMemory": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "storyAllMemoriesAdded": "Every memory is already in this story.",
   "storyShare": "Share",
   "storySaveToPhotos": "Save to Photos",
   "storySaved": "Saved to your photos.",

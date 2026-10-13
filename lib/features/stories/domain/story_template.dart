@@ -43,11 +43,46 @@ class StorySelection {
     return StorySelection([...ids, id]);
   }
 
+  /// Without [id]. The story keeps at least one memory, so removing the
+  /// last one returns this selection unchanged.
+  StorySelection remove(String id) {
+    if (ids.length <= 1) return this;
+    return StorySelection([
+      for (final other in ids)
+        if (other != id) other,
+    ]);
+  }
+
+  /// The memory at [from] moved to [to] (indices into [ids], [to] counted
+  /// after the removal, as `ReorderableListView` reports with the fix-up).
+  StorySelection move(int from, int to) {
+    if (from < 0 || from >= ids.length) return this;
+    final next = [...ids];
+    final id = next.removeAt(from);
+    next.insert(to.clamp(0, next.length), id);
+    return StorySelection(next);
+  }
+
   /// The selected memories that still exist, in selection order.
   List<MemoryEvent> resolve(List<MemoryEvent> events) {
     final byId = {for (final event in events) event.id: event};
     return [for (final id in ids) ?byId[id]];
   }
+}
+
+/// Whether [event] matches what the user typed in the memory search: every
+/// word must appear in the title, story, place or year (case-insensitive).
+bool storyMemoryMatches(MemoryEvent event, String query) {
+  final words = query.toLowerCase().split(RegExp(r'\s+'))
+    ..removeWhere((word) => word.isEmpty);
+  if (words.isEmpty) return true;
+  final haystack = [
+    event.title,
+    event.description,
+    event.locationLabel,
+    '${event.occurredAt.year}',
+  ].join(' ').toLowerCase();
+  return words.every(haystack.contains);
 }
 
 /// The caption a new story starts with: the first memory's story, short

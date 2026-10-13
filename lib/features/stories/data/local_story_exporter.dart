@@ -73,6 +73,7 @@ class LocalStoryExporter implements StoryExporter {
     BuildContext context,
     StoryFilm film, {
     MusicTrack? music,
+    Duration musicStart = Duration.zero,
     void Function(double progress)? onProgress,
     StoryExportCancel? cancel,
   }) async {
@@ -117,6 +118,7 @@ class LocalStoryExporter implements StoryExporter {
           height: size.height.round(),
           fps: film.fps,
           audioPath: audio?.path,
+          audioStart: audio == null ? null : musicStart,
           fadeOut: audio == null ? null : fadeOut,
         );
       }

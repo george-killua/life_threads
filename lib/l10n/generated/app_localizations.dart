@@ -3723,6 +3723,60 @@ abstract class AppLocalizations {
   /// **'Emotional'**
   String get storyMoodEmotional;
 
+  /// No description provided for @storyMusicTrimHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to choose which part plays'**
+  String get storyMusicTrimHint;
+
+  /// No description provided for @storySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search memories, places, years'**
+  String get storySearchHint;
+
+  /// No description provided for @storySearchEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No memory matches “{query}”.'**
+  String storySearchEmpty(String query);
+
+  /// No description provided for @storyMemoriesInStory.
+  ///
+  /// In en, this message translates to:
+  /// **'In your story'**
+  String get storyMemoriesInStory;
+
+  /// No description provided for @storyMemoriesReorderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold and drag to change the order'**
+  String get storyMemoriesReorderHint;
+
+  /// No description provided for @storyAddMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get storyAddMemory;
+
+  /// No description provided for @storyAddMemoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a memory'**
+  String get storyAddMemoryTitle;
+
+  /// No description provided for @storyRemoveMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {title} from the story'**
+  String storyRemoveMemory(String title);
+
+  /// No description provided for @storyAllMemoriesAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Every memory is already in this story.'**
+  String get storyAllMemoriesAdded;
+
   /// No description provided for @storyShare.
   ///
   /// In en, this message translates to:

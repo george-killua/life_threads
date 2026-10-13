@@ -2094,6 +2094,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storyMoodEmotional => 'Emotional';
 
   @override
+  String get storyMusicTrimHint => 'Drag to choose which part plays';
+
+  @override
+  String get storySearchHint => 'Search memories, places, years';
+
+  @override
+  String storySearchEmpty(String query) {
+    return 'No memory matches “$query”.';
+  }
+
+  @override
+  String get storyMemoriesInStory => 'In your story';
+
+  @override
+  String get storyMemoriesReorderHint => 'Hold and drag to change the order';
+
+  @override
+  String get storyAddMemory => 'Add';
+
+  @override
+  String get storyAddMemoryTitle => 'Add a memory';
+
+  @override
+  String storyRemoveMemory(String title) {
+    return 'Remove $title from the story';
+  }
+
+  @override
+  String get storyAllMemoriesAdded => 'Every memory is already in this story.';
+
+  @override
   String get storyShare => 'Share';
 
   @override

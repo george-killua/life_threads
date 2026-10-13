@@ -13,6 +13,7 @@ class MusicTrack {
     required this.length,
     required this.license,
     required this.sourceUrl,
+    this.peaks = const [],
   });
 
   final String id;
@@ -26,4 +27,8 @@ class MusicTrack {
   final Duration length;
   final String license;
   final String sourceUrl;
+
+  /// Loudness outline of the file (0–100, evenly spread over [length]),
+  /// drawn as the waveform when choosing which part of the song plays.
+  final List<int> peaks;
 }

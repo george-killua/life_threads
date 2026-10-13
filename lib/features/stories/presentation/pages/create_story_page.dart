@@ -20,7 +20,10 @@ import '../../domain/story_template.dart';
 import '../story_template_film.dart';
 import '../templates/story_templates.dart';
 import '../templates/story_visuals.dart';
+import '../widgets/music_trimmer.dart';
 import '../widgets/story_export_progress_dialog.dart';
+import '../widgets/story_memory_strip.dart';
+import '../widgets/story_search_field.dart';
 
 /// Create Story: pick 1–6 memories, choose a template, edit the caption,
 /// optionally make it a film with music, then share or save. The preview
@@ -45,6 +48,9 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
   final _pages = PageController();
   var _video = false;
   MusicTrack? _music;
+
+  /// Where the chosen song starts in the film (see [MusicTrimmer]).
+  var _musicStart = Duration.zero;
   late final MusicPreview _preview;
   var _busy = false;
   final _shareButtonKey = GlobalKey();
@@ -63,10 +69,56 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
     _preview = ref.read(musicPreviewProvider);
   }
 
-  /// Picks [track] (or no music) and plays it so the user hears it.
-  void _selectMusic(MusicTrack? track) {
-    setState(() => _music = track);
-    unawaited(track == null ? _preview.stop() : _preview.play(track));
+  /// Picks [track] (or no music) and plays the part the film would use:
+  /// [window] long, from its loudest part.
+  void _selectMusic(MusicTrack? track, {Duration? window}) {
+    if (track == null) {
+      setState(() => _music = null);
+      unawaited(_preview.stop());
+      return;
+    }
+    final length = window ?? track.length;
+    final start = MusicTrimmer.suggestedStart(track, length);
+    setState(() {
+      _music = track;
+      _musicStart = start;
+    });
+    unawaited(_preview.play(track, start: start, length: length));
+  }
+
+  /// The film length for [memories] as the story looks now.
+  Duration _filmLength(List<MemoryEvent> memories) => StoryTemplateFilm(
+    template: _template,
+    memories: memories,
+    caption: _caption.text,
+  ).duration;
+
+  /// Applies a change to the memories in the story from the editor. The
+  /// caption follows the first memory until the user edits it.
+  void _changeSelection(StorySelection selection, List<MemoryEvent> events) {
+    setState(() {
+      _selection = selection;
+      if (!_captionEdited) {
+        _caption.text = defaultStoryCaption(selection.resolve(events));
+      }
+    });
+  }
+
+  Future<void> _addMemory(List<MemoryEvent> events) async {
+    final added = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: AppColors.wallInk,
+      builder: (context) => _AddMemorySheet(
+        events: [
+          for (final event in events)
+            if (!_selection.contains(event.id)) event,
+        ],
+      ),
+    );
+    if (added == null || !mounted) return;
+    _changeSelection(_selection.toggle(added), events);
   }
 
   @override
@@ -106,7 +158,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
               _captionReady = true;
               _caption.text = defaultStoryCaption(memories);
             }
-            return _buildEditor(context, memories);
+            return _buildEditor(context, memories, state.events);
           }
           return _StoryMemoryPicker(
             events: state.events,
@@ -127,10 +179,16 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
     );
   }
 
-  Widget _buildEditor(BuildContext context, List<MemoryEvent> memories) {
+  Widget _buildEditor(
+    BuildContext context,
+    List<MemoryEvent> memories,
+    List<MemoryEvent> events,
+  ) {
     final l10n = context.l10n;
     final isPremium = ref.watch(premiumActiveProvider);
     final caption = _caption.text;
+    final filmLength = _filmLength(memories);
+    final music = _music;
     return SafeArea(
       top: false,
       child: Column(
@@ -183,6 +241,15 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
                   ),
               ],
             ),
+          ),
+          const SizedBox(height: 8),
+          StoryMemoryStrip(
+            memories: memories,
+            canAdd: !_selection.isFull && memories.length < events.length,
+            onReorder: (from, to) =>
+                _changeSelection(_selection.move(from, to), events),
+            onRemove: (id) => _changeSelection(_selection.remove(id), events),
+            onAdd: () => _addMemory(events),
           ),
           Expanded(
             flex: 7,
@@ -244,10 +311,28 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
                             '${musicMoodLabel(l10n, track.mood)}',
                           ),
                           selected: _music?.id == track.id,
-                          onSelected: (_) => _selectMusic(track),
+                          onSelected: (_) =>
+                              _selectMusic(track, window: filmLength),
                         ),
                     ],
                   ),
+                  if (music != null) ...[
+                    const SizedBox(height: 14),
+                    MusicTrimmer(
+                      key: ValueKey('music-trimmer-${music.id}'),
+                      track: music,
+                      window: filmLength,
+                      start: MusicTrimmer.clampStart(
+                        music,
+                        filmLength,
+                        _musicStart,
+                      ),
+                      onChanged: (start) => setState(() => _musicStart = start),
+                      onChangeEnd: (start) => unawaited(
+                        _preview.play(music, start: start, length: filmLength),
+                      ),
+                    ),
+                  ],
                   if (_music == null) ...[
                     const SizedBox(height: 8),
                     Text(
@@ -372,6 +457,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
       _template.name,
       _video,
       _music?.id,
+      _musicStart,
       caption,
       for (final memory in memories) memory.id,
     ].join('|');
@@ -399,6 +485,9 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
             context,
             film,
             music: _music,
+            musicStart: _music == null
+                ? Duration.zero
+                : MusicTrimmer.clampStart(_music!, film.duration, _musicStart),
             onProgress: onProgress,
             cancel: cancel,
           ),
@@ -548,8 +637,11 @@ class _FilmPreviewState extends State<_FilmPreview>
   }
 }
 
+/// Shows the memory search bar from this many memories on.
+const _searchFrom = 7;
+
 /// Step one: choose up to [StorySelection.maxMemories] memories.
-class _StoryMemoryPicker extends StatelessWidget {
+class _StoryMemoryPicker extends StatefulWidget {
   const _StoryMemoryPicker({
     required this.events,
     required this.selection,
@@ -563,8 +655,18 @@ class _StoryMemoryPicker extends StatelessWidget {
   final VoidCallback onContinue;
 
   @override
+  State<_StoryMemoryPicker> createState() => _StoryMemoryPickerState();
+}
+
+class _StoryMemoryPickerState extends State<_StoryMemoryPicker> {
+  var _query = '';
+
+  @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final events = widget.events;
+    final selection = widget.selection;
+    final onChanged = widget.onChanged;
     if (events.isEmpty) {
       return Center(
         child: Padding(
@@ -577,12 +679,21 @@ class _StoryMemoryPicker extends StatelessWidget {
         ),
       );
     }
-    final sorted = [...events]
-      ..sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
+    final sorted = [
+      for (final event in events)
+        if (storyMemoryMatches(event, _query)) event,
+    ]..sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
     return SafeArea(
       top: false,
       child: Column(
         children: [
+          if (events.length >= _searchFrom)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+              child: StorySearchField(
+                onChanged: (query) => setState(() => _query = query),
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
             child: Row(
@@ -607,33 +718,37 @@ class _StoryMemoryPicker extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-              itemCount: sorted.length,
-              itemBuilder: (context, index) {
-                final event = sorted[index];
-                final order = selection.ids.indexOf(event.id);
-                return _PickerTile(
-                  event: event,
-                  order: order < 0 ? null : order + 1,
-                  onTap: () {
-                    if (order < 0 && selection.isFull) {
-                      ScaffoldMessenger.of(context)
-                        ..hideCurrentSnackBar()
-                        ..showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              l10n.storyPickLimit(StorySelection.maxMemories),
-                            ),
-                          ),
-                        );
-                      return;
-                    }
-                    onChanged(selection.toggle(event.id));
-                  },
-                );
-              },
-            ),
+            child: sorted.isEmpty
+                ? _NoMatch(query: _query)
+                : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                    itemCount: sorted.length,
+                    itemBuilder: (context, index) {
+                      final event = sorted[index];
+                      final order = selection.ids.indexOf(event.id);
+                      return _PickerTile(
+                        event: event,
+                        order: order < 0 ? null : order + 1,
+                        onTap: () {
+                          if (order < 0 && selection.isFull) {
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    l10n.storyPickLimit(
+                                      StorySelection.maxMemories,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            return;
+                          }
+                          onChanged(selection.toggle(event.id));
+                        },
+                      );
+                    },
+                  ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
@@ -641,12 +756,104 @@ class _StoryMemoryPicker extends StatelessWidget {
               width: double.infinity,
               child: FilledButton(
                 key: const ValueKey('story-continue'),
-                onPressed: selection.isEmpty ? null : onContinue,
+                onPressed: selection.isEmpty ? null : widget.onContinue,
                 child: Text(l10n.storyPickContinue),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _NoMatch extends StatelessWidget {
+  const _NoMatch({required this.query});
+
+  final String query;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Text(
+          context.l10n.storySearchEmpty(query.trim()),
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: AppColors.muted, height: 1.4),
+        ),
+      ),
+    );
+  }
+}
+
+/// Picks one more memory for the story being edited; pops its id.
+class _AddMemorySheet extends StatefulWidget {
+  const _AddMemorySheet({required this.events});
+
+  /// The memories not in the story yet.
+  final List<MemoryEvent> events;
+
+  @override
+  State<_AddMemorySheet> createState() => _AddMemorySheetState();
+}
+
+class _AddMemorySheetState extends State<_AddMemorySheet> {
+  var _query = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final matches = [
+      for (final event in widget.events)
+        if (storyMemoryMatches(event, _query)) event,
+    ]..sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
+    return SafeArea(
+      child: SizedBox(
+        height: MediaQuery.sizeOf(context).height * 0.75,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+              child: Text(
+                l10n.storyAddMemoryTitle,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+            if (widget.events.length >= _searchFrom)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: StorySearchField(
+                  onChanged: (query) => setState(() => _query = query),
+                ),
+              ),
+            Expanded(
+              child: widget.events.isEmpty
+                  ? Center(
+                      child: Text(
+                        l10n.storyAllMemoriesAdded,
+                        style: const TextStyle(color: AppColors.muted),
+                      ),
+                    )
+                  : matches.isEmpty
+                  ? _NoMatch(query: _query)
+                  : ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                      itemCount: matches.length,
+                      itemBuilder: (context, index) => _PickerTile(
+                        event: matches[index],
+                        order: null,
+                        onTap: () =>
+                            Navigator.of(context).pop(matches[index].id),
+                      ),
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
