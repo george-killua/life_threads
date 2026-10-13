@@ -26,28 +26,25 @@ flutter pub get
 flutter run
 ```
 
-## Android Release
+## Releases and store listings
 
-Release preparation is documented in [docs/android_release_notes.md](docs/android_release_notes.md).
-Google Play listing content is prepared in [docs/play_store_content.md](docs/play_store_content.md), with the privacy policy in [docs/privacy_policy.md](docs/privacy_policy.md) and terms in [docs/terms_of_use.md](docs/terms_of_use.md).
-Closed beta preparation is documented in [docs/closed_beta_checklist.md](docs/closed_beta_checklist.md), with safe logging rules in [docs/crash_safe_logging.md](docs/crash_safe_logging.md).
-Launch and monetization planning starts in [docs/launch_checklist.md](docs/launch_checklist.md), [docs/marketing_30_day_plan.md](docs/marketing_30_day_plan.md), and [docs/pricing_strategy.md](docs/pricing_strategy.md).
+- Store listings, ready to paste, in English, German and Arabic:
+  [Google Play](docs/store_listing/google_play.md) and [App Store](docs/store_listing/app_store.md)
+  (texts, graphics, subscription, Data safety / App Privacy, review notes, checklists).
+- Play closed testing upload: [docs/google_play_closed_testing_pipeline.md](docs/google_play_closed_testing_pipeline.md).
+- Family wall setup (sign-in, server, subscription check): [docs/family_wall_setup.md](docs/family_wall_setup.md).
+- Privacy policy and terms: [docs/privacy_policy.md](docs/privacy_policy.md), [docs/terms_of_use.md](docs/terms_of_use.md).
+- Pricing: [docs/pricing_strategy.md](docs/pricing_strategy.md). Safe logging: [docs/crash_safe_logging.md](docs/crash_safe_logging.md).
 
-Current Android release setup:
-- App name: `LifeThreads`
-- Package: `dev.gkcoding.lifethreads`
-- Version: see `pubspec.yaml` (currently `0.1.4+6`)
-- Permissions: internet, camera (QR + optional memory photos), contacts (optional person import), selected photo/media access, optional EXIF media location, notifications (optional On this day reminders, asked when turned on; boot-completed to restore them). No background location, microphone, or account permissions.
-- Release signing reads `android/key.properties` when available. Use `android/key.properties.example` as the template.
-- Production maps require `--dart-define=MAPTILER_KEY=...`.
-
-Build checks:
+Version and build number come from `pubspec.yaml` (`1.0.0+15`). Release signing reads
+`android/key.properties` (template: `android/key.properties.example`).
 
 ```bash
 flutter analyze
 flutter test
-flutter build apk --release --dart-define=MAPTILER_KEY="$MAPTILER_KEY"
-flutter build appbundle --release --dart-define=MAPTILER_KEY="$MAPTILER_KEY"
+flutter build appbundle --release   # Google Play
+flutter build ipa --release         # App Store / TestFlight
+tool/store_screenshots/run.sh       # store screenshots from the real app screens
 ```
 
 ## Architecture
@@ -65,12 +62,10 @@ lib/
   shared/               Shared widgets and helpers
 ```
 
-## Product Strategy
+## Product
 
-See [docs/product_success_plan.md](docs/product_success_plan.md) for the monetization and launch plan.
-
-Current direction:
-- Free: 30 memories, local-only.
-- Premium: monthly subscription (`lifethreads_premium_monthly`) for unlimited memories, export, themes, and advanced layouts.
-- Cloud sync remains a later add-on.
-- Google Play subscription product ID: `lifethreads_premium_monthly`.
+- Free: 30 memories, wall, timeline and map, full backups in one file, encrypted capsule sharing.
+- Premium (monthly subscription `lifethreads_premium_monthly`): unlimited memories, Create Story
+  with music, Thread of the Year, On this day and family walls.
+- The user's own wall stays on the device; only family walls, capsules and the wall display use
+  the server.
