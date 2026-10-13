@@ -282,6 +282,16 @@ LifeThreads متاح بالعربية والإنجليزية والألماني�
 Rendered from the real app by `tool/store_screenshots/run.sh` (not in git). Upload all five per
 language in order: wall, memory, story, timeline, add.
 
+## Product page header (Kopfzeile)
+
+| Size | File |
+|---|---|
+| 5244 × 2950 | `store_listing_assets/app_store/header_5244x2950.png` |
+| 3840 × 1646 | `store_listing_assets/app_store/header_3840x1646.png` |
+
+No text in the artwork (Apple overlays the icon and name at the bottom left, which stays dark),
+so the same images serve every language. Check the result with **Vorschau** in App Store Connect.
+
 ## In-app purchase: LifeThreads Premium Monthly
 
 | | |
