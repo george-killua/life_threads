@@ -149,14 +149,14 @@ class MemoryCapsuleService {
   Future<MemoryCapsuleImportDraft?> pickAndPrepareImport({
     String? password,
   }) async {
-    final result = await FilePicker.pickFiles(
+    final picked = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: const ['zip'],
     );
-    if (result == null || result.files.isEmpty) return null;
+    if (picked == null) return null;
 
-    final picked = result.files.single;
-    if (picked.size > maxCapsuleFileBytes) {
+    final size = picked.lengthSync() ?? await picked.length() ?? 0;
+    if (size > maxCapsuleFileBytes) {
       throw const BackupValidationException(
         'This memory capsule is too large to import.',
       );

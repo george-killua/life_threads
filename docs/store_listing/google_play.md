@@ -7,7 +7,7 @@ description 4000, release notes 500).
 | | |
 |---|---|
 | Package | `dev.gkcoding.lifethreads` |
-| Version | 1.0.0 (15), from `pubspec.yaml` |
+| Version | 1.0.0 (17), from `pubspec.yaml` |
 | Store name | LifeThreads – Memory Wall (the name on the phone stays "LifeThreads") |
 | Category | Lifestyle (alternative: Photography) |
 | Contact email | info@gkcoding.dev |

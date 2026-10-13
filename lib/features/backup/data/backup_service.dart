@@ -220,13 +220,12 @@ class BackupService {
   }
 
   Future<BackupImportData?> pickAndPrepareImport({String? password}) async {
-    final result = await FilePicker.pickFiles(
+    final picked = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: const ['zip'],
     );
-    if (result == null || result.files.isEmpty) return null;
+    if (picked == null) return null;
 
-    final picked = result.files.single;
     final path = picked.path;
     if (path != null) return prepareImportFile(path, password: password);
     return prepareImportBytes(await picked.readAsBytes(), password: password);
