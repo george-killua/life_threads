@@ -1431,15 +1431,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get premiumHeroActiveTitle => 'جدار ذكرياتك غير محدود.';
 
   @override
-  String get premiumHeroLockedTitle => 'انقل ذكرياتك بين الأجهزة بأمان.';
+  String get premiumHeroLockedTitle => 'حوّل ذكرياتك إلى قصص.';
 
   @override
   String get premiumHeroActiveBody =>
-      'اشتراك Premium مفعّل. تصدير الأرشيف المشفر والمظاهر المميزة والتخطيطات المتقدمة متاحة.';
+      'اشتراكك في Premium مفعّل. القصص مع الموسيقى وخيط السنة وجدران العائلة والذكريات بلا حدود أصبحت لك.';
 
   @override
   String premiumHeroLockedBody(int limit) {
-    return 'المجاني يتضمن $limit ذكرى ونسخاً احتياطية كاملة. يضيف Premium ذكريات غير محدودة ومظاهر وتخطيطات متقدمة.';
+    return 'النسخة المجانية تشمل $limit ذكرى ونسخاً احتياطية كاملة. يضيف Premium القصص والأفلام مع الموسيقى، وخيط السنة، وجدران العائلة، وذكريات بلا حدود.';
   }
 
   @override
@@ -1479,8 +1479,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get premiumActiveOnDevice => 'Premium مفعّل على هذا الجهاز.';
 
   @override
-  String get onePurchaseBody =>
-      'اشترك شهرياً لذكريات غير محدودة ومظاهر Premium وتخطيطات متقدمة. يمكنك الإلغاء في أي وقت من Google Play أو App Store.';
+  String onePurchaseBody(String store) {
+    return 'اشتراك شهري للقصص مع الموسيقى، وخيط السنة، وجدران العائلة، وذكريات بلا حدود. يمكنك الإلغاء في أي وقت من إعدادات $store.';
+  }
 
   @override
   String get premiumActiveButton => 'Premium مفعّل';
@@ -1498,8 +1499,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enableDebugMockUnlock => 'تفعيل فتح تجريبي';
 
   @override
-  String get purchasesHandledByGooglePlay =>
-      'الاشتراكات عبر Google Play أو App Store. يبقى Premium نشطاً طالما يتجدد اشتراكك.';
+  String purchasesHandledByGooglePlay(String store) {
+    return 'يُخصم المبلغ من حسابك في $store. يتجدّد الاشتراك تلقائياً كل شهر ما لم تُلغِه قبل 24 ساعة على الأقل من نهاية الفترة الحالية. يمكنك إدارته أو إلغاؤه من إعدادات حسابك في $store.';
+  }
 
   @override
   String lifetimeUnlockWithPrice(Object price) {
@@ -1507,10 +1509,10 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get loadingPlayStoreProduct => 'جار تحميل منتج Play Store...';
+  String get loadingPlayStoreProduct => 'جارٍ تحميل الاشتراك…';
 
   @override
-  String get playStoreUnavailable => 'Play Store غير متاح';
+  String get playStoreUnavailable => 'المتجر غير متاح حالياً';
 
   @override
   String get productNotConfigured => 'المنتج غير مهيأ';
@@ -2199,6 +2201,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get benefitYearThreadBody =>
       'عامك في فيلم قصير: اللحظات التي صنعت فرقاً، مربوطة بالترتيب، مع موسيقى.';
+
+  @override
+  String get benefitFamilyTitle => 'جدران العائلة';
+
+  @override
+  String get benefitFamilyBody =>
+      'جدار مشترك لعائلتك، مشفّر من طرف إلى طرف. كل واحد يضيف لحظاته.';
 
   @override
   String get myWall => 'جداري';

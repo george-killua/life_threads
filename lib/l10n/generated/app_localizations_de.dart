@@ -1459,15 +1459,15 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get premiumHeroLockedTitle =>
-      'Verschiebe deine Erinnerungen sicher zwischen Geräten.';
+      'Mach aus deinen Erinnerungen Geschichten.';
 
   @override
   String get premiumHeroActiveBody =>
-      'Dein Premium-Abo ist aktiv. Verschlüsselter Archivexport, Premium-Designs und erweiterte Layouts sind verfügbar.';
+      'Dein Premium-Abo ist aktiv. Storys mit Musik, der Faden des Jahres, Familienwände und unbegrenzte Erinnerungen gehören dir.';
 
   @override
   String premiumHeroLockedBody(int limit) {
-    return 'Kostenlos enthält $limit Erinnerungen und vollständige Backups. Premium ergänzt unbegrenzte Erinnerungen, Designs und erweiterte Layouts.';
+    return 'Gratis sind $limit Erinnerungen und vollständige Backups. Premium bringt Storys und Filme mit Musik, den Faden des Jahres, Familienwände und unbegrenzte Erinnerungen.';
   }
 
   @override
@@ -1507,8 +1507,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get premiumActiveOnDevice => 'Premium ist auf diesem Gerät aktiv.';
 
   @override
-  String get onePurchaseBody =>
-      'Monatliches Abo für unbegrenzte Erinnerungen, Premium-Designs und erweiterte Layouts. Jederzeit in Google Play oder im App Store kündbar.';
+  String onePurchaseBody(String store) {
+    return 'Monatliches Abo für Storys mit Musik, den Faden des Jahres, Familienwände und unbegrenzte Erinnerungen. Jederzeit in den Einstellungen von $store kündbar.';
+  }
 
   @override
   String get premiumActiveButton => 'Premium aktiv';
@@ -1526,8 +1527,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enableDebugMockUnlock => 'Debug-Mock-Unlock aktivieren';
 
   @override
-  String get purchasesHandledByGooglePlay =>
-      'Abos laufen über Google Play oder den App Store. Premium bleibt aktiv, solange dein Abo verlängert wird.';
+  String purchasesHandledByGooglePlay(String store) {
+    return 'Die Zahlung wird über deinen $store-Account abgerechnet. Das Abo verlängert sich automatisch jeden Monat, wenn du es nicht spätestens 24 Stunden vor Ende des laufenden Zeitraums kündigst. Verwalten oder kündigen kannst du es in den Account-Einstellungen von $store.';
+  }
 
   @override
   String lifetimeUnlockWithPrice(Object price) {
@@ -1535,10 +1537,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get loadingPlayStoreProduct => 'Play-Store-Produkt wird geladen...';
+  String get loadingPlayStoreProduct => 'Abo wird geladen …';
 
   @override
-  String get playStoreUnavailable => 'Play Store nicht verfügbar';
+  String get playStoreUnavailable => 'Der Store ist gerade nicht erreichbar';
 
   @override
   String get productNotConfigured => 'Produkt nicht konfiguriert';
@@ -2200,6 +2202,13 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get benefitYearThreadBody =>
       'Dein Jahr als Kurzfilm: die Momente, die gezählt haben, der Reihe nach verbunden, mit Musik.';
+
+  @override
+  String get benefitFamilyTitle => 'Familienwände';
+
+  @override
+  String get benefitFamilyBody =>
+      'Eine gemeinsame Wand für deine Familie, Ende-zu-Ende-verschlüsselt. Alle fügen ihre Momente hinzu.';
 
   @override
   String get myWall => 'Meine Wand';

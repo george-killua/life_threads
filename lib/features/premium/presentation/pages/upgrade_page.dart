@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -19,6 +20,10 @@ class UpgradePage extends ConsumerWidget {
 
   /// The Premium feature that opened this page, if any.
   final PremiumFeature? feature;
+
+  /// Whether debug builds offer the mock unlock (off for screenshots).
+  @visibleForTesting
+  static bool showDebugUnlock = kDebugMode;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -48,18 +53,19 @@ class UpgradePage extends ConsumerWidget {
               _SubscriptionOfferCard(
                 isPremium: isPremium,
                 purchaseState: purchaseState,
-                onPurchase: () => ref
-                    .read(premiumBillingProvider.notifier)
-                    .buySubscription(),
+                onPurchase: () =>
+                    ref.read(premiumBillingProvider.notifier).buySubscription(),
                 onRestore: () => ref
                     .read(premiumBillingProvider.notifier)
                     .restorePurchases(),
-                onMockUnlock: kDebugMode
+                onMockUnlock: showDebugUnlock
                     ? () => _unlockMockPremium(context, ref)
                     : null,
                 onContinue: () => _leave(context),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 4),
+              const _LegalLinks(),
+              const SizedBox(height: 10),
               const _BillingReadyNotice(),
             ],
           ),
@@ -319,44 +325,53 @@ class _BenefitGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth > 560;
-        return GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: isWide ? 2 : 1,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: isWide ? 2.65 : 3.45,
+        // Cards as tall as their text: a fixed grid cell clips the third
+        // line with long translations or a larger text size.
+        final cardWidth = isWide
+            ? (constraints.maxWidth - 12) / 2
+            : constraints.maxWidth;
+        final cards = [
+          _BenefitCard(
+            icon: Icons.all_inclusive_rounded,
+            title: context.l10n.benefitUnlimitedTitle,
+            body: context.l10n.benefitUnlimitedBody,
+          ),
+          _BenefitCard(
+            icon: Icons.palette_rounded,
+            title: context.l10n.benefitThemesTitle,
+            body: context.l10n.benefitThemesBody,
+          ),
+          _BenefitCard(
+            icon: Icons.dashboard_customize_rounded,
+            title: context.l10n.benefitLayoutsTitle,
+            body: context.l10n.benefitLayoutsBody,
+          ),
+          _BenefitCard(
+            icon: Icons.event_repeat_rounded,
+            title: context.l10n.onThisDayTitle,
+            body: context.l10n.benefitOnThisDayBody,
+          ),
+          _BenefitCard(
+            icon: Icons.auto_stories_rounded,
+            title: context.l10n.benefitStoriesTitle,
+            body: context.l10n.benefitStoriesBody,
+          ),
+          _BenefitCard(
+            icon: Icons.movie_filter_rounded,
+            title: context.l10n.yearThreadTitle,
+            body: context.l10n.benefitYearThreadBody,
+          ),
+          _BenefitCard(
+            icon: Icons.diversity_3_rounded,
+            title: context.l10n.benefitFamilyTitle,
+            body: context.l10n.benefitFamilyBody,
+          ),
+        ];
+        return Wrap(
+          spacing: 12,
+          runSpacing: 12,
           children: [
-            _BenefitCard(
-              icon: Icons.all_inclusive_rounded,
-              title: context.l10n.benefitUnlimitedTitle,
-              body: context.l10n.benefitUnlimitedBody,
-            ),
-            _BenefitCard(
-              icon: Icons.palette_rounded,
-              title: context.l10n.benefitThemesTitle,
-              body: context.l10n.benefitThemesBody,
-            ),
-            _BenefitCard(
-              icon: Icons.dashboard_customize_rounded,
-              title: context.l10n.benefitLayoutsTitle,
-              body: context.l10n.benefitLayoutsBody,
-            ),
-            _BenefitCard(
-              icon: Icons.event_repeat_rounded,
-              title: context.l10n.onThisDayTitle,
-              body: context.l10n.benefitOnThisDayBody,
-            ),
-            _BenefitCard(
-              icon: Icons.auto_stories_rounded,
-              title: context.l10n.benefitStoriesTitle,
-              body: context.l10n.benefitStoriesBody,
-            ),
-            _BenefitCard(
-              icon: Icons.movie_filter_rounded,
-              title: context.l10n.yearThreadTitle,
-              body: context.l10n.benefitYearThreadBody,
-            ),
+            for (final card in cards) SizedBox(width: cardWidth, child: card),
           ],
         );
       },
@@ -418,8 +433,6 @@ class _BenefitCard extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text(
                   body,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: AppColors.muted,
                     height: 1.32,
@@ -488,7 +501,7 @@ class _SubscriptionOfferCard extends StatelessWidget {
           Text(
             isPremium
                 ? context.l10n.premiumActiveOnDevice
-                : context.l10n.onePurchaseBody,
+                : context.l10n.onePurchaseBody(_storeName),
             style: const TextStyle(
               color: Color(0xFF6D5741),
               height: 1.38,
@@ -544,7 +557,7 @@ class _SubscriptionOfferCard extends StatelessWidget {
           ],
           const SizedBox(height: 10),
           Text(
-            context.l10n.purchasesHandledByGooglePlay,
+            context.l10n.purchasesHandledByGooglePlay(_storeName),
             style: const TextStyle(
               color: Color(0xFF7A654E),
               fontSize: 12,
@@ -645,6 +658,52 @@ class _PurchaseMessage extends StatelessWidget {
           fontWeight: FontWeight.w800,
         ),
       ),
+    );
+  }
+}
+
+/// The store that bills the subscription on this device; Apple does not
+/// allow naming other platforms in the iOS app.
+String get _storeName => switch (defaultTargetPlatform) {
+  TargetPlatform.iOS || TargetPlatform.macOS => 'App Store',
+  _ => 'Google Play',
+};
+
+/// Terms of Use and Privacy Policy next to the subscription, as the stores
+/// require for auto-renewing subscriptions.
+class _LegalLinks extends StatelessWidget {
+  const _LegalLinks();
+
+  static final _terms = Uri.parse('https://gkcoding.dev/lifethreads/terms');
+  static final _privacy = Uri.parse('https://gkcoding.dev/lifethreads/privacy');
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    Widget link(String label, Uri uri, Key key) => TextButton(
+      key: key,
+      onPressed: () => launchUrl(uri, mode: LaunchMode.externalApplication),
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.muted,
+        // The app font: a bare TextStyle would fall back to the system font.
+        textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+      child: Text(label),
+    );
+    return Wrap(
+      alignment: WrapAlignment.center,
+      children: [
+        link(l10n.viewTerms, _terms, const ValueKey('premium-terms')),
+        link(
+          l10n.viewPrivacyPolicy,
+          _privacy,
+          const ValueKey('premium-privacy'),
+        ),
+      ],
     );
   }
 }

@@ -2694,19 +2694,19 @@ abstract class AppLocalizations {
   /// No description provided for @premiumHeroLockedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Move your memories between devices safely.'**
+  /// **'Turn your memories into stories.'**
   String get premiumHeroLockedTitle;
 
   /// No description provided for @premiumHeroActiveBody.
   ///
   /// In en, this message translates to:
-  /// **'Your Premium subscription is active. Encrypted archive export, premium themes, and advanced layouts are available.'**
+  /// **'Your Premium subscription is active. Stories with music, Thread of the Year, family walls and unlimited memories are yours.'**
   String get premiumHeroActiveBody;
 
   /// No description provided for @premiumHeroLockedBody.
   ///
   /// In en, this message translates to:
-  /// **'Free includes {limit} memories and full backups. Premium adds unlimited memories, themes and advanced layouts.'**
+  /// **'Free includes {limit} memories and full backups. Premium adds stories and films with music, Thread of the Year, family walls and unlimited memories.'**
   String premiumHeroLockedBody(int limit);
 
   /// No description provided for @premiumMemories.
@@ -2778,8 +2778,8 @@ abstract class AppLocalizations {
   /// No description provided for @onePurchaseBody.
   ///
   /// In en, this message translates to:
-  /// **'Subscribe monthly for unlimited memories, premium themes and advanced layouts. Cancel anytime in Google Play or the App Store.'**
-  String get onePurchaseBody;
+  /// **'Subscribe monthly for stories with music, Thread of the Year, family walls and unlimited memories. Cancel anytime in your {store} settings.'**
+  String onePurchaseBody(String store);
 
   /// No description provided for @premiumActiveButton.
   ///
@@ -2814,8 +2814,8 @@ abstract class AppLocalizations {
   /// No description provided for @purchasesHandledByGooglePlay.
   ///
   /// In en, this message translates to:
-  /// **'Subscriptions are handled by Google Play or the App Store. Premium stays active while your subscription renews.'**
-  String get purchasesHandledByGooglePlay;
+  /// **'Payment is charged to your {store} account. The subscription renews automatically every month unless you cancel it at least 24 hours before the current period ends. Manage or cancel it in your {store} account settings.'**
+  String purchasesHandledByGooglePlay(String store);
 
   /// No description provided for @lifetimeUnlockWithPrice.
   ///
@@ -2826,13 +2826,13 @@ abstract class AppLocalizations {
   /// No description provided for @loadingPlayStoreProduct.
   ///
   /// In en, this message translates to:
-  /// **'Loading Play Store product...'**
+  /// **'Loading the subscription…'**
   String get loadingPlayStoreProduct;
 
   /// No description provided for @playStoreUnavailable.
   ///
   /// In en, this message translates to:
-  /// **'Play Store unavailable'**
+  /// **'The store is unavailable right now'**
   String get playStoreUnavailable;
 
   /// No description provided for @productNotConfigured.
@@ -3866,6 +3866,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your year as a short film: the moments that mattered, threaded in order, with music.'**
   String get benefitYearThreadBody;
+
+  /// No description provided for @benefitFamilyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family walls'**
+  String get benefitFamilyTitle;
+
+  /// No description provided for @benefitFamilyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A shared wall for your family, end-to-end encrypted. Everyone adds their moments.'**
+  String get benefitFamilyBody;
 
   /// No description provided for @myWall.
   ///

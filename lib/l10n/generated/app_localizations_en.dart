@@ -1441,16 +1441,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumHeroActiveTitle => 'Your memory wall is unlimited.';
 
   @override
-  String get premiumHeroLockedTitle =>
-      'Move your memories between devices safely.';
+  String get premiumHeroLockedTitle => 'Turn your memories into stories.';
 
   @override
   String get premiumHeroActiveBody =>
-      'Your Premium subscription is active. Encrypted archive export, premium themes, and advanced layouts are available.';
+      'Your Premium subscription is active. Stories with music, Thread of the Year, family walls and unlimited memories are yours.';
 
   @override
   String premiumHeroLockedBody(int limit) {
-    return 'Free includes $limit memories and full backups. Premium adds unlimited memories, themes and advanced layouts.';
+    return 'Free includes $limit memories and full backups. Premium adds stories and films with music, Thread of the Year, family walls and unlimited memories.';
   }
 
   @override
@@ -1490,8 +1489,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumActiveOnDevice => 'Premium is active on this device.';
 
   @override
-  String get onePurchaseBody =>
-      'Subscribe monthly for unlimited memories, premium themes and advanced layouts. Cancel anytime in Google Play or the App Store.';
+  String onePurchaseBody(String store) {
+    return 'Subscribe monthly for stories with music, Thread of the Year, family walls and unlimited memories. Cancel anytime in your $store settings.';
+  }
 
   @override
   String get premiumActiveButton => 'Premium Active';
@@ -1509,8 +1509,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enableDebugMockUnlock => 'Enable debug mock unlock';
 
   @override
-  String get purchasesHandledByGooglePlay =>
-      'Subscriptions are handled by Google Play or the App Store. Premium stays active while your subscription renews.';
+  String purchasesHandledByGooglePlay(String store) {
+    return 'Payment is charged to your $store account. The subscription renews automatically every month unless you cancel it at least 24 hours before the current period ends. Manage or cancel it in your $store account settings.';
+  }
 
   @override
   String lifetimeUnlockWithPrice(Object price) {
@@ -1518,10 +1519,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get loadingPlayStoreProduct => 'Loading Play Store product...';
+  String get loadingPlayStoreProduct => 'Loading the subscription…';
 
   @override
-  String get playStoreUnavailable => 'Play Store unavailable';
+  String get playStoreUnavailable => 'The store is unavailable right now';
 
   @override
   String get productNotConfigured => 'Product not configured';
@@ -2180,6 +2181,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get benefitYearThreadBody =>
       'Your year as a short film: the moments that mattered, threaded in order, with music.';
+
+  @override
+  String get benefitFamilyTitle => 'Family walls';
+
+  @override
+  String get benefitFamilyBody =>
+      'A shared wall for your family, end-to-end encrypted. Everyone adds their moments.';
 
   @override
   String get myWall => 'My wall';

@@ -506,9 +506,9 @@
   "lifetimeActive": "Subscription active",
   "oneTimeLifetimeUnlock": "Monthly subscription",
   "premiumHeroActiveTitle": "Your memory wall is unlimited.",
-  "premiumHeroLockedTitle": "Move your memories between devices safely.",
-  "premiumHeroActiveBody": "Your Premium subscription is active. Encrypted archive export, premium themes, and advanced layouts are available.",
-  "premiumHeroLockedBody": "Free includes {limit} memories and full backups. Premium adds unlimited memories, themes and advanced layouts.",
+  "premiumHeroLockedTitle": "Turn your memories into stories.",
+  "premiumHeroActiveBody": "Your Premium subscription is active. Stories with music, Thread of the Year, family walls and unlimited memories are yours.",
+  "premiumHeroLockedBody": "Free includes {limit} memories and full backups. Premium adds stories and films with music, Thread of the Year, family walls and unlimited memories.",
   "premiumMemories": "Premium memories",
   "freeMemories": "Free memories",
   "unlimited": "unlimited",
@@ -520,16 +520,32 @@
   "benefitLayoutsBody": "More ways to arrange threads, timelines, anchors, and memory clusters.",
   "lifetimeUnlock": "Premium subscription",
   "premiumActiveOnDevice": "Premium is active on this device.",
-  "onePurchaseBody": "Subscribe monthly for unlimited memories, premium themes and advanced layouts. Cancel anytime in Google Play or the App Store.",
+  "onePurchaseBody": "Subscribe monthly for stories with music, Thread of the Year, family walls and unlimited memories. Cancel anytime in your {store} settings.",
+  "@onePurchaseBody": {
+    "placeholders": {
+      "store": {
+        "type": "String",
+        "example": "App Store"
+      }
+    }
+  },
   "premiumActiveButton": "Premium Active",
   "processing": "Processing...",
   "unlockPremium": "Subscribe to Premium",
   "restorePurchase": "Restore subscription",
   "enableDebugMockUnlock": "Enable debug mock unlock",
-  "purchasesHandledByGooglePlay": "Subscriptions are handled by Google Play or the App Store. Premium stays active while your subscription renews.",
+  "purchasesHandledByGooglePlay": "Payment is charged to your {store} account. The subscription renews automatically every month unless you cancel it at least 24 hours before the current period ends. Manage or cancel it in your {store} account settings.",
+  "@purchasesHandledByGooglePlay": {
+    "placeholders": {
+      "store": {
+        "type": "String",
+        "example": "App Store"
+      }
+    }
+  },
   "lifetimeUnlockWithPrice": "Premium • {price}/month",
-  "loadingPlayStoreProduct": "Loading Play Store product...",
-  "playStoreUnavailable": "Play Store unavailable",
+  "loadingPlayStoreProduct": "Loading the subscription…",
+  "playStoreUnavailable": "The store is unavailable right now",
   "productNotConfigured": "Product not configured",
   "purchasePending": "Purchase pending",
   "purchased": "Purchased",
@@ -1005,6 +1021,8 @@
     }
   },
   "benefitYearThreadBody": "Your year as a short film: the moments that mattered, threaded in order, with music.",
+  "benefitFamilyTitle": "Family walls",
+  "benefitFamilyBody": "A shared wall for your family, end-to-end encrypted. Everyone adds their moments.",
   "myWall": "My wall",
   "myWallSubtitle": "Private, on this device",
   "switchWall": "Switch wall",
