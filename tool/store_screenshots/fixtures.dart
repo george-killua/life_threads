@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:life_threads/features/memories/data/memory_repository.dart';
 import 'package:life_threads/features/memories/data/memory_seed_data.dart';
+import 'package:life_threads/features/memories/domain/memory_connection.dart';
+import 'package:life_threads/features/memories/domain/memory_person.dart';
 import 'package:life_threads/features/wall/domain/wall_item.dart';
 import 'package:life_threads/l10n/generated/app_localizations.dart';
 
@@ -9,13 +11,36 @@ import 'package:life_threads/l10n/generated/app_localizations.dart';
 /// users can preview in the app.
 const momentsPrefix = 'assets/demo_moments/';
 
+/// The demo memories under their own ids (`store-…`): with the demo ids the
+/// wall would show its "Demo wall preview – clear demo" banner.
+String storeId(String demoId) => demoId.replaceFirst('demo-', 'store-');
+
 MemoryState storeMemoryState(String lang) {
   final l10n = lookupAppLocalizations(Locale(lang));
   return MemoryState(
-    events: MemorySeedData.localizedEvents(l10n),
-    connections: MemorySeedData.localizedConnections(l10n),
+    events: [
+      for (final event in MemorySeedData.localizedEvents(l10n))
+        event.copyWith(id: storeId(event.id)),
+    ],
+    connections: [
+      for (final c in MemorySeedData.localizedConnections(l10n))
+        MemoryConnection(
+          id: c.id,
+          fromEventId: storeId(c.fromEventId),
+          toEventId: storeId(c.toEventId),
+          label: c.label,
+        ),
+    ],
     photos: const [],
-    people: MemorySeedData.localizedPeople(l10n),
+    people: [
+      for (final p in MemorySeedData.localizedPeople(l10n))
+        MemoryPerson(
+          id: p.id,
+          eventId: storeId(p.eventId),
+          name: p.name,
+          relationship: p.relationship,
+        ),
+    ],
     wallItems: const <WallItem>[],
   );
 }

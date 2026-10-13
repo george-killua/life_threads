@@ -276,6 +276,7 @@ LifeThreads متاح بالعربية والإنجليزية والألماني�
 |---|---|---|
 | iPhone 6.9" | 1320 × 2868 | `store_listing_assets/store_screenshots/ios-6.9/<lang>/` |
 | iPhone 6.5" | 1242 × 2688 | `store_listing_assets/store_screenshots/ios-6.5/<lang>/` |
+| iPhone 6.1" / 6.3" | 1206 × 2622 | `store_listing_assets/store_screenshots/ios-6.3/<lang>/` |
 | iPad 13" | 2064 × 2752 | `store_listing_assets/store_screenshots/ios-ipad-13/<lang>/` |
 
 Rendered from the real app by `tool/store_screenshots/run.sh` (not in git). Upload all five per
@@ -342,7 +343,7 @@ Tracking: **No** (no data is used to track users across apps or websites).
 - [ ] App Store version named **1.0.0** and the build selected
 - [ ] Paid Apps agreement **active**; subscription localized, review screenshot and promo image added
 - [ ] Name, subtitle, promotional text, description, keywords and What's New in EN, DE and AR
-- [ ] Screenshots for iPhone 6.9", 6.5" and iPad 13" in all three languages
+- [ ] Screenshots for iPhone 6.9", 6.5", 6.3" and iPad 13" in all three languages
 - [ ] App Privacy answers saved, age rating done, export compliance confirmed
 - [ ] Support, marketing and privacy URLs reachable
 - [ ] TestFlight smoke test: onboarding, demo wall, add memory, backup and restore, story video with

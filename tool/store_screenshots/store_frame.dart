@@ -53,6 +53,8 @@ const storeSizes = [
   ),
   StoreSize('ios-6.9', Size(1320, 2868), DeviceKind.iphone, Size(440, 956)),
   StoreSize('ios-6.5', Size(1242, 2688), DeviceKind.iphone, Size(414, 896)),
+  // App Store Connect's 6.1"/6.3" slot (iPhone 16/17 Pro).
+  StoreSize('ios-6.3', Size(1206, 2622), DeviceKind.iphone, Size(402, 874)),
   // An 11" iPad layout (same 3:4 shape): at the 13" size the wall and lists
   // look sparse in a still image.
   StoreSize('ios-ipad-13', Size(2064, 2752), DeviceKind.ipad, Size(834, 1112)),

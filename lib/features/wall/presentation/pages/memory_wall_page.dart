@@ -133,9 +133,12 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                     _manualLayoutOverrides[_layoutMode] ?? const {},
               ).map(_withPendingMemory).toList();
               final displayWallItems = _displayWallItems(state, filteredEvents);
-              final boardEvents = filteredEvents.map(_toBoardLocalMemory).toList();
-              final boardWallItems =
-                  displayWallItems.map(_toBoardLocalWallItem).toList();
+              final boardEvents = filteredEvents
+                  .map(_toBoardLocalMemory)
+                  .toList();
+              final boardWallItems = displayWallItems
+                  .map(_toBoardLocalWallItem)
+                  .toList();
               final anchors = _buildAnchors(boardEvents, boardWallItems);
               final textNoteIds = {
                 for (final item in displayWallItems)
@@ -218,7 +221,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                     Positioned.fill(
                                       child: WallPanSurface(
                                         controller: _wallController,
-                                        enabled: _draggingNodeId == null &&
+                                        enabled:
+                                            _draggingNodeId == null &&
                                             !_nodePointerIsDown,
                                       ),
                                     ),
@@ -696,7 +700,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   /// is wrong here when the z axis isn't scaled along with x and y.
   double _viewportScale() {
     final m = _wallController.value;
-    return math.sqrt(m.entry(0, 0) * m.entry(0, 0) + m.entry(1, 0) * m.entry(1, 0));
+    return math.sqrt(
+      m.entry(0, 0) * m.entry(0, 0) + m.entry(1, 0) * m.entry(1, 0),
+    );
   }
 
   Future<void> _endDrag(MemoryRepository repository, String endedNodeId) async {
@@ -1179,10 +1185,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
         context: context,
         barrierDismissible: false,
         // Back must not dismiss it: the caller pops it when work finishes.
-        builder: (_) => const PopScope(
-          canPop: false,
-          child: _WallDisplayProgressDialog(),
-        ),
+        builder: (_) =>
+            const PopScope(canPop: false, child: _WallDisplayProgressDialog()),
       );
       progressVisible = true;
 
@@ -1258,23 +1262,29 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final size = MediaQuery.sizeOf(context);
-      final minX = positions
-          .map((position) => position.dx)
-          .reduce((a, b) => a < b ? a : b);
+      // The cards' outer edges plus the same margin on both sides, so the
+      // first and last column are equally far from the screen edges.
+      final minX =
+          positions
+              .map((position) => position.dx)
+              .reduce((a, b) => a < b ? a : b) -
+          20;
       final maxX =
           positions
               .map((position) => position.dx)
               .reduce((a, b) => a > b ? a : b) +
           MemoryCard.visualSize.width +
-          40;
+          20;
       final minY = positions
           .map((position) => position.dy)
           .reduce((a, b) => a < b ? a : b);
       final contentWidth = maxX - minX;
       final fitScale = size.width / (contentWidth + 120);
       final mobile = size.width < 520;
+      // Narrow phones (iPhone 16/17 Pro: 402 pt) need a little more zoom-out
+      // to show three columns without cutting off the outer cards.
       final scale = mobile
-          ? fitScale.clamp(0.62, 0.9)
+          ? fitScale.clamp(0.56, 0.9)
           : fitScale.clamp(0.5, 0.9);
       final headerSpace = controlsExpanded
           ? (mobile ? 218.0 : 244.0)
