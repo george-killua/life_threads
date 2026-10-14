@@ -53,7 +53,7 @@ class ArchiveTransferPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.enhanced_encryption_rounded,
                       color: AppColors.amber,
                       size: 38,

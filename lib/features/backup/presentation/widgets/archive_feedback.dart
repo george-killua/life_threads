@@ -125,7 +125,7 @@ class _SummaryRow extends StatelessWidget {
           ),
           Text(
             '$value',
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.gold,
               fontWeight: FontWeight.w900,
             ),

@@ -181,7 +181,7 @@ class _WallSwitcherSheet extends ConsumerWidget {
                 selected: currentFamilyId == family.id,
                 onTap: () => Navigator.of(context).pop(_FamilyWall(family.id)),
               ),
-            const Divider(color: AppColors.line),
+            Divider(color: AppColors.line),
             _ChoiceTile(
               icon: Icons.tune_rounded,
               title: l10n.familyWallsManage,
@@ -221,7 +221,7 @@ class _ChoiceTile extends StatelessWidget {
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
       subtitle: subtitle == null ? null : Text(subtitle!),
       trailing: selected
-          ? const Icon(Icons.check_rounded, color: AppColors.amber)
+          ? Icon(Icons.check_rounded, color: AppColors.amber)
           : null,
     );
   }

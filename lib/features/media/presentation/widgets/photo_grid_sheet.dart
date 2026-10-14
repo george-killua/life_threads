@@ -225,7 +225,7 @@ class PhotoPermissionDeniedSheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.lock_rounded, color: AppColors.gold, size: 42),
+          Icon(Icons.lock_rounded, color: AppColors.gold, size: 42),
           const SizedBox(height: 14),
           Text(
             context.l10n.photoAccessOff,

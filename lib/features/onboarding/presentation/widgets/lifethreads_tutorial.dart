@@ -27,7 +27,7 @@ Future<void> showLifeThreadsTutorialSheet(BuildContext context) {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.school_rounded, color: AppColors.gold),
+                    Icon(Icons.school_rounded, color: AppColors.gold),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -164,7 +164,7 @@ class _TutorialStep extends StatelessWidget {
             ),
             child: Text(
               '$number',
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.gold,
                 fontWeight: FontWeight.w900,
               ),

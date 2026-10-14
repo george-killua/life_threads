@@ -88,7 +88,7 @@ class _CapsuleCinemaPageState extends State<CapsuleCinemaPage>
     final controller = _controller;
     final wind = _windController;
     if (script == null || controller == null || wind == null) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppColors.wallInk,
         body: SizedBox.expand(),
       );
@@ -112,11 +112,7 @@ class _CapsuleCinemaPageState extends State<CapsuleCinemaPage>
                 duration: const Duration(milliseconds: 500),
                 child: KeyedSubtree(
                   key: ValueKey(beat.kind),
-                  child: _BeatContent(
-                    script: script,
-                    beat: beat,
-                    wind: wind,
-                  ),
+                  child: _BeatContent(script: script, beat: beat, wind: wind),
                 ),
               ),
               SafeArea(
@@ -145,8 +141,7 @@ class _CapsuleCinemaPageState extends State<CapsuleCinemaPage>
                           beat.kind == CapsuleCinemaBeatKind.invite)
                         _InviteBar(
                           onAdd: () => _finish(CapsuleCinemaResult.addToWall),
-                          onDismiss: () =>
-                              _finish(CapsuleCinemaResult.dismiss),
+                          onDismiss: () => _finish(CapsuleCinemaResult.dismiss),
                         ),
                     ],
                   ),
@@ -281,7 +276,7 @@ class _BeatContent extends StatelessWidget {
                 ),
                 child: Text(
                   script.feeling.localizedLabel(context.l10n),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.wallInk,
                     fontWeight: FontWeight.w900,
                   ),
@@ -329,7 +324,7 @@ class _BeatContent extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(28, 0, 28, 140),
           child: Row(
             children: [
-              const Icon(Icons.place_rounded, color: AppColors.gold, size: 34),
+              Icon(Icons.place_rounded, color: AppColors.gold, size: 34),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -354,7 +349,7 @@ class _BeatContent extends StatelessWidget {
             children: [
               Text(
                 l10n.cinemaConnectedThread,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.gold,
                   fontWeight: FontWeight.w900,
                 ),
@@ -419,7 +414,7 @@ class _SealBeat extends StatelessWidget {
                   painter: _ThreadPainter(progress: progress),
                 ),
                 const SizedBox(height: 18),
-                const Text(
+                Text(
                   'LifeThreads',
                   style: TextStyle(
                     color: AppColors.gold,

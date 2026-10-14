@@ -33,7 +33,7 @@ class _StorySearchFieldState extends State<StorySearchField> {
   Widget build(BuildContext context) {
     final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(22),
-      borderSide: const BorderSide(color: AppColors.line),
+      borderSide: BorderSide(color: AppColors.line),
     );
     return TextField(
       key: const ValueKey('story-search'),
@@ -51,7 +51,7 @@ class _StorySearchFieldState extends State<StorySearchField> {
         fillColor: AppColors.panel.withValues(alpha: 0.85),
         hintText: context.l10n.storySearchHint,
         hintStyle: const TextStyle(color: AppColors.muted),
-        prefixIcon: const Icon(Icons.search_rounded, color: AppColors.gold),
+        prefixIcon: Icon(Icons.search_rounded, color: AppColors.gold),
         suffixIcon: _controller.text.isEmpty
             ? null
             : IconButton(
@@ -63,7 +63,7 @@ class _StorySearchFieldState extends State<StorySearchField> {
         border: border,
         enabledBorder: border,
         focusedBorder: border.copyWith(
-          borderSide: const BorderSide(color: AppColors.gold, width: 1.5),
+          borderSide: BorderSide(color: AppColors.gold, width: 1.5),
         ),
       ),
     );

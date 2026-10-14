@@ -130,12 +130,12 @@ class _FeatureNotice extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(Icons.lock_rounded, color: AppColors.amber, size: 18),
+        Icon(Icons.lock_rounded, color: AppColors.amber, size: 18),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             context.l10n.premiumFeatureNotice(feature.label(context.l10n)),
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.amber,
               fontWeight: FontWeight.w900,
             ),
@@ -196,7 +196,7 @@ class _SubscriptionHero extends StatelessWidget {
                     color: AppColors.amber.withValues(alpha: 0.32),
                   ),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.workspace_premium_rounded,
                   color: AppColors.amber,
                   size: 30,
@@ -216,7 +216,7 @@ class _SubscriptionHero extends StatelessWidget {
                   isPremium
                       ? context.l10n.lifetimeActive
                       : context.l10n.oneTimeLifetimeUnlock,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.amber,
                     fontWeight: FontWeight.w900,
                     fontSize: 12,
@@ -294,7 +294,7 @@ class _LimitMeter extends StatelessWidget {
                 isPremium
                     ? '$memoryCount / ${context.l10n.unlimited}'
                     : '$memoryCount / ${PremiumEntitlement.freeMemoryLimit}',
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.gold,
                   fontWeight: FontWeight.w900,
                 ),
@@ -639,7 +639,7 @@ class _PricePill extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.workspace_premium_rounded,
             color: AppColors.gold,
             size: 19,
@@ -827,7 +827,7 @@ class _BillingReadyNotice extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.shopping_bag_rounded, color: AppColors.amber),
+          Icon(Icons.shopping_bag_rounded, color: AppColors.amber),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

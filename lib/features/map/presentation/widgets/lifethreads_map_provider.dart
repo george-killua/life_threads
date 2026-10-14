@@ -86,12 +86,13 @@ class _OpenFreeMapLayerState extends State<_OpenFreeMapLayer> {
   // failed fetch is retried the next time a map is shown.
   static Future<Style>? _style;
 
-  late final Future<Style> _future = _style ??= StyleReader(
-    uri: lifeThreadsOpenFreeMapStyleUrl,
-  ).read().catchError((Object error) {
-    _style = null;
-    throw error;
-  });
+  late final Future<Style> _future = _style ??=
+      StyleReader(uri: lifeThreadsOpenFreeMapStyleUrl).read().catchError((
+        Object error,
+      ) {
+        _style = null;
+        throw error;
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +183,7 @@ class LifeThreadsMapUnavailablePanel extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.map_outlined, color: AppColors.gold, size: 38),
+          Icon(Icons.map_outlined, color: AppColors.gold, size: 38),
           const SizedBox(height: 12),
           Text(
             context.l10n.mapUnavailable,
@@ -209,7 +210,7 @@ class _AttributionLink extends StatelessWidget {
         cursor: SystemMouseCursors.click,
         child: Text(
           '© $label',
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.text,
             fontSize: 10.5,
             fontWeight: FontWeight.w800,

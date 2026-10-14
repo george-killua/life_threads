@@ -115,11 +115,7 @@ class _MusicTrimmerState extends State<MusicTrimmer> {
       children: [
         Row(
           children: [
-            const Icon(
-              Icons.content_cut_rounded,
-              size: 16,
-              color: AppColors.gold,
-            ),
+            Icon(Icons.content_cut_rounded, size: 16, color: AppColors.gold),
             const SizedBox(width: 6),
             Expanded(
               child: Text(
@@ -134,7 +130,7 @@ class _MusicTrimmerState extends State<MusicTrimmer> {
             Text(
               range,
               key: const ValueKey('music-trim-range'),
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.amber,
                 fontWeight: FontWeight.w900,
                 fontFeatures: [FontFeature.tabularFigures()],

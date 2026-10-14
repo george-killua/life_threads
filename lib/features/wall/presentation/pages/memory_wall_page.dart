@@ -1573,7 +1573,7 @@ class _TimelineMemoryTile extends StatelessWidget {
                           children: [
                             Text(
                               _formatTimelineDate(context, event.occurredAt),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.gold,
                                 fontWeight: FontWeight.w900,
                                 fontSize: 12,
@@ -2386,7 +2386,7 @@ class _MemoryRitualCard extends StatelessWidget {
                             : context.l10n.rememberThis,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.gold,
                           fontSize: 12,
                           fontWeight: FontWeight.w900,
@@ -2496,7 +2496,7 @@ class _DemoWallBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.preview_rounded, color: AppColors.gold, size: 20),
+          Icon(Icons.preview_rounded, color: AppColors.gold, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -2544,7 +2544,7 @@ class _BackupReminderBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.save_alt_rounded, color: AppColors.gold, size: 20),
+          Icon(Icons.save_alt_rounded, color: AppColors.gold, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -2920,10 +2920,7 @@ class _QuickPhotoPickerSheet extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
             child: Row(
               children: [
-                const Icon(
-                  Icons.add_photo_alternate_rounded,
-                  color: AppColors.gold,
-                ),
+                Icon(Icons.add_photo_alternate_rounded, color: AppColors.gold),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(

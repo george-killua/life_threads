@@ -349,7 +349,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.workspace_premium_rounded,
                         color: AppColors.gold,
                         size: 18,
@@ -387,7 +387,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
                     ),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.amber,
-                      side: const BorderSide(color: AppColors.line),
+                      side: BorderSide(color: AppColors.line),
                       padding: const EdgeInsets.symmetric(vertical: 15),
                     ),
                   ),
@@ -709,7 +709,7 @@ class _StoryMemoryPickerState extends State<_StoryMemoryPicker> {
                     selection.ids.length,
                     StorySelection.maxMemories,
                   ),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.amber,
                     fontWeight: FontWeight.w900,
                   ),

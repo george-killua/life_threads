@@ -228,7 +228,7 @@ Future<bool> showMemoryCapsuleImportPreview(
             const SizedBox(height: 8),
             Text(
               context.l10n.capsulePasswordProtected,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.gold,
                 fontWeight: FontWeight.w900,
               ),
@@ -280,7 +280,7 @@ class _CapsulePreviewRow extends StatelessWidget {
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.gold,
               fontWeight: FontWeight.w900,
             ),

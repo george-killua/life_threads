@@ -433,7 +433,7 @@ class _FamilyMemoryEditorPageState
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: const Icon(Icons.storage_rounded, color: AppColors.gold),
+        icon: Icon(Icons.storage_rounded, color: AppColors.gold),
         title: Text(l10n.familyQuotaTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -494,7 +494,7 @@ class _PhotoStrip extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.add_photo_alternate_rounded,
               color: AppColors.gold,
               size: 34,
@@ -530,7 +530,7 @@ class _PhotoStrip extends StatelessWidget {
                 File(photo.localPath),
                 fit: BoxFit.cover,
                 errorBuilder: (_, _, _) =>
-                    const ColoredBox(color: AppColors.wallDeep),
+                    ColoredBox(color: AppColors.wallDeep),
               ),
             ),
         ],

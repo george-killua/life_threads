@@ -163,7 +163,7 @@ class _WallTextNoteWidgetState extends State<WallTextNoteWidget> {
                               child: Container(
                                 width: 12,
                                 height: 12,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: AppColors.gold,
                                 ),

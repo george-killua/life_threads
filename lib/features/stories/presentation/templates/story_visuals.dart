@@ -191,20 +191,24 @@ class StoryMark extends StatelessWidget {
       child: Container(
         padding: const EdgeInsetsDirectional.fromSTEB(8, 5, 10, 5),
         decoration: BoxDecoration(
-          color: AppColors.wallInk.withValues(alpha: 0.55),
+          color: BrandColors.wallInk.withValues(alpha: 0.55),
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
+          border: Border.all(color: BrandColors.gold.withValues(alpha: 0.3)),
         ),
         child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.auto_awesome_rounded, color: AppColors.amber, size: 12),
+            Icon(
+              Icons.auto_awesome_rounded,
+              color: BrandColors.amber,
+              size: 12,
+            ),
             SizedBox(width: 5),
             Text(
               'LifeThreads',
               textDirection: TextDirection.ltr,
               style: TextStyle(
-                color: AppColors.text,
+                color: BrandColors.text,
                 fontSize: 10.5,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.2,
@@ -272,7 +276,7 @@ class StoryPhotoPlaceholder extends StatelessWidget {
           colors: [
             color.withValues(alpha: 0.92),
             color,
-            AppColors.cardDark.withValues(alpha: 0.55),
+            BrandColors.cardDark.withValues(alpha: 0.55),
           ],
         ),
       ),
@@ -326,7 +330,11 @@ class StoryPaperCard extends StatelessWidget {
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFFFFF7E7), AppColors.card, Color(0xFFEBD6AF)],
+                colors: [
+                  Color(0xFFFFF7E7),
+                  BrandColors.card,
+                  Color(0xFFEBD6AF),
+                ],
               ),
               borderRadius: BorderRadius.circular(16 * scale.clamp(0.7, 1.3)),
               border: Border.all(color: Colors.white.withValues(alpha: 0.54)),
@@ -363,7 +371,7 @@ class StoryPaperCard extends StatelessWidget {
                   maxLines: titleLines,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: AppColors.paperInk,
+                    color: BrandColors.paperInk,
                     fontWeight: FontWeight.w900,
                     fontSize: (16 * scale).clamp(11.5, 20),
                     height: 1.15,
@@ -376,7 +384,7 @@ class StoryPaperCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: AppColors.paperInk.withValues(alpha: 0.6),
+                    color: BrandColors.paperInk.withValues(alpha: 0.6),
                     fontWeight: FontWeight.w700,
                     fontSize: (11.5 * scale).clamp(9, 14),
                   ),
@@ -454,7 +462,7 @@ class StoryFeelingChip extends StatelessWidget {
           Text(
             feeling.localizedLabel(context.l10n),
             style: const TextStyle(
-              color: AppColors.text,
+              color: BrandColors.text,
               fontSize: 11.5,
               fontWeight: FontWeight.w800,
             ),
@@ -506,7 +514,7 @@ class StoryRopePainter extends CustomPainter {
     );
     canvas.drawPath(
       path,
-      stroke(AppColors.amber.withValues(alpha: 0.3), 18, blur: 14),
+      stroke(BrandColors.amber.withValues(alpha: 0.3), 18, blur: 14),
     );
     canvas.drawPath(path, stroke(const Color(0xE64A3425), 6.4));
     canvas.drawPath(

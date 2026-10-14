@@ -99,7 +99,7 @@ class _ScannerHint extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.qr_code_scanner_rounded, color: AppColors.gold),
+            Icon(Icons.qr_code_scanner_rounded, color: AppColors.gold),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

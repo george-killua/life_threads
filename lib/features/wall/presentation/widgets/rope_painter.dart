@@ -26,7 +26,7 @@ class RopePainter extends CustomPainter {
     required this.windValue,
     required this.activeNodeId,
     this.paintAnchors = false,
-    this.glowColor = AppColors.amber,
+    this.glowColor = BrandColors.amber,
   });
 
   final Map<String, RopeAnchor> anchors;

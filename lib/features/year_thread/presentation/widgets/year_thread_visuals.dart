@@ -171,8 +171,8 @@ class YearThreadRopePainter extends CustomPainter {
           Paint()
             ..shader = RadialGradient(
               colors: [
-                AppColors.amber.withValues(alpha: 0.9),
-                AppColors.amber.withValues(alpha: 0),
+                BrandColors.amber.withValues(alpha: 0.9),
+                BrandColors.amber.withValues(alpha: 0),
               ],
             ).createShader(Rect.fromCircle(center: tip, radius: radius)),
         );
@@ -194,7 +194,7 @@ class YearThreadRopePainter extends CustomPainter {
       ..drawPath(
         path,
         Paint()
-          ..color = AppColors.gold.withValues(alpha: 0.2)
+          ..color = BrandColors.gold.withValues(alpha: 0.2)
           ..strokeWidth = width(10)
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round
@@ -203,7 +203,7 @@ class YearThreadRopePainter extends CustomPainter {
       ..drawPath(
         path,
         Paint()
-          ..color = AppColors.rope
+          ..color = BrandColors.rope
           ..strokeWidth = width(4.4)
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round,
@@ -211,7 +211,7 @@ class YearThreadRopePainter extends CustomPainter {
       ..drawPath(
         path,
         Paint()
-          ..color = AppColors.amber.withValues(alpha: 0.55)
+          ..color = BrandColors.amber.withValues(alpha: 0.55)
           ..strokeWidth = width(1.4)
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round,
@@ -263,7 +263,7 @@ class YearThreadCard extends StatelessWidget {
                   end: Alignment.bottomRight,
                   colors: [
                     Color(0xFFFFF7E7),
-                    AppColors.card,
+                    BrandColors.card,
                     Color(0xFFEBD6AF),
                   ],
                 ),
@@ -358,7 +358,7 @@ class _Caption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final meta = TextStyle(
-      color: AppColors.paperInk.withValues(alpha: 0.62),
+      color: BrandColors.paperInk.withValues(alpha: 0.62),
       fontWeight: FontWeight.w700,
       fontSize: 12.5,
     );
@@ -373,7 +373,7 @@ class _Caption extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-            color: AppColors.paperInk,
+            color: BrandColors.paperInk,
             fontWeight: FontWeight.w900,
             fontSize: 19,
             height: 1.15,
@@ -386,7 +386,7 @@ class _Caption extends StatelessWidget {
             Icon(
               Icons.event_rounded,
               size: 14,
-              color: AppColors.rope.withValues(alpha: 0.9),
+              color: BrandColors.rope.withValues(alpha: 0.9),
             ),
             const SizedBox(width: 5),
             Expanded(
@@ -406,7 +406,7 @@ class _Caption extends StatelessWidget {
               Icon(
                 Icons.place_rounded,
                 size: 14,
-                color: AppColors.rope.withValues(alpha: 0.9),
+                color: BrandColors.rope.withValues(alpha: 0.9),
               ),
               const SizedBox(width: 5),
               Expanded(
@@ -461,7 +461,7 @@ class YearThreadPhotoPlaceholder extends StatelessWidget {
           colors: [
             color.withValues(alpha: 0.92),
             color,
-            AppColors.cardDark.withValues(alpha: 0.6),
+            BrandColors.cardDark.withValues(alpha: 0.6),
           ],
         ),
       ),
@@ -490,7 +490,7 @@ class _FeelingBadge extends StatelessWidget {
       height: 30,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.card.withValues(alpha: 0.92),
+        color: BrandColors.card.withValues(alpha: 0.92),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.25),
@@ -510,7 +510,7 @@ class YearThreadStatChip extends StatelessWidget {
     super.key,
     required this.icon,
     required this.label,
-    this.color = AppColors.gold,
+    this.color = BrandColors.gold,
   });
 
   final IconData icon;
@@ -522,7 +522,7 @@ class YearThreadStatChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
       decoration: BoxDecoration(
-        color: AppColors.wallInk.withValues(alpha: 0.72),
+        color: BrandColors.wallInk.withValues(alpha: 0.72),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: color.withValues(alpha: 0.34)),
       ),
@@ -534,7 +534,7 @@ class YearThreadStatChip extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              color: AppColors.text,
+              color: BrandColors.text,
               fontSize: 13,
               fontWeight: FontWeight.w800,
             ),
@@ -560,14 +560,14 @@ class YearThreadMark extends StatelessWidget {
           height: 7,
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.gold,
+            color: BrandColors.gold,
           ),
         ),
         const SizedBox(width: 6),
         Text(
           'LifeThreads',
           style: TextStyle(
-            color: AppColors.text.withValues(alpha: 0.72),
+            color: BrandColors.text.withValues(alpha: 0.72),
             fontSize: 12,
             fontWeight: FontWeight.w800,
             letterSpacing: 0.8,

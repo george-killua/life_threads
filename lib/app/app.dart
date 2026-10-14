@@ -9,6 +9,7 @@ import '../features/premium/data/premium_billing_controller.dart';
 import '../features/wall/data/wall_theme_controller.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'router/app_router.dart';
+import 'theme/app_colors.dart';
 import 'theme/app_theme.dart';
 
 class LifeThreadsApp extends ConsumerWidget {
@@ -18,6 +19,14 @@ class LifeThreadsApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(localeControllerProvider).asData?.value;
     final wallTheme = ref.watch(effectiveWallThemeProvider);
+    // Set before any screen builds, so AppColors match the theme below.
+    AppColors.use(ThemePalette.of(wallTheme));
+    ref.listen(effectiveWallThemeProvider, (previous, next) {
+      if (previous?.id == next.id) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) _refreshAll(context);
+      });
+    });
     // Keep the store listener alive for the whole app session: purchases can
     // be delivered at any time (approved pending payments, interrupted
     // checkouts) and must be acknowledged even if the upgrade page is closed.
@@ -41,4 +50,17 @@ class LifeThreadsApp extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Rebuilds and repaints every screen below [context], so widgets and
+/// painters that read [AppColors] pick up a new wall theme. Unlike replacing
+/// the tree, this keeps scroll positions, text fields and open pages.
+void _refreshAll(BuildContext context) {
+  void visit(Element element) {
+    element.markNeedsBuild();
+    if (element is RenderObjectElement) element.renderObject.markNeedsPaint();
+    element.visitChildren(visit);
+  }
+
+  (context as Element).visitChildren(visit);
 }

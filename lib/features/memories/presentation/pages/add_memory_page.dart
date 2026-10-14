@@ -683,7 +683,7 @@ class _FlowHeader extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.cable_rounded, color: AppColors.amber),
+                Icon(Icons.cable_rounded, color: AppColors.amber),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -758,7 +758,7 @@ class _StepCard extends StatelessWidget {
         children: [
           Text(
             eyebrow.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.gold,
               fontSize: 12,
               fontWeight: FontWeight.w900,
@@ -861,7 +861,7 @@ class _ChoiceTile extends StatelessWidget {
               if (selected)
                 Icon(Icons.check_circle_rounded, color: color)
               else
-                const Icon(Icons.circle_outlined, color: AppColors.line),
+                Icon(Icons.circle_outlined, color: AppColors.line),
             ],
           ),
         ),
@@ -891,7 +891,7 @@ class _DateButton extends StatelessWidget {
         decoration: InputDecoration(labelText: context.l10n.dateLabel),
         child: Row(
           children: [
-            const Icon(Icons.calendar_month_rounded, color: AppColors.gold),
+            Icon(Icons.calendar_month_rounded, color: AppColors.gold),
             const SizedBox(width: 10),
             Text(value, style: const TextStyle(fontWeight: FontWeight.w800)),
           ],
@@ -967,7 +967,7 @@ class _MemoryDetailsPanel extends StatelessWidget {
     return ExpansionTile(
       tilePadding: EdgeInsets.zero,
       childrenPadding: EdgeInsets.zero,
-      leading: const Icon(Icons.tune_rounded, color: AppColors.gold),
+      leading: Icon(Icons.tune_rounded, color: AppColors.gold),
       title: Text(
         l10n.organize,
         style: const TextStyle(fontWeight: FontWeight.w900),
@@ -1134,7 +1134,7 @@ class _PhotoPickerPanel extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.photo_library_rounded, color: AppColors.gold),
+              Icon(Icons.photo_library_rounded, color: AppColors.gold),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -1204,7 +1204,7 @@ class _PhotoPickerPanel extends StatelessWidget {
                           width: 108,
                           height: 108,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => const ColoredBox(
+                          errorBuilder: (_, _, _) => ColoredBox(
                             color: AppColors.wallDeep,
                             child: SizedBox(
                               width: 108,
@@ -1238,7 +1238,7 @@ class _PhotoPickerPanel extends StatelessWidget {
                               ),
                               child: Text(
                                 l10n.coverPhoto,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppColors.wallDeep,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w900,
@@ -1359,7 +1359,7 @@ class _LimitedAccessNotice extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.photo_filter_rounded, color: AppColors.gold),
+          Icon(Icons.photo_filter_rounded, color: AppColors.gold),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -1413,7 +1413,7 @@ class _MemoryLimitReached extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.workspace_premium_rounded,
                 color: AppColors.amber,
                 size: 48,

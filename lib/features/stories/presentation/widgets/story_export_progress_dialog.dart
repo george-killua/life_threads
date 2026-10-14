@@ -93,7 +93,7 @@ class _StoryExportProgressDialogState extends State<StoryExportProgressDialog> {
             const SizedBox(height: 8),
             Text(
               l10n.storyRenderingPercent((value * 100).floor()),
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.amber,
                 fontWeight: FontWeight.w800,
               ),

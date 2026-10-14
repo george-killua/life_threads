@@ -147,7 +147,7 @@ class _MemoryThumb extends StatelessWidget {
                 ),
                 child: Text(
                   '$order',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.wallInk,
                     fontWeight: FontWeight.w900,
                     fontSize: 11,
@@ -175,7 +175,7 @@ class _MemoryThumb extends StatelessWidget {
                         shape: BoxShape.circle,
                         border: Border.all(color: AppColors.line),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.close_rounded,
                         size: 15,
                         color: AppColors.amber,
@@ -213,12 +213,12 @@ class _AddTile extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.add_rounded, color: AppColors.gold),
+                Icon(Icons.add_rounded, color: AppColors.gold),
                 Text(
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.gold,
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,

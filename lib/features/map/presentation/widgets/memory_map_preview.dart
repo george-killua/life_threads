@@ -40,7 +40,7 @@ class MemoryMapPreview extends StatelessWidget {
                   point: point,
                   width: 48,
                   height: 48,
-                  child: const Icon(
+                  child: Icon(
                     Icons.location_pin,
                     color: AppColors.gold,
                     size: 42,

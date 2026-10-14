@@ -150,7 +150,7 @@ class _FamilyTile extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
             child: Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   backgroundColor: AppColors.wallPlum,
                   foregroundColor: AppColors.amber,
                   child: Icon(Icons.diversity_1_rounded),

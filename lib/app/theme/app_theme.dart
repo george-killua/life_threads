@@ -12,18 +12,12 @@ class AppTheme {
   /// fields take the wall's accent and surfaces. Warm Memory Room keeps the
   /// original palette exactly.
   static ThemeData forWall(WallThemePreset wall) {
-    final isWarm = wall.id == WallThemeId.warmMemoryRoom;
-    final accent = wall.accent;
+    final palette = ThemePalette.of(wall);
+    final accent = palette.gold;
     final onAccent = _onColor(accent);
-    final highlight = isWarm
-        ? AppColors.amber
-        : Color.lerp(accent, Colors.white, 0.28)!;
-    final panel = isWarm
-        ? AppColors.panel
-        : Color.lerp(wall.background, wall.depth, 0.7)!;
-    final panelWarm = isWarm
-        ? AppColors.panelWarm
-        : Color.lerp(wall.depth, accent, 0.1)!;
+    final highlight = palette.amber;
+    final panel = palette.panel;
+    final panelWarm = palette.panelWarm;
 
     final colorScheme = ColorScheme.dark(
       primary: accent,

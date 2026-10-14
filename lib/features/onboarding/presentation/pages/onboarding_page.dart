@@ -53,7 +53,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
     return Scaffold(
       body: DecoratedBox(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: RadialGradient(
             center: Alignment.topRight,
             radius: 1.2,
@@ -93,7 +93,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     }
                   },
                   children: [
-                    _WelcomeStep(headline: l10n.onboardingHeadline, body: l10n.onboardingBody),
+                    _WelcomeStep(
+                      headline: l10n.onboardingHeadline,
+                      body: l10n.onboardingBody,
+                    ),
                     _HowItWorksStep(
                       title: l10n.howItWorks,
                       cards: [
@@ -187,7 +190,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                           if (_pageIndex > 0) const SizedBox(width: 12),
                           Expanded(
                             child: FilledButton(
-                              onPressed: _isContinuing ||
+                              onPressed:
+                                  _isContinuing ||
                                       (_isNamePage && !_canAdvanceFromName)
                                   ? null
                                   : _goNext,
@@ -240,9 +244,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     } catch (_) {
       if (!mounted) return;
       setState(() => _isContinuing = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.somethingWentWrong)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.somethingWentWrong)));
       return;
     }
     ref.invalidate(userDisplayNameProvider);
@@ -268,7 +272,7 @@ class _BrandMark extends StatelessWidget {
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: AppColors.gold.withValues(alpha: 0.38)),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.auto_awesome_rounded,
             color: AppColors.gold,
             size: 24,
@@ -422,7 +426,10 @@ class _FeatureCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -485,15 +492,19 @@ class _NameStep extends StatelessWidget {
             fillColor: AppColors.panel.withValues(alpha: 0.72),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
-              borderSide: BorderSide(color: AppColors.gold.withValues(alpha: 0.24)),
+              borderSide: BorderSide(
+                color: AppColors.gold.withValues(alpha: 0.24),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
-              borderSide: BorderSide(color: AppColors.gold.withValues(alpha: 0.24)),
+              borderSide: BorderSide(
+                color: AppColors.gold.withValues(alpha: 0.24),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
-              borderSide: const BorderSide(color: AppColors.gold, width: 1.4),
+              borderSide: BorderSide(color: AppColors.gold, width: 1.4),
             ),
           ),
         ),
@@ -501,7 +512,7 @@ class _NameStep extends StatelessWidget {
           const SizedBox(height: 18),
           Text(
             preview!,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.gold,
               fontWeight: FontWeight.w900,
               fontSize: 18,
@@ -533,7 +544,7 @@ class _PrivacyStep extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: AppColors.gold.withValues(alpha: 0.32)),
           ),
-          child: const Icon(Icons.lock_rounded, color: AppColors.gold, size: 34),
+          child: Icon(Icons.lock_rounded, color: AppColors.gold, size: 34),
         ),
         const SizedBox(height: 22),
         Text(
@@ -560,10 +571,7 @@ class _PrivacyStep extends StatelessWidget {
 }
 
 class _GetStartedStep extends StatelessWidget {
-  const _GetStartedStep({
-    required this.title,
-    required this.body,
-  });
+  const _GetStartedStep({required this.title, required this.body});
 
   final String title;
   final String body;

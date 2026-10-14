@@ -387,7 +387,7 @@ class _TitleCard extends StatelessWidget {
                   l10n.yearThreadTitle.toUpperCase(),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: AppColors.gold,
+                    color: BrandColors.gold,
                     fontSize: 13,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 3,
@@ -401,7 +401,7 @@ class _TitleCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                     textDirection: TextDirection.ltr,
                     style: const TextStyle(
-                      color: AppColors.card,
+                      color: BrandColors.card,
                       fontSize: 100,
                       height: 1,
                       fontWeight: FontWeight.w900,
@@ -416,7 +416,7 @@ class _TitleCard extends StatelessWidget {
                     yearThreadSummary(l10n, film.stats, withYear: false),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: AppColors.muted,
+                      color: BrandColors.muted,
                       fontSize: 17,
                       fontWeight: FontWeight.w800,
                     ),
@@ -507,7 +507,7 @@ class _MonthHeader extends StatelessWidget {
             '${film.stats.year}',
             textDirection: TextDirection.ltr,
             style: const TextStyle(
-              color: AppColors.gold,
+              color: BrandColors.gold,
               fontSize: 12,
               fontWeight: FontWeight.w900,
               letterSpacing: 3,
@@ -517,7 +517,7 @@ class _MonthHeader extends StatelessWidget {
           Text(
             DateFormat.MMMM(locale).format(shown),
             style: const TextStyle(
-              color: AppColors.card,
+              color: BrandColors.card,
               fontSize: 28,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.4,
@@ -555,7 +555,7 @@ class _MonthRibbon extends StatelessWidget {
             top: 7,
             child: Container(
               height: 1.6,
-              color: AppColors.rope.withValues(alpha: 0.55),
+              color: BrandColors.rope.withValues(alpha: 0.55),
             ),
           ),
           Row(
@@ -574,14 +574,14 @@ class _MonthRibbon extends StatelessWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: month == current
-                                  ? AppColors.amber
+                                  ? BrandColors.amber
                                   : months.contains(month)
-                                  ? AppColors.gold
-                                  : AppColors.line,
+                                  ? BrandColors.gold
+                                  : BrandColors.line,
                               boxShadow: month == current
                                   ? [
                                       BoxShadow(
-                                        color: AppColors.amber.withValues(
+                                        color: BrandColors.amber.withValues(
                                           alpha: 0.6,
                                         ),
                                         blurRadius: 10,
@@ -604,7 +604,7 @@ class _MonthRibbon extends StatelessWidget {
                               maxLines: 1,
                               softWrap: false,
                               style: const TextStyle(
-                                color: AppColors.amber,
+                                color: BrandColors.amber,
                                 fontSize: 11,
                                 fontWeight: FontWeight.w900,
                               ),
@@ -638,7 +638,7 @@ class _ClosingPanel extends StatelessWidget {
           '${stats.year}',
           textDirection: TextDirection.ltr,
           style: const TextStyle(
-            color: AppColors.gold,
+            color: BrandColors.gold,
             fontSize: 14,
             fontWeight: FontWeight.w900,
             letterSpacing: 3,
@@ -649,7 +649,7 @@ class _ClosingPanel extends StatelessWidget {
           l10n.yearThreadClosingLine,
           textAlign: TextAlign.center,
           style: const TextStyle(
-            color: AppColors.card,
+            color: BrandColors.card,
             fontSize: 30,
             height: 1.1,
             fontWeight: FontWeight.w900,

@@ -610,7 +610,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
             createdAt: now.millisecondsSinceEpoch,
             wallX: position.dx,
             wallY: position.dy,
-            colorValue: AppColors.cardDark.toARGB32(),
+            colorValue: BrandColors.cardDark.toARGB32(),
           ),
         );
     state = await AsyncValue.guard(_loadState);
@@ -628,7 +628,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
             createdAt: now.millisecondsSinceEpoch,
             wallX: position.dx,
             wallY: position.dy,
-            colorValue: AppColors.gold.toARGB32(),
+            colorValue: BrandColors.gold.toARGB32(),
           ),
         );
     state = await AsyncValue.guard(_loadState);
@@ -827,7 +827,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
                   coverColorValue: _intValue(
                     event,
                     'coverColorValue',
-                    fallback: AppColors.gold.toARGB32(),
+                    fallback: BrandColors.gold.toARGB32(),
                   ),
                   wallX: _doubleValue(event, 'wallX', fallback: 180) + offset,
                   wallY: _doubleValue(event, 'wallY', fallback: 220) + offset,
@@ -879,7 +879,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
                   colorValue: _intValue(
                     item,
                     'colorValue',
-                    fallback: AppColors.cardDark.toARGB32(),
+                    fallback: BrandColors.cardDark.toARGB32(),
                   ),
                 ),
               );
@@ -1206,10 +1206,10 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
   }
 
   static const _colors = [
-    AppColors.gold,
-    AppColors.blue,
-    AppColors.rose,
-    AppColors.sage,
+    BrandColors.gold,
+    BrandColors.blue,
+    BrandColors.rose,
+    BrandColors.sage,
     Color(0xFFBDA0C9),
   ];
 

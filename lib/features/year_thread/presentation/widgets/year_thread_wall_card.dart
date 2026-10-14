@@ -45,7 +45,7 @@ class YearThreadWallCard extends ConsumerWidget {
             padding: const EdgeInsetsDirectional.fromSTEB(13, 8, 4, 8),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.movie_filter_rounded,
                   color: AppColors.gold,
                   size: 22,
@@ -60,7 +60,7 @@ class YearThreadWallCard extends ConsumerWidget {
                         l10n.yearThreadWallCardTitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.gold,
                           fontSize: 12,
                           fontWeight: FontWeight.w900,

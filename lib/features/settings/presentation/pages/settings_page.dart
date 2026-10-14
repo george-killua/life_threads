@@ -259,7 +259,7 @@ class SettingsPage extends ConsumerWidget {
                       info == null
                           ? 'LifeThreads'
                           : '${info.version}+${info.buildNumber}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.gold,
                         fontSize: 18,
                         fontWeight: FontWeight.w900,

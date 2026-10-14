@@ -23,7 +23,7 @@ class FamilyPhoto extends ConsumerWidget {
       familyPhotoProvider((familyId: familyId, photoId: photoId)),
     );
     return file.when(
-      loading: () => const ColoredBox(
+      loading: () => ColoredBox(
         color: AppColors.wallDeep,
         child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
       ),
@@ -43,7 +43,7 @@ class _Missing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ColoredBox(
+    return ColoredBox(
       color: AppColors.wallDeep,
       child: Center(
         child: Icon(Icons.broken_image_rounded, color: AppColors.muted),

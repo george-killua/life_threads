@@ -204,7 +204,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
                         type: MaterialType.transparency,
                         child: ListTile(
                           contentPadding: EdgeInsets.zero,
-                          leading: const Icon(
+                          leading: Icon(
                             Icons.event_rounded,
                             color: AppColors.gold,
                           ),
@@ -654,7 +654,7 @@ class _CoverPicker extends StatelessWidget {
             Image.file(
               File(path!),
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => const Center(
+              errorBuilder: (_, _, _) => Center(
                 child: Icon(
                   Icons.photo_camera_back_rounded,
                   color: AppColors.gold,
@@ -663,7 +663,7 @@ class _CoverPicker extends StatelessWidget {
               ),
             ),
           if (!hasImage)
-            const Center(
+            Center(
               child: Icon(
                 Icons.photo_camera_back_rounded,
                 color: AppColors.gold,
@@ -851,12 +851,12 @@ class _GalleryPhotoTile extends StatelessWidget {
                   ? Image.file(
                       File(photo.localPath),
                       fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => const ColoredBox(
+                      errorBuilder: (_, _, _) => ColoredBox(
                         color: AppColors.wallDeep,
                         child: Icon(Icons.broken_image_rounded),
                       ),
                     )
-                  : const ColoredBox(
+                  : ColoredBox(
                       color: AppColors.wallDeep,
                       child: Icon(Icons.broken_image_rounded),
                     ),

@@ -588,15 +588,12 @@ class _PersonSuggestions extends StatelessWidget {
             shrinkWrap: true,
             itemCount: options.length,
             separatorBuilder: (_, _) =>
-                const Divider(height: 1, color: AppColors.line),
+                Divider(height: 1, color: AppColors.line),
             itemBuilder: (context, index) {
               final person = options[index];
               return ListTile(
                 dense: true,
-                leading: const Icon(
-                  Icons.person_rounded,
-                  color: AppColors.gold,
-                ),
+                leading: Icon(Icons.person_rounded, color: AppColors.gold),
                 title: Text(
                   person.name,
                   style: const TextStyle(fontWeight: FontWeight.w900),
@@ -644,7 +641,7 @@ class _PersonChip extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.person_rounded, color: AppColors.gold, size: 18),
+              Icon(Icons.person_rounded, color: AppColors.gold, size: 18),
               const SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

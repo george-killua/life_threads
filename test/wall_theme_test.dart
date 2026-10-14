@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:life_threads/app/theme/app_colors.dart';
 import 'package:life_threads/app/theme/app_theme.dart';
 import 'package:life_threads/features/premium/data/premium_entitlement_controller.dart';
 import 'package:life_threads/features/wall/data/wall_theme_controller.dart';
@@ -156,5 +157,15 @@ void main() {
       expect(theme.scaffoldBackgroundColor, wall.background);
       expect(theme.extension<WallCardStyle>(), wall.cardStyle);
     }
+  });
+
+  test('AppColors follow the palette in use', () {
+    addTearDown(() => AppColors.use(ThemePalette.warm));
+
+    expect(AppColors.gold, BrandColors.gold);
+    AppColors.use(ThemePalette.of(WallThemePreset.midnightArchive));
+    expect(AppColors.gold, WallThemePreset.midnightArchive.accent);
+    expect(AppColors.wallInk, WallThemePreset.midnightArchive.background);
+    expect(ThemePalette.of(WallThemePreset.warmMemoryRoom), ThemePalette.warm);
   });
 }

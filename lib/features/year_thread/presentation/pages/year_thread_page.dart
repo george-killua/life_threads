@@ -275,7 +275,7 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
       _Panel(
         child: Row(
           children: [
-            const Icon(Icons.music_note_rounded, color: AppColors.gold),
+            Icon(Icons.music_note_rounded, color: AppColors.gold),
             const SizedBox(width: 10),
             Expanded(
               child: tracks.isEmpty
@@ -815,7 +815,7 @@ class _Label extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.gold,
           fontSize: 13,
           fontWeight: FontWeight.w900,

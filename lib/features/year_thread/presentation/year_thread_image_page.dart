@@ -97,7 +97,7 @@ class YearThreadImagePage extends StatelessWidget {
             children: [
               Text(
                 l10n.yearThreadMyYear.toUpperCase(),
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.gold,
                   fontSize: 13,
                   fontWeight: FontWeight.w900,

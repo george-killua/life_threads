@@ -45,11 +45,7 @@ class WallEmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.auto_awesome_rounded,
-              color: AppColors.gold,
-              size: 46,
-            ),
+            Icon(Icons.auto_awesome_rounded, color: AppColors.gold, size: 46),
             const SizedBox(height: 16),
             Text(
               context.l10n.startWithOneThing,

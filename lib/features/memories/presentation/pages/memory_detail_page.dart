@@ -219,10 +219,8 @@ class MemoryDetailPage extends ConsumerWidget {
       context: context,
       barrierDismissible: false,
       // Back must not dismiss it: the caller pops it when work finishes.
-      builder: (context) => const PopScope(
-        canPop: false,
-        child: _CloudShareProgressDialog(),
-      ),
+      builder: (context) =>
+          const PopScope(canPop: false, child: _CloudShareProgressDialog()),
     );
   }
 
@@ -481,16 +479,12 @@ class _OnThisDayHeader extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.event_repeat_rounded,
-            color: AppColors.amber,
-            size: 18,
-          ),
+          Icon(Icons.event_repeat_rounded, color: AppColors.amber, size: 18),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
               context.l10n.onThisDayHeader(yearsAgo),
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.amber,
                 fontWeight: FontWeight.w900,
               ),
@@ -595,7 +589,7 @@ class _ChapterActions extends StatelessWidget {
                 label: Text(context.l10n.editStory),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.amber,
-                  side: const BorderSide(color: AppColors.line),
+                  side: BorderSide(color: AppColors.line),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
               ),
@@ -608,7 +602,7 @@ class _ChapterActions extends StatelessWidget {
                 label: Text(context.l10n.connect),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.amber,
-                  side: const BorderSide(color: AppColors.line),
+                  side: BorderSide(color: AppColors.line),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
               ),
@@ -624,7 +618,7 @@ class _ChapterActions extends StatelessWidget {
             label: Text(context.l10n.createStory),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.amber,
-              side: const BorderSide(color: AppColors.line),
+              side: BorderSide(color: AppColors.line),
               padding: const EdgeInsets.symmetric(vertical: 15),
             ),
           ),
@@ -806,7 +800,7 @@ class _GallerySection extends StatelessWidget {
                           File(photo.localPath),
                           fit: BoxFit.cover,
                           filterQuality: FilterQuality.medium,
-                          errorBuilder: (_, _, _) => const ColoredBox(
+                          errorBuilder: (_, _, _) => ColoredBox(
                             color: AppColors.wallDeep,
                             child: Center(
                               child: Icon(Icons.photo_camera_back_rounded),
@@ -814,7 +808,7 @@ class _GallerySection extends StatelessWidget {
                           ),
                         ),
                       )
-                    : const ColoredBox(
+                    : ColoredBox(
                         color: AppColors.wallDeep,
                         child: Center(child: Icon(Icons.broken_image_rounded)),
                       ),
@@ -854,11 +848,7 @@ class _PeopleSection extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.person_rounded,
-                    color: AppColors.gold,
-                    size: 19,
-                  ),
+                  Icon(Icons.person_rounded, color: AppColors.gold, size: 19),
                   const SizedBox(width: 8),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1197,7 +1187,7 @@ class _ChapterPanel extends StatelessWidget {
           children: [
             Text(
               eyebrow.toUpperCase(),
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.gold,
                 fontSize: 11,
                 fontWeight: FontWeight.w900,

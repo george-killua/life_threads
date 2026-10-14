@@ -59,7 +59,9 @@ class StoryPage extends StatelessWidget {
             if (memories.isEmpty) const StoryWallBackdrop() else page,
             if (motion.ending > 0)
               ColoredBox(
-                color: AppColors.wallInk.withValues(alpha: motion.ending * 0.9),
+                color: BrandColors.wallInk.withValues(
+                  alpha: motion.ending * 0.9,
+                ),
               ),
           ],
         ),
@@ -185,10 +187,10 @@ class _SingleScene extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.wallInk.withValues(alpha: 0),
-                  AppColors.wallInk.withValues(alpha: 0.6),
-                  AppColors.wallInk.withValues(alpha: 0.92),
-                  AppColors.wallInk.withValues(alpha: 0.9),
+                  BrandColors.wallInk.withValues(alpha: 0),
+                  BrandColors.wallInk.withValues(alpha: 0.6),
+                  BrandColors.wallInk.withValues(alpha: 0.92),
+                  BrandColors.wallInk.withValues(alpha: 0.9),
                 ],
                 stops: const [0, 0.35, 0.75, 1],
               ),
@@ -239,7 +241,7 @@ class _SingleScene extends StatelessWidget {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: AppColors.text,
+                    color: BrandColors.text,
                     fontSize: 30,
                     height: 1.08,
                     fontWeight: FontWeight.w900,
@@ -258,7 +260,7 @@ class _SingleScene extends StatelessWidget {
                           ? Icons.place_rounded
                           : Icons.event_rounded,
                       size: 15,
-                      color: AppColors.amber,
+                      color: BrandColors.amber,
                     ),
                     const SizedBox(width: 6),
                     Expanded(
@@ -267,7 +269,7 @@ class _SingleScene extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: AppColors.amber,
+                          color: BrandColors.amber,
                           fontSize: 13.5,
                           fontWeight: FontWeight.w800,
                         ),
@@ -295,7 +297,7 @@ class _SingleScene extends StatelessWidget {
                       maxLines: 4,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: AppColors.text.withValues(alpha: 0.88),
+                        color: BrandColors.text.withValues(alpha: 0.88),
                         fontSize: 15,
                         height: 1.4,
                         fontWeight: FontWeight.w600,
@@ -409,7 +411,7 @@ class _ThreadStory extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: AppColors.text,
+                      color: BrandColors.text,
                       fontSize: 19,
                       height: 1.2,
                       fontWeight: FontWeight.w900,
@@ -420,7 +422,7 @@ class _ThreadStory extends StatelessWidget {
                 Text(
                   storyDateRange(context, ordered),
                   style: const TextStyle(
-                    color: AppColors.amber,
+                    color: BrandColors.amber,
                     fontSize: 12.5,
                     fontWeight: FontWeight.w800,
                   ),
@@ -568,7 +570,7 @@ class _CollageStory extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFFFFF7E7), AppColors.card],
+                    colors: [Color(0xFFFFF7E7), BrandColors.card],
                   ),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
@@ -588,7 +590,7 @@ class _CollageStory extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: AppColors.paperInk,
+                        color: BrandColors.paperInk,
                         fontSize: 16.5,
                         height: 1.3,
                         fontWeight: FontWeight.w800,
@@ -598,7 +600,7 @@ class _CollageStory extends StatelessWidget {
                     Text(
                       storyDateRange(context, memories),
                       style: TextStyle(
-                        color: AppColors.paperInk.withValues(alpha: 0.58),
+                        color: BrandColors.paperInk.withValues(alpha: 0.58),
                         fontSize: 11.5,
                         fontWeight: FontWeight.w800,
                       ),
@@ -630,7 +632,7 @@ class _CollageTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: BrandColors.card,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
@@ -714,7 +716,7 @@ class _QuoteStory extends StatelessWidget {
                   maxLines: 9,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: AppColors.text,
+                    color: BrandColors.text,
                     fontSize: fontSize,
                     height: 1.32,
                     fontWeight: FontWeight.w800,
@@ -729,7 +731,7 @@ class _QuoteStory extends StatelessWidget {
                   width: 46,
                   height: 3,
                   decoration: BoxDecoration(
-                    color: AppColors.gold,
+                    color: BrandColors.gold,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),

@@ -223,7 +223,7 @@ class _ConnectionReasonCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.cable_rounded, color: AppColors.amber),
+                  Icon(Icons.cable_rounded, color: AppColors.amber),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
