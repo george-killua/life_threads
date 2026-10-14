@@ -26,9 +26,8 @@ import '../../../premium/data/premium_entitlement_controller.dart';
 import '../../../premium/domain/premium_feature.dart';
 import '../../../premium/presentation/premium_gate.dart';
 import '../../../stories/data/music_catalog.dart';
-import '../../../wall/data/wall_theme_controller.dart';
-import '../../../wall/domain/wall_theme.dart';
 import '../../../wall/presentation/widgets/wall_background.dart';
+import '../../../wall/presentation/widgets/wall_theme_picker.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -41,7 +40,6 @@ class SettingsPage extends ConsumerWidget {
     final selectedLocale = ref.watch(localeControllerProvider).asData?.value;
     final displayName = ref.watch(userDisplayNameProvider).asData?.value ?? '';
     final isPremium = entitlement?.isPremium ?? false;
-    final effectiveTheme = ref.watch(effectiveWallThemeProvider);
     final onThisDay =
         ref.watch(onThisDaySettingsProvider).asData?.value ??
         const OnThisDaySettings();
@@ -172,11 +170,7 @@ class SettingsPage extends ConsumerWidget {
                 title: l10n.themeTitle,
                 body: l10n.themeBody,
                 badge: isPremium ? l10n.premiumBadge : l10n.oneFreeBadge,
-                child: _ThemeSelector(
-                  selectedTheme: effectiveTheme,
-                  isPremium: isPremium,
-                  onSelect: (theme) => _selectTheme(context, ref, theme),
-                ),
+                child: const WallThemePicker(),
               ),
               _SettingsCard(
                 icon: Icons.event_repeat_rounded,
@@ -514,27 +508,6 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  Future<void> _selectTheme(
-    BuildContext context,
-    WidgetRef ref,
-    WallThemePreset theme,
-  ) async {
-    final isPremium =
-        ref.read(premiumEntitlementProvider).asData?.value.isPremium ?? false;
-    if (theme.isPremium && !isPremium) {
-      await context.push(RouteNames.upgrade);
-      return;
-    }
-
-    await ref.read(wallThemeProvider.notifier).selectTheme(theme);
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(context.l10n.themeSelected(_themeLabel(context, theme))),
-      ),
-    );
-  }
-
   Future<void> _setOnThisDayReminders(
     BuildContext context,
     WidgetRef ref,
@@ -868,152 +841,6 @@ class _LanguageOption extends StatelessWidget {
       ),
     );
   }
-}
-
-class _ThemeSelector extends StatelessWidget {
-  const _ThemeSelector({
-    required this.selectedTheme,
-    required this.isPremium,
-    required this.onSelect,
-  });
-
-  final WallThemePreset selectedTheme;
-  final bool isPremium;
-  final ValueChanged<WallThemePreset> onSelect;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        for (final theme in WallThemePreset.all)
-          _ThemeOption(
-            theme: theme,
-            selected: selectedTheme.id == theme.id,
-            locked: theme.isPremium && !isPremium,
-            onTap: () => onSelect(theme),
-          ),
-      ],
-    );
-  }
-}
-
-class _ThemeOption extends StatelessWidget {
-  const _ThemeOption({
-    required this.theme,
-    required this.selected,
-    required this.locked,
-    required this.onTap,
-  });
-
-  final WallThemePreset theme;
-  final bool selected;
-  final bool locked;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(22),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.all(13),
-          decoration: BoxDecoration(
-            color: selected
-                ? theme.accent.withValues(alpha: 0.16)
-                : AppColors.wallInk.withValues(alpha: 0.24),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: selected
-                  ? theme.accent.withValues(alpha: 0.7)
-                  : AppColors.line,
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  gradient: LinearGradient(
-                    colors: [theme.background, theme.depth, theme.surface],
-                  ),
-                  border: Border.all(
-                    color: theme.accent.withValues(alpha: 0.42),
-                  ),
-                ),
-                child: Icon(theme.icon, color: theme.accent, size: 23),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            _themeLabel(context, theme),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
-                        if (locked)
-                          const Icon(
-                            Icons.lock_rounded,
-                            color: AppColors.gold,
-                            size: 17,
-                          )
-                        else if (selected)
-                          const Icon(
-                            Icons.check_circle_rounded,
-                            color: AppColors.gold,
-                            size: 18,
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _themeDescription(context, theme),
-                      style: const TextStyle(
-                        color: AppColors.muted,
-                        height: 1.3,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-String _themeLabel(BuildContext context, WallThemePreset theme) {
-  return switch (theme.id) {
-    WallThemeId.warmMemoryRoom => context.l10n.themeWarmMemoryRoom,
-    WallThemeId.midnightArchive => context.l10n.themeMidnightArchive,
-    WallThemeId.softPaperWall => context.l10n.themeSoftPaperWall,
-    WallThemeId.travelCorkboard => context.l10n.themeTravelCorkboard,
-  };
-}
-
-String _themeDescription(BuildContext context, WallThemePreset theme) {
-  return switch (theme.id) {
-    WallThemeId.warmMemoryRoom => context.l10n.themeWarmMemoryRoomDescription,
-    WallThemeId.midnightArchive => context.l10n.themeMidnightArchiveDescription,
-    WallThemeId.softPaperWall => context.l10n.themeSoftPaperWallDescription,
-    WallThemeId.travelCorkboard => context.l10n.themeTravelCorkboardDescription,
-  };
 }
 
 class _DisplayNameEditor extends StatefulWidget {

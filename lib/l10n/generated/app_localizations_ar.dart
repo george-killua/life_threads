@@ -1463,7 +1463,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get benefitThemesBody =>
-      'افتح أجواء جدار أغنى للعائلة والسفر والأرشيف والمعرض.';
+      'افتح أجواء جدار أغنى، وسمات موسمية محدودة، والتبديل التلقائي حسب وقت اليوم.';
 
   @override
   String get benefitLayoutsTitle => 'تخطيطات متقدمة';
@@ -1626,6 +1626,68 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get themeTravelCorkboardDescription =>
       'دفء لوحة فلين مع تلميحات شبكة خرائط للرحلات والأماكن.';
+
+  @override
+  String get themeAutoTitle => 'تلقائي حسب وقت اليوم';
+
+  @override
+  String get themeAutoDescription =>
+      'جدار ورقي ناعم نهاراً، وغرفة ذكريات دافئة مساءً، وأرشيف منتصف الليل ليلاً.';
+
+  @override
+  String get themeAutoSelected => 'أصبح جدارك يتبع وقت اليوم.';
+
+  @override
+  String get themeSeasonalTitle => 'موسمي';
+
+  @override
+  String get themeSeasonalBody =>
+      'سمات Premium محدودة، كل منها متاحة خلال موسمها فقط.';
+
+  @override
+  String themeSeasonalUntil(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'حتى $dateString';
+  }
+
+  @override
+  String get themeUseButton => 'استخدام هذه السمة';
+
+  @override
+  String get themeInUse => 'قيد الاستخدام';
+
+  @override
+  String get themeUnlockButton => 'افتحها مع Premium';
+
+  @override
+  String get themeAutumnHarvest => 'حصاد الخريف';
+
+  @override
+  String get themeAutumnHarvestDescription =>
+      'ضوء كهرماني وبطاقات من ورق الكرافت ووهج الأوراق المتساقطة.';
+
+  @override
+  String get themeWinterLights => 'أضواء الشتاء';
+
+  @override
+  String get themeWinterLightsDescription =>
+      'بطاقات مكسوّة بالصقيع وأضواء دافئة في ليلة زرقاء باردة.';
+
+  @override
+  String get themeSpringBlossom => 'زهر الربيع';
+
+  @override
+  String get themeSpringBlossomDescription =>
+      'بطاقات بلون الزهر الفاتح مع توهج وردي ناعم.';
+
+  @override
+  String get themeSummerEvening => 'مساء صيفي';
+
+  @override
+  String get themeSummerEveningDescription =>
+      'ألوان الغروب وبطاقات الصور الفورية.';
 
   @override
   String get demoFirstDanceTitle => 'رقصتنا الأولى';

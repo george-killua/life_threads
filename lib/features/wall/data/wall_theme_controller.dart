@@ -9,17 +9,36 @@ final wallThemeProvider =
       WallThemeController.new,
     );
 
-/// The theme the app actually shows: the saved choice, or Warm Memory Room
-/// while that choice is a Premium theme and Premium is not active.
+/// Whether the wall follows the time of day instead of one chosen theme.
+final wallThemeAutoProvider =
+    AsyncNotifierProvider<WallThemeAutoController, bool>(
+      WallThemeAutoController.new,
+    );
+
+/// The current time, refreshed every minute, for Auto and seasonal themes.
+final wallClockProvider = StreamProvider<DateTime>((ref) async* {
+  yield DateTime.now();
+  yield* Stream.periodic(const Duration(minutes: 1), (_) => DateTime.now());
+});
+
+/// The theme the app actually shows. Premium themes, seasonal themes and
+/// Auto need Premium; a seasonal theme also ends with its season. Anything
+/// not allowed right now falls back to Warm Memory Room.
 final effectiveWallThemeProvider = Provider<WallThemePreset>((ref) {
+  final isPremium =
+      ref.watch(premiumEntitlementProvider).asData?.value.isPremium ?? false;
+  if (!isPremium) return WallThemePreset.warmMemoryRoom;
+
+  final now = ref.watch(wallClockProvider).asData?.value ?? DateTime.now();
+  if (ref.watch(wallThemeAutoProvider).asData?.value ?? false) {
+    return WallThemePreset.autoAt(now);
+  }
   final selected =
       ref.watch(wallThemeProvider).asData?.value ??
       WallThemePreset.warmMemoryRoom;
-  final isPremium =
-      ref.watch(premiumEntitlementProvider).asData?.value.isPremium ?? false;
-  return selected.isPremium && !isPremium
-      ? WallThemePreset.warmMemoryRoom
-      : selected;
+  return selected.isAvailableAt(now)
+      ? selected
+      : WallThemePreset.warmMemoryRoom;
 });
 
 class WallThemeController extends AsyncNotifier<WallThemePreset> {
@@ -34,9 +53,27 @@ class WallThemeController extends AsyncNotifier<WallThemePreset> {
     return WallThemePreset.fromId(id);
   }
 
+  /// Chooses one fixed theme, which also turns Auto off.
   Future<void> selectTheme(WallThemePreset theme) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(_selectedThemeKey, theme.id.name);
     state = AsyncData(theme);
+    await ref.read(wallThemeAutoProvider.notifier).setEnabled(false);
+  }
+}
+
+class WallThemeAutoController extends AsyncNotifier<bool> {
+  static const _autoKey = 'wall_theme_auto';
+
+  @override
+  Future<bool> build() async {
+    final preferences = await SharedPreferences.getInstance();
+    return preferences.getBool(_autoKey) ?? false;
+  }
+
+  Future<void> setEnabled(bool enabled) async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(_autoKey, enabled);
+    state = AsyncData(enabled);
   }
 }

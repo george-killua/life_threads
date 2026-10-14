@@ -515,7 +515,7 @@
   "benefitUnlimitedTitle": "Unlimited memories",
   "benefitUnlimitedBody": "No 30-memory ceiling. Keep building the wall as life grows.",
   "benefitThemesTitle": "Premium wall themes",
-  "benefitThemesBody": "Unlock richer wall moods for family, travel, archive, and gallery styles.",
+  "benefitThemesBody": "Unlock richer wall moods, limited seasonal themes and Auto by time of day.",
   "benefitLayoutsTitle": "Advanced layouts",
   "benefitLayoutsBody": "More ways to arrange threads, timelines, anchors, and memory clusters.",
   "lifetimeUnlock": "Premium subscription",
@@ -683,6 +683,31 @@
   "themeSoftPaperWallDescription": "Cream paper, ink shadows, and calm scrapbook feeling.",
   "themeTravelCorkboard": "Travel Corkboard",
   "themeTravelCorkboardDescription": "Corkboard warmth with map-grid hints for trips and places.",
+  "themeAutoTitle": "Auto by time of day",
+  "themeAutoDescription": "Soft Paper Wall by day, Warm Memory Room in the evening, Midnight Archive at night.",
+  "themeAutoSelected": "Your wall now follows the time of day.",
+  "themeSeasonalTitle": "Seasonal",
+  "themeSeasonalBody": "Limited Premium themes, each available only during its season.",
+  "themeSeasonalUntil": "Until {date}",
+  "@themeSeasonalUntil": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "MMMd"
+      }
+    }
+  },
+  "themeUseButton": "Use this theme",
+  "themeInUse": "In use",
+  "themeUnlockButton": "Unlock with Premium",
+  "themeAutumnHarvest": "Autumn Harvest",
+  "themeAutumnHarvestDescription": "Amber light, kraft-paper cards and the glow of falling leaves.",
+  "themeWinterLights": "Winter Lights",
+  "themeWinterLightsDescription": "Frosted cards and warm string lights on a cold blue night.",
+  "themeSpringBlossom": "Spring Blossom",
+  "themeSpringBlossomDescription": "Pale blossom cards with a soft pink glow.",
+  "themeSummerEvening": "Summer Evening",
+  "themeSummerEveningDescription": "Sunset colours and instant-photo cards.",
   "demoFirstDanceTitle": "Our first dance",
   "demoFirstDanceStory": "The band played our song and the whole barn went quiet. I stepped on your foot twice, you laughed through all of it, and for three minutes nobody else was there.",
   "demoFirstDancePlace": "Salzburg",

@@ -1473,7 +1473,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get benefitThemesBody =>
-      'Unlock richer wall moods for family, travel, archive, and gallery styles.';
+      'Unlock richer wall moods, limited seasonal themes and Auto by time of day.';
 
   @override
   String get benefitLayoutsTitle => 'Advanced layouts';
@@ -1637,6 +1637,68 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get themeTravelCorkboardDescription =>
       'Corkboard warmth with map-grid hints for trips and places.';
+
+  @override
+  String get themeAutoTitle => 'Auto by time of day';
+
+  @override
+  String get themeAutoDescription =>
+      'Soft Paper Wall by day, Warm Memory Room in the evening, Midnight Archive at night.';
+
+  @override
+  String get themeAutoSelected => 'Your wall now follows the time of day.';
+
+  @override
+  String get themeSeasonalTitle => 'Seasonal';
+
+  @override
+  String get themeSeasonalBody =>
+      'Limited Premium themes, each available only during its season.';
+
+  @override
+  String themeSeasonalUntil(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Until $dateString';
+  }
+
+  @override
+  String get themeUseButton => 'Use this theme';
+
+  @override
+  String get themeInUse => 'In use';
+
+  @override
+  String get themeUnlockButton => 'Unlock with Premium';
+
+  @override
+  String get themeAutumnHarvest => 'Autumn Harvest';
+
+  @override
+  String get themeAutumnHarvestDescription =>
+      'Amber light, kraft-paper cards and the glow of falling leaves.';
+
+  @override
+  String get themeWinterLights => 'Winter Lights';
+
+  @override
+  String get themeWinterLightsDescription =>
+      'Frosted cards and warm string lights on a cold blue night.';
+
+  @override
+  String get themeSpringBlossom => 'Spring Blossom';
+
+  @override
+  String get themeSpringBlossomDescription =>
+      'Pale blossom cards with a soft pink glow.';
+
+  @override
+  String get themeSummerEvening => 'Summer Evening';
+
+  @override
+  String get themeSummerEveningDescription =>
+      'Sunset colours and instant-photo cards.';
 
   @override
   String get demoFirstDanceTitle => 'Our first dance';

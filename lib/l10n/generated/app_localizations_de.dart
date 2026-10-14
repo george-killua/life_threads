@@ -1491,7 +1491,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get benefitThemesBody =>
-      'Schalte reichere Wandstimmungen für Familie, Reisen, Archiv und Galerie frei.';
+      'Schalte reichere Wandstimmungen, limitierte saisonale Themes und den automatischen Wechsel nach Tageszeit frei.';
 
   @override
   String get benefitLayoutsTitle => 'Erweiterte Layouts';
@@ -1656,6 +1656,68 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get themeTravelCorkboardDescription =>
       'Korkwandwärme mit Kartenraster-Hinweisen für Reisen und Orte.';
+
+  @override
+  String get themeAutoTitle => 'Automatisch nach Tageszeit';
+
+  @override
+  String get themeAutoDescription =>
+      'Tagsüber Weiche Papierwand, abends Warmer Erinnerungsraum, nachts Mitternachtsarchiv.';
+
+  @override
+  String get themeAutoSelected => 'Deine Wand folgt jetzt der Tageszeit.';
+
+  @override
+  String get themeSeasonalTitle => 'Saisonal';
+
+  @override
+  String get themeSeasonalBody =>
+      'Limitierte Premium-Themes, jeweils nur in ihrer Jahreszeit verfügbar.';
+
+  @override
+  String themeSeasonalUntil(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Bis $dateString';
+  }
+
+  @override
+  String get themeUseButton => 'Dieses Theme verwenden';
+
+  @override
+  String get themeInUse => 'Aktiv';
+
+  @override
+  String get themeUnlockButton => 'Mit Premium freischalten';
+
+  @override
+  String get themeAutumnHarvest => 'Herbsternte';
+
+  @override
+  String get themeAutumnHarvestDescription =>
+      'Bernsteinlicht, Kraftpapier-Karten und das Leuchten fallender Blätter.';
+
+  @override
+  String get themeWinterLights => 'Winterlichter';
+
+  @override
+  String get themeWinterLightsDescription =>
+      'Bereifte Karten und warme Lichterketten in einer kalten blauen Nacht.';
+
+  @override
+  String get themeSpringBlossom => 'Frühlingsblüte';
+
+  @override
+  String get themeSpringBlossomDescription =>
+      'Zarte Blütenkarten mit sanftem rosa Schimmer.';
+
+  @override
+  String get themeSummerEvening => 'Sommerabend';
+
+  @override
+  String get themeSummerEveningDescription =>
+      'Sonnenuntergangsfarben und Sofortbild-Karten.';
 
   @override
   String get demoFirstDanceTitle => 'Unser erster Tanz';

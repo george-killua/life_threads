@@ -2748,7 +2748,7 @@ abstract class AppLocalizations {
   /// No description provided for @benefitThemesBody.
   ///
   /// In en, this message translates to:
-  /// **'Unlock richer wall moods for family, travel, archive, and gallery styles.'**
+  /// **'Unlock richer wall moods, limited seasonal themes and Auto by time of day.'**
   String get benefitThemesBody;
 
   /// No description provided for @benefitLayoutsTitle.
@@ -3032,6 +3032,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Corkboard warmth with map-grid hints for trips and places.'**
   String get themeTravelCorkboardDescription;
+
+  /// No description provided for @themeAutoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto by time of day'**
+  String get themeAutoTitle;
+
+  /// No description provided for @themeAutoDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Soft Paper Wall by day, Warm Memory Room in the evening, Midnight Archive at night.'**
+  String get themeAutoDescription;
+
+  /// No description provided for @themeAutoSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Your wall now follows the time of day.'**
+  String get themeAutoSelected;
+
+  /// No description provided for @themeSeasonalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Seasonal'**
+  String get themeSeasonalTitle;
+
+  /// No description provided for @themeSeasonalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Limited Premium themes, each available only during its season.'**
+  String get themeSeasonalBody;
+
+  /// No description provided for @themeSeasonalUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Until {date}'**
+  String themeSeasonalUntil(DateTime date);
+
+  /// No description provided for @themeUseButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this theme'**
+  String get themeUseButton;
+
+  /// No description provided for @themeInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'In use'**
+  String get themeInUse;
+
+  /// No description provided for @themeUnlockButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock with Premium'**
+  String get themeUnlockButton;
+
+  /// No description provided for @themeAutumnHarvest.
+  ///
+  /// In en, this message translates to:
+  /// **'Autumn Harvest'**
+  String get themeAutumnHarvest;
+
+  /// No description provided for @themeAutumnHarvestDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Amber light, kraft-paper cards and the glow of falling leaves.'**
+  String get themeAutumnHarvestDescription;
+
+  /// No description provided for @themeWinterLights.
+  ///
+  /// In en, this message translates to:
+  /// **'Winter Lights'**
+  String get themeWinterLights;
+
+  /// No description provided for @themeWinterLightsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Frosted cards and warm string lights on a cold blue night.'**
+  String get themeWinterLightsDescription;
+
+  /// No description provided for @themeSpringBlossom.
+  ///
+  /// In en, this message translates to:
+  /// **'Spring Blossom'**
+  String get themeSpringBlossom;
+
+  /// No description provided for @themeSpringBlossomDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Pale blossom cards with a soft pink glow.'**
+  String get themeSpringBlossomDescription;
+
+  /// No description provided for @themeSummerEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Summer Evening'**
+  String get themeSummerEvening;
+
+  /// No description provided for @themeSummerEveningDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunset colours and instant-photo cards.'**
+  String get themeSummerEveningDescription;
 
   /// No description provided for @demoFirstDanceTitle.
   ///

@@ -7,6 +7,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../memories/domain/memory_event.dart';
 import '../../../memories/presentation/memory_l10n.dart';
+import '../../domain/wall_card_style.dart';
 import 'metallic_ball_pin.dart';
 import 'wall_drag_listener.dart';
 
@@ -246,17 +247,18 @@ class _PhotoPaper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final style = WallCardStyle.of(context);
     return Container(
       width: 190,
-      padding: const EdgeInsets.all(10),
+      padding: style.padding,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFFFF7E7), AppColors.card, Color(0xFFEBD6AF)],
+          colors: style.paper,
         ),
-        borderRadius: BorderRadius.circular(19),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.54)),
+        borderRadius: BorderRadius.circular(style.radius),
+        border: Border.all(color: style.edge),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDragging ? 0.58 : 0.42),
@@ -277,12 +279,12 @@ class _PhotoPaper extends StatelessWidget {
         ],
       ),
       child: CustomPaint(
-        foregroundPainter: _PaperTexturePainter(),
+        foregroundPainter: _PaperTexturePainter(style.texture),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(13),
+              borderRadius: BorderRadius.circular(style.photoRadius),
               child: SizedBox(
                 height: 128,
                 width: double.infinity,
@@ -294,8 +296,8 @@ class _PhotoPaper extends StatelessWidget {
               event.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColors.paperInk,
+              style: TextStyle(
+                color: style.ink,
                 fontWeight: FontWeight.w900,
                 fontSize: 17,
                 letterSpacing: -0.25,
@@ -310,7 +312,7 @@ class _PhotoPaper extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: AppColors.paperInk.withValues(alpha: 0.58),
+                color: style.ink.withValues(alpha: 0.58),
                 fontWeight: FontWeight.w700,
                 fontSize: 12.5,
               ),
@@ -322,7 +324,7 @@ class _PhotoPaper extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: AppColors.rope.withValues(alpha: 0.9),
+                  color: style.accentInk.withValues(alpha: 0.9),
                   fontWeight: FontWeight.w800,
                   fontSize: 12,
                 ),
@@ -342,6 +344,7 @@ class _Tape extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tape = WallCardStyle.of(context).tape;
     return Positioned(
       top: -13,
       left: 62,
@@ -353,8 +356,8 @@ class _Tape extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                AppColors.card.withValues(alpha: isDragging ? 0.86 : 0.68),
-                AppColors.cardDark.withValues(alpha: isDragging ? 0.82 : 0.62),
+                tape.first.withValues(alpha: isDragging ? 0.86 : 0.68),
+                tape.last.withValues(alpha: isDragging ? 0.82 : 0.62),
               ],
             ),
             borderRadius: BorderRadius.circular(6),
@@ -383,11 +386,7 @@ class _Pin extends StatelessWidget {
     return Positioned(
       top: -44,
       left: 80,
-      child: MetallicBallPin(
-        size: 17,
-        showStem: false,
-        elevated: isDragging,
-      ),
+      child: MetallicBallPin(size: 17, showStem: false, elevated: isDragging),
     );
   }
 }
@@ -444,10 +443,15 @@ class _CardImage extends StatelessWidget {
 }
 
 class _PaperTexturePainter extends CustomPainter {
+  const _PaperTexturePainter(this.color);
+
+  final Color color;
+
   @override
   void paint(Canvas canvas, Size size) {
+    if (color.a == 0) return;
     final paint = Paint()
-      ..color = const Color(0xFF8A6A32).withValues(alpha: 0.045)
+      ..color = color
       ..strokeWidth = 1;
     for (double y = 8; y < size.height; y += 7) {
       canvas.drawLine(Offset(6, y), Offset(size.width - 6, y), paint);
@@ -455,7 +459,8 @@ class _PaperTexturePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _PaperTexturePainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 class _PhotoPlaceholderPainter extends CustomPainter {

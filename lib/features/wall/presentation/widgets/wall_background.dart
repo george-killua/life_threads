@@ -8,21 +8,25 @@ import '../../data/wall_theme_controller.dart';
 import '../../domain/wall_theme.dart';
 
 class WallBackground extends ConsumerWidget {
-  const WallBackground({super.key, required this.child});
+  const WallBackground({super.key, required this.child, this.theme});
 
   final Widget child;
 
+  /// Paints this theme instead of the one in use, e.g. for previews.
+  final WallThemePreset? theme;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = ref.watch(effectiveWallThemeProvider);
+    final WallThemePreset wall =
+        theme ?? ref.watch<WallThemePreset>(effectiveWallThemeProvider);
 
     // Scaffold gives its body loose constraints: without the expand, the
     // wall ends where a short page's content ends.
     return SizedBox.expand(
       child: DecoratedBox(
-        decoration: BoxDecoration(color: theme.background),
+        decoration: BoxDecoration(color: wall.background),
         child: CustomPaint(
-          painter: _MemoryRoomPainter(theme: theme),
+          painter: _MemoryRoomPainter(theme: wall),
           child: child,
         ),
       ),

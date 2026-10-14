@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:life_threads/app/theme/app_theme.dart';
 import 'package:life_threads/features/premium/data/premium_entitlement_controller.dart';
 import 'package:life_threads/features/wall/data/wall_theme_controller.dart';
+import 'package:life_threads/features/wall/domain/wall_card_style.dart';
 import 'package:life_threads/features/wall/domain/wall_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,19 +28,111 @@ void main() {
     });
   });
 
+  group('seasons', () {
+    test('seasonal themes are only available in their season', () {
+      expect(
+        WallThemePreset.seasonalAt(DateTime(2026, 10, 15)).map((t) => t.id),
+        [WallThemeId.autumnHarvest],
+      );
+      expect(
+        WallThemePreset.seasonalAt(DateTime(2027, 1, 5)).map((t) => t.id),
+        [WallThemeId.winterLights],
+      );
+    });
+
+    test('a season ends on its last day, across the new year', () {
+      expect(
+        WallThemeSeason.autumn.endAfter(DateTime(2026, 10, 15)),
+        DateTime(2026, 11, 30),
+      );
+      expect(
+        WallThemeSeason.winter.endAfter(DateTime(2026, 12, 3)),
+        DateTime(2027, 2, 28),
+      );
+      expect(
+        WallThemeSeason.winter.endAfter(DateTime(2027, 1, 3)),
+        DateTime(2027, 2, 28),
+      );
+    });
+  });
+
+  test('Auto picks a theme by time of day', () {
+    WallThemeId at(int hour) =>
+        WallThemePreset.autoAt(DateTime(2026, 10, 15, hour)).id;
+
+    expect(at(9), WallThemeId.softPaperWall);
+    expect(at(19), WallThemeId.warmMemoryRoom);
+    expect(at(23), WallThemeId.midnightArchive);
+    expect(at(3), WallThemeId.midnightArchive);
+  });
+
   group('effectiveWallThemeProvider', () {
-    Future<WallThemePreset> effectiveTheme({required bool premium}) async {
+    Future<WallThemePreset> effectiveTheme({
+      required bool premium,
+      WallThemeId selected = WallThemeId.midnightArchive,
+      bool auto = false,
+      DateTime? now,
+    }) async {
       SharedPreferences.setMockInitialValues({
-        'selected_wall_theme': WallThemeId.midnightArchive.name,
+        'selected_wall_theme': selected.name,
         'premium_store_unlock_enabled': premium,
+        'wall_theme_auto': auto,
       });
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [
+          wallClockProvider.overrideWithValue(
+            AsyncData(now ?? DateTime(2026, 10, 15, 12)),
+          ),
+        ],
+      );
       addTearDown(container.dispose);
       container.listen(effectiveWallThemeProvider, (_, _) {});
       await container.read(wallThemeProvider.future);
+      await container.read(wallThemeAutoProvider.future);
       await container.read(premiumEntitlementProvider.future);
       return container.read(effectiveWallThemeProvider);
     }
+
+    test('shows a seasonal theme in season only', () async {
+      final inSeason = await effectiveTheme(
+        premium: true,
+        selected: WallThemeId.autumnHarvest,
+      );
+      final afterSeason = await effectiveTheme(
+        premium: true,
+        selected: WallThemeId.autumnHarvest,
+        now: DateTime(2026, 12, 2),
+      );
+
+      expect(inSeason.id, WallThemeId.autumnHarvest);
+      expect(afterSeason.id, WallThemeId.warmMemoryRoom);
+    });
+
+    test('Auto follows the clock with Premium only', () async {
+      final night = DateTime(2026, 10, 15, 23);
+
+      expect(
+        (await effectiveTheme(premium: true, auto: true, now: night)).id,
+        WallThemeId.midnightArchive,
+      );
+      expect(
+        (await effectiveTheme(premium: false, auto: true, now: night)).id,
+        WallThemeId.warmMemoryRoom,
+      );
+    });
+
+    test('choosing a theme turns Auto off', () async {
+      SharedPreferences.setMockInitialValues({'wall_theme_auto': true});
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      await container.read(wallThemeAutoProvider.future);
+
+      await container
+          .read(wallThemeProvider.notifier)
+          .selectTheme(WallThemePreset.travelCorkboard);
+
+      expect(container.read(wallThemeAutoProvider).value, isFalse);
+    });
 
     test('applies a Premium theme with Premium', () async {
       expect(
@@ -56,11 +149,12 @@ void main() {
     });
   });
 
-  test('each wall theme gives the app its own accent', () {
-    for (final wall in WallThemePreset.all) {
+  test('each wall theme gives the app its accent and card style', () {
+    for (final wall in WallThemePreset.everyTheme) {
       final theme = AppTheme.forWall(wall);
       expect(theme.colorScheme.primary, wall.accent);
       expect(theme.scaffoldBackgroundColor, wall.background);
+      expect(theme.extension<WallCardStyle>(), wall.cardStyle);
     }
   });
 }

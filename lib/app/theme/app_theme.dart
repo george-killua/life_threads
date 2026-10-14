@@ -42,6 +42,7 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: wall.background,
+      extensions: [wall.cardStyle],
       colorScheme: colorScheme,
       fontFamily: 'Avenir',
       appBarTheme: const AppBarTheme(
