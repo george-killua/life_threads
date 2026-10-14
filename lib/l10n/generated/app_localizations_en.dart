@@ -271,11 +271,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Preview a sample wall, or start with a blank one and hang your own memories.';
 
   @override
-  String wallWelcome(String name) {
-    return 'Welcome, $name.';
-  }
-
-  @override
   String get settingsNameTitle => 'Your name';
 
   @override
@@ -1287,15 +1282,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noMappedMemories => 'No mapped memories yet';
 
   @override
-  String get headerSubtitle => 'Your memories, hanging together.';
-
-  @override
-  String get importBackupTooltip => 'Import backup';
-
-  @override
-  String get exportBackupTooltip => 'Export backup';
-
-  @override
   String get displayWallTooltip => 'Display wall';
 
   @override
@@ -1305,9 +1291,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTooltip => 'Settings';
 
   @override
-  String get hideControlsTooltip => 'Hide controls';
-
-  @override
   String get freeformLayout => 'Freeform';
 
   @override
@@ -1315,9 +1298,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get locationLayout => 'Location';
-
-  @override
-  String get wallControls => 'Wall Controls';
 
   @override
   String get saveToday => 'Save today';
@@ -1352,6 +1332,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get wallFilterAll => 'All';
+
+  @override
+  String get wallViewButton => 'View';
+
+  @override
+  String get wallShowAs => 'Show as';
+
+  @override
+  String get wallArrange => 'Arrange';
+
+  @override
+  String get wallShowOnly => 'Show';
+
+  @override
+  String get layoutByDate => 'By date';
+
+  @override
+  String get moreActionsTooltip => 'More';
 
   @override
   String get expandableMemory => 'Memory';

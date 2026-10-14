@@ -270,11 +270,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'عاين جداراً تجريبياً، أو ابدأ بجدار فارغ وعلّق ذكرياتك.';
 
   @override
-  String wallWelcome(String name) {
-    return 'أهلاً، $name.';
-  }
-
-  @override
   String get settingsNameTitle => 'اسمك';
 
   @override
@@ -1279,15 +1274,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noMappedMemories => 'لا توجد ذكريات على الخريطة بعد';
 
   @override
-  String get headerSubtitle => 'ذكرياتك معلّقة معاً.';
-
-  @override
-  String get importBackupTooltip => 'استيراد نسخة';
-
-  @override
-  String get exportBackupTooltip => 'تصدير نسخة';
-
-  @override
   String get displayWallTooltip => 'عرض الجدار';
 
   @override
@@ -1297,9 +1283,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsTooltip => 'الإعدادات';
 
   @override
-  String get hideControlsTooltip => 'إخفاء الأدوات';
-
-  @override
   String get freeformLayout => 'حر';
 
   @override
@@ -1307,9 +1290,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get locationLayout => 'مكان';
-
-  @override
-  String get wallControls => 'أدوات الجدار';
 
   @override
   String get saveToday => 'احفظ اليوم';
@@ -1344,6 +1324,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get wallFilterAll => 'الكل';
+
+  @override
+  String get wallViewButton => 'العرض';
+
+  @override
+  String get wallShowAs => 'اعرض كـ';
+
+  @override
+  String get wallArrange => 'الترتيب';
+
+  @override
+  String get wallShowOnly => 'إظهار';
+
+  @override
+  String get layoutByDate => 'حسب التاريخ';
+
+  @override
+  String get moreActionsTooltip => 'المزيد';
 
   @override
   String get expandableMemory => 'ذكرى';

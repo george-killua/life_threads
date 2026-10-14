@@ -109,10 +109,7 @@ void main() {
     await pumpApp(tester, service: withFamilies(), familyWallsUsed: false);
     expect(find.byType(MemoryWallPage), findsOneWidget);
     expect(find.byKey(const ValueKey('wall-switcher')), findsNothing);
-    await tapAndSettle(
-      tester,
-      find.byKey(const ValueKey('collapsed-wall-controls')),
-    );
+    await tapAndSettle(tester, find.byKey(const ValueKey('wall-view-button')));
     expect(find.byKey(const ValueKey('wall-switcher')), findsNothing);
     expect(serviceReads, 0);
   });
@@ -152,17 +149,6 @@ void main() {
     await tapAndSettle(tester, find.text('My wall').last);
     expect(find.byType(MemoryWallPage), findsOneWidget);
     expect(find.byType(FamilyWallPage), findsNothing);
-  });
-
-  testWidgets('the expanded wall header carries the switcher too', (
-    tester,
-  ) async {
-    await pumpApp(tester, service: withFamilies(), familyWallsUsed: true);
-    await tapAndSettle(
-      tester,
-      find.byKey(const ValueKey('collapsed-wall-controls')),
-    );
-    expect(find.byKey(const ValueKey('wall-switcher')), findsOneWidget);
   });
 
   testWidgets('Settings has a Family walls card that opens the walls', (

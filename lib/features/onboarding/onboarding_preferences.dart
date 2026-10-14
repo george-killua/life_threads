@@ -24,12 +24,42 @@ class UserDisplayNameController extends AsyncNotifier<String> {
   }
 }
 
+/// Whether the "tap to open • drag to move" wall hint has done its job.
+final wallHintSeenProvider =
+    AsyncNotifierProvider<WallHintSeenController, bool>(
+      WallHintSeenController.new,
+    );
+
+class WallHintSeenController extends AsyncNotifier<bool> {
+  @override
+  Future<bool> build() {
+    return ref.read(onboardingPreferencesProvider).isWallHintSeen();
+  }
+
+  Future<void> markSeen() async {
+    if (state.asData?.value ?? false) return;
+    state = const AsyncData(true);
+    await ref.read(onboardingPreferencesProvider).markWallHintSeen();
+  }
+}
+
 class OnboardingPreferences {
   const OnboardingPreferences();
 
   static const _completedKey = 'onboarding_completed';
   static const _demoWallKey = 'demo_wall_enabled';
   static const _displayNameKey = 'user_display_name';
+  static const _wallHintSeenKey = 'wall_hint_seen';
+
+  Future<bool> isWallHintSeen() async {
+    final preferences = await SharedPreferences.getInstance();
+    return preferences.getBool(_wallHintSeenKey) ?? false;
+  }
+
+  Future<void> markWallHintSeen() async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(_wallHintSeenKey, true);
+  }
 
   Future<bool> isCompleted() async {
     final preferences = await SharedPreferences.getInstance();

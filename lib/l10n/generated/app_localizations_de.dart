@@ -271,11 +271,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sieh dir eine Beispielwand an oder beginne leer und hänge deine eigenen Erinnerungen auf.';
 
   @override
-  String wallWelcome(String name) {
-    return 'Willkommen, $name.';
-  }
-
-  @override
   String get settingsNameTitle => 'Dein Name';
 
   @override
@@ -1303,15 +1298,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noMappedMemories => 'Noch keine kartierten Erinnerungen';
 
   @override
-  String get headerSubtitle => 'Deine Erinnerungen, zusammen aufgehängt.';
-
-  @override
-  String get importBackupTooltip => 'Backup importieren';
-
-  @override
-  String get exportBackupTooltip => 'Backup exportieren';
-
-  @override
   String get displayWallTooltip => 'Wand anzeigen';
 
   @override
@@ -1321,9 +1307,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsTooltip => 'Einstellungen';
 
   @override
-  String get hideControlsTooltip => 'Steuerung ausblenden';
-
-  @override
   String get freeformLayout => 'Frei';
 
   @override
@@ -1331,9 +1314,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get locationLayout => 'Ort';
-
-  @override
-  String get wallControls => 'Wandsteuerung';
 
   @override
   String get saveToday => 'Heute speichern';
@@ -1368,6 +1348,24 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get wallFilterAll => 'Alle';
+
+  @override
+  String get wallViewButton => 'Ansicht';
+
+  @override
+  String get wallShowAs => 'Anzeigen als';
+
+  @override
+  String get wallArrange => 'Anordnen';
+
+  @override
+  String get wallShowOnly => 'Zeigen';
+
+  @override
+  String get layoutByDate => 'Nach Datum';
+
+  @override
+  String get moreActionsTooltip => 'Mehr';
 
   @override
   String get expandableMemory => 'Erinnerung';

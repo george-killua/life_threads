@@ -122,14 +122,6 @@
   },
   "onboardingGetStartedTitle": "Choose how to begin",
   "onboardingGetStartedBody": "Preview a sample wall, or start with a blank one and hang your own memories.",
-  "wallWelcome": "Welcome, {name}.",
-  "@wallWelcome": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "settingsNameTitle": "Your name",
   "settingsNameBody": "Shown as a greeting on your wall.",
   "settingsNameHint": "Your name",
@@ -457,17 +449,12 @@
   "memoryMapTitle": "Memory Map",
   "memoryMapSubtitle": "Your memories grouped by place.",
   "noMappedMemories": "No mapped memories yet",
-  "headerSubtitle": "Your memories, hanging together.",
-  "importBackupTooltip": "Import backup",
-  "exportBackupTooltip": "Export backup",
   "displayWallTooltip": "Display wall",
   "tutorialTooltip": "Tutorial",
   "settingsTooltip": "Settings",
-  "hideControlsTooltip": "Hide controls",
   "freeformLayout": "Freeform",
   "categoryLayout": "Category",
   "locationLayout": "Location",
-  "wallControls": "Wall Controls",
   "saveToday": "Save today",
   "rememberThis": "Remember this",
   "whatHappenedToday": "What happened today?",
@@ -479,6 +466,12 @@
   "timelineView": "Timeline",
   "mapView": "Map",
   "wallFilterAll": "All",
+  "wallViewButton": "View",
+  "wallShowAs": "Show as",
+  "wallArrange": "Arrange",
+  "wallShowOnly": "Show",
+  "layoutByDate": "By date",
+  "moreActionsTooltip": "More",
   "expandableMemory": "Memory",
   "expandableMemorySubtitle": "Full guided story",
   "expandableQuickPhoto": "Quick photo memory",

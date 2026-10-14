@@ -556,12 +556,6 @@ abstract class AppLocalizations {
   /// **'Preview a sample wall, or start with a blank one and hang your own memories.'**
   String get onboardingGetStartedBody;
 
-  /// No description provided for @wallWelcome.
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome, {name}.'**
-  String wallWelcome(String name);
-
   /// No description provided for @settingsNameTitle.
   ///
   /// In en, this message translates to:
@@ -2397,24 +2391,6 @@ abstract class AppLocalizations {
   /// **'No mapped memories yet'**
   String get noMappedMemories;
 
-  /// No description provided for @headerSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Your memories, hanging together.'**
-  String get headerSubtitle;
-
-  /// No description provided for @importBackupTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Import backup'**
-  String get importBackupTooltip;
-
-  /// No description provided for @exportBackupTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Export backup'**
-  String get exportBackupTooltip;
-
   /// No description provided for @displayWallTooltip.
   ///
   /// In en, this message translates to:
@@ -2433,12 +2409,6 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settingsTooltip;
 
-  /// No description provided for @hideControlsTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Hide controls'**
-  String get hideControlsTooltip;
-
   /// No description provided for @freeformLayout.
   ///
   /// In en, this message translates to:
@@ -2456,12 +2426,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Location'**
   String get locationLayout;
-
-  /// No description provided for @wallControls.
-  ///
-  /// In en, this message translates to:
-  /// **'Wall Controls'**
-  String get wallControls;
 
   /// No description provided for @saveToday.
   ///
@@ -2528,6 +2492,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All'**
   String get wallFilterAll;
+
+  /// No description provided for @wallViewButton.
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get wallViewButton;
+
+  /// No description provided for @wallShowAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Show as'**
+  String get wallShowAs;
+
+  /// No description provided for @wallArrange.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrange'**
+  String get wallArrange;
+
+  /// No description provided for @wallShowOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Show'**
+  String get wallShowOnly;
+
+  /// No description provided for @layoutByDate.
+  ///
+  /// In en, this message translates to:
+  /// **'By date'**
+  String get layoutByDate;
+
+  /// No description provided for @moreActionsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get moreActionsTooltip;
 
   /// No description provided for @expandableMemory.
   ///

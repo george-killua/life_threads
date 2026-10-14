@@ -15,7 +15,6 @@ import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../backup/data/backup_reminder.dart';
 import '../../../backup/data/backup_service.dart';
-import '../../../backup/domain/backup_models.dart';
 import '../../../backup/presentation/widgets/archive_feedback.dart';
 import '../../../backup/presentation/widgets/archive_password_dialog.dart';
 import '../../../display/data/wall_display_service.dart';
@@ -65,12 +64,15 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   static const _boardOrigin = Offset(-40000, -40000);
   static const _boardSize = Size(80000, 80000);
 
+  /// Below the top bar: where banners start and timeline/map content begins.
+  static const _bannerTop = 64.0;
+  static const _topBarSpace = 76.0;
+
   late final AnimationController _windController;
   final TransformationController _wallController = TransformationController();
   bool _didSetInitialViewport = false;
   bool _isRouteTransitioning = false;
   bool _isCapturingPhotos = false;
-  bool _controlsExpanded = false;
   WallFilter _filter = WallFilter.all;
   _WallViewMode _mode = _WallViewMode.wall;
   WallLayoutMode _layoutMode = WallLayoutMode.freeform;
@@ -167,12 +169,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                   state.events.length < PremiumEntitlement.freeMemoryLimit;
 
               if (_mode == _WallViewMode.wall) {
-                _setInitialViewport(
-                  context,
-                  boardEvents,
-                  boardWallItems,
-                  controlsExpanded: _controlsExpanded,
-                );
+                _setInitialViewport(context, boardEvents, boardWallItems);
               }
 
               return PopScope(
@@ -303,8 +300,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                         isDragging: _draggingNodeId == event.id,
                                         hasConnection: connectedMemoryIds
                                             .contains(event.id),
-                                        onTap: () =>
-                                            _pushRoute('/memories/${event.id}'),
+                                        onTap: () {
+                                          _markHintSeen();
+                                          _pushRoute('/memories/${event.id}');
+                                        },
                                         onLongPress: () =>
                                             _showMemoryMenu(context, event.id),
                                         onEdit: () => _pushRoute(
@@ -336,14 +335,14 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                       Positioned.fill(
                         child: _TimelineView(
                           events: filteredEvents,
-                          topPadding: _controlsExpanded ? 206 : 92,
+                          topPadding: _topBarSpace,
                         ),
                       )
                     else
                       Positioned.fill(
                         child: _MapView(
                           events: filteredEvents,
-                          topPadding: _controlsExpanded ? 206 : 92,
+                          topPadding: _topBarSpace,
                         ),
                       ),
                     if (_mode == _WallViewMode.wall &&
@@ -359,132 +358,70 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                         ),
                       ),
                     Positioned(
-                      left: 20,
-                      right: 20,
-                      top: 18,
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 260),
-                        switchInCurve: Curves.easeOutCubic,
-                        switchOutCurve: Curves.easeInCubic,
-                        transitionBuilder: (child, animation) {
-                          return FadeTransition(
-                            opacity: animation,
-                            child: SizeTransition(
-                              sizeFactor: animation,
-                              // ignore: deprecated_member_use
-                              axisAlignment: -1,
-                              child: child,
-                            ),
-                          );
+                      left: 16,
+                      right: 16,
+                      top: 12,
+                      child: _WallTopBar(
+                        selectedMode: _mode,
+                        // Dot on "View" when cards are hidden or rearranged.
+                        hasCustomView:
+                            _filter != WallFilter.all ||
+                            (_mode == _WallViewMode.wall &&
+                                _layoutMode != WallLayoutMode.freeform),
+                        wallSwitcher: showWallSwitcher
+                            ? const WallSwitcherButton()
+                            : null,
+                        onOpenView: () => _showViewSheet(context),
+                        onMoreAction: (action) => switch (action) {
+                          _MoreAction.story => _pushRoute(
+                            RouteNames.createStory,
+                          ),
+                          _MoreAction.display => _displayWall(context, state),
+                          _MoreAction.help => showLifeThreadsTutorialSheet(
+                            context,
+                          ),
+                          _MoreAction.settings => _pushRoute(
+                            RouteNames.settings,
+                          ),
                         },
-                        child: _controlsExpanded
-                            ? _WallHeader(
-                                key: const ValueKey('expanded-wall-controls'),
-                                greetingName: ref
-                                    .watch(userDisplayNameProvider)
-                                    .asData
-                                    ?.value,
-                                selectedFilter: _filter,
-                                selectedMode: _mode,
-                                selectedLayout: _layoutMode,
-                                onFilterChanged: (filter) =>
-                                    setState(() => _filter = filter),
-                                onModeChanged: (mode) =>
-                                    setState(() => _mode = mode),
-                                onLayoutChanged: (layout) =>
-                                    setState(() => _layoutMode = layout),
-                                onExportBackup: () =>
-                                    _exportBackup(context, state),
-                                onImportBackup: () =>
-                                    _importBackup(context, repository),
-                                onDisplayWall: () =>
-                                    _displayWall(context, state),
-                                onShowTutorial: () =>
-                                    showLifeThreadsTutorialSheet(context),
-                                onCreateStory: () =>
-                                    _pushRoute(RouteNames.createStory),
-                                onOpenSettings: () =>
-                                    _pushRoute(RouteNames.settings),
-                                onCollapse: () =>
-                                    setState(() => _controlsExpanded = false),
-                                wallSwitcher: showWallSwitcher
-                                    ? const WallSwitcherButton()
-                                    : null,
-                              )
-                            : Align(
-                                alignment: Alignment.centerLeft,
-                                child: showWallSwitcher
-                                    ? Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          _CollapsedWallControlsButton(
-                                            key: const ValueKey(
-                                              'collapsed-wall-controls',
-                                            ),
-                                            selectedMode: _mode,
-                                            onTap: () => setState(
-                                              () => _controlsExpanded = true,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          const Flexible(
-                                            child: WallSwitcherButton(),
-                                          ),
-                                        ],
-                                      )
-                                    : _CollapsedWallControlsButton(
-                                        key: const ValueKey(
-                                          'collapsed-wall-controls',
-                                        ),
-                                        selectedMode: _mode,
-                                        onTap: () => setState(
-                                          () => _controlsExpanded = true,
-                                        ),
-                                      ),
-                              ),
                       ),
                     ),
-                    if (hasWallContent &&
-                        _mode == _WallViewMode.wall &&
-                        !_controlsExpanded)
-                      const Positioned(
-                        left: 20,
-                        right: 20,
-                        top: 78,
-                        child: _WallInteractionHint(),
+                    // Demo or backup banner, then the first-run hint.
+                    Positioned(
+                      left: 16,
+                      right: 16,
+                      top: _bannerTop,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (state.isDemoOnly)
+                            _DemoWallBanner(
+                              onClear: () =>
+                                  _clearDemoWall(context, repository),
+                            )
+                          else if (backupReminder != null &&
+                              backupReminder.shouldRemind(state.events))
+                            _BackupReminderBanner(
+                              unsavedCount: backupReminder.unsavedMemories(
+                                state.events,
+                              ),
+                              onBackUp: () => _exportBackup(context, state),
+                              onLater: () => ref
+                                  .read(backupReminderProvider.notifier)
+                                  .snooze(),
+                            ),
+                          if (hasWallContent &&
+                              _mode == _WallViewMode.wall &&
+                              ref.watch(wallHintSeenProvider).asData?.value ==
+                                  false)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8),
+                              child: _WallInteractionHint(),
+                            ),
+                        ],
                       ),
-                    if (state.isDemoOnly)
-                      Positioned(
-                        left: 20,
-                        right: 20,
-                        top: _controlsExpanded
-                            ? (_mode == _WallViewMode.wall ? 226 : 190)
-                            : 120,
-                        child: _DemoWallBanner(
-                          onClear: () => _clearDemoWall(context, repository),
-                        ),
-                      )
-                    else if (backupReminder != null &&
-                        backupReminder.shouldRemind(state.events))
-                      Positioned(
-                        left: 20,
-                        right: 20,
-                        top: _controlsExpanded
-                            ? (_mode == _WallViewMode.wall ? 226 : 190)
-                            : 120,
-                        child: _BackupReminderBanner(
-                          unsavedCount: backupReminder.unsavedMemories(
-                            state.events,
-                          ),
-                          onBackUp: () => _exportBackup(context, state),
-                          onLater: () => ref
-                              .read(backupReminderProvider.notifier)
-                              .snooze(),
-                        ),
-                      ),
-                    if (hasWallContent &&
-                        _mode == _WallViewMode.wall &&
-                        !_controlsExpanded)
+                    ),
+                    if (hasWallContent && _mode == _WallViewMode.wall)
                       // Thread of the Year, in December and January.
                       const Positioned(
                         left: 20,
@@ -492,7 +429,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                         bottom: 100,
                         child: YearThreadWallCard(),
                       ),
-                    if (hasWallContent && !_controlsExpanded)
+                    if (hasWallContent)
                       Positioned(
                         left: 20,
                         right: 20,
@@ -681,7 +618,28 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     setState(() {});
   }
 
+  void _markHintSeen() {
+    ref.read(wallHintSeenProvider.notifier).markSeen();
+  }
+
+  Future<void> _showViewSheet(BuildContext context) {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => _WallViewSheet(
+        mode: _mode,
+        layout: _layoutMode,
+        filter: _filter,
+        onModeChanged: (mode) => setState(() => _mode = mode),
+        onLayoutChanged: (layout) => setState(() => _layoutMode = layout),
+        onFilterChanged: (filter) => setState(() => _filter = filter),
+      ),
+    );
+  }
+
   void _startDrag(String nodeId, Offset startPosition, _DragTargetKind kind) {
+    _markHintSeen();
     if (!mounted || _isRouteTransitioning) return;
     // One node at a time: a second finger on another card doesn't take over.
     if (_draggingNodeId != null && _draggingNodeId != nodeId) return;
@@ -1094,56 +1052,6 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     }
   }
 
-  Future<void> _importBackup(
-    BuildContext context,
-    MemoryRepository repository,
-  ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(context.l10n.importBackupQuestion),
-        content: Text(context.l10n.importBackupBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(context.l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(context.l10n.chooseBackup),
-          ),
-        ],
-      ),
-    );
-    if (!context.mounted || confirmed != true) return;
-
-    final password = await showArchivePasswordDialog(
-      context,
-      purpose: ArchivePasswordPurpose.import,
-    );
-    if (!context.mounted || password == null) return;
-
-    try {
-      final backup = await ref
-          .read(backupServiceProvider)
-          .pickAndPrepareImport(password: password);
-      if (!context.mounted || backup == null) return;
-      final result = await repository.importBackup(backup);
-      if (!context.mounted) return;
-      await showArchiveImportSummary(context, result);
-    } on BackupValidationException catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.importRejected(error.message))),
-      );
-    } catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.importFailed('$error'))),
-      );
-    }
-  }
-
   Future<void> _displayWall(BuildContext context, MemoryState state) async {
     final l10n = context.l10n;
 
@@ -1254,9 +1162,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   void _setInitialViewport(
     BuildContext context,
     List<MemoryEvent> events,
-    List<WallItem> wallItems, {
-    required bool controlsExpanded,
-  }) {
+    List<WallItem> wallItems,
+  ) {
     if (_didSetInitialViewport || (events.isEmpty && wallItems.isEmpty)) return;
     _didSetInitialViewport = true;
 
@@ -1292,9 +1199,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       final scale = mobile
           ? fitScale.clamp(0.56, 0.9)
           : fitScale.clamp(0.5, 0.9);
-      final headerSpace = controlsExpanded
-          ? (mobile ? 218.0 : 244.0)
-          : (mobile ? 116.0 : 132.0);
+      final headerSpace = mobile ? 116.0 : 132.0;
       final translateX =
           ((size.width - contentWidth * scale) / 2) - minX * scale;
       final translateY = headerSpace - minY * scale;
@@ -1981,236 +1886,368 @@ class _EmptyModePanel extends StatelessWidget {
   }
 }
 
-class _WallHeader extends StatelessWidget {
-  const _WallHeader({
-    super.key,
-    required this.greetingName,
-    required this.selectedFilter,
+enum _MoreAction { story, display, help, settings }
+
+/// One row at the top of the wall: which wall, how it is shown, and a
+/// menu for everything else. It never grows over the cards.
+class _WallTopBar extends StatelessWidget {
+  const _WallTopBar({
     required this.selectedMode,
-    required this.selectedLayout,
-    required this.onFilterChanged,
-    required this.onModeChanged,
-    required this.onLayoutChanged,
-    required this.onExportBackup,
-    required this.onImportBackup,
-    required this.onDisplayWall,
-    required this.onShowTutorial,
-    required this.onCreateStory,
-    required this.onOpenSettings,
-    required this.onCollapse,
+    required this.hasCustomView,
+    required this.onOpenView,
+    required this.onMoreAction,
     this.wallSwitcher,
   });
 
-  final String? greetingName;
-  final WallFilter selectedFilter;
   final _WallViewMode selectedMode;
-  final WallLayoutMode selectedLayout;
-  final ValueChanged<WallFilter> onFilterChanged;
-  final ValueChanged<_WallViewMode> onModeChanged;
-  final ValueChanged<WallLayoutMode> onLayoutChanged;
-  final VoidCallback onExportBackup;
-  final VoidCallback onImportBackup;
-  final VoidCallback onDisplayWall;
-  final VoidCallback onShowTutorial;
-  final VoidCallback onCreateStory;
-  final VoidCallback onOpenSettings;
-  final VoidCallback onCollapse;
+  final bool hasCustomView;
+  final VoidCallback onOpenView;
+  final ValueChanged<_MoreAction> onMoreAction;
 
-  /// "My wall" / family walls, before the view modes once family walls
-  /// are in use.
+  /// "My wall" / family walls, once family walls are in use.
   final Widget? wallSwitcher;
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final compact = constraints.maxWidth < 390;
-        // Seven actions: narrower buttons leave the title room on phones.
-        final denseActions = constraints.maxWidth < 440;
-        final name = greetingName?.trim();
-        final subtitle = (name != null && name.isNotEmpty)
-            ? context.l10n.wallWelcome(name)
-            : context.l10n.headerSubtitle;
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(28),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: compact ? 12 : 14,
-              vertical: compact ? 11 : 12,
-            ),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.panelWarm.withValues(alpha: 0.82),
-                  AppColors.wallInk.withValues(alpha: 0.76),
-                ],
+    return Row(
+      children: [
+        Flexible(
+          child: Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: wallSwitcher ?? const _WallWordmark(),
+          ),
+        ),
+        const SizedBox(width: 8),
+        _WallViewButton(
+          selectedMode: selectedMode,
+          hasCustomView: hasCustomView,
+          onTap: onOpenView,
+        ),
+        const SizedBox(width: 8),
+        _WallMoreButton(onSelected: onMoreAction),
+      ],
+    );
+  }
+}
+
+BoxDecoration _barDecoration(BuildContext context) {
+  final scheme = Theme.of(context).colorScheme;
+  return BoxDecoration(
+    color: scheme.surface.withValues(alpha: 0.86),
+    borderRadius: BorderRadius.circular(999),
+    border: Border.all(color: scheme.primary.withValues(alpha: 0.24)),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.3),
+        blurRadius: 20,
+        offset: const Offset(0, 10),
+      ),
+    ],
+  );
+}
+
+class _WallWordmark extends StatelessWidget {
+  const _WallWordmark();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 14, 0),
+      decoration: _barDecoration(context),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.auto_awesome_rounded,
+            color: Theme.of(context).colorScheme.primary,
+            size: 18,
+          ),
+          const SizedBox(width: 7),
+          const Flexible(
+            child: Text(
+              'LifeThreads',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.3,
               ),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: AppColors.gold.withValues(alpha: 0.16)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.34),
-                  blurRadius: 28,
-                  offset: const Offset(0, 14),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.auto_awesome_rounded,
-                      color: AppColors.amber,
-                      size: compact ? 22 : 24,
-                    ),
-                    const SizedBox(width: 9),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'LifeThreads',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: compact ? 21 : 22,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 1),
-                          Text(
-                            subtitle,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: AppColors.muted,
-                              fontSize: compact ? 12 : 12.5,
-                              height: 1.25,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    _HeaderIconButton(
-                      dense: denseActions,
-                      tooltip: context.l10n.createStory,
-                      onPressed: onCreateStory,
-                      icon: Icons.auto_stories_rounded,
-                      color: AppColors.amber,
-                    ),
-                    _HeaderIconButton(
-                      dense: denseActions,
-                      tooltip: context.l10n.importBackupTooltip,
-                      onPressed: onImportBackup,
-                      icon: Icons.restore_rounded,
-                      color: AppColors.muted,
-                    ),
-                    _HeaderIconButton(
-                      dense: denseActions,
-                      tooltip: context.l10n.exportBackupTooltip,
-                      onPressed: onExportBackup,
-                      icon: Icons.ios_share_rounded,
-                      color: AppColors.gold,
-                    ),
-                    _HeaderIconButton(
-                      dense: denseActions,
-                      tooltip: context.l10n.displayWallTooltip,
-                      onPressed: onDisplayWall,
-                      icon: Icons.qr_code_scanner_rounded,
-                      color: AppColors.amber,
-                    ),
-                    _HeaderIconButton(
-                      dense: denseActions,
-                      tooltip: context.l10n.tutorialTooltip,
-                      onPressed: onShowTutorial,
-                      icon: Icons.help_outline_rounded,
-                      color: AppColors.muted,
-                    ),
-                    _HeaderIconButton(
-                      dense: denseActions,
-                      tooltip: context.l10n.settingsTooltip,
-                      onPressed: onOpenSettings,
-                      icon: Icons.settings_rounded,
-                      color: AppColors.muted,
-                    ),
-                    _HeaderIconButton(
-                      dense: denseActions,
-                      tooltip: context.l10n.hideControlsTooltip,
-                      onPressed: onCollapse,
-                      icon: Icons.keyboard_arrow_up_rounded,
-                      color: AppColors.amber,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 9),
-                _HeaderScrollRow(
-                  children: [
-                    ?wallSwitcher,
-                    for (final mode in _WallViewMode.values)
-                      _WallHeaderPill(
-                        selected: selectedMode == mode,
-                        icon: mode.icon,
-                        label: _wallViewModeLabel(context, mode),
-                        onTap: () => onModeChanged(mode),
-                      ),
-                  ],
-                ),
-                if (selectedMode == _WallViewMode.wall) ...[
-                  const SizedBox(height: 8),
-                  _HeaderScrollRow(
-                    children: [
-                      for (final layout in WallLayoutMode.values)
-                        _WallHeaderPill(
-                          selected: selectedLayout == layout,
-                          icon: layout.icon,
-                          label: _layoutPillLabel(context, layout),
-                          onTap: () => onLayoutChanged(layout),
-                        ),
-                    ],
-                  ),
-                ],
-                const SizedBox(height: 8),
-                _HeaderScrollRow(
-                  children: [
-                    for (final filter in WallFilter.values)
-                      _WallHeaderPill(
-                        selected: selectedFilter == filter,
-                        icon: selectedFilter == filter
-                            ? Icons.check_rounded
-                            : null,
-                        label: _filterLabel(context, filter),
-                        onTap: () => onFilterChanged(filter),
-                      ),
-                  ],
-                ),
-              ],
             ),
           ),
-        );
-      },
+        ],
+      ),
+    );
+  }
+}
+
+class _WallViewButton extends StatelessWidget {
+  const _WallViewButton({
+    required this.selectedMode,
+    required this.hasCustomView,
+    required this.onTap,
+  });
+
+  final _WallViewMode selectedMode;
+  final bool hasCustomView;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        key: const ValueKey('wall-view-button'),
+        onTap: onTap,
+        child: Container(
+          height: 40,
+          padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 10, 0),
+          decoration: _barDecoration(context),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(selectedMode.icon, color: primary, size: 18),
+              const SizedBox(width: 7),
+              Text(
+                context.l10n.wallViewButton,
+                style: const TextStyle(
+                  color: AppColors.card,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              if (hasCustomView) ...[
+                const SizedBox(width: 6),
+                Container(
+                  key: const ValueKey('wall-view-custom-dot'),
+                  width: 7,
+                  height: 7,
+                  decoration: BoxDecoration(
+                    color: primary,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+              const SizedBox(width: 2),
+              const Icon(
+                Icons.keyboard_arrow_down_rounded,
+                color: AppColors.muted,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WallMoreButton extends StatelessWidget {
+  const _WallMoreButton({required this.onSelected});
+
+  final ValueChanged<_MoreAction> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final primary = Theme.of(context).colorScheme.primary;
+    PopupMenuItem<_MoreAction> item(
+      _MoreAction action,
+      IconData icon,
+      String label,
+    ) {
+      return PopupMenuItem(
+        value: action,
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: primary),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Text(
+                label,
+                style: const TextStyle(fontWeight: FontWeight.w800),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return DecoratedBox(
+      decoration: _barDecoration(context),
+      child: PopupMenuButton<_MoreAction>(
+        key: const ValueKey('wall-more-button'),
+        tooltip: l10n.moreActionsTooltip,
+        onSelected: onSelected,
+        position: PopupMenuPosition.under,
+        color: Theme.of(context).cardTheme.color,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        icon: const Icon(Icons.more_horiz_rounded, color: AppColors.card),
+        iconSize: 22,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(minWidth: 200),
+        style: IconButton.styleFrom(
+          fixedSize: const Size(40, 40),
+          minimumSize: const Size(40, 40),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        itemBuilder: (_) => [
+          item(_MoreAction.story, Icons.auto_stories_rounded, l10n.createStory),
+          item(
+            _MoreAction.display,
+            Icons.qr_code_scanner_rounded,
+            l10n.displayWallTooltip,
+          ),
+          item(
+            _MoreAction.help,
+            Icons.help_outline_rounded,
+            l10n.tutorialTooltip,
+          ),
+          item(
+            _MoreAction.settings,
+            Icons.settings_rounded,
+            l10n.settingsTooltip,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// How the wall is shown: view, arrangement and category filter. Changes
+/// apply as you tap, so the sheet can stay open while you compare.
+class _WallViewSheet extends StatefulWidget {
+  const _WallViewSheet({
+    required this.mode,
+    required this.layout,
+    required this.filter,
+    required this.onModeChanged,
+    required this.onLayoutChanged,
+    required this.onFilterChanged,
+  });
+
+  final _WallViewMode mode;
+  final WallLayoutMode layout;
+  final WallFilter filter;
+  final ValueChanged<_WallViewMode> onModeChanged;
+  final ValueChanged<WallLayoutMode> onLayoutChanged;
+  final ValueChanged<WallFilter> onFilterChanged;
+
+  @override
+  State<_WallViewSheet> createState() => _WallViewSheetState();
+}
+
+class _WallViewSheetState extends State<_WallViewSheet> {
+  late var _mode = widget.mode;
+  late var _layout = widget.layout;
+  late var _filter = widget.filter;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final scheme = Theme.of(context).colorScheme;
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              l10n.wallViewButton,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+            ),
+            _SheetSectionLabel(l10n.wallShowAs),
+            SegmentedButton<_WallViewMode>(
+              key: const ValueKey('wall-mode-segments'),
+              expandedInsets: EdgeInsets.zero,
+              showSelectedIcon: false,
+              style: SegmentedButton.styleFrom(
+                selectedBackgroundColor: scheme.primary,
+                selectedForegroundColor: scheme.onPrimary,
+                foregroundColor: AppColors.muted,
+                side: BorderSide(color: scheme.outline),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+              ),
+              segments: [
+                for (final mode in _WallViewMode.values)
+                  ButtonSegment(
+                    value: mode,
+                    // Icon above the label: three labels share a phone's
+                    // width even in German and Arabic.
+                    label: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(mode.icon, size: 20),
+                        const SizedBox(height: 3),
+                        Text(
+                          _wallViewModeLabel(context, mode),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+              selected: {_mode},
+              onSelectionChanged: (selection) {
+                setState(() => _mode = selection.single);
+                widget.onModeChanged(selection.single);
+              },
+            ),
+            if (_mode == _WallViewMode.wall) ...[
+              _SheetSectionLabel(l10n.wallArrange),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final layout in WallLayoutMode.values)
+                    _SheetChoice(
+                      selected: _layout == layout,
+                      icon: layout.icon,
+                      label: _layoutLabel(context, layout),
+                      onSelected: () {
+                        setState(() => _layout = layout);
+                        widget.onLayoutChanged(layout);
+                      },
+                    ),
+                ],
+              ),
+            ],
+            _SheetSectionLabel(l10n.wallShowOnly),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final filter in WallFilter.values)
+                  _SheetChoice(
+                    selected: _filter == filter,
+                    label: _filterLabel(context, filter),
+                    onSelected: () {
+                      setState(() => _filter = filter);
+                      widget.onFilterChanged(filter);
+                    },
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  String _layoutPillLabel(BuildContext context, WallLayoutMode layout) {
+  String _layoutLabel(BuildContext context, WallLayoutMode layout) {
     return switch (layout) {
       WallLayoutMode.freeform => context.l10n.freeformLayout,
-      WallLayoutMode.timeline => context.l10n.timelineTitle,
+      WallLayoutMode.timeline => context.l10n.layoutByDate,
       WallLayoutMode.categoryCluster => context.l10n.categoryLayout,
       WallLayoutMode.locationCluster => context.l10n.locationLayout,
-    };
-  }
-
-  String _wallViewModeLabel(BuildContext context, _WallViewMode mode) {
-    return switch (mode) {
-      _WallViewMode.wall => context.l10n.wallView,
-      _WallViewMode.timeline => context.l10n.timelineView,
-      _WallViewMode.map => context.l10n.mapView,
     };
   }
 
@@ -2224,98 +2261,60 @@ class _WallHeader extends StatelessWidget {
   }
 }
 
-class _HeaderIconButton extends StatelessWidget {
-  const _HeaderIconButton({
-    required this.tooltip,
-    required this.onPressed,
-    required this.icon,
-    required this.color,
-    this.dense = false,
-  });
+String _wallViewModeLabel(BuildContext context, _WallViewMode mode) {
+  return switch (mode) {
+    _WallViewMode.wall => context.l10n.wallView,
+    _WallViewMode.timeline => context.l10n.timelineView,
+    _WallViewMode.map => context.l10n.mapView,
+  };
+}
 
-  final String tooltip;
-  final VoidCallback onPressed;
-  final IconData icon;
-  final Color color;
-  final bool dense;
+class _SheetSectionLabel extends StatelessWidget {
+  const _SheetSectionLabel(this.text);
+
+  final String text;
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      tooltip: tooltip,
-      onPressed: onPressed,
-      icon: Icon(icon),
-      color: color,
-      iconSize: dense ? 21 : 23,
-      visualDensity: VisualDensity.compact,
-      constraints: BoxConstraints.tightFor(width: dense ? 31 : 36, height: 36),
-      padding: EdgeInsets.zero,
+    return Padding(
+      padding: const EdgeInsets.only(top: 20, bottom: 10),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: AppColors.muted,
+          fontSize: 13,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
     );
   }
 }
 
-class _CollapsedWallControlsButton extends StatelessWidget {
-  const _CollapsedWallControlsButton({
-    super.key,
-    required this.selectedMode,
-    required this.onTap,
+class _SheetChoice extends StatelessWidget {
+  const _SheetChoice({
+    required this.selected,
+    required this.label,
+    required this.onSelected,
+    this.icon,
   });
 
-  final _WallViewMode selectedMode;
-  final VoidCallback onTap;
+  final bool selected;
+  final String label;
+  final VoidCallback onSelected;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.panelWarm.withValues(alpha: 0.9),
-              AppColors.wallInk.withValues(alpha: 0.82),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: AppColors.gold.withValues(alpha: 0.22)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.34),
-              blurRadius: 24,
-              offset: const Offset(0, 12),
-            ),
-            BoxShadow(
-              color: AppColors.gold.withValues(alpha: 0.1),
-              blurRadius: 22,
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(13, 10, 11, 10),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(selectedMode.icon, color: AppColors.amber, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                context.l10n.wallControls,
-                style: TextStyle(
-                  color: AppColors.card,
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.1,
-                ),
-              ),
-              const SizedBox(width: 6),
-              const Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: AppColors.muted,
-                size: 20,
-              ),
-            ],
-          ),
-        ),
-      ),
+    final scheme = Theme.of(context).colorScheme;
+    final foreground = selected ? scheme.onPrimary : AppColors.muted;
+    return ChoiceChip(
+      selected: selected,
+      onSelected: (_) => onSelected(),
+      showCheckmark: false,
+      selectedColor: scheme.primary,
+      avatar: icon == null ? null : Icon(icon, size: 18, color: foreground),
+      label: Text(label),
+      labelStyle: TextStyle(color: foreground, fontWeight: FontWeight.w900),
     );
   }
 }
@@ -2354,57 +2353,63 @@ class _MemoryRitualCard extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(13),
-        child: Row(
-          children: [
-            Icon(
-              memory == null
-                  ? Icons.edit_note_rounded
-                  : years != null
-                  ? Icons.event_repeat_rounded
-                  : Icons.history_edu_rounded,
-              color: AppColors.gold,
-              size: 22,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: InkWell(
-                onTap: memory == null ? onSave : () => onOpen(memory),
-                borderRadius: BorderRadius.circular(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      memory == null
-                          ? context.l10n.saveToday
-                          : years != null
-                          ? context.l10n.onThisDayYearsAgoToday(years)
-                          : context.l10n.rememberThis,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppColors.gold,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
+        // German "Hinzufügen" on a small phone leaves little room: the text
+        // keeps it and the icon goes.
+        child: LayoutBuilder(
+          builder: (context, constraints) => Row(
+            children: [
+              if (constraints.maxWidth >= 96) ...[
+                Icon(
+                  memory == null
+                      ? Icons.edit_note_rounded
+                      : years != null
+                      ? Icons.event_repeat_rounded
+                      : Icons.history_edu_rounded,
+                  color: AppColors.gold,
+                  size: 22,
+                ),
+                const SizedBox(width: 10),
+              ],
+              Expanded(
+                child: InkWell(
+                  onTap: memory == null ? onSave : () => onOpen(memory),
+                  borderRadius: BorderRadius.circular(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        memory == null
+                            ? context.l10n.saveToday
+                            : years != null
+                            ? context.l10n.onThisDayYearsAgoToday(years)
+                            : context.l10n.rememberThis,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.gold,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      memory == null
-                          ? context.l10n.whatHappenedToday
-                          : memory.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w900,
-                        height: 1.2,
+                      const SizedBox(height: 2),
+                      Text(
+                        memory == null
+                            ? context.l10n.whatHappenedToday
+                            : memory.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          height: 1.2,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -2444,7 +2449,7 @@ class _WallInteractionHint extends StatelessWidget {
   Widget build(BuildContext context) {
     return IgnorePointer(
       child: Align(
-        alignment: Alignment.centerLeft,
+        alignment: AlignmentDirectional.centerStart,
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: AppColors.wallInk.withValues(alpha: 0.52),
@@ -2462,98 +2467,6 @@ class _WallInteractionHint extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HeaderScrollRow extends StatelessWidget {
-  const _HeaderScrollRow({required this.children});
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 36,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        clipBehavior: Clip.hardEdge,
-        physics: const BouncingScrollPhysics(),
-        child: Row(
-          children: [
-            for (var index = 0; index < children.length; index++) ...[
-              if (index > 0) const SizedBox(width: 8),
-              children[index],
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _WallHeaderPill extends StatelessWidget {
-  const _WallHeaderPill({
-    required this.selected,
-    required this.label,
-    required this.onTap,
-    this.icon,
-  });
-
-  final bool selected;
-  final String label;
-  final VoidCallback onTap;
-  final IconData? icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final foreground = selected ? AppColors.card : AppColors.muted;
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeOutCubic,
-        height: 36,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          color: selected
-              ? AppColors.gold.withValues(alpha: 0.92)
-              : AppColors.panelWarm.withValues(alpha: 0.56),
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: selected
-                ? AppColors.amber.withValues(alpha: 0.72)
-                : AppColors.gold.withValues(alpha: 0.13),
-          ),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: AppColors.gold.withValues(alpha: 0.16),
-                    blurRadius: 18,
-                    offset: const Offset(0, 8),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (icon != null) ...[
-              Icon(icon, size: 17, color: foreground),
-              const SizedBox(width: 7),
-            ],
-            Text(
-              label,
-              style: TextStyle(
-                color: foreground,
-                fontSize: 13.5,
-                fontWeight: FontWeight.w900,
-                letterSpacing: -0.1,
-              ),
-            ),
-          ],
         ),
       ),
     );

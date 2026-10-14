@@ -163,12 +163,12 @@ void main() {
   testWidgets('dragging in Timeline layout does not rewrite the freeform '
       'position', (tester) async {
     await pumpWall(tester);
-    await tester.tap(find.byKey(const ValueKey('collapsed-wall-controls')));
+    await tester.tap(find.byKey(const ValueKey('wall-view-button')));
     await settle(tester);
-    final timeline = find.text('Timeline');
-    await tester.tap(timeline.last);
+    await tester.tap(find.text('By date'));
     await settle(tester);
-    await tester.tap(find.byTooltip('Hide controls'));
+    // Close the View sheet by tapping the wall above it.
+    await tester.tapAt(const Offset(20, 20));
     await settle(tester);
     final b = tester.getCenter(card('B'));
     final g = await tester.startGesture(b);
