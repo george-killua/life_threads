@@ -24,6 +24,7 @@ class WallThemePreset {
     required this.accent,
     required this.secondaryGlow,
     required this.line,
+    required this.ropeGlow,
     required this.isPremium,
   });
 
@@ -35,6 +36,9 @@ class WallThemePreset {
   final Color accent;
   final Color secondaryGlow;
   final Color line;
+
+  /// Glow and pin colour of the ropes connecting memories on the wall.
+  final Color ropeGlow;
   final bool isPremium;
 
   static const warmMemoryRoom = WallThemePreset(
@@ -46,6 +50,7 @@ class WallThemePreset {
     accent: Color(0xFFD2A24A),
     secondaryGlow: Color(0xFFE59A8D),
     line: Color(0xFF3A2C33),
+    ropeGlow: Color(0xFFF2C86B),
     isPremium: false,
   );
 
@@ -58,6 +63,7 @@ class WallThemePreset {
     accent: Color(0xFF8EA7C6),
     secondaryGlow: Color(0xFFD2A24A),
     line: Color(0xFF243452),
+    ropeGlow: Color(0xFFB9CBE3),
     isPremium: true,
   );
 
@@ -70,6 +76,7 @@ class WallThemePreset {
     accent: Color(0xFFA87442),
     secondaryGlow: Color(0xFFFFF1D8),
     line: Color(0xFF6D5741),
+    ropeGlow: Color(0xFFE0A86A),
     isPremium: true,
   );
 
@@ -82,6 +89,7 @@ class WallThemePreset {
     accent: Color(0xFFF2C86B),
     secondaryGlow: Color(0xFF8EA7C6),
     line: Color(0xFF5F3E1E),
+    ropeGlow: Color(0xFFE0614F),
     isPremium: true,
   );
 

@@ -75,7 +75,9 @@ class _ExpandableAddButtonState extends State<ExpandableAddButton> {
             borderRadius: BorderRadius.circular(999),
             boxShadow: [
               BoxShadow(
-                color: AppColors.gold.withValues(alpha: 0.28),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.28),
                 blurRadius: 28,
                 offset: const Offset(0, 12),
               ),

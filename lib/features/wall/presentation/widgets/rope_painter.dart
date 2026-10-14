@@ -26,6 +26,7 @@ class RopePainter extends CustomPainter {
     required this.windValue,
     required this.activeNodeId,
     this.paintAnchors = false,
+    this.glowColor = AppColors.amber,
   });
 
   final Map<String, RopeAnchor> anchors;
@@ -33,6 +34,9 @@ class RopePainter extends CustomPainter {
   final double windValue;
   final String? activeNodeId;
   final bool paintAnchors;
+
+  /// Glow, shimmer and active-pin colour; follows the wall theme.
+  final Color glowColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -163,7 +167,7 @@ class RopePainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = AppColors.amber.withValues(alpha: alpha)
+        ..color = glowColor.withValues(alpha: alpha)
         ..strokeWidth = isActive ? 26 : 18
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
@@ -182,7 +186,7 @@ class RopePainter extends CustomPainter {
 
   void _drawActiveShimmer(Canvas canvas, Path path) {
     final shimmerPaint = Paint()
-      ..color = AppColors.amber.withValues(alpha: 0.26)
+      ..color = glowColor.withValues(alpha: 0.26)
       ..strokeWidth = 1.7
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -243,7 +247,7 @@ class RopePainter extends CustomPainter {
 
     final count = rope.isActive ? 9 : 4;
     final glowPaint = Paint()
-      ..color = AppColors.amber.withValues(
+      ..color = glowColor.withValues(
         alpha: (rope.isActive ? 0.46 : 0.2) * clutterFactor,
       )
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7);
@@ -296,7 +300,7 @@ class RopePainter extends CustomPainter {
             center: const Alignment(-0.35, -0.45),
             radius: 0.9,
             colors: [
-              isActive ? AppColors.amber : const Color(0xFFFFD77D),
+              isActive ? glowColor : const Color(0xFFFFD77D),
               const Color(0xFF9C6727),
             ],
           ).createShader(Rect.fromCircle(center: point, radius: 8.6)),
@@ -335,7 +339,7 @@ class RopePainter extends CustomPainter {
       Paint()
         ..shader = RadialGradient(
           colors: [
-            isActive ? AppColors.amber : const Color(0xFFFFD77D),
+            isActive ? glowColor : const Color(0xFFFFD77D),
             const Color(0xFF9B6829),
           ],
         ).createShader(Rect.fromCircle(center: point, radius: radius)),
@@ -356,7 +360,8 @@ class RopePainter extends CustomPainter {
         oldDelegate.connections != connections ||
         oldDelegate.windValue != windValue ||
         oldDelegate.activeNodeId != activeNodeId ||
-        oldDelegate.paintAnchors != paintAnchors;
+        oldDelegate.paintAnchors != paintAnchors ||
+        oldDelegate.glowColor != glowColor;
   }
 }
 

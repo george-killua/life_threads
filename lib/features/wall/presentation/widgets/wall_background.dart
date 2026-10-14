@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../../premium/data/premium_entitlement_controller.dart';
 import '../../data/wall_theme_controller.dart';
 import '../../domain/wall_theme.dart';
 
@@ -15,14 +14,7 @@ class WallBackground extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedTheme =
-        ref.watch(wallThemeProvider).asData?.value ??
-        WallThemePreset.warmMemoryRoom;
-    final isPremium =
-        ref.watch(premiumEntitlementProvider).asData?.value.isPremium ?? false;
-    final theme = selectedTheme.isPremium && !isPremium
-        ? WallThemePreset.warmMemoryRoom
-        : selectedTheme;
+    final theme = ref.watch(effectiveWallThemeProvider);
 
     // Scaffold gives its body loose constraints: without the expand, the
     // wall ends where a short page's content ends.

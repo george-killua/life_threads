@@ -42,6 +42,7 @@ import '../../domain/wall_item.dart';
 import '../../domain/wall_layout.dart';
 import '../widgets/expandable_add_button.dart';
 import '../widgets/memory_card.dart';
+import '../../data/wall_theme_controller.dart';
 import '../widgets/rope_painter.dart';
 import '../widgets/wall_background.dart';
 import '../widgets/wall_empty_state.dart';
@@ -235,6 +236,11 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                             windValue: _windController.value,
                                             activeNodeId: _draggingNodeId,
                                             paintAnchors: false,
+                                            glowColor: ref
+                                                .watch(
+                                                  effectiveWallThemeProvider,
+                                                )
+                                                .ropeGlow,
                                           ),
                                         ),
                                       ),

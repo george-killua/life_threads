@@ -40,13 +40,8 @@ class SettingsPage extends ConsumerWidget {
     final entitlement = ref.watch(premiumEntitlementProvider).asData?.value;
     final selectedLocale = ref.watch(localeControllerProvider).asData?.value;
     final displayName = ref.watch(userDisplayNameProvider).asData?.value ?? '';
-    final selectedTheme =
-        ref.watch(wallThemeProvider).asData?.value ??
-        WallThemePreset.warmMemoryRoom;
     final isPremium = entitlement?.isPremium ?? false;
-    final effectiveTheme = selectedTheme.isPremium && !isPremium
-        ? WallThemePreset.warmMemoryRoom
-        : selectedTheme;
+    final effectiveTheme = ref.watch(effectiveWallThemeProvider);
     final onThisDay =
         ref.watch(onThisDaySettingsProvider).asData?.value ??
         const OnThisDaySettings();
@@ -363,9 +358,9 @@ class SettingsPage extends ConsumerWidget {
     }
     await Clipboard.setData(ClipboardData(text: uri.toString()));
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(uri.toString())),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(uri.toString())));
   }
 
   Future<void> _exportBackup(
@@ -1022,10 +1017,7 @@ String _themeDescription(BuildContext context, WallThemePreset theme) {
 }
 
 class _DisplayNameEditor extends StatefulWidget {
-  const _DisplayNameEditor({
-    required this.initialName,
-    required this.onSave,
-  });
+  const _DisplayNameEditor({required this.initialName, required this.onSave});
 
   final String initialName;
   final Future<void> Function(String name) onSave;

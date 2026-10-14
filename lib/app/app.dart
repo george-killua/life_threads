@@ -6,6 +6,7 @@ import '../features/capsule/presentation/widgets/memory_capsule_deep_link_listen
 import '../features/family/presentation/widgets/family_invite_link_listener.dart';
 import '../features/on_this_day/data/on_this_day_scheduler.dart';
 import '../features/premium/data/premium_billing_controller.dart';
+import '../features/wall/data/wall_theme_controller.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
@@ -16,6 +17,7 @@ class LifeThreadsApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(localeControllerProvider).asData?.value;
+    final wallTheme = ref.watch(effectiveWallThemeProvider);
     // Keep the store listener alive for the whole app session: purchases can
     // be delivered at any time (approved pending payments, interrupted
     // checkouts) and must be acknowledged even if the upgrade page is closed.
@@ -27,7 +29,7 @@ class LifeThreadsApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       title: 'LifeThreads',
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
-      theme: AppTheme.dark,
+      theme: AppTheme.forWall(wallTheme),
       locale: locale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

@@ -1,28 +1,47 @@
 import 'package:flutter/material.dart';
 
+import '../../features/wall/domain/wall_theme.dart';
 import 'app_colors.dart';
 
 class AppTheme {
   const AppTheme._();
 
-  static ThemeData get dark {
-    const colorScheme = ColorScheme.dark(
-      primary: AppColors.gold,
-      onPrimary: Color(0xFF241505),
-      secondary: AppColors.rose,
-      onSecondary: Color(0xFF2A1010),
+  static ThemeData get dark => forWall(WallThemePreset.warmMemoryRoom);
+
+  /// The app theme for a wall theme: buttons, chips, dialogs, sheets and
+  /// fields take the wall's accent and surfaces. Warm Memory Room keeps the
+  /// original palette exactly.
+  static ThemeData forWall(WallThemePreset wall) {
+    final isWarm = wall.id == WallThemeId.warmMemoryRoom;
+    final accent = wall.accent;
+    final onAccent = _onColor(accent);
+    final highlight = isWarm
+        ? AppColors.amber
+        : Color.lerp(accent, Colors.white, 0.28)!;
+    final panel = isWarm
+        ? AppColors.panel
+        : Color.lerp(wall.background, wall.depth, 0.7)!;
+    final panelWarm = isWarm
+        ? AppColors.panelWarm
+        : Color.lerp(wall.depth, accent, 0.1)!;
+
+    final colorScheme = ColorScheme.dark(
+      primary: accent,
+      onPrimary: onAccent,
+      secondary: wall.secondaryGlow,
+      onSecondary: _onColor(wall.secondaryGlow),
       tertiary: AppColors.sage,
-      onTertiary: Color(0xFF111C12),
-      surface: AppColors.wallDeep,
+      onTertiary: const Color(0xFF111C12),
+      surface: wall.depth,
       onSurface: AppColors.text,
-      error: Color(0xFFFF7D73),
-      outline: AppColors.line,
+      error: const Color(0xFFFF7D73),
+      outline: wall.line,
     );
 
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppColors.wallInk,
+      scaffoldBackgroundColor: wall.background,
       colorScheme: colorScheme,
       fontFamily: 'Avenir',
       appBarTheme: const AppBarTheme(
@@ -37,27 +56,27 @@ class AppTheme {
           letterSpacing: -0.3,
         ),
       ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.gold,
-        foregroundColor: Color(0xFF241505),
-        extendedTextStyle: TextStyle(fontWeight: FontWeight.w900),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: accent,
+        foregroundColor: onAccent,
+        extendedTextStyle: const TextStyle(fontWeight: FontWeight.w900),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: AppColors.gold,
-          foregroundColor: const Color(0xFF241505),
+          backgroundColor: accent,
+          foregroundColor: onAccent,
           textStyle: const TextStyle(fontWeight: FontWeight.w900),
           shape: const StadiumBorder(),
           padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 15),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: AppColors.amber),
+        style: TextButton.styleFrom(foregroundColor: highlight),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.panelWarm,
-        selectedColor: AppColors.gold.withValues(alpha: 0.28),
-        secondarySelectedColor: AppColors.gold,
+        backgroundColor: panelWarm,
+        selectedColor: accent.withValues(alpha: 0.28),
+        secondarySelectedColor: accent,
         labelStyle: const TextStyle(
           color: AppColors.muted,
           fontWeight: FontWeight.w800,
@@ -66,42 +85,49 @@ class AppTheme {
           color: AppColors.text,
           fontWeight: FontWeight.w900,
         ),
-        side: const BorderSide(color: AppColors.line),
+        side: BorderSide(color: wall.line),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       ),
       cardTheme: CardThemeData(
-        color: AppColors.panel,
+        color: panel,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: AppColors.panel,
+        backgroundColor: panel,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: AppColors.panel,
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: panel,
         surfaceTintColor: Colors.transparent,
-        modalBackgroundColor: AppColors.panel,
-        dragHandleColor: AppColors.line,
+        modalBackgroundColor: panel,
+        dragHandleColor: wall.line,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.panelWarm,
+        fillColor: panelWarm,
         hintStyle: const TextStyle(color: AppColors.muted),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.line),
+          borderSide: BorderSide(color: wall.line),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.line),
+          borderSide: BorderSide(color: wall.line),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.gold, width: 1.4),
+          borderSide: BorderSide(color: accent, width: 1.4),
         ),
       ),
     );
+  }
+
+  /// Dark text on light accents, light text on dark ones.
+  static Color _onColor(Color background) {
+    return background.computeLuminance() > 0.35
+        ? const Color(0xFF241505)
+        : AppColors.text;
   }
 }
