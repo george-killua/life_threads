@@ -468,7 +468,7 @@ class _SubscriptionOfferCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final price = purchaseState.price ?? '€2.99';
+    final price = purchaseState.price ?? '€4.99';
     final canBuy = purchaseState.canBuy && !purchaseState.isBusy;
     final message = purchaseState.message;
 

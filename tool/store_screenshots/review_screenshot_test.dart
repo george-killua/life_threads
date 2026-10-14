@@ -50,7 +50,7 @@ class _ReadyStore extends PremiumBillingController {
   PremiumPurchaseState build() => const PremiumPurchaseState(
     status: PremiumPurchaseStatus.ready,
     productId: 'lifethreads_premium_monthly',
-    price: '€2.99',
+    price: '€4.99',
     canBuy: true,
   );
 }

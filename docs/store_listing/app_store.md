@@ -298,7 +298,7 @@ so the same images serve every language. Check the result with **Vorschau** in A
 |---|---|
 | Product ID | `lifethreads_premium_monthly` (Apple ID 6821821887) |
 | Group | LifeThreads Premium (ID 22466945), localized EN and DE |
-| Duration and price | 1 month, €2.99, 175 countries |
+| Duration and price | 1 month, €4.99 (Germany as the base; Apple converts the rest, e.g. $3.99, £3.99), 175 countries |
 | EN display name / description | LifeThreads Premium – Stories with music, family walls, unlimited memories |
 | DE display name / description | LifeThreads Premium – Storys mit Musik, Familienwände, unbegrenzte Momente |
 | Review screenshot | `store_listing_assets/app_review/premium_en_2_offer.png` (render: `flutter test tool/store_screenshots/review_screenshot_test.dart`) |

@@ -252,7 +252,7 @@ run it to regenerate). Upload all five per language in order: wall, memory, stor
 | | |
 |---|---|
 | Product ID | `lifethreads_premium_monthly` |
-| Base plan | monthly, auto-renewing, €2.99 (other countries: Play's price conversion) |
+| Base plan | monthly, auto-renewing, €4.99 incl. VAT in Germany (set as €4.19 net for all countries; Play converts, e.g. $4.69, £4.29) |
 | Name | LifeThreads Premium |
 
 Benefits (Play shows up to 4, 40 characters each):
