@@ -285,7 +285,7 @@ class _BeatContent extends StatelessWidget {
               const SizedBox(height: 14),
               Text(
                 script.title,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.text,
                   fontSize: 36,
                   fontWeight: FontWeight.w900,
@@ -296,7 +296,7 @@ class _BeatContent extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 l10n.cinemaSharedChapter,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.muted,
                   fontWeight: FontWeight.w700,
                 ),
@@ -310,7 +310,7 @@ class _BeatContent extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(28, 0, 28, 140),
           child: Text(
             script.story,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.text,
               fontSize: 24,
               fontWeight: FontWeight.w700,
@@ -329,7 +329,7 @@ class _BeatContent extends StatelessWidget {
               Expanded(
                 child: Text(
                   script.locationLabel,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.text,
                     fontSize: 28,
                     fontWeight: FontWeight.w900,
@@ -361,7 +361,7 @@ class _BeatContent extends StatelessWidget {
                     Container(
                       width: 10,
                       height: 10,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.rope,
                         shape: BoxShape.circle,
                       ),
@@ -370,7 +370,7 @@ class _BeatContent extends StatelessWidget {
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.text,
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
@@ -514,7 +514,7 @@ class _InviteBar extends StatelessWidget {
           children: [
             Text(
               l10n.cinemaInviteTitle,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.text,
                 fontSize: 18,
                 fontWeight: FontWeight.w900,

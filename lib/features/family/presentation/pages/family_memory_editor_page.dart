@@ -195,7 +195,7 @@ class _FamilyMemoryEditorPageState
           const SizedBox(height: 18),
           Text(
             l10n.familyPostNote,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.muted,
               fontSize: 12.5,
               height: 1.4,
@@ -502,7 +502,7 @@ class _PhotoStrip extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               l10n.familyNoPhotosYet,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.muted,
                 fontWeight: FontWeight.w700,
               ),

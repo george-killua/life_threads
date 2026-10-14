@@ -42,7 +42,7 @@ class MemoryPeopleEditor extends StatelessWidget {
             ),
             child: Text(
               l10n.addPeopleHint,
-              style: const TextStyle(color: AppColors.muted, height: 1.35),
+              style: TextStyle(color: AppColors.muted, height: 1.35),
             ),
           )
         else
@@ -464,7 +464,7 @@ class _ContactPickerSheetState extends State<_ContactPickerSheet> {
     final error = _error;
     if (error != null) {
       return Center(
-        child: Text(error, style: const TextStyle(color: AppColors.muted)),
+        child: Text(error, style: TextStyle(color: AppColors.muted)),
       );
     }
 
@@ -472,7 +472,7 @@ class _ContactPickerSheetState extends State<_ContactPickerSheet> {
       return Center(
         child: Text(
           context.l10n.noContactsFound,
-          style: const TextStyle(color: AppColors.muted),
+          style: TextStyle(color: AppColors.muted),
         ),
       );
     }
@@ -652,7 +652,7 @@ class _PersonChip extends StatelessWidget {
                   ),
                   Text(
                     person.relationship,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.muted,
                       fontSize: 12,
                       fontWeight: FontWeight.w700,

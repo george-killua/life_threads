@@ -85,7 +85,7 @@ class YearThreadWallCard extends ConsumerWidget {
                   onPressed: () => ref
                       .read(yearThreadCardDismissalProvider.notifier)
                       .dismiss(year),
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.close_rounded,
                     color: AppColors.muted,
                     size: 20,

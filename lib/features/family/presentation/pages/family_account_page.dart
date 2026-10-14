@@ -57,7 +57,7 @@ class FamilyAccountPage extends ConsumerWidget {
               child: Text(
                 l10n.familyAccountId(account.id),
                 textDirection: TextDirection.ltr,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.muted,
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,
@@ -207,7 +207,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
         FilledButton(
           key: const ValueKey('family-delete-account-confirm'),
           style: FilledButton.styleFrom(
-            backgroundColor: Colors.redAccent,
+            backgroundColor: AppColors.error,
             foregroundColor: AppColors.text,
           ),
           onPressed: _understood ? () => Navigator.of(context).pop(true) : null,

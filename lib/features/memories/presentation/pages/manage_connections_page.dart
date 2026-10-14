@@ -42,7 +42,7 @@ class ManageConnectionsPage extends ConsumerWidget {
               if (candidates.isEmpty)
                 Text(
                   l10n.createMoreMemoriesBeforeLinking,
-                  style: const TextStyle(color: AppColors.muted),
+                  style: TextStyle(color: AppColors.muted),
                 )
               else
                 ...candidates.map((event) {
@@ -134,7 +134,7 @@ class _Header extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             context.l10n.connectionHeaderBody,
-            style: const TextStyle(color: AppColors.muted, height: 1.45),
+            style: TextStyle(color: AppColors.muted, height: 1.45),
           ),
         ],
       ),
@@ -199,7 +199,7 @@ class _ConnectionReasonCard extends StatelessWidget {
                       ].join(' • '),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: AppColors.muted),
+                      style: TextStyle(color: AppColors.muted),
                     ),
                   ],
                 ),
@@ -303,7 +303,7 @@ class _ConnectionReasonDialogState extends State<_ConnectionReasonDialog> {
         children: [
           Text(
             widget.connectedTitle,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.muted,
               fontWeight: FontWeight.w800,
             ),

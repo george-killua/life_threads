@@ -170,7 +170,7 @@ class SettingsPage extends ConsumerWidget {
                 title: l10n.themeTitle,
                 body: l10n.themeBody,
                 badge: isPremium ? l10n.premiumBadge : l10n.oneFreeBadge,
-                child: const WallThemePicker(),
+                child: const WallThemeSummary(),
               ),
               _SettingsCard(
                 icon: Icons.event_repeat_rounded,
@@ -477,7 +477,7 @@ class SettingsPage extends ConsumerWidget {
             child: Text(l10n.cancel),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(l10n.clearAll),
           ),
@@ -615,7 +615,7 @@ class _BetaFeedbackDialogState extends State<_BetaFeedbackDialog> {
             const SizedBox(height: 12),
             Text(
               l10n.betaFeedbackNotIncluded,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.muted,
                 fontSize: 12,
                 height: 1.35,
@@ -961,7 +961,7 @@ class _SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = danger ? Colors.redAccent : AppColors.gold;
+    final accent = danger ? AppColors.error : AppColors.gold;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -1025,7 +1025,7 @@ class _SettingsCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               body,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.muted,
                 height: 1.45,
                 fontWeight: FontWeight.w600,
@@ -1058,7 +1058,7 @@ class _SettingsAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = danger ? Colors.redAccent : AppColors.gold;
+    final color = danger ? AppColors.error : AppColors.gold;
 
     return FilledButton.icon(
       onPressed: onTap,

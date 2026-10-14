@@ -43,7 +43,7 @@ Future<void> showLifeThreadsTutorialSheet(BuildContext context) {
                 const SizedBox(height: 8),
                 Text(
                   l10n.tutorialIntro,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.muted,
                     height: 1.4,
                     fontWeight: FontWeight.w600,
@@ -184,7 +184,7 @@ class _TutorialStep extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   text,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.muted,
                     height: 1.35,
                     fontWeight: FontWeight.w600,

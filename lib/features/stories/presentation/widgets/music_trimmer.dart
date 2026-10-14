@@ -120,7 +120,7 @@ class _MusicTrimmerState extends State<MusicTrimmer> {
             Expanded(
               child: Text(
                 l10n.storyMusicTrimHint,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.muted,
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,

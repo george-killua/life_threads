@@ -50,13 +50,13 @@ class _StorySearchFieldState extends State<StorySearchField> {
         filled: true,
         fillColor: AppColors.panel.withValues(alpha: 0.85),
         hintText: context.l10n.storySearchHint,
-        hintStyle: const TextStyle(color: AppColors.muted),
+        hintStyle: TextStyle(color: AppColors.muted),
         prefixIcon: Icon(Icons.search_rounded, color: AppColors.gold),
         suffixIcon: _controller.text.isEmpty
             ? null
             : IconButton(
                 tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
-                icon: const Icon(Icons.close_rounded, color: AppColors.muted),
+                icon: Icon(Icons.close_rounded, color: AppColors.muted),
                 onPressed: _clear,
               ),
         contentPadding: const EdgeInsets.symmetric(vertical: 12),

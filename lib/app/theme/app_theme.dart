@@ -39,7 +39,7 @@ class AppTheme {
       extensions: [wall.cardStyle],
       colorScheme: colorScheme,
       fontFamily: 'Avenir',
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         foregroundColor: AppColors.text,
         elevation: 0,
@@ -72,11 +72,11 @@ class AppTheme {
         backgroundColor: panelWarm,
         selectedColor: accent.withValues(alpha: 0.28),
         secondarySelectedColor: accent,
-        labelStyle: const TextStyle(
+        labelStyle: TextStyle(
           color: AppColors.muted,
           fontWeight: FontWeight.w800,
         ),
-        secondaryLabelStyle: const TextStyle(
+        secondaryLabelStyle: TextStyle(
           color: AppColors.text,
           fontWeight: FontWeight.w900,
         ),
@@ -102,7 +102,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: panelWarm,
-        hintStyle: const TextStyle(color: AppColors.muted),
+        hintStyle: TextStyle(color: AppColors.muted),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
           borderSide: BorderSide(color: wall.line),

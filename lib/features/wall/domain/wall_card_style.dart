@@ -123,6 +123,19 @@ class WallCardStyle extends ThemeExtension<WallCardStyle> {
     texture: Color(0x0E8A3A5A),
   );
 
+  /// Pale green paper.
+  static const meadow = WallCardStyle(
+    paper: [Color(0xFFFAFFF5), Color(0xFFEAF5DE), Color(0xFFD3E6C0)],
+    radius: 14,
+    photoRadius: 9,
+    padding: EdgeInsets.all(10),
+    ink: Color(0xFF1C2E17),
+    accentInk: Color(0xFF557A3A),
+    tape: [Color(0xFFF7F3D9), Color(0xFFE2DAA6)],
+    edge: Color(0x99FFFFFF),
+    texture: Color(0x0E3A5A2A),
+  );
+
   static WallCardStyle of(BuildContext context) =>
       Theme.of(context).extension<WallCardStyle>() ?? classic;
 

@@ -138,7 +138,7 @@ class FamilyMemoryDetailPage extends ConsumerWidget {
                   value: _DetailAction.delete,
                   child: Text(
                     l10n.delete,
-                    style: const TextStyle(color: Colors.redAccent),
+                    style: const TextStyle(color: AppColors.error),
                   ),
                 ),
             ],

@@ -14,6 +14,7 @@ import '../../features/onboarding/presentation/pages/onboarding_gate.dart';
 import '../../features/premium/domain/premium_feature.dart';
 import '../../features/premium/presentation/pages/upgrade_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/wall/presentation/pages/themes_page.dart';
 import '../../features/stories/presentation/pages/create_story_page.dart';
 import '../../features/wall/presentation/pages/memory_wall_page.dart';
 import '../../features/year_thread/presentation/pages/year_thread_page.dart';
@@ -43,6 +44,10 @@ class AppRouter {
       GoRoute(
         path: RouteNames.settings,
         builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.themes,
+        builder: (context, state) => const ThemesPage(),
       ),
       GoRoute(
         path: RouteNames.upgrade,

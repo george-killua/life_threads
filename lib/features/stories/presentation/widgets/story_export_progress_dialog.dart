@@ -80,7 +80,7 @@ class _StoryExportProgressDialogState extends State<StoryExportProgressDialog> {
           children: [
             Text(
               l10n.storyRenderingBody,
-              style: const TextStyle(color: AppColors.muted, height: 1.4),
+              style: TextStyle(color: AppColors.muted, height: 1.4),
             ),
             const SizedBox(height: 18),
             ClipRRect(

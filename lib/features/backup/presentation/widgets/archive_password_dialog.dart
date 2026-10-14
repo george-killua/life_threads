@@ -59,7 +59,7 @@ Future<String?> showArchivePasswordDialog(
                     const SizedBox(height: 10),
                     Text(
                       l10n.archivePasswordWarning,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.muted,
                         fontSize: 12,
                         height: 1.35,

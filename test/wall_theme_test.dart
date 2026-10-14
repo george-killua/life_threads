@@ -33,12 +33,34 @@ void main() {
     test('seasonal themes are only available in their season', () {
       expect(
         WallThemePreset.seasonalAt(DateTime(2026, 10, 15)).map((t) => t.id),
-        [WallThemeId.autumnHarvest],
+        [WallThemeId.autumnHarvest, WallThemeId.mistyForest],
       );
       expect(
         WallThemePreset.seasonalAt(DateTime(2027, 1, 5)).map((t) => t.id),
-        [WallThemeId.winterLights],
+        [WallThemeId.winterLights, WallThemeId.snowyCabin],
       );
+    });
+
+    test('every season has two themes', () {
+      for (final season in WallThemeSeason.values) {
+        expect(
+          WallThemePreset.seasonal.where((t) => t.season == season),
+          hasLength(2),
+        );
+      }
+    });
+
+    test('upcoming themes come soonest season first', () {
+      final october = DateTime(2026, 10, 15);
+      final upcoming = WallThemePreset.upcomingAt(october);
+
+      expect(upcoming.map((t) => t.season).toSet().toList(), [
+        WallThemeSeason.winter,
+        WallThemeSeason.spring,
+        WallThemeSeason.summer,
+      ]);
+      expect(WallThemeSeason.winter.startAfter(october), DateTime(2026, 12));
+      expect(WallThemeSeason.spring.startAfter(october), DateTime(2027, 3));
     });
 
     test('a season ends on its last day, across the new year', () {
@@ -167,5 +189,16 @@ void main() {
     expect(AppColors.gold, WallThemePreset.midnightArchive.accent);
     expect(AppColors.wallInk, WallThemePreset.midnightArchive.background);
     expect(ThemePalette.of(WallThemePreset.warmMemoryRoom), ThemePalette.warm);
+  });
+
+  test('text and paper colours follow the theme too', () {
+    addTearDown(() => AppColors.use(ThemePalette.warm));
+
+    expect(AppColors.muted, BrandColors.muted);
+    expect(AppColors.card, BrandColors.card);
+    AppColors.use(ThemePalette.of(WallThemePreset.travelCorkboard));
+    expect(AppColors.muted, isNot(BrandColors.muted));
+    expect(AppColors.card, WallThemePreset.travelCorkboard.cardStyle.paper[1]);
+    expect(AppColors.paperInk, WallThemePreset.travelCorkboard.cardStyle.ink);
   });
 }

@@ -139,7 +139,7 @@ class _YearThreadPlayerState extends State<YearThreadPlayer>
             ),
             Text(
               '${_seconds(_position)} / ${_seconds(total)}',
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.muted,
                 fontWeight: FontWeight.w800,
                 fontFeatures: [FontFeature.tabularFigures()],

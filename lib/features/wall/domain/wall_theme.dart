@@ -10,7 +10,11 @@ enum WallThemeId {
   autumnHarvest,
   winterLights,
   springBlossom,
-  summerEvening;
+  summerEvening,
+  seaside,
+  snowyCabin,
+  springMeadow,
+  mistyForest;
 
   static WallThemeId fromName(String value) {
     return WallThemeId.values.firstWhere(
@@ -33,6 +37,13 @@ enum WallThemeSeason {
   final List<int> months;
 
   bool contains(DateTime time) => months.contains(time.month);
+
+  /// The first day of this season's next start after [time].
+  DateTime startAfter(DateTime time) {
+    final firstMonth = months.first;
+    final year = firstMonth <= time.month ? time.year + 1 : time.year;
+    return DateTime(year, firstMonth);
+  }
 
   /// The last day of this season that is on or after [time].
   DateTime endAfter(DateTime time) {
@@ -196,6 +207,66 @@ class WallThemePreset {
     season: WallThemeSeason.summer,
   );
 
+  static const seaside = WallThemePreset(
+    id: WallThemeId.seaside,
+    icon: Icons.beach_access_rounded,
+    background: Color(0xFF051218),
+    depth: Color(0xFF0B2A33),
+    surface: Color(0xFF1D4A52),
+    accent: Color(0xFF6FD3D6),
+    secondaryGlow: Color(0xFFF2D49B),
+    line: Color(0xFF1E3E45),
+    ropeGlow: Color(0xFFF2D49B),
+    cardStyle: WallCardStyle.creamPaper,
+    isPremium: true,
+    season: WallThemeSeason.summer,
+  );
+
+  static const snowyCabin = WallThemePreset(
+    id: WallThemeId.snowyCabin,
+    icon: Icons.cabin_rounded,
+    background: Color(0xFF120B07),
+    depth: Color(0xFF2A1A10),
+    surface: Color(0xFF4A3020),
+    accent: Color(0xFFE9B872),
+    secondaryGlow: Color(0xFFE8F1F5),
+    line: Color(0xFF3E2A1D),
+    ropeGlow: Color(0xFFF6D9A8),
+    cardStyle: WallCardStyle.frost,
+    isPremium: true,
+    season: WallThemeSeason.winter,
+  );
+
+  static const springMeadow = WallThemePreset(
+    id: WallThemeId.springMeadow,
+    icon: Icons.grass_rounded,
+    background: Color(0xFF07110A),
+    depth: Color(0xFF122516),
+    surface: Color(0xFF244428),
+    accent: Color(0xFF9BD07A),
+    secondaryGlow: Color(0xFFF5E08A),
+    line: Color(0xFF223A26),
+    ropeGlow: Color(0xFFF5E08A),
+    cardStyle: WallCardStyle.meadow,
+    isPremium: true,
+    season: WallThemeSeason.spring,
+  );
+
+  static const mistyForest = WallThemePreset(
+    id: WallThemeId.mistyForest,
+    icon: Icons.forest_rounded,
+    background: Color(0xFF080C0B),
+    depth: Color(0xFF151F1C),
+    surface: Color(0xFF2A3833),
+    accent: Color(0xFFC9A66B),
+    secondaryGlow: Color(0xFF9FB3AA),
+    line: Color(0xFF26332F),
+    ropeGlow: Color(0xFFD8B97E),
+    cardStyle: WallCardStyle.archive,
+    isPremium: true,
+    season: WallThemeSeason.autumn,
+  );
+
   /// Year-round themes, in picker order.
   static const all = [
     warmMemoryRoom,
@@ -207,15 +278,26 @@ class WallThemePreset {
   /// Limited themes; each is only available during its season.
   static const seasonal = [
     springBlossom,
+    springMeadow,
     summerEvening,
+    seaside,
     autumnHarvest,
+    mistyForest,
     winterLights,
+    snowyCabin,
   ];
 
   static const everyTheme = [...all, ...seasonal];
 
   static List<WallThemePreset> seasonalAt(DateTime time) =>
       seasonal.where((theme) => theme.isAvailableAt(time)).toList();
+
+  /// Seasonal themes not available at [time], soonest season first.
+  static List<WallThemePreset> upcomingAt(DateTime time) =>
+      seasonal.where((theme) => !theme.isAvailableAt(time)).toList()..sort(
+        (a, b) =>
+            a.season!.startAfter(time).compareTo(b.season!.startAfter(time)),
+      );
 
   static WallThemePreset fromId(WallThemeId id) {
     return everyTheme.firstWhere(

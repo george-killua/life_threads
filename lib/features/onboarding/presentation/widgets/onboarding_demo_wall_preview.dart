@@ -135,7 +135,7 @@ class _PreviewMemoryCard extends StatelessWidget {
                 title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.paperInk,
                   fontSize: 10,
                   fontWeight: FontWeight.w900,

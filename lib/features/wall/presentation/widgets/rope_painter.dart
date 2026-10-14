@@ -130,7 +130,7 @@ class RopePainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = const Color(0xFF4A3425).withValues(alpha: bodyAlpha * 0.9)
+        ..color = AppColors.ropeBody.withValues(alpha: bodyAlpha * 0.9)
         ..strokeWidth = width
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round,
@@ -176,7 +176,7 @@ class RopePainter extends CustomPainter {
     canvas.drawPath(
       path.shift(const Offset(2, -2)),
       Paint()
-        ..color = const Color(0xFF89A7D8).withValues(alpha: alpha * 0.55)
+        ..color = AppColors.ropeHalo.withValues(alpha: alpha * 0.55)
         ..strokeWidth = isActive ? 18 : 12
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
@@ -300,8 +300,8 @@ class RopePainter extends CustomPainter {
             center: const Alignment(-0.35, -0.45),
             radius: 0.9,
             colors: [
-              isActive ? glowColor : const Color(0xFFFFD77D),
-              const Color(0xFF9C6727),
+              isActive ? glowColor : AppColors.knotLight,
+              AppColors.knotDark,
             ],
           ).createShader(Rect.fromCircle(center: point, radius: 8.6)),
       );
@@ -339,8 +339,8 @@ class RopePainter extends CustomPainter {
       Paint()
         ..shader = RadialGradient(
           colors: [
-            isActive ? glowColor : const Color(0xFFFFD77D),
-            const Color(0xFF9B6829),
+            isActive ? glowColor : AppColors.knotLight,
+            AppColors.knotDark,
           ],
         ).createShader(Rect.fromCircle(center: point, radius: radius)),
     );

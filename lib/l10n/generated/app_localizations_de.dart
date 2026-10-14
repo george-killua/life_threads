@@ -1718,6 +1718,64 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sonnenuntergangsfarben und Sofortbild-Karten.';
 
   @override
+  String get themeYearRoundTitle => 'Immer verfügbar';
+
+  @override
+  String get themeComingTitle => 'Demnächst';
+
+  @override
+  String get themeComingBody =>
+      'Schau dir die nächsten Jahreszeiten an. Jedes Theme startet am ersten Tag seiner Jahreszeit.';
+
+  @override
+  String themeAvailableFrom(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Ab $dateString';
+  }
+
+  @override
+  String themeBrowse(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Alle Themes ansehen, $count davon für diese Jahreszeit',
+      one: 'Alle Themes ansehen, 1 davon für diese Jahreszeit',
+      zero: 'Alle Themes ansehen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get themeSeaside => 'Am Meer';
+
+  @override
+  String get themeSeasideDescription =>
+      'Türkises Wasser, sandfarbenes Papier und warmes Sommerlicht.';
+
+  @override
+  String get themeSnowyCabin => 'Verschneite Hütte';
+
+  @override
+  String get themeSnowyCabinDescription =>
+      'Holz am Kamin, bereifte Karten und leiser Schnee draußen.';
+
+  @override
+  String get themeSpringMeadow => 'Frühlingswiese';
+
+  @override
+  String get themeSpringMeadowDescription =>
+      'Frisches grünes Gras, helle Karten und gelber Sonnenschein.';
+
+  @override
+  String get themeMistyForest => 'Nebelwald';
+
+  @override
+  String get themeMistyForestDescription =>
+      'Stille Kiefern, Morgennebel und goldene Blätter.';
+
+  @override
   String get demoFirstDanceTitle => 'Unser erster Tanz';
 
   @override

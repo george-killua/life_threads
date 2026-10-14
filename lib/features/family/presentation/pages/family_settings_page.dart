@@ -309,7 +309,7 @@ class _MemberTile extends ConsumerWidget {
                     value: _MemberAction.remove,
                     child: Text(
                       l10n.familyRemoveMember,
-                      style: const TextStyle(color: Colors.redAccent),
+                      style: const TextStyle(color: AppColors.error),
                     ),
                   ),
               ],
@@ -428,7 +428,7 @@ class _ContentChoiceDialogState extends State<_ContentChoiceDialog> {
         FilledButton(
           key: const ValueKey('family-content-choice-confirm'),
           style: FilledButton.styleFrom(
-            backgroundColor: Colors.redAccent,
+            backgroundColor: AppColors.error,
             foregroundColor: AppColors.text,
           ),
           onPressed: () => Navigator.of(context).pop(_deleteContent),

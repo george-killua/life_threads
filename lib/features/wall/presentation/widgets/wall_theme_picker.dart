@@ -25,6 +25,7 @@ class WallThemePicker extends ConsumerWidget {
     final effective = ref.watch(effectiveWallThemeProvider);
     final now = ref.watch(wallClockProvider).asData?.value ?? DateTime.now();
     final seasonal = WallThemePreset.seasonalAt(now);
+    final upcoming = WallThemePreset.upcomingAt(now);
 
     Widget option(WallThemePreset theme) => _ThemeOption(
       theme: theme,
@@ -36,6 +37,19 @@ class WallThemePicker extends ConsumerWidget {
       onTap: () => _showPreview(context, ref, theme),
     );
 
+    // Not available yet: shown so people can look forward to them.
+    Widget comingOption(WallThemePreset theme) {
+      final opensOn = theme.season!.startAfter(now);
+      return _ThemeOption(
+        theme: theme,
+        selected: false,
+        locked: true,
+        lockIcon: Icons.schedule_rounded,
+        badge: l10n.themeAvailableFrom(opensOn),
+        onTap: () => _showPreview(context, ref, theme, opensOn: opensOn),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -45,24 +59,21 @@ class WallThemePicker extends ConsumerWidget {
           now: now,
           onTap: () => _selectAuto(context, ref),
         ),
+        _SectionHeader(title: l10n.themeYearRoundTitle),
         for (final theme in WallThemePreset.all) option(theme),
         if (seasonal.isNotEmpty) ...[
-          const SizedBox(height: 6),
-          Text(
-            l10n.themeSeasonalTitle,
-            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
+          _SectionHeader(
+            title: l10n.themeSeasonalTitle,
+            body: l10n.themeSeasonalBody,
           ),
-          const SizedBox(height: 3),
-          Text(
-            l10n.themeSeasonalBody,
-            style: const TextStyle(
-              color: AppColors.muted,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 10),
           for (final theme in seasonal) option(theme),
+        ],
+        if (upcoming.isNotEmpty) ...[
+          _SectionHeader(
+            title: l10n.themeComingTitle,
+            body: l10n.themeComingBody,
+          ),
+          for (final theme in upcoming) comingOption(theme),
         ],
       ],
     );
@@ -85,14 +96,16 @@ class WallThemePicker extends ConsumerWidget {
   Future<void> _showPreview(
     BuildContext context,
     WidgetRef ref,
-    WallThemePreset theme,
-  ) async {
+    WallThemePreset theme, {
+    DateTime? opensOn,
+  }) async {
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
       builder: (sheetContext) => _ThemePreviewSheet(
         theme: theme,
+        opensOn: opensOn,
         onUse: () async {
           Navigator.of(sheetContext).pop();
           await _selectTheme(context, ref, theme);
@@ -122,16 +135,48 @@ class WallThemePicker extends ConsumerWidget {
   }
 }
 
+/// The theme in use, for Settings; opens the Themes screen.
+class WallThemeSummary extends ConsumerWidget {
+  const WallThemeSummary({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final isPremium =
+        ref.watch(premiumEntitlementProvider).asData?.value.isPremium ?? false;
+    final autoOn =
+        isPremium && (ref.watch(wallThemeAutoProvider).asData?.value ?? false);
+    final theme = ref.watch(effectiveWallThemeProvider);
+    final now = ref.watch(wallClockProvider).asData?.value ?? DateTime.now();
+    final inSeason = WallThemePreset.seasonalAt(now).length;
+
+    return _OptionFrame(
+      selected: true,
+      locked: false,
+      accent: theme.accent,
+      onTap: () => context.push(RouteNames.themes),
+      leading: WallThemePreview(theme: theme, radius: 0),
+      title: autoOn ? l10n.themeAutoTitle : wallThemeLabel(context, theme),
+      description: l10n.themeBrowse(inSeason),
+      trailing: Icons.chevron_right_rounded,
+    );
+  }
+}
+
 class _ThemePreviewSheet extends ConsumerWidget {
   const _ThemePreviewSheet({
     required this.theme,
     required this.onUse,
     required this.onUnlock,
+    this.opensOn,
   });
 
   final WallThemePreset theme;
   final VoidCallback onUse;
   final VoidCallback onUnlock;
+
+  /// Set for a seasonal theme whose season has not started yet.
+  final DateTime? opensOn;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -173,14 +218,20 @@ class _ThemePreviewSheet extends ConsumerWidget {
             const SizedBox(height: 6),
             Text(
               wallThemeDescription(context, theme),
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.muted,
                 height: 1.35,
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 18),
-            if (locked)
+            if (opensOn != null)
+              FilledButton.icon(
+                onPressed: null,
+                icon: const Icon(Icons.schedule_rounded),
+                label: Text(l10n.themeAvailableFrom(opensOn!)),
+              )
+            else if (locked)
               FilledButton.icon(
                 onPressed: onUnlock,
                 icon: const Icon(Icons.lock_open_rounded),
@@ -255,11 +306,13 @@ class _ThemeOption extends StatelessWidget {
     required this.locked,
     required this.onTap,
     this.badge,
+    this.lockIcon = Icons.lock_rounded,
   });
 
   final WallThemePreset theme;
   final bool selected;
   final bool locked;
+  final IconData lockIcon;
   final String? badge;
   final VoidCallback onTap;
 
@@ -274,6 +327,7 @@ class _ThemeOption extends StatelessWidget {
       title: wallThemeLabel(context, theme),
       description: wallThemeDescription(context, theme),
       badge: badge,
+      lockIcon: lockIcon,
     );
   }
 }
@@ -288,6 +342,8 @@ class _OptionFrame extends StatelessWidget {
     required this.title,
     required this.description,
     this.badge,
+    this.lockIcon = Icons.lock_rounded,
+    this.trailing,
   });
 
   final bool selected;
@@ -298,6 +354,10 @@ class _OptionFrame extends StatelessWidget {
   final String title;
   final String description;
   final String? badge;
+  final IconData lockIcon;
+
+  /// Replaces the selection check, e.g. with a chevron for navigation.
+  final IconData? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -341,8 +401,10 @@ class _OptionFrame extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (locked)
-                          Icon(Icons.lock_rounded, color: accent, size: 17)
+                        if (trailing != null)
+                          Icon(trailing, color: accent, size: 22)
+                        else if (locked)
+                          Icon(lockIcon, color: accent, size: 17)
                         else if (selected)
                           Icon(
                             Icons.check_circle_rounded,
@@ -365,7 +427,7 @@ class _OptionFrame extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       description,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.muted,
                         height: 1.3,
                         fontSize: 12,
@@ -383,6 +445,41 @@ class _OptionFrame extends StatelessWidget {
   }
 }
 
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.title, this.body});
+
+  final String title;
+  final String? body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 10, 4, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+          ),
+          if (body != null) ...[
+            const SizedBox(height: 3),
+            Text(
+              body!,
+              style: TextStyle(
+                color: AppColors.muted,
+                fontSize: 12.5,
+                height: 1.3,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 String wallThemeLabel(BuildContext context, WallThemePreset theme) {
   final l10n = context.l10n;
   return switch (theme.id) {
@@ -394,6 +491,10 @@ String wallThemeLabel(BuildContext context, WallThemePreset theme) {
     WallThemeId.winterLights => l10n.themeWinterLights,
     WallThemeId.springBlossom => l10n.themeSpringBlossom,
     WallThemeId.summerEvening => l10n.themeSummerEvening,
+    WallThemeId.seaside => l10n.themeSeaside,
+    WallThemeId.snowyCabin => l10n.themeSnowyCabin,
+    WallThemeId.springMeadow => l10n.themeSpringMeadow,
+    WallThemeId.mistyForest => l10n.themeMistyForest,
   };
 }
 
@@ -408,5 +509,9 @@ String wallThemeDescription(BuildContext context, WallThemePreset theme) {
     WallThemeId.winterLights => l10n.themeWinterLightsDescription,
     WallThemeId.springBlossom => l10n.themeSpringBlossomDescription,
     WallThemeId.summerEvening => l10n.themeSummerEveningDescription,
+    WallThemeId.seaside => l10n.themeSeasideDescription,
+    WallThemeId.snowyCabin => l10n.themeSnowyCabinDescription,
+    WallThemeId.springMeadow => l10n.themeSpringMeadowDescription,
+    WallThemeId.mistyForest => l10n.themeMistyForestDescription,
   };
 }

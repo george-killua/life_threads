@@ -235,7 +235,7 @@ class PhotoPermissionDeniedSheet extends StatelessWidget {
           Text(
             context.l10n.photoAccessOffBody,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.muted, height: 1.45),
+            style: TextStyle(color: AppColors.muted, height: 1.45),
           ),
           const SizedBox(height: 20),
           SizedBox(

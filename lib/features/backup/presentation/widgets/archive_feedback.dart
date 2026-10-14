@@ -84,7 +84,7 @@ Future<void> showArchiveImportSummary(
           const SizedBox(height: 10),
           Text(
             context.l10n.archiveImportSummary,
-            style: const TextStyle(color: AppColors.muted, height: 1.35),
+            style: TextStyle(color: AppColors.muted, height: 1.35),
           ),
         ],
       ),

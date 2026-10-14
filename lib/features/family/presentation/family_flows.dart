@@ -189,7 +189,7 @@ class FamilyProgressDialog extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.text,
                 fontWeight: FontWeight.w800,
               ),
@@ -600,7 +600,7 @@ Future<bool> confirmFamilyAction(
         FilledButton(
           style: danger
               ? FilledButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
+                  backgroundColor: AppColors.error,
                   foregroundColor: AppColors.text,
                 )
               : null,

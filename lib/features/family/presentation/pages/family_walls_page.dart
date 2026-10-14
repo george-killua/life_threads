@@ -94,7 +94,7 @@ class FamilyWallsPage extends ConsumerWidget {
                     padding: const EdgeInsets.only(bottom: 14),
                     child: Text(
                       l10n.familyNoWallsYet,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.muted,
                         fontWeight: FontWeight.w700,
                       ),
@@ -184,7 +184,7 @@ class _FamilyTile extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         l10n.familyMemberCount(family.memberCount),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.muted,
                           fontWeight: FontWeight.w700,
                         ),

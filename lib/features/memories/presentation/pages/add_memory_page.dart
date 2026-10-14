@@ -377,7 +377,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
                   const SizedBox(height: 8),
                   Text(
                     l10n.takeAnotherOrContinueBody,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.muted,
                       fontWeight: FontWeight.w600,
                     ),
@@ -645,7 +645,7 @@ class _PhotoGpsStatus extends StatelessWidget {
                       longitude!.toStringAsFixed(5),
                     )
                   : l10n.photoGpsMissing,
-              style: const TextStyle(color: AppColors.muted, height: 1.35),
+              style: TextStyle(color: AppColors.muted, height: 1.35),
             ),
           ),
         ],
@@ -695,7 +695,7 @@ class _FlowHeader extends StatelessWidget {
                 ),
                 Text(
                   '${step + 1}/$stepCount',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.muted,
                     fontWeight: FontWeight.w900,
                   ),
@@ -778,7 +778,7 @@ class _StepCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             subtitle,
-            style: const TextStyle(color: AppColors.muted, height: 1.45),
+            style: TextStyle(color: AppColors.muted, height: 1.45),
           ),
           const SizedBox(height: 20),
           child,
@@ -850,10 +850,7 @@ class _ChoiceTile extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       subtitle,
-                      style: const TextStyle(
-                        color: AppColors.muted,
-                        height: 1.25,
-                      ),
+                      style: TextStyle(color: AppColors.muted, height: 1.25),
                     ),
                   ],
                 ),
@@ -1181,7 +1178,7 @@ class _PhotoPickerPanel extends StatelessWidget {
           if (photos.isEmpty)
             Text(
               l10n.photoStorageHint,
-              style: const TextStyle(color: AppColors.muted, height: 1.45),
+              style: TextStyle(color: AppColors.muted, height: 1.45),
             )
           else ...[
             _PhotoMetadataSummary(photos: photos),
@@ -1432,7 +1429,7 @@ class _MemoryLimitReached extends StatelessWidget {
               Text(
                 context.l10n.freeMemoryLimitBody,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.muted, height: 1.45),
+                style: TextStyle(color: AppColors.muted, height: 1.45),
               ),
               const SizedBox(height: 20),
               FilledButton.icon(

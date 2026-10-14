@@ -93,7 +93,7 @@ class FamilyPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = danger ? Colors.redAccent : AppColors.gold;
+    final accent = danger ? AppColors.error : AppColors.gold;
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(18),
@@ -140,7 +140,7 @@ class FamilyPanel extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 body!,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.muted,
                   height: 1.45,
                   fontWeight: FontWeight.w600,
@@ -212,7 +212,7 @@ class FamilyAction extends StatelessWidget {
         label: Text(label),
       );
     }
-    final color = danger ? Colors.redAccent : AppColors.gold;
+    final color = danger ? AppColors.error : AppColors.gold;
     return FilledButton.icon(
       onPressed: onTap,
       style: FilledButton.styleFrom(
@@ -281,16 +281,13 @@ class FamilyUsageBar extends StatelessWidget {
             value: fraction,
             minHeight: 9,
             backgroundColor: AppColors.line,
-            color: nearlyFull ? Colors.redAccent : AppColors.gold,
+            color: nearlyFull ? AppColors.error : AppColors.gold,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           label,
-          style: const TextStyle(
-            color: AppColors.muted,
-            fontWeight: FontWeight.w700,
-          ),
+          style: TextStyle(color: AppColors.muted, fontWeight: FontWeight.w700),
         ),
       ],
     );

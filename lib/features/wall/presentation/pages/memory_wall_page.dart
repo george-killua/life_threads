@@ -351,7 +351,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                       Center(
                         child: Text(
                           context.l10n.noMemoriesFilter,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.muted,
                             fontWeight: FontWeight.w700,
                           ),
@@ -785,7 +785,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                   children: [
                     Text(
                       l10n.photosCapturedCount(photos.length),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.text,
                         fontWeight: FontWeight.w900,
                         fontSize: 20,
@@ -794,7 +794,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                     const SizedBox(height: 8),
                     Text(
                       l10n.takeAnotherOrContinueBody,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.muted,
                         fontWeight: FontWeight.w600,
                         height: 1.35,
@@ -1242,11 +1242,11 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
             ListTile(
               leading: const Icon(
                 Icons.delete_outline_rounded,
-                color: Colors.redAccent,
+                color: AppColors.error,
               ),
               title: Text(
                 context.l10n.delete,
-                style: const TextStyle(color: Colors.redAccent),
+                style: const TextStyle(color: AppColors.error),
               ),
               onTap: () => Navigator.of(context).pop(_MemoryAction.delete),
             ),
@@ -1311,11 +1311,11 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
             ListTile(
               leading: const Icon(
                 Icons.delete_outline_rounded,
-                color: Colors.redAccent,
+                color: AppColors.error,
               ),
               title: Text(
                 context.l10n.delete,
-                style: const TextStyle(color: Colors.redAccent),
+                style: const TextStyle(color: AppColors.error),
               ),
               onTap: () => Navigator.of(context).pop(_TextAction.delete),
             ),
@@ -1375,11 +1375,11 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
             ListTile(
               leading: const Icon(
                 Icons.delete_outline_rounded,
-                color: Colors.redAccent,
+                color: AppColors.error,
               ),
               title: Text(
                 context.l10n.deleteNail,
-                style: const TextStyle(color: Colors.redAccent),
+                style: const TextStyle(color: AppColors.error),
               ),
               onTap: () => Navigator.of(context).pop(_NailAction.delete),
             ),
@@ -1595,7 +1595,7 @@ class _TimelineMemoryTile extends StatelessWidget {
                               _eventTimelineSubtitle(context, event),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.muted,
                                 height: 1.25,
                               ),
@@ -1777,7 +1777,7 @@ class _MapMemoryChip extends StatelessWidget {
                       event.locationDisplayLabel,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: AppColors.muted),
+                      style: TextStyle(color: AppColors.muted),
                     ),
                   ],
                 ],
@@ -1832,7 +1832,7 @@ class _ViewTitle extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 3),
-                Text(subtitle, style: const TextStyle(color: AppColors.muted)),
+                Text(subtitle, style: TextStyle(color: AppColors.muted)),
               ],
             ),
           ),
@@ -1877,7 +1877,7 @@ class _EmptyModePanel extends StatelessWidget {
             Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.muted, height: 1.4),
+              style: TextStyle(color: AppColors.muted, height: 1.4),
             ),
           ],
         ),
@@ -2012,7 +2012,7 @@ class _WallViewButton extends StatelessWidget {
               const SizedBox(width: 7),
               Text(
                 context.l10n.wallViewButton,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.card,
                   fontSize: 13.5,
                   fontWeight: FontWeight.w900,
@@ -2031,7 +2031,7 @@ class _WallViewButton extends StatelessWidget {
                 ),
               ],
               const SizedBox(width: 2),
-              const Icon(
+              Icon(
                 Icons.keyboard_arrow_down_rounded,
                 color: AppColors.muted,
                 size: 20,
@@ -2084,7 +2084,7 @@ class _WallMoreButton extends StatelessWidget {
         position: PopupMenuPosition.under,
         color: Theme.of(context).cardTheme.color,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        icon: const Icon(Icons.more_horiz_rounded, color: AppColors.card),
+        icon: Icon(Icons.more_horiz_rounded, color: AppColors.card),
         iconSize: 22,
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints(minWidth: 200),
@@ -2280,7 +2280,7 @@ class _SheetSectionLabel extends StatelessWidget {
       padding: const EdgeInsets.only(top: 20, bottom: 10),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.muted,
           fontSize: 13,
           fontWeight: FontWeight.w900,
@@ -2460,7 +2460,7 @@ class _WallInteractionHint extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Text(
               context.l10n.tapToOpenDrag,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.muted,
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
@@ -2501,7 +2501,7 @@ class _DemoWallBanner extends StatelessWidget {
           Expanded(
             child: Text(
               context.l10n.demoWallPreview,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.muted,
                 fontWeight: FontWeight.w800,
                 height: 1.25,
@@ -2549,7 +2549,7 @@ class _BackupReminderBanner extends StatelessWidget {
           Expanded(
             child: Text(
               context.l10n.backupReminder(unsavedCount),
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.muted,
                 fontWeight: FontWeight.w800,
                 height: 1.25,
@@ -2650,10 +2650,7 @@ class _PlacementPreviewSheetState extends State<_PlacementPreviewSheet> {
                         widget.subtitle,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppColors.muted,
-                          height: 1.3,
-                        ),
+                        style: TextStyle(color: AppColors.muted, height: 1.3),
                       ),
                     ],
                   ),

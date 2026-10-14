@@ -55,7 +55,7 @@ class WallSwitcherButton extends ConsumerWidget {
                   text,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.card,
                     fontSize: 13.5,
                     fontWeight: FontWeight.w900,
@@ -77,7 +77,7 @@ class WallSwitcherButton extends ConsumerWidget {
                     Flexible(child: name)
                   else
                     name,
-                  const Icon(
+                  Icon(
                     Icons.unfold_more_rounded,
                     size: 18,
                     color: AppColors.muted,

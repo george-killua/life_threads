@@ -117,7 +117,7 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
                     _Panel(
                       child: Text(
                         l10n.yearThreadNoYears,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.muted,
                           height: 1.45,
                           fontWeight: FontWeight.w700,
@@ -230,7 +230,7 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
                   const SizedBox(height: 6),
                   Text(
                     l10n.yearThreadSettingsBody,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.muted,
                       height: 1.4,
                       fontWeight: FontWeight.w600,
@@ -327,7 +327,7 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
               selection.length,
               YearThread.maxMemories,
             ),
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.muted,
               fontWeight: FontWeight.w800,
             ),
@@ -352,7 +352,7 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Text(
             l10n.yearThreadNeedMore(YearThread.minMemories),
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.rose,
               fontWeight: FontWeight.w800,
             ),
@@ -701,7 +701,7 @@ class _ProgressDialog extends StatelessWidget {
                 const SizedBox(height: 10),
                 Text(
                   '${(value * 100).round()} %',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.muted,
                     fontWeight: FontWeight.w800,
                   ),
@@ -775,7 +775,7 @@ class _MemoryRow extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       yearThreadDate(context, memory.event.occurredAt),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.muted,
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,

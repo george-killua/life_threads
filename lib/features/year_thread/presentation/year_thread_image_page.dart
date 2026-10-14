@@ -107,7 +107,7 @@ class YearThreadImagePage extends StatelessWidget {
               Text(
                 '${stats.year}',
                 textDirection: TextDirection.ltr,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.card,
                   fontSize: 64,
                   height: 1.05,
@@ -135,7 +135,7 @@ class YearThreadImagePage extends StatelessWidget {
                 ].join(' · '),
                 textAlign: TextAlign.center,
                 maxLines: 2,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.text,
                   fontSize: 14,
                   height: 1.35,

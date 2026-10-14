@@ -3135,6 +3135,84 @@ abstract class AppLocalizations {
   /// **'Sunset colours and instant-photo cards.'**
   String get themeSummerEveningDescription;
 
+  /// No description provided for @themeYearRoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Always available'**
+  String get themeYearRoundTitle;
+
+  /// No description provided for @themeComingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming later'**
+  String get themeComingTitle;
+
+  /// No description provided for @themeComingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview the next seasons. Each theme opens on the first day of its season.'**
+  String get themeComingBody;
+
+  /// No description provided for @themeAvailableFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From {date}'**
+  String themeAvailableFrom(DateTime date);
+
+  /// No description provided for @themeBrowse.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{See all themes} =1{See all themes, with 1 for this season} other{See all themes, with {count} for this season}}'**
+  String themeBrowse(int count);
+
+  /// No description provided for @themeSeaside.
+  ///
+  /// In en, this message translates to:
+  /// **'Seaside'**
+  String get themeSeaside;
+
+  /// No description provided for @themeSeasideDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Turquoise water, sandy paper and warm summer light.'**
+  String get themeSeasideDescription;
+
+  /// No description provided for @themeSnowyCabin.
+  ///
+  /// In en, this message translates to:
+  /// **'Snowy Cabin'**
+  String get themeSnowyCabin;
+
+  /// No description provided for @themeSnowyCabinDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Fireside wood, frosted cards and soft snow outside.'**
+  String get themeSnowyCabinDescription;
+
+  /// No description provided for @themeSpringMeadow.
+  ///
+  /// In en, this message translates to:
+  /// **'Spring Meadow'**
+  String get themeSpringMeadow;
+
+  /// No description provided for @themeSpringMeadowDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Fresh green grass, pale cards and yellow sunshine.'**
+  String get themeSpringMeadowDescription;
+
+  /// No description provided for @themeMistyForest.
+  ///
+  /// In en, this message translates to:
+  /// **'Misty Forest'**
+  String get themeMistyForest;
+
+  /// No description provided for @themeMistyForestDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet pines, morning fog and golden leaves.'**
+  String get themeMistyForestDescription;
+
   /// No description provided for @demoFirstDanceTitle.
   ///
   /// In en, this message translates to:

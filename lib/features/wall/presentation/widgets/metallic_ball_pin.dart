@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/theme/app_colors.dart';
+
 /// Satin bronze ball-head pin matching the physical pin reference.
 class MetallicBallPin extends StatelessWidget {
   const MetallicBallPin({
@@ -18,10 +20,10 @@ class MetallicBallPin extends StatelessWidget {
   /// Slightly stronger shadow while dragging.
   final bool elevated;
 
-  static const _highlight = Color(0xFFE6C78A);
-  static const _mid = Color(0xFFB89255);
-  static const _shadow = Color(0xFF6A4824);
-  static const _deep = Color(0xFF4A3118);
+  static Color get _highlight => AppColors.pinHighlight;
+  static Color get _mid => AppColors.pinMid;
+  static Color get _shadow => AppColors.pinShadow;
+  static Color get _deep => AppColors.pinDeep;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +91,7 @@ class _BallHead extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: const RadialGradient(
+        gradient: RadialGradient(
           center: Alignment(-0.38, -0.42),
           radius: 0.95,
           colors: [
@@ -169,7 +171,7 @@ class _Stem extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(width),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [

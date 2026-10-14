@@ -86,7 +86,7 @@ class _FamilySignInPageState extends ConsumerState<FamilySignInPage> {
         Text(
           l10n.familySignInFinePrint,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.muted,
             fontSize: 12.5,
             height: 1.4,

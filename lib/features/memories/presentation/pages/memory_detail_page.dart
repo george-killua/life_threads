@@ -414,7 +414,7 @@ class _CinematicHero extends StatelessWidget {
                         _heroSubtitle(context, event),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.muted,
                           fontWeight: FontWeight.w800,
                           height: 1.25,
@@ -710,7 +710,7 @@ class _MetaCard extends StatelessWidget {
           const SizedBox(height: 9),
           Text(
             label.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.muted,
               fontSize: 10,
               fontWeight: FontWeight.w900,
@@ -742,7 +742,7 @@ class _StorySection extends StatelessWidget {
       title: context.l10n.whyMemoryMatters,
       child: Text(
         event.description,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 18,
           height: 1.62,
           color: AppColors.text,
@@ -859,7 +859,7 @@ class _PeopleSection extends StatelessWidget {
                       ),
                       Text(
                         _personContactLabel(person),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.muted,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
@@ -941,7 +941,7 @@ class _AttachedNoteCard extends StatelessWidget {
             width: 9,
             height: 9,
             margin: const EdgeInsets.only(top: 7),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.paperInk,
               shape: BoxShape.circle,
             ),
@@ -963,7 +963,7 @@ class _AttachedNoteCard extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text(
                   note.content,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.paperInk,
                     fontSize: 16,
                     height: 1.38,
@@ -1013,7 +1013,7 @@ class _ConnectedThreadPath extends StatelessWidget {
       child: events.isEmpty
           ? Text(
               context.l10n.noConnectedMemoriesYet,
-              style: const TextStyle(color: AppColors.muted, height: 1.45),
+              style: TextStyle(color: AppColors.muted, height: 1.45),
             )
           : Column(
               children: [
@@ -1115,7 +1115,7 @@ class _ConnectedMemoryNode extends StatelessWidget {
                                   : _eventContextLabel(context, event),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.muted,
                                 height: 1.25,
                               ),
@@ -1343,7 +1343,7 @@ class _PhotoPreviewPageState extends State<_PhotoPreviewPage> {
                   children: [
                     Text(
                       '${_index + 1} / ${widget.photos.length}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.muted,
                         fontWeight: FontWeight.w900,
                       ),
@@ -1399,11 +1399,7 @@ class _PreviewPhotoImage extends StatelessWidget {
     final isAsset = photo.path.startsWith('assets/');
     final exists = isAsset || File(photo.path).existsSync();
     if (!exists) {
-      return const Icon(
-        Icons.broken_image_rounded,
-        color: AppColors.muted,
-        size: 72,
-      );
+      return Icon(Icons.broken_image_rounded, color: AppColors.muted, size: 72);
     }
 
     return Hero(
@@ -1412,7 +1408,7 @@ class _PreviewPhotoImage extends StatelessWidget {
           ? Image.asset(
               photo.path,
               fit: BoxFit.contain,
-              errorBuilder: (_, _, _) => const Icon(
+              errorBuilder: (_, _, _) => Icon(
                 Icons.broken_image_rounded,
                 color: AppColors.muted,
                 size: 72,
@@ -1421,7 +1417,7 @@ class _PreviewPhotoImage extends StatelessWidget {
           : Image.file(
               File(photo.path),
               fit: BoxFit.contain,
-              errorBuilder: (_, _, _) => const Icon(
+              errorBuilder: (_, _, _) => Icon(
                 Icons.broken_image_rounded,
                 color: AppColors.muted,
                 size: 72,

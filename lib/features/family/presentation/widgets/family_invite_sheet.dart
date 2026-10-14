@@ -81,7 +81,7 @@ class FamilyInviteSheet extends ConsumerWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textDirection: TextDirection.ltr,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.muted,
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,

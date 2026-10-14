@@ -96,7 +96,7 @@ class _WallTextNoteWidgetState extends State<WallTextNoteWidget> {
                             colors: [
                               widget.item.color.withValues(alpha: 0.98),
                               widget.item.color,
-                              const Color(0xFFD7B875),
+                              AppColors.cardDark,
                             ],
                           ),
                           borderRadius: BorderRadius.circular(20),
@@ -127,7 +127,7 @@ class _WallTextNoteWidgetState extends State<WallTextNoteWidget> {
                                 widget.item.content,
                                 maxLines: 6,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppColors.paperInk,
                                   fontSize: 15,
                                   height: 1.35,
@@ -237,7 +237,7 @@ class _NoteLinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final line = Paint()
-      ..color = const Color(0xFF8A6A32).withValues(alpha: 0.1)
+      ..color = AppColors.paperMuted.withValues(alpha: 0.1)
       ..strokeWidth = 1;
     final edge = Paint()
       ..color = Colors.black.withValues(alpha: 0.04)

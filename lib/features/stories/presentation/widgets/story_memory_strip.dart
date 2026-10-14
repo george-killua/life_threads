@@ -47,7 +47,7 @@ class StoryMemoryStrip extends StatelessWidget {
                 child: Text(
                   memories.length > 1 ? l10n.storyMemoriesReorderHint : '',
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: AppColors.muted, fontSize: 12),
+                  style: TextStyle(color: AppColors.muted, fontSize: 12),
                 ),
               ),
             ],

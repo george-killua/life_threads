@@ -96,7 +96,7 @@ class _FamilyReportPageState extends ConsumerState<FamilyReportPage> {
       children: [
         Text(
           l10n.familyReportIntro,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.muted,
             height: 1.45,
             fontWeight: FontWeight.w600,
@@ -174,7 +174,7 @@ class _FamilyReportPageState extends ConsumerState<FamilyReportPage> {
         Text(
           l10n.familyReportReviewNote,
           textAlign: TextAlign.center,
-          style: const TextStyle(color: AppColors.muted, fontSize: 12.5),
+          style: TextStyle(color: AppColors.muted, fontSize: 12.5),
         ),
       ],
     );

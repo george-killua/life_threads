@@ -78,7 +78,7 @@ Future<String?> showMemoryCapsulePasswordDialog(
                     const SizedBox(height: 10),
                     Text(
                       l10n.capsulePasswordWarning,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.muted,
                         fontSize: 12,
                         height: 1.35,
@@ -195,7 +195,7 @@ Future<bool> showMemoryCapsuleImportPreview(
                 : preview.description,
             maxLines: 4,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: AppColors.muted, height: 1.35),
+            style: TextStyle(color: AppColors.muted, height: 1.35),
           ),
           const SizedBox(height: 14),
           if (preview.locationLabel.trim().isNotEmpty)

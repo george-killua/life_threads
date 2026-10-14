@@ -165,10 +165,8 @@ class _MemoryCapsuleDeepLinkListenerState
       context: _uiContext,
       barrierDismissible: false,
       // Back must not dismiss it: the caller pops it when work finishes.
-      builder: (context) => const PopScope(
-        canPop: false,
-        child: _SharedMemoryProgressDialog(),
-      ),
+      builder: (context) =>
+          const PopScope(canPop: false, child: _SharedMemoryProgressDialog()),
     );
   }
 
@@ -206,7 +204,7 @@ class _SharedMemoryProgressDialog extends StatelessWidget {
           Expanded(
             child: Text(
               context.l10n.openingSharedMemory,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.text,
                 fontWeight: FontWeight.w800,
               ),

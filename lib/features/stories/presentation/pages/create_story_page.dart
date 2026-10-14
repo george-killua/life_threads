@@ -284,7 +284,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
                   ),
                   subtitle: Text(
                     l10n.storyVideoBody,
-                    style: const TextStyle(color: AppColors.muted),
+                    style: TextStyle(color: AppColors.muted),
                   ),
                 ),
                 if (_video) ...[
@@ -337,7 +337,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
                     const SizedBox(height: 8),
                     Text(
                       l10n.storyMusicNoneHint,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.muted,
                         fontSize: 12.5,
                         height: 1.35,
@@ -358,7 +358,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
                       Expanded(
                         child: Text(
                           l10n.storyPreviewFree,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.muted,
                             fontSize: 12.5,
                             height: 1.35,
@@ -674,7 +674,7 @@ class _StoryMemoryPickerState extends State<_StoryMemoryPicker> {
           child: Text(
             l10n.storyNoMemories,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.muted, height: 1.4),
+            style: TextStyle(color: AppColors.muted, height: 1.4),
           ),
         ),
       );
@@ -701,7 +701,7 @@ class _StoryMemoryPickerState extends State<_StoryMemoryPicker> {
                 Expanded(
                   child: Text(
                     l10n.storyPickBody(StorySelection.maxMemories),
-                    style: const TextStyle(color: AppColors.muted),
+                    style: TextStyle(color: AppColors.muted),
                   ),
                 ),
                 Text(
@@ -780,7 +780,7 @@ class _NoMatch extends StatelessWidget {
         child: Text(
           context.l10n.storySearchEmpty(query.trim()),
           textAlign: TextAlign.center,
-          style: const TextStyle(color: AppColors.muted, height: 1.4),
+          style: TextStyle(color: AppColors.muted, height: 1.4),
         ),
       ),
     );
@@ -836,7 +836,7 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
                   ? Center(
                       child: Text(
                         l10n.storyAllMemoriesAdded,
-                        style: const TextStyle(color: AppColors.muted),
+                        style: TextStyle(color: AppColors.muted),
                       ),
                     )
                   : matches.isEmpty
@@ -926,7 +926,7 @@ class _PickerTile extends StatelessWidget {
                         storyMemoryDetail(context, event),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.muted,
                           fontSize: 12.5,
                         ),
@@ -951,7 +951,7 @@ class _PickerTile extends StatelessWidget {
                   child: selected
                       ? Text(
                           '$order',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.paperInk,
                             fontWeight: FontWeight.w900,
                           ),

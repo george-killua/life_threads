@@ -56,7 +56,7 @@ class WallEmptyState extends StatelessWidget {
             Text(
               context.l10n.emptyWallBody,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.muted, height: 1.45),
+              style: TextStyle(color: AppColors.muted, height: 1.45),
             ),
             const SizedBox(height: 22),
             FilledButton.icon(

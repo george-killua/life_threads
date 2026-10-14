@@ -701,6 +701,34 @@
   "themeSpringBlossomDescription": "Pale blossom cards with a soft pink glow.",
   "themeSummerEvening": "Summer Evening",
   "themeSummerEveningDescription": "Sunset colours and instant-photo cards.",
+  "themeYearRoundTitle": "Always available",
+  "themeComingTitle": "Coming later",
+  "themeComingBody": "Preview the next seasons. Each theme opens on the first day of its season.",
+  "themeAvailableFrom": "From {date}",
+  "@themeAvailableFrom": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "MMMd"
+      }
+    }
+  },
+  "themeBrowse": "{count, plural, =0{See all themes} =1{See all themes, with 1 for this season} other{See all themes, with {count} for this season}}",
+  "@themeBrowse": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "themeSeaside": "Seaside",
+  "themeSeasideDescription": "Turquoise water, sandy paper and warm summer light.",
+  "themeSnowyCabin": "Snowy Cabin",
+  "themeSnowyCabinDescription": "Fireside wood, frosted cards and soft snow outside.",
+  "themeSpringMeadow": "Spring Meadow",
+  "themeSpringMeadowDescription": "Fresh green grass, pale cards and yellow sunshine.",
+  "themeMistyForest": "Misty Forest",
+  "themeMistyForestDescription": "Quiet pines, morning fog and golden leaves.",
   "demoFirstDanceTitle": "Our first dance",
   "demoFirstDanceStory": "The band played our song and the whole barn went quiet. I stepped on your foot twice, you laughed through all of it, and for three minutes nobody else was there.",
   "demoFirstDancePlace": "Salzburg",

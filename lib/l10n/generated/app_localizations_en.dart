@@ -1699,6 +1699,64 @@ class AppLocalizationsEn extends AppLocalizations {
       'Sunset colours and instant-photo cards.';
 
   @override
+  String get themeYearRoundTitle => 'Always available';
+
+  @override
+  String get themeComingTitle => 'Coming later';
+
+  @override
+  String get themeComingBody =>
+      'Preview the next seasons. Each theme opens on the first day of its season.';
+
+  @override
+  String themeAvailableFrom(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'From $dateString';
+  }
+
+  @override
+  String themeBrowse(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'See all themes, with $count for this season',
+      one: 'See all themes, with 1 for this season',
+      zero: 'See all themes',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get themeSeaside => 'Seaside';
+
+  @override
+  String get themeSeasideDescription =>
+      'Turquoise water, sandy paper and warm summer light.';
+
+  @override
+  String get themeSnowyCabin => 'Snowy Cabin';
+
+  @override
+  String get themeSnowyCabinDescription =>
+      'Fireside wood, frosted cards and soft snow outside.';
+
+  @override
+  String get themeSpringMeadow => 'Spring Meadow';
+
+  @override
+  String get themeSpringMeadowDescription =>
+      'Fresh green grass, pale cards and yellow sunshine.';
+
+  @override
+  String get themeMistyForest => 'Misty Forest';
+
+  @override
+  String get themeMistyForestDescription =>
+      'Quiet pines, morning fog and golden leaves.';
+
+  @override
   String get demoFirstDanceTitle => 'Our first dance';
 
   @override

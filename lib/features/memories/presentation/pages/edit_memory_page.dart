@@ -608,7 +608,7 @@ class _PhotoGpsStatus extends StatelessWidget {
                       longitude!.toStringAsFixed(5),
                     )
                   : l10n.photoGpsMissing,
-              style: const TextStyle(color: AppColors.muted, height: 1.35),
+              style: TextStyle(color: AppColors.muted, height: 1.35),
             ),
           ),
         ],
@@ -787,7 +787,7 @@ class _GalleryEditor extends StatelessWidget {
     if (photos.isEmpty) {
       return Text(
         context.l10n.noPhotosFound,
-        style: const TextStyle(color: AppColors.muted, height: 1.45),
+        style: TextStyle(color: AppColors.muted, height: 1.45),
       );
     }
 
@@ -874,16 +874,13 @@ class _GalleryPhotoTile extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   '${photo.width} x ${photo.height} • ${_shortDate(photo.capturedAt)}',
-                  style: const TextStyle(color: AppColors.muted, fontSize: 12),
+                  style: TextStyle(color: AppColors.muted, fontSize: 12),
                 ),
                 if (photo.hasLocation) ...[
                   const SizedBox(height: 3),
                   Text(
                     '${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}',
-                    style: const TextStyle(
-                      color: AppColors.muted,
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: AppColors.muted, fontSize: 12),
                   ),
                 ],
               ],

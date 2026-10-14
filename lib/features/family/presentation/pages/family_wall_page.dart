@@ -487,7 +487,7 @@ class _SyncChip extends StatelessWidget {
       FamilySyncStatus.error => (
         Icons.error_outline_rounded,
         l10n.familySyncFailed,
-        Colors.redAccent,
+        AppColors.error,
       ),
       FamilySyncStatus.idle => (Icons.check_rounded, '', AppColors.sage),
     };
@@ -548,7 +548,7 @@ class _CenteredPanel extends StatelessWidget {
             Text(
               body,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.muted,
                 height: 1.45,
                 fontWeight: FontWeight.w600,

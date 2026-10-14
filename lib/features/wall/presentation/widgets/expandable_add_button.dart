@@ -161,7 +161,7 @@ class _ActionChipButton extends StatelessWidget {
                   children: [
                     Text(
                       label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.text,
                         fontWeight: FontWeight.w900,
                       ),
@@ -169,7 +169,7 @@ class _ActionChipButton extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.muted,
                         fontSize: 11,
                         fontWeight: FontWeight.w700,

@@ -71,7 +71,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     const Spacer(),
                     Text(
                       '${_pageIndex + 1}/$_pageCount',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.muted,
                         fontWeight: FontWeight.w800,
                         fontSize: 13,
@@ -344,7 +344,7 @@ class _WelcomeStep extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           body,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.muted,
             fontSize: 16,
             height: 1.45,
@@ -436,7 +436,7 @@ class _FeatureCard extends StatelessWidget {
                   text,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.muted,
                     height: 1.35,
                     fontWeight: FontWeight.w600,
@@ -558,7 +558,7 @@ class _PrivacyStep extends StatelessWidget {
         const SizedBox(height: 14),
         Text(
           body,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.muted,
             fontSize: 17,
             height: 1.45,
@@ -592,7 +592,7 @@ class _GetStartedStep extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           body,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.muted,
             fontSize: 16,
             height: 1.45,

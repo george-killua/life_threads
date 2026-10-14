@@ -102,7 +102,7 @@ class _FamilyTermsPageState extends State<FamilyTermsPage> {
         Text(
           l10n.familyTermsVersion(widget.account.requiredTermsVersion),
           textAlign: TextAlign.center,
-          style: const TextStyle(color: AppColors.muted, fontSize: 12),
+          style: TextStyle(color: AppColors.muted, fontSize: 12),
         ),
       ],
     );

@@ -1688,6 +1688,65 @@ class AppLocalizationsAr extends AppLocalizations {
       'ألوان الغروب وبطاقات الصور الفورية.';
 
   @override
+  String get themeYearRoundTitle => 'متاحة دائماً';
+
+  @override
+  String get themeComingTitle => 'قريباً';
+
+  @override
+  String get themeComingBody =>
+      'شاهد سمات المواسم القادمة. تُفتح كل سمة في أول يوم من موسمها.';
+
+  @override
+  String themeAvailableFrom(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'من $dateString';
+  }
+
+  @override
+  String themeBrowse(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'عرض كل السمات، منها $count لهذا الموسم',
+      two: 'عرض كل السمات، منها سمتان لهذا الموسم',
+      one: 'عرض كل السمات، منها سمة واحدة لهذا الموسم',
+      zero: 'عرض كل السمات',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get themeSeaside => 'على الشاطئ';
+
+  @override
+  String get themeSeasideDescription =>
+      'مياه فيروزية وورق بلون الرمل وضوء صيفي دافئ.';
+
+  @override
+  String get themeSnowyCabin => 'كوخ ثلجي';
+
+  @override
+  String get themeSnowyCabinDescription =>
+      'خشب بجانب المدفأة وبطاقات مكسوّة بالصقيع وثلج هادئ في الخارج.';
+
+  @override
+  String get themeSpringMeadow => 'مرج الربيع';
+
+  @override
+  String get themeSpringMeadowDescription =>
+      'عشب أخضر منعش وبطاقات فاتحة وشمس صفراء.';
+
+  @override
+  String get themeMistyForest => 'غابة الضباب';
+
+  @override
+  String get themeMistyForestDescription =>
+      'صنوبر هادئ وضباب الصباح وأوراق ذهبية.';
+
+  @override
   String get demoFirstDanceTitle => 'رقصتنا الأولى';
 
   @override

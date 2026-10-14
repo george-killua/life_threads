@@ -71,7 +71,7 @@ class ArchiveTransferPage extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text(
                       context.l10n.archiveTransferHeroBody,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.muted,
                         height: 1.45,
                         fontWeight: FontWeight.w600,
@@ -138,7 +138,7 @@ class _StepCard extends StatelessWidget {
             backgroundColor: AppColors.gold,
             child: Text(
               number,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.paperInk,
                 fontWeight: FontWeight.w900,
               ),
@@ -167,7 +167,7 @@ class _StepCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   body,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.muted,
                     height: 1.4,
                     fontWeight: FontWeight.w600,

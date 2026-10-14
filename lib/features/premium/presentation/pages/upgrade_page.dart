@@ -245,7 +245,7 @@ class _SubscriptionHero extends StatelessWidget {
                 : context.l10n.premiumHeroLockedBody(
                     PremiumEntitlement.freeMemoryLimit,
                   ),
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.muted,
               height: 1.45,
               fontWeight: FontWeight.w600,
@@ -433,7 +433,7 @@ class _BenefitCard extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text(
                   body,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.muted,
                     height: 1.32,
                     fontSize: 13,
@@ -490,7 +490,7 @@ class _SubscriptionOfferCard extends StatelessWidget {
         children: [
           Text(
             context.l10n.lifetimeUnlock,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.paperInk,
               fontSize: 23,
               fontWeight: FontWeight.w900,
@@ -502,8 +502,8 @@ class _SubscriptionOfferCard extends StatelessWidget {
             isPremium
                 ? context.l10n.premiumActiveOnDevice
                 : context.l10n.onePurchaseBody(_storeName),
-            style: const TextStyle(
-              color: Color(0xFF6D5741),
+            style: TextStyle(
+              color: AppColors.paperMuted,
               height: 1.38,
               fontWeight: FontWeight.w700,
             ),
@@ -566,8 +566,8 @@ class _SubscriptionOfferCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             context.l10n.purchasesHandledByGooglePlay(_storeName),
-            style: const TextStyle(
-              color: Color(0xFF7A654E),
+            style: TextStyle(
+              color: AppColors.paperMuted,
               fontSize: 12,
               height: 1.35,
               fontWeight: FontWeight.w700,
@@ -580,7 +580,7 @@ class _SubscriptionOfferCard extends StatelessWidget {
 }
 
 /// Text on the light offer card.
-const _cardBody = Color(0xFF6D5741);
+Color get _cardBody => AppColors.paperMuted;
 
 /// Buttons made for the light offer card: the dark app theme's defaults
 /// (light text, dark outline) disappear on cream.
@@ -633,7 +633,7 @@ class _PricePill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF352817).withValues(alpha: 0.1),
+        color: AppColors.paperInk.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.gold.withValues(alpha: 0.25)),
       ),
@@ -650,7 +650,7 @@ class _PricePill extends StatelessWidget {
               purchaseState.status == PremiumPurchaseStatus.ready
                   ? context.l10n.lifetimeUnlockWithPrice(price)
                   : _statusLabel(context, purchaseState.status),
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.paperInk,
                 fontWeight: FontWeight.w900,
               ),
@@ -720,7 +720,7 @@ class _PurchaseMessage extends StatelessWidget {
     ) = switch (message) {
       PremiumPurchaseMessage.restored || PremiumPurchaseMessage.active => (
         AppColors.sage.withValues(alpha: 0.22),
-        const Color(0xFF38512D),
+        AppColors.successInk,
         Icons.check_circle_rounded,
       ),
       PremiumPurchaseMessage.openingCheckout ||
@@ -734,7 +734,7 @@ class _PurchaseMessage extends StatelessWidget {
       ),
       _ => (
         AppColors.rose.withValues(alpha: 0.18),
-        const Color(0xFF7A2B24),
+        AppColors.errorInk,
         Icons.error_outline_rounded,
       ),
     };
@@ -843,7 +843,7 @@ class _BillingReadyNotice extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text(
                   context.l10n.premiumLocalFirstBody,
-                  style: const TextStyle(color: AppColors.muted, height: 1.4),
+                  style: TextStyle(color: AppColors.muted, height: 1.4),
                 ),
               ],
             ),
