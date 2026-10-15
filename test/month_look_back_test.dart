@@ -199,4 +199,31 @@ void main() {
     );
     expect(next.onPressed, isNull);
   });
+
+  testWidgets('from the menu, an empty month gives way to the latest one', (
+    tester,
+  ) async {
+    // 20 November: no card month, and November has no memories yet.
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          memoryRepositoryProvider.overrideWith(_Repo.new),
+          lookBackClockProvider.overrideWithValue(() => DateTime(2026, 11, 20)),
+        ],
+        child: MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Consumer(
+            builder: (context, ref, _) =>
+                ref.watch(memoryRepositoryProvider).hasValue
+                ? const MonthLookBackPage()
+                : const SizedBox(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Your October 2026'), findsOneWidget);
+  });
 }

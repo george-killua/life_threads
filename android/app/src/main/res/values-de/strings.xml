@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_description">Jeden Tag eine Erinnerung von deiner Wand.</string>
+    <string name="widget_placeholder_title">Deine Erinnerungen</string>
+    <string name="widget_placeholder_subtitle">Öffne LifeThreads einmal, um dieses Widget zu füllen.</string>
+</resources>

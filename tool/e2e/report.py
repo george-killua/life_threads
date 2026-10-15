@@ -23,6 +23,9 @@ PROTOCOL = [
     ("WAL-08", "Free limit"),
     ("WAL-09", "Search, walls and hidden memories"),
     ("WAL-10", "Edit pencils, rename and delete a wall"),
+    ("WAL-11", "Unfinished memory kept as a draft"),
+    ("WAL-12", "Look back on a month"),
+    ("WAL-13", "Home screen widget"),
     ("PRM-01", "Premium page"),
     ("PRM-02", "Subscribe"),
     ("PRM-03", "Restore"),
@@ -56,6 +59,7 @@ MANUAL = {
     "BAK-03": "The capsule link opens on a second device.",
     "BAK-04": "Scanning a QR code needs a camera.",
     "SET-04": "A person's impression.",
+    "WAL-13": "Widgets are added on the home screen by hand.",
 }
 
 

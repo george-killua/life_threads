@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">LifeThreads</string>
+    <string name="widget_description">A memory from your wall, every day.</string>
+    <string name="widget_placeholder_title">Your memories</string>
+    <string name="widget_placeholder_subtitle">Open LifeThreads once to fill this widget.</string>
 </resources>

@@ -3401,7 +3401,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get draftContinue => 'Continue';
+  String get draftContinue => 'Continue draft';
 
   @override
   String get draftStartNew => 'Start new';
@@ -3494,4 +3494,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lookBackNotificationPrivate => 'Your month in memories is ready.';
+
+  @override
+  String get homeWidgetLocked => 'Open LifeThreads to see your memories.';
 }

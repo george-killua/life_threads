@@ -5,6 +5,8 @@ import '../core/localization/locale_controller.dart';
 import '../features/app_lock/app_lock_gate.dart';
 import '../features/capsule/presentation/widgets/memory_capsule_deep_link_listener.dart';
 import '../features/family/presentation/widgets/family_invite_link_listener.dart';
+import '../features/home_widget/data/home_widget_sync.dart';
+import '../features/home_widget/presentation/home_widget_link_listener.dart';
 import '../features/memories/data/memory_repository.dart';
 import '../features/on_this_day/data/on_this_day_scheduler.dart';
 import '../features/premium/data/premium_billing_controller.dart';
@@ -46,6 +48,8 @@ class LifeThreadsApp extends ConsumerWidget {
     ref.listen(premiumBillingProvider, (_, _) {});
     // Reschedules On this day reminders as settings and memories change.
     ref.listen(onThisDaySchedulerProvider, (_, _) {});
+    // Keeps the home screen widget's memories current.
+    ref.listen(homeWidgetSyncProvider, (_, _) {});
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
@@ -69,7 +73,9 @@ class LifeThreadsApp extends ConsumerWidget {
           child: AppLockGate(
             child: MemoryCapsuleDeepLinkListener(
               child: FamilyInviteLinkListener(
-                child: child ?? const SizedBox.shrink(),
+                child: HomeWidgetLinkListener(
+                  child: child ?? const SizedBox.shrink(),
+                ),
               ),
             ),
           ),

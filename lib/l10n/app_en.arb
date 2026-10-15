@@ -1597,7 +1597,7 @@
       }
     }
   },
-  "draftContinue": "Continue",
+  "draftContinue": "Continue draft",
   "draftStartNew": "Start new",
   "lookBackMenu": "Look back on a month",
   "lookBackTitle": "Your {month}",
@@ -1668,5 +1668,6 @@
       }
     }
   },
-  "lookBackNotificationPrivate": "Your month in memories is ready."
+  "lookBackNotificationPrivate": "Your month in memories is ready.",
+  "homeWidgetLocked": "Open LifeThreads to see your memories."
 }

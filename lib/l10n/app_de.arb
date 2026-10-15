@@ -1017,7 +1017,7 @@
   "draftResumeTitle": "Weitermachen, wo du aufgehört hast?",
   "draftResumeBody": "Du hast am {date} eine Erinnerung begonnen und noch nicht gespeichert.",
   "draftResumePhotos": "{count, plural, =1{1 Foto} other{{count} Fotos}}",
-  "draftContinue": "Weitermachen",
+  "draftContinue": "Entwurf fortsetzen",
   "draftStartNew": "Neu beginnen",
   "lookBackMenu": "Monatsrückblick",
   "lookBackTitle": "Dein {month}",
@@ -1033,5 +1033,6 @@
   "lookBackPreviousMonth": "Vorheriger Monat",
   "lookBackNextMonth": "Nächster Monat",
   "lookBackNotificationBody": "{month}: {count, plural, =1{1 Erinnerung} other{{count} Erinnerungen}} zum Zurückblicken.",
-  "lookBackNotificationPrivate": "Dein Monat in Erinnerungen ist bereit."
+  "lookBackNotificationPrivate": "Dein Monat in Erinnerungen ist bereit.",
+  "homeWidgetLocked": "Öffne LifeThreads, um deine Erinnerungen zu sehen."
 }

@@ -1,0 +1,52 @@
+# WAL-11 An unfinished memory is kept as a draft and comes back;
+# WAL-12 Look back on a month from the More menu.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+name: WAL-11 / WAL-12 Drafts and look back on a month
+tags: [protocol, wal]
+---
+- runFlow: ../subflows/three_memories.yaml
+
+# WAL-11: start a memory, leave without saving, come back to it.
+- tapOn: "Add"
+- tapOn: "Memory Full guided story.*"
+- extendedWaitUntil:
+    visible: "Save it before it fades"
+    timeout: 15000
+- tapOn: "Moment"
+- inputText: "Half a thought"
+- runFlow: ../subflows/hide_keyboard.yaml
+- tapOn: "Save it before it fades"   # closes the keyboard (iOS)
+- tapOn: "Back"
+- extendedWaitUntil:
+    visible: "Kept as a draft.*"
+    timeout: 10000
+- tapOn: "Add"
+- tapOn: "Memory Full guided story.*"
+- extendedWaitUntil:
+    visible: "Continue where you left off?"
+    timeout: 15000
+- assertVisible: "(?s).*Half a thought.*"
+- takeScreenshot: WAL-11_draft_offered
+- tapOn: "Continue draft"
+- assertVisible: "Half a thought"
+- takeScreenshot: WAL-11_draft_continued
+- tapOn: "Back"
+- tapOn: "Add"
+- tapOn: "Memory Full guided story.*"
+- tapOn: "Start new"
+- assertNotVisible: "Half a thought"
+- tapOn: "Back"
+
+# WAL-12: the month's memories, people and places.
+- runFlow:
+    file: ../subflows/more.yaml
+    env:
+      ITEM: "Look back on a month"
+- extendedWaitUntil:
+    visible: "Your .*"
+    timeout: 10000
+- assertVisible: "\\d+ memor(y|ies)"
+- takeScreenshot: WAL-12_look_back
+- tapOn: "Previous month"
+- assertVisible: "Your .*"
+- tapOn: "Back"

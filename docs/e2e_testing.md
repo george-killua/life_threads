@@ -27,7 +27,7 @@ protocol ID for iOS and Android, screenshots of every checked step, and logs.
 | `.maestro/flows/` | Maestro taps the real debug app like a person, including system dialogs, the photo picker, the contact picker, Save to Photos and the share sheet | INS, WAL, PRM-01, STO, YR, OTD, BAK-01/02, SET |
 | `integration_test/` | Flutter integration test with a stand-in store and family server (a simulator has no store account and no Google/Apple sign-in) | PRM-02/03, FAM-01..05 |
 | `.maestro/large/` | The same app at the largest iOS text size (Accessibility XXXL; the app shows text at up to 2×): adds a memory and opens every main screen, with screenshots | SET-02 (text size) |
-| by a person | the protocol page | PRM-04 (Play Store promo code), BAK-03 (capsule on a second device), BAK-04 (QR camera), SET-04 |
+| by a person | the protocol page | PRM-04 (Play Store promo code), BAK-03 (capsule on a second device), BAK-04 (QR camera), WAL-13 (home screen widget), SET-04 |
 
 Test data: `tool/e2e/make_photos.py` writes six photos with real EXIF dates and
 GPS positions; one is dated exactly one year ago (On this day), three fall in

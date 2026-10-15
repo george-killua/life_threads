@@ -2,6 +2,28 @@
 
 What changed in each TestFlight / Play build. Newest first.
 
+## Next build – 16 October 2026 (not uploaded yet)
+
+**New**
+- **Home screen widget** (iPhone and Android, free): a memory from your wall
+  with its photo – one from this day in an earlier year when there is one,
+  otherwise a different memory each day. Tapping it opens the memory. Small,
+  medium and large on iPhone; resizable on Android. With the app lock on it
+  shows "LifeThreads is locked" and no memory or photo. Hidden memories never
+  appear. Details: [home_widget.md](home_widget.md).
+- **Unfinished memories are kept as drafts**: "Add memory" saves while you
+  type. Leaving shows "Kept as a draft"; the next time it asks "Continue where
+  you left off?" with *Continue draft* / *Start new*. Survives closing the app.
+- **Look back on a month**: More › Look back on a month shows "Your
+  September" – its memories, the people in them and the places, with arrows
+  to other months and "Create story". In the first week of a month a card on
+  the wall offers the month before (Thread of the Year's card goes first in
+  January). With On this day reminders on, a notification on the 1st:
+  "September: 5 memories to look back on."
+
+**Tests**: 370 automated tests pass; new UI test flow `13_drafts_look_back`
+(WAL-11, WAL-12) written but not run yet.
+
 ## 1.0.0 (20) – 15 October 2026
 
 **New**

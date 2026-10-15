@@ -19,7 +19,7 @@ class MonthLookBackPage extends ConsumerStatefulWidget {
   const MonthLookBackPage({super.key, this.year, this.month});
 
   /// The month shown first; by default the one the wall card offers, else
-  /// the current month.
+  /// the current month, or the latest with memories when that is empty.
   final int? year;
   final int? month;
 
@@ -35,8 +35,21 @@ class _MonthLookBackPageState extends ConsumerState<MonthLookBackPage> {
   void initState() {
     super.initState();
     final now = ref.read(lookBackClockProvider)();
-    final fallback =
+    final state = ref.read(memoryRepositoryProvider).asData?.value;
+    var fallback =
         MonthLookBack.cardMonth(now) ?? (year: now.year, month: now.month);
+    // Nothing that month: the latest month with memories instead.
+    if (state != null &&
+        MonthLookBack.of(fallback.year, fallback.month, state).isEmpty) {
+      final latest = state.visibleEvents
+          .map((event) => event.occurredAt.toLocal())
+          .where((at) => !at.isAfter(now))
+          .fold<DateTime?>(
+            null,
+            (latest, at) => latest == null || at.isAfter(latest) ? at : latest,
+          );
+      if (latest != null) fallback = (year: latest.year, month: latest.month);
+    }
     final month = widget.month;
     final valid = widget.year != null && month != null && month >= 1;
     _year = valid ? widget.year! : fallback.year;

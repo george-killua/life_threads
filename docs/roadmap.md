@@ -6,7 +6,7 @@ step is done.
 
 Status: ✅ done · 🔄 in progress · ⏳ waiting on someone · ⬜ not started
 
-_Last updated: 15 October 2026_
+_Last updated: 16 October 2026_
 
 ## Phase 1 – Finish the beta properly
 
@@ -54,6 +54,12 @@ Design: [sync_plan.md](sync_plan.md).
 | 18 | In-app review prompt after the 10th memory | Claude | ⬜ |
 | 19 | Monthly: new users, 7-day retention, Premium conversion – improve the weakest | both | ⬜ |
 
+## Done beyond the plan
+
+- 16 October 2026: home screen widget (iPhone + Android), drafts for
+  unfinished memories, look back on a month – see [changelog.md](changelog.md)
+  and [home_widget.md](home_widget.md). Goes out with the next build.
+
 ## Related documents
 
 - [changelog.md](changelog.md) – what changed in each build
@@ -62,4 +68,5 @@ Design: [sync_plan.md](sync_plan.md).
 - [pricing_strategy.md](pricing_strategy.md) – plans and product IDs
 - [store_setup_yearly.md](store_setup_yearly.md) – yearly plan in both stores, server and website
 - [e2e_testing.md](e2e_testing.md) – automated UI tests
+- [home_widget.md](home_widget.md) – the home screen widget
 - [privacy_policy.md](privacy_policy.md) – the published privacy policy

@@ -3,10 +3,12 @@ import ContactsUI
 import Flutter
 import UIKit
 import UserNotifications
+import WidgetKit
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   private var contactPickerHandler: LifeThreadsContactPickerHandler?
+  private var homeWidgetHandler: LifeThreadsHomeWidgetHandler?
 
   override func application(
     _ application: UIApplication,
@@ -21,12 +23,63 @@ import UserNotifications
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
 
+    if let registrar = engineBridge.pluginRegistry.registrar(
+      forPlugin: "LifeThreadsHomeWidget"
+    ) {
+      homeWidgetHandler = LifeThreadsHomeWidgetHandler(messenger: registrar.messenger())
+    }
+
     guard let registrar = engineBridge.pluginRegistry.registrar(
       forPlugin: "LifeThreadsContactPicker"
     ) else { return }
     contactPickerHandler = LifeThreadsContactPickerHandler(
       messenger: registrar.messenger()
     )
+  }
+}
+
+/// Hands the home screen widget its memories: a folder in the App Group for
+/// the photos, and the days as JSON in the group's defaults.
+private final class LifeThreadsHomeWidgetHandler {
+  private static let appGroup = "group.dev.gkcoding.lifeThreads"
+  private let channel: FlutterMethodChannel
+
+  init(messenger: FlutterBinaryMessenger) {
+    channel = FlutterMethodChannel(
+      name: "dev.gkcoding.lifethreads/home_widget",
+      binaryMessenger: messenger
+    )
+    channel.setMethodCallHandler { call, result in
+      switch call.method {
+      case "containerPath":
+        result(Self.containerPath())
+      case "update":
+        guard
+          let arguments = call.arguments as? [String: Any],
+          let payload = arguments["payload"] as? String
+        else {
+          result(FlutterError(code: "bad_arguments", message: nil, details: nil))
+          return
+        }
+        UserDefaults(suiteName: Self.appGroup)?.set(payload, forKey: "home_widget_payload")
+        if #available(iOS 14.0, *) {
+          WidgetCenter.shared.reloadAllTimelines()
+        }
+        result(nil)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+  }
+
+  /// Nil without the App Group entitlement.
+  private static func containerPath() -> String? {
+    guard let group = FileManager.default.containerURL(
+      forSecurityApplicationGroupIdentifier: appGroup
+    ) else { return nil }
+    let folder = group.appendingPathComponent("home_widget", isDirectory: true)
+    try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+    return folder.path
   }
 }
 

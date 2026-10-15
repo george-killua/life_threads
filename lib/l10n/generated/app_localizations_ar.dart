@@ -3436,7 +3436,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get draftContinue => 'متابعة';
+  String get draftContinue => 'متابعة المسودة';
 
   @override
   String get draftStartNew => 'ابدأ من جديد';
@@ -3544,4 +3544,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get lookBackNotificationPrivate => 'شهرك في ذكريات جاهز.';
+
+  @override
+  String get homeWidgetLocked => 'افتح LifeThreads لترى ذكرياتك.';
 }

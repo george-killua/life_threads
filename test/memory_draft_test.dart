@@ -186,12 +186,7 @@ void main() {
     await _openAdd(tester, router);
     expect(find.text('Continue where you left off?'), findsOneWidget);
     expect(find.textContaining('“Lisbon trip”'), findsOneWidget);
-    await tester.tap(
-      find.descendant(
-        of: find.byType(AlertDialog),
-        matching: find.text('Continue'),
-      ),
-    );
+    await tester.tap(find.text('Continue draft'));
     await tester.pumpAndSettle();
     expect(find.widgetWithText(TextField, 'Lisbon trip'), findsOneWidget);
   });

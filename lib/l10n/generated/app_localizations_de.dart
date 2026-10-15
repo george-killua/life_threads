@@ -3431,7 +3431,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get draftContinue => 'Weitermachen';
+  String get draftContinue => 'Entwurf fortsetzen';
 
   @override
   String get draftStartNew => 'Neu beginnen';
@@ -3526,4 +3526,8 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get lookBackNotificationPrivate =>
       'Dein Monat in Erinnerungen ist bereit.';
+
+  @override
+  String get homeWidgetLocked =>
+      'Öffne LifeThreads, um deine Erinnerungen zu sehen.';
 }

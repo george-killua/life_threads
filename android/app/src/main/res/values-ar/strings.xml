@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_description">ذكرى من جدارك كل يوم.</string>
+    <string name="widget_placeholder_title">ذكرياتك</string>
+    <string name="widget_placeholder_subtitle">افتح LifeThreads مرة لملء هذه الأداة.</string>
+</resources>

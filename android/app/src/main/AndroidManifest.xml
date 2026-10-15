@@ -76,6 +76,18 @@
                     android:path="/family/join" />
             </intent-filter>
         </activity>
+        <!-- The home screen widget: a memory from the wall each day. -->
+        <receiver
+            android:name=".LifeThreadsWidgetProvider"
+            android:exported="false"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/lifethreads_widget_info" />
+        </receiver>
         <!-- flutter_local_notifications: shows scheduled On this day reminders
              and reschedules them after a reboot or app update. -->
         <receiver

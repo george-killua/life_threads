@@ -5844,7 +5844,7 @@ abstract class AppLocalizations {
   /// No description provided for @draftContinue.
   ///
   /// In en, this message translates to:
-  /// **'Continue'**
+  /// **'Continue draft'**
   String get draftContinue;
 
   /// No description provided for @draftStartNew.
@@ -5942,6 +5942,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your month in memories is ready.'**
   String get lookBackNotificationPrivate;
+
+  /// No description provided for @homeWidgetLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Open LifeThreads to see your memories.'**
+  String get homeWidgetLocked;
 }
 
 class _AppLocalizationsDelegate
