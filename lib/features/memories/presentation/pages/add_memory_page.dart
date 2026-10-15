@@ -83,6 +83,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => _backToWall(context),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back_rounded),
         ),
         title: Text(l10n.saveMomentTitle),
@@ -1216,6 +1217,7 @@ class _PhotoPickerPanel extends StatelessWidget {
                         top: 4,
                         child: IconButton.filledTonal(
                           onPressed: () => onRemove(photo),
+                          tooltip: context.l10n.removePhoto,
                           icon: const Icon(Icons.close_rounded, size: 18),
                         ),
                       ),

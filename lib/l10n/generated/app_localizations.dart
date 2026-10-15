@@ -898,6 +898,12 @@ abstract class AppLocalizations {
   /// **'Use selected'**
   String get useSelected;
 
+  /// Screen reader label of a photo in the photo picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo from {date}'**
+  String photoGridItem(String date);
+
   /// No description provided for @noPhotosFound.
   ///
   /// In en, this message translates to:
@@ -5342,6 +5348,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'To review it, GK Coding receives this memory\'s title and story with your report. Its photos are never sent.'**
   String get familyReportEvidenceNote;
+
+  /// No description provided for @moveLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Move left'**
+  String get moveLeft;
+
+  /// No description provided for @moveUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Move up'**
+  String get moveUp;
+
+  /// No description provided for @moveDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Move down'**
+  String get moveDown;
+
+  /// No description provided for @moveRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Move right'**
+  String get moveRight;
+
+  /// No description provided for @showPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get showPassword;
+
+  /// No description provided for @hidePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get hidePassword;
+
+  /// No description provided for @removePerson.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove person'**
+  String get removePerson;
 }
 
 class _AppLocalizationsDelegate

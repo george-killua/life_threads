@@ -43,9 +43,15 @@ class LifeThreadsApp extends ConsumerWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       routerConfig: AppRouter.router,
-      builder: (context, child) => MemoryCapsuleDeepLinkListener(
-        child: FamilyInviteLinkListener(
-          child: child ?? const SizedBox.shrink(),
+      builder: (context, child) => GestureDetector(
+        // Tapping outside a text field closes the keyboard, as users expect
+        // on iOS; multi-line fields have no Done key to close it otherwise.
+        behavior: HitTestBehavior.translucent,
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: MemoryCapsuleDeepLinkListener(
+          child: FamilyInviteLinkListener(
+            child: child ?? const SizedBox.shrink(),
+          ),
         ),
       ),
     );

@@ -97,6 +97,9 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
                     children: [
                       IconButton(
                         onPressed: () => Navigator.of(context).maybePop(),
+                        tooltip: MaterialLocalizations.of(
+                          context,
+                        ).backButtonTooltip,
                         icon: const Icon(Icons.arrow_back_rounded),
                       ),
                       const SizedBox(width: 8),
@@ -648,13 +651,18 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
                 FilledButton.tonalIcon(
                   onPressed: () async {
                     final messenger = ScaffoldMessenger.of(context);
+                    // The page's snack bar would show behind this sheet, so
+                    // the sheet closes first and the result is visible.
+                    final sheet = Navigator.of(sheetContext);
                     try {
                       await exporter.saveToGallery(file);
+                      if (sheet.mounted) sheet.pop();
                       messenger.showSnackBar(
                         SnackBar(content: Text(l10n.yearThreadSaved)),
                       );
                     } catch (_) {
                       AppLogger.event('year_thread_save_failed');
+                      if (sheet.mounted) sheet.pop();
                       messenger.showSnackBar(
                         SnackBar(content: Text(l10n.yearThreadExportFailed)),
                       );

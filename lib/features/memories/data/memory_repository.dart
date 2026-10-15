@@ -783,12 +783,44 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       await _database.transaction(() async {
         // Restoring onto an empty wall keeps the saved arrangement; importing
         // next to existing memories nudges the imports so they don't overlap.
-        final wallIsEmpty =
-            (await _database.select(_database.memoryEvents).get()).isEmpty &&
-            (await _database.select(_database.wallItems).get()).isEmpty;
+        final existingEvents = await _database
+            .select(_database.memoryEvents)
+            .get();
+        final existingItems = await _database.select(_database.wallItems).get();
+        final wallIsEmpty = existingEvents.isEmpty && existingItems.isEmpty;
+
+        // Memories already on the wall are not added again: the same
+        // memory (its id, or the same title, date and creation time after
+        // an earlier import) keeps the copy that is there.
+        final existingEventIds = {for (final row in existingEvents) row.id};
+        final existingEventKeys = {
+          for (final row in existingEvents)
+            '${row.title}|${row.occurredAt}|${row.createdAt}': row.id,
+        };
+        final existingItemIds = {for (final row in existingItems) row.id};
+        final existingItemKeys = {
+          for (final row in existingItems)
+            '${row.type}|${row.content}|${row.createdAt}': row.id,
+        };
+        final skippedEventIds = <String>{};
+        final existingPairs = {
+          for (final row
+              in await _database.select(_database.memoryConnections).get())
+            ([row.fromEventId, row.toEventId]..sort()).join('|'),
+        };
 
         for (final event in backup.events) {
           final sourceId = _stringValue(event, 'id');
+          final existingId = existingEventIds.contains(sourceId)
+              ? sourceId
+              : existingEventKeys['${_stringValue(event, 'title', fallback: 'Restored memory')}|'
+                    '${_intValue(event, 'occurredAt', fallback: -1)}|'
+                    '${_intValue(event, 'createdAt', fallback: -1)}'];
+          if (existingId != null) {
+            idMap[sourceId] = existingId;
+            skippedEventIds.add(sourceId);
+            continue;
+          }
           final newId = _uuid.v4();
           final offset = wallIsEmpty ? 0.0 : 52.0 + eventCount * 8.0;
           final coverPhotoPath = _nullableString(event, 'coverPhotoPath');
@@ -854,6 +886,14 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
 
         for (final item in backup.wallItems) {
           final sourceId = _stringValue(item, 'id');
+          if (existingItemIds.contains(sourceId) ||
+              existingItemKeys.containsKey(
+                '${_stringValue(item, 'type', fallback: WallItemType.text.name)}|'
+                '${_stringValue(item, 'content')}|'
+                '${_intValue(item, 'createdAt', fallback: -1)}',
+              )) {
+            continue;
+          }
           final newId = _uuid.v4();
           final offset = wallIsEmpty ? 0.0 : 52.0 + wallItemCount * 6.0;
           idMap[sourceId] = newId;
@@ -887,6 +927,9 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
         }
 
         for (final photo in backup.photos) {
+          if (skippedEventIds.contains(_stringValue(photo, 'eventId'))) {
+            continue;
+          }
           final eventId = idMap[_stringValue(photo, 'eventId')];
           final archivePath = _stringValue(photo, 'localPath');
           final localPath = backup.photoPaths[archivePath];
@@ -920,6 +963,9 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
         }
 
         for (final person in backup.people) {
+          if (skippedEventIds.contains(_stringValue(person, 'eventId'))) {
+            continue;
+          }
           final eventId = idMap[_stringValue(person, 'eventId')];
           if (eventId == null) continue;
 
@@ -947,6 +993,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
           final toId = idMap[_stringValue(connection, 'toEventId')];
           if (fromId == null || toId == null || fromId == toId) continue;
           final pairKey = ([fromId, toId]..sort()).join('|');
+          if (existingPairs.contains(pairKey)) continue;
           if (!importedPairs.add(pairKey)) continue;
 
           await _database

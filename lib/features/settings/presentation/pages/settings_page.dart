@@ -10,6 +10,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/localization/locale_controller.dart';
 import '../../../../core/logging/app_logger.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../backup/data/backup_reminder.dart';
 import '../../../backup/data/backup_service.dart';
 import '../../../backup/domain/backup_models.dart';
@@ -56,6 +57,9 @@ class SettingsPage extends ConsumerWidget {
                 children: [
                   IconButton(
                     onPressed: () => context.pop(),
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).backButtonTooltip,
                     icon: const Icon(Icons.arrow_back_rounded),
                   ),
                   const SizedBox(width: 8),
@@ -188,20 +192,34 @@ class SettingsPage extends ConsumerWidget {
                         : null,
                   ),
                 ],
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        l10n.onThisDayReminderSwitch,
-                        style: const TextStyle(fontWeight: FontWeight.w800),
+                // One control for screen readers ("Daily reminder, switch"),
+                // and the whole row toggles like a list tile.
+                child: Semantics(
+                  container: true,
+                  child: MergeSemantics(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () =>
+                          _setOnThisDayReminders(context, ref, !remindersOn),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              l10n.onThisDayReminderSwitch,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                          Switch.adaptive(
+                            value: remindersOn,
+                            onChanged: (value) =>
+                                _setOnThisDayReminders(context, ref, value),
+                          ),
+                        ],
                       ),
                     ),
-                    Switch.adaptive(
-                      value: remindersOn,
-                      onChanged: (value) =>
-                          _setOnThisDayReminders(context, ref, value),
-                    ),
-                  ],
+                  ),
                 ),
               ),
               _SettingsCard(
@@ -322,14 +340,27 @@ class SettingsPage extends ConsumerWidget {
       await ref.read(localeControllerProvider.notifier).selectLocale(locale);
     }
     if (!context.mounted) return;
-    final label = _languageLabel(context, locale);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.languageSelected(label))),
-    );
+    // The page still shows the old language here: word the confirmation in
+    // the language just chosen.
+    final l10n = lookupAppLocalizations(_effectiveLocale(locale));
+    final label = _languageLabel(l10n, locale);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.languageSelected(label))));
   }
 
-  String _languageLabel(BuildContext context, Locale? locale) {
-    final l10n = context.l10n;
+  /// [locale], or the phone's language when it is "System" (English when
+  /// LifeThreads does not support the phone's language).
+  Locale _effectiveLocale(Locale? locale) {
+    if (locale != null) return locale;
+    final phone = WidgetsBinding.instance.platformDispatcher.locale;
+    final supported = AppLocalizations.supportedLocales.any(
+      (l) => l.languageCode == phone.languageCode,
+    );
+    return supported ? Locale(phone.languageCode) : const Locale('en');
+  }
+
+  String _languageLabel(AppLocalizations l10n, Locale? locale) {
     return switch (locale?.languageCode) {
       null => l10n.systemLanguage,
       'de' => l10n.germanLanguage,

@@ -89,10 +89,17 @@ class MemoryPeopleEditor extends StatelessWidget {
     final phoneController = TextEditingController(text: initial?.phone ?? '');
     final emailController = TextEditingController(text: initial?.email ?? '');
     var isPickingContact = false;
+    var pickedFromContacts = false;
 
     void applyPerson(MemoryPersonDraft person) {
+      pickedFromContacts = true;
       nameController.text = person.name;
-      relationshipController.text = person.relationship;
+      // The generic "Contact" stays a fallback instead of text in the field,
+      // so typing the real relationship does not append to it.
+      relationshipController.text =
+          person.relationship == l10n.contactRelationship
+          ? ''
+          : person.relationship;
       phoneController.text = person.phone ?? '';
       emailController.text = person.email ?? '';
     }
@@ -214,7 +221,10 @@ class MemoryPeopleEditor extends StatelessWidget {
                   FilledButton(
                     onPressed: () {
                       final name = nameController.text.trim();
-                      final relationship = relationshipController.text.trim();
+                      var relationship = relationshipController.text.trim();
+                      if (relationship.isEmpty && pickedFromContacts) {
+                        relationship = l10n.contactRelationship;
+                      }
                       if (name.isEmpty || relationship.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -664,6 +674,7 @@ class _PersonChip extends StatelessWidget {
               IconButton(
                 visualDensity: VisualDensity.compact,
                 onPressed: onRemove,
+                tooltip: context.l10n.removePerson,
                 icon: const Icon(Icons.close_rounded, size: 18),
               ),
             ],

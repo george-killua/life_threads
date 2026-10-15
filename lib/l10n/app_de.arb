@@ -132,6 +132,7 @@
   "cinemaConnectedThread": "Verbundener Faden",
   "cinemaInviteTitle": "Diese Erinnerung zu deiner Wand hinzufügen?",
   "useSelected": "Auswahl verwenden",
+  "photoGridItem": "Foto vom {date}",
   "noPhotosFound": "Keine Fotos gefunden.",
   "manage": "Verwalten",
   "manageAccess": "Zugriff verwalten",
@@ -933,5 +934,12 @@
   "familyErrorNameTooLong": "Dieser Name ist zu lang. Bitte nimm einen kürzeren.",
   "familyErrorPhotoUnreadable": "Eines der Fotos konnte nicht gelesen werden. Entferne es und versuche es erneut.",
   "familyErrorTooLarge": "Das ist zu groß zum Hochladen. Versuche es mit weniger oder kleineren Fotos.",
-  "familyReportEvidenceNote": "Zur Prüfung erhält GK Coding mit deiner Meldung den Titel und die Geschichte dieser Erinnerung. Ihre Fotos werden nie gesendet."
+  "familyReportEvidenceNote": "Zur Prüfung erhält GK Coding mit deiner Meldung den Titel und die Geschichte dieser Erinnerung. Ihre Fotos werden nie gesendet.",
+  "moveLeft": "Nach links",
+  "moveUp": "Nach oben",
+  "moveDown": "Nach unten",
+  "moveRight": "Nach rechts",
+  "showPassword": "Passwort anzeigen",
+  "hidePassword": "Passwort verbergen",
+  "removePerson": "Person entfernen"
 }

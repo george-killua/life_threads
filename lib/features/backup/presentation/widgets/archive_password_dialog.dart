@@ -47,6 +47,9 @@ Future<String?> showArchivePasswordDialog(
                           : l10n.archivePasswordLabel,
                       suffixIcon: IconButton(
                         onPressed: () => setState(() => obscure = !obscure),
+                        tooltip: obscure
+                            ? l10n.showPassword
+                            : l10n.hidePassword,
                         icon: Icon(
                           obscure
                               ? Icons.visibility_rounded

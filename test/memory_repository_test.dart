@@ -303,4 +303,90 @@ void main() {
     expect(event.longitude, isNull);
     expect(event.hasGeoPoint, isFalse);
   });
+
+  test('importing a backup twice does not duplicate memories', () async {
+    SharedPreferences.setMockInitialValues({});
+    final container = _container();
+    addTearDown(container.dispose);
+    await container.read(memoryRepositoryProvider.future);
+    const backup = BackupImportData(
+      events: [
+        {'id': 'e1', 'title': 'Split', 'occurredAt': 1000, 'createdAt': 2000},
+        {'id': 'e2', 'title': 'Summit', 'occurredAt': 3000, 'createdAt': 4000},
+      ],
+      photos: [],
+      people: [],
+      connections: [
+        {'fromEventId': 'e1', 'toEventId': 'e2', 'label': 'Same summer'},
+      ],
+      wallItems: [
+        {'id': 'n1', 'type': 'text', 'content': 'Hello', 'createdAt': 5000},
+      ],
+      photoPaths: {},
+    );
+    final repository = container.read(memoryRepositoryProvider.notifier);
+
+    final first = await repository.importBackup(backup);
+    final second = await repository.importBackup(backup);
+
+    final state = container.read(memoryRepositoryProvider).value!;
+    expect(first.memoryCount, 2);
+    expect(second.memoryCount, 0);
+    expect(second.connectionCount, 0);
+    expect(
+      state.events.map((e) => e.title),
+      unorderedEquals(['Split', 'Summit']),
+    );
+    expect(state.connections, hasLength(1));
+    expect(state.wallItems, hasLength(1));
+  });
+
+  test('restoring a backup of this wall skips memories still on it', () async {
+    SharedPreferences.setMockInitialValues({});
+    final container = _container();
+    addTearDown(container.dispose);
+    await container.read(memoryRepositoryProvider.future);
+    final repository = container.read(memoryRepositoryProvider.notifier);
+    await repository.importBackup(
+      const BackupImportData(
+        events: [
+          {'id': 'e1', 'title': 'Split', 'occurredAt': 1000, 'createdAt': 2000},
+        ],
+        photos: [],
+        people: [],
+        connections: [],
+        wallItems: [],
+        photoPaths: {},
+      ),
+    );
+    final existingId = container
+        .read(memoryRepositoryProvider)
+        .value!
+        .events
+        .single
+        .id;
+
+    // A backup made from this wall carries the wall's own ids.
+    final result = await repository.importBackup(
+      BackupImportData(
+        events: [
+          {'id': existingId, 'title': 'Split (renamed)', 'occurredAt': 1000},
+          {'id': 'other', 'title': 'New one', 'occurredAt': 9000},
+        ],
+        photos: const [],
+        people: const [],
+        connections: const [],
+        wallItems: const [],
+        photoPaths: const {},
+      ),
+    );
+
+    final titles = container
+        .read(memoryRepositoryProvider)
+        .value!
+        .events
+        .map((e) => e.title);
+    expect(result.memoryCount, 1);
+    expect(titles, unorderedEquals(['Split', 'New one']));
+  });
 }
