@@ -11,18 +11,16 @@ class EqualWidthButtons extends StatelessWidget {
     super.key,
     required this.buttons,
     this.gap = 10,
-    this.labelStyle = const TextStyle(
-      fontSize: 15,
-      fontWeight: FontWeight.w900,
-    ),
-    this.chrome = 72,
+    this.labelStyle,
+    this.chrome = 70,
   });
 
   final List<EqualWidthButton> buttons;
   final double gap;
 
-  /// The style the buttons' labels are drawn in, to measure them.
-  final TextStyle labelStyle;
+  /// The style the buttons' labels are drawn in, to measure them; by
+  /// default the theme's button label (bold).
+  final TextStyle? labelStyle;
 
   /// Width a button needs besides its label: icon, gaps and padding.
   final double chrome;
@@ -30,13 +28,18 @@ class EqualWidthButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scaler = MediaQuery.textScalerOf(context);
+    final style =
+        labelStyle ??
+        Theme.of(
+          context,
+        ).textTheme.labelLarge!.copyWith(fontWeight: FontWeight.w900);
     final direction = Directionality.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         final needed = buttons
             .map((b) {
               final painter = TextPainter(
-                text: TextSpan(text: b.label, style: labelStyle),
+                text: TextSpan(text: b.label, style: style),
                 textDirection: direction,
                 textScaler: scaler,
                 maxLines: 1,

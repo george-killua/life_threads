@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/equal_width_buttons.dart';
 import '../../../../core/widgets/top_bar_page.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
@@ -174,66 +175,84 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
         ],
       ),
       const SizedBox(height: 18),
+      // The poster is as tall as the text beside it, and Preview sits at
+      // the bottom, so the button's edge lines up with the poster's.
       _Panel(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 90,
-              child: AspectRatio(
-                aspectRatio: 9 / 16,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: film == null
-                      ? const YearThreadBackdrop()
-                      : IgnorePointer(
-                          child: FittedBox(
-                            child: SizedBox.fromSize(
-                              size: StoryCanvas.storyLogicalSize,
-                              child: film.buildFrame(
-                                context,
-                                const Duration(milliseconds: 2200),
-                              ),
-                            ),
-                          ),
+        child: IntrinsicHeight(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 190),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  width: 108,
+                  // Positioned, so the poster takes the row's height and doesn't
+                  // set it (its frame is 1920 pt tall).
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: film == null
+                              ? const YearThreadBackdrop()
+                              : IgnorePointer(
+                                  child: FittedBox(
+                                    fit: BoxFit.cover,
+                                    child: SizedBox.fromSize(
+                                      size: StoryCanvas.storyLogicalSize,
+                                      child: film.buildFrame(
+                                        context,
+                                        const Duration(milliseconds: 2200),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                         ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        // Breaks only at the dots: "2 places" stays together.
+                        yearThreadSummary(
+                          l10n,
+                          year.stats,
+                        ).split(' · ').map(_keepTogether).join(' · '),
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        l10n.yearThreadSettingsBody,
+                        style: TextStyle(
+                          color: AppColors.muted,
+                          height: 1.4,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      const Spacer(),
+                      FilledButton.icon(
+                        key: const ValueKey('year-thread-preview'),
+                        onPressed: film == null
+                            ? null
+                            : () => _preview(context, film),
+                        icon: const Icon(Icons.play_arrow_rounded),
+                        label: Text(l10n.yearThreadPreview),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    yearThreadSummary(l10n, year.stats),
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    l10n.yearThreadSettingsBody,
-                    style: TextStyle(
-                      color: AppColors.muted,
-                      height: 1.4,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  FilledButton.icon(
-                    key: const ValueKey('year-thread-preview'),
-                    onPressed: film == null
-                        ? null
-                        : () => _preview(context, film),
-                    icon: const Icon(Icons.play_arrow_rounded),
-                    label: Text(l10n.yearThreadPreview),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
       const SizedBox(height: 18),
@@ -363,25 +382,30 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
         ],
       ),
       const SizedBox(height: 18),
-      Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: [
-          FilledButton.icon(
-            key: const ValueKey('year-thread-export-video'),
-            onPressed: film == null || _exporting
-                ? null
-                : () => _exportVideo(context, film),
-            icon: const Icon(Icons.movie_creation_rounded),
-            label: Text(l10n.yearThreadExportVideo),
+      // Side by side across the width; stacked when a label doesn't fit.
+      EqualWidthButtons(
+        buttons: [
+          (
+            label: l10n.yearThreadExportVideo,
+            button: FilledButton.icon(
+              key: const ValueKey('year-thread-export-video'),
+              onPressed: film == null || _exporting
+                  ? null
+                  : () => _exportVideo(context, film),
+              icon: const Icon(Icons.movie_creation_rounded),
+              label: Text(l10n.yearThreadExportVideo),
+            ),
           ),
-          FilledButton.tonalIcon(
-            key: const ValueKey('year-thread-export-image'),
-            onPressed: !ready || _exporting
-                ? null
-                : () => _exportImage(context, year, selection),
-            icon: const Icon(Icons.image_rounded),
-            label: Text(l10n.yearThreadExportImage),
+          (
+            label: l10n.yearThreadExportImage,
+            button: FilledButton.tonalIcon(
+              key: const ValueKey('year-thread-export-image'),
+              onPressed: !ready || _exporting
+                  ? null
+                  : () => _exportImage(context, year, selection),
+              icon: const Icon(Icons.image_rounded),
+              label: Text(l10n.yearThreadExportImage),
+            ),
           ),
         ],
       ),
@@ -841,3 +865,6 @@ class _Panel extends StatelessWidget {
     );
   }
 }
+
+/// Non-breaking spaces, so a part like "2 places" never splits over lines.
+String _keepTogether(String part) => part.replaceAll(' ', '\u00A0');
