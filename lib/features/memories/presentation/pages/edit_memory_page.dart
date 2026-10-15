@@ -23,6 +23,7 @@ import '../memory_l10n.dart';
 import '../widgets/memory_people_editor.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/equal_width_buttons.dart';
+import '../../../../core/widgets/save_action.dart';
 
 /// A part of the edit screen, to open it scrolled to that part (the pencil
 /// on a card of the memory screen).
@@ -70,6 +71,37 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
   bool _isPicking = false;
   bool _isSaving = false;
 
+  /// The form as it was loaded or last saved, to know if anything changed.
+  String? _savedSignature;
+
+  @override
+  void initState() {
+    super.initState();
+    // Typing changes whether Save is active.
+    _titleController.addListener(_onTextChanged);
+    _descriptionController.addListener(_onTextChanged);
+  }
+
+  void _onTextChanged() {
+    if (mounted) setState(() {});
+  }
+
+  String _signature() => [
+    _titleController.text,
+    _descriptionController.text,
+    _category.name,
+    _memoryType.name,
+    _feeling.name,
+    _occurredAt?.toIso8601String(),
+    _coverPhotoPath,
+    for (final photo in _photos) photo.localPath,
+    for (final p in _people)
+      '${p.name}|${p.relationship}|${p.phone}|${p.email}',
+  ].join('\u0001');
+
+  bool get _hasChanges =>
+      _savedSignature != null && _signature() != _savedSignature;
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -82,259 +114,273 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
     final l10n = context.l10n;
     final memoryState = ref.watch(memoryRepositoryProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.editMemoryTitle)),
-      body: memoryState.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text(error.toString())),
-        data: (state) {
-          final event = state.findEvent(widget.memoryId);
-          if (event == null) {
-            return Center(child: Text(l10n.memoryNotFound));
-          }
-          _init(
-            event,
-            state.photosForEvent(widget.memoryId),
-            state.peopleForEvent(widget.memoryId),
-          );
-
-          _scrollToSectionOnce();
-          return Form(
-            key: _formKey,
-            // Not a lazy list: every section is built, so a card's pencil can
-            // scroll straight to its section.
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _CoverPicker(
-                    path: _coverPhotoPath,
-                    isPicking: _isPicking,
-                    onPick: () => _pickPhotos(setFirstAsCover: true),
-                    onCapture: () => _capturePhoto(setAsCover: true),
-                    onClear: _coverPhotoPath == null
-                        ? null
-                        : () => setState(() => _coverPhotoPath = null),
-                  ),
-                  const SizedBox(height: 22),
-                  _EditPanel(
-                    key: _sectionKeys[EditMemorySection.story],
-                    title: l10n.storyPanel,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          controller: _titleController,
-                          decoration: InputDecoration(
-                            labelText: l10n.memoryTitleLabel,
-                          ),
-                          validator: (value) =>
-                              value == null || value.trim().isEmpty
-                              ? l10n.addTitleValidation
-                              : null,
-                        ),
-                        const SizedBox(height: 14),
-                        TextFormField(
-                          controller: _descriptionController,
-                          minLines: 4,
-                          maxLines: 7,
-                          decoration: InputDecoration(
-                            labelText: l10n.storyDescriptionLabel,
-                          ),
-                          validator: (value) =>
-                              value == null || value.trim().isEmpty
-                              ? l10n.addStoryValidation
-                              : null,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _EditPanel(
-                    key: _sectionKeys[EditMemorySection.details],
-                    title: l10n.shapeFeelingTitle,
-                    child: Column(
-                      children: [
-                        DropdownButtonFormField<MemoryType>(
-                          initialValue: _memoryType,
-                          decoration: InputDecoration(
-                            labelText: l10n.memoryTypeLabel,
-                          ),
-                          items: MemoryType.values
-                              .map(
-                                (type) => DropdownMenuItem(
-                                  value: type,
-                                  child: Text(type.localizedLabel(l10n)),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) => setState(
-                            () => _memoryType = value ?? MemoryType.moment,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        DropdownButtonFormField<MemoryFeeling>(
-                          initialValue: _feeling,
-                          decoration: InputDecoration(
-                            labelText: l10n.feelingLabel,
-                          ),
-                          items: MemoryFeeling.values
-                              .map(
-                                (feeling) => DropdownMenuItem(
-                                  value: feeling,
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        feeling.icon,
-                                        color: feeling.color,
-                                        size: 18,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Text(feeling.localizedLabel(l10n)),
-                                    ],
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) =>
-                              setState(() => _feeling = value ?? _feeling),
-                        ),
-                        const SizedBox(height: 14),
-                        DropdownButtonFormField<MemoryCategory>(
-                          initialValue: _category,
-                          decoration: InputDecoration(
-                            labelText: l10n.categoryLabel,
-                          ),
-                          items: MemoryCategory.values
-                              .map(
-                                (category) => DropdownMenuItem(
-                                  value: category,
-                                  child: Text(category.localizedLabel(l10n)),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) => setState(
-                            () => _category = value ?? MemoryCategory.personal,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _EditPanel(
-                    key: _sectionKeys[EditMemorySection.time],
-                    title: l10n.timePhotoGpsTitle,
-                    child: Column(
-                      children: [
-                        Material(
-                          type: MaterialType.transparency,
-                          child: ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: Icon(
-                              Icons.event_rounded,
-                              color: AppColors.gold,
-                            ),
-                            title: Text(
-                              DateFormat.yMMMd(
-                                Localizations.localeOf(context).toLanguageTag(),
-                              ).format(_occurredAt ?? event.occurredAt),
-                            ),
-                            subtitle: Text(l10n.memoryDateLabel),
-                            trailing: const Icon(Icons.edit_calendar_rounded),
-                            onTap: () => _pickDate(event.occurredAt),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        _PhotoGpsStatus(
-                          latitude: _latitude,
-                          longitude: _longitude,
-                          placeName:
-                              _locationFromPhotos ||
-                                  _locationLabel.trim().isEmpty ||
-                                  isCoordinateLabel(_locationLabel)
-                              ? null
-                              : _locationLabel.trim(),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _EditPanel(
-                    key: _sectionKeys[EditMemorySection.people],
-                    title: l10n.peopleTitle,
-                    child: MemoryPeopleEditor(
-                      people: _people,
-                      suggestedPeople: state.people
-                          .map(_personToDraft)
-                          .toList(),
-                      onChanged: (people) => setState(() => _people = people),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _EditPanel(
-                    key: _sectionKeys[EditMemorySection.gallery],
-                    title: l10n.galleryTitle,
-                    trailing: EqualWidthButtons(
-                      labelStyle: const TextStyle(fontWeight: FontWeight.w800),
-                      chrome: 64,
-                      buttons: [
-                        (
-                          label: l10n.takePhoto,
-                          button: OutlinedButton.icon(
-                            onPressed: _isPicking ? null : _capturePhoto,
-                            icon: const Icon(Icons.photo_camera_rounded),
-                            label: Text(l10n.takePhoto),
-                          ),
-                        ),
-                        (
-                          label: l10n.addPhotos,
-                          button: OutlinedButton.icon(
-                            onPressed: _isPicking ? null : _pickPhotos,
-                            icon: _isPicking
-                                ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.add_photo_alternate_rounded),
-                            label: Text(l10n.addPhotos),
-                          ),
-                        ),
-                      ],
-                    ),
-                    child: _GalleryEditor(
-                      photos: _photos,
-                      placeName:
-                          _locationLabel.trim().isEmpty ||
-                              isCoordinateLabel(_locationLabel)
-                          ? null
-                          : _locationLabel.trim(),
-                      coverPhotoPath: _coverPhotoPath,
-                      onSetCover: (photo) =>
-                          setState(() => _coverPhotoPath = photo.localPath),
-                      onReplace: _replacePhoto,
-                      onRemove: _removePhoto,
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-                  FilledButton.icon(
-                    onPressed: _isSaving ? null : () => _save(context),
-                    icon: _isSaving
-                        ? const SizedBox(
-                            width: 17,
-                            height: 17,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.save_rounded),
-                    label: Text(l10n.saveMemory),
-                  ),
-                ],
-              ),
+    // Leaving with unsaved changes asks first.
+    return PopScope(
+      canPop: !_hasChanges || _isSaving,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        if (!await confirmDiscardChanges(context) || !context.mounted) return;
+        _savedSignature = _signature();
+        Navigator.of(context).pop();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.editMemoryTitle),
+          actions: [
+            SaveAction(
+              enabled: _hasChanges,
+              saving: _isSaving,
+              onSave: () => _save(context),
             ),
-          );
-        },
+          ],
+        ),
+        body: memoryState.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => Center(child: Text(error.toString())),
+          data: (state) {
+            final event = state.findEvent(widget.memoryId);
+            if (event == null) {
+              return Center(child: Text(l10n.memoryNotFound));
+            }
+            _init(
+              event,
+              state.photosForEvent(widget.memoryId),
+              state.peopleForEvent(widget.memoryId),
+            );
+
+            _scrollToSectionOnce();
+            return Form(
+              key: _formKey,
+              // Not a lazy list: every section is built, so a card's pencil can
+              // scroll straight to its section.
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _CoverPicker(
+                      path: _coverPhotoPath,
+                      isPicking: _isPicking,
+                      onPick: () => _pickPhotos(setFirstAsCover: true),
+                      onCapture: () => _capturePhoto(setAsCover: true),
+                      onClear: _coverPhotoPath == null
+                          ? null
+                          : () => setState(() => _coverPhotoPath = null),
+                    ),
+                    const SizedBox(height: 22),
+                    _EditPanel(
+                      key: _sectionKeys[EditMemorySection.story],
+                      title: l10n.storyPanel,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: _titleController,
+                            decoration: InputDecoration(
+                              labelText: l10n.memoryTitleLabel,
+                            ),
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty
+                                ? l10n.addTitleValidation
+                                : null,
+                          ),
+                          const SizedBox(height: 14),
+                          TextFormField(
+                            controller: _descriptionController,
+                            minLines: 4,
+                            maxLines: 7,
+                            decoration: InputDecoration(
+                              labelText: l10n.storyDescriptionLabel,
+                            ),
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty
+                                ? l10n.addStoryValidation
+                                : null,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _EditPanel(
+                      key: _sectionKeys[EditMemorySection.details],
+                      title: l10n.shapeFeelingTitle,
+                      child: Column(
+                        children: [
+                          DropdownButtonFormField<MemoryType>(
+                            initialValue: _memoryType,
+                            decoration: InputDecoration(
+                              labelText: l10n.memoryTypeLabel,
+                            ),
+                            items: MemoryType.values
+                                .map(
+                                  (type) => DropdownMenuItem(
+                                    value: type,
+                                    child: Text(type.localizedLabel(l10n)),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (value) => setState(
+                              () => _memoryType = value ?? MemoryType.moment,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          DropdownButtonFormField<MemoryFeeling>(
+                            initialValue: _feeling,
+                            decoration: InputDecoration(
+                              labelText: l10n.feelingLabel,
+                            ),
+                            items: MemoryFeeling.values
+                                .map(
+                                  (feeling) => DropdownMenuItem(
+                                    value: feeling,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          feeling.icon,
+                                          color: feeling.color,
+                                          size: 18,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(feeling.localizedLabel(l10n)),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (value) =>
+                                setState(() => _feeling = value ?? _feeling),
+                          ),
+                          const SizedBox(height: 14),
+                          DropdownButtonFormField<MemoryCategory>(
+                            initialValue: _category,
+                            decoration: InputDecoration(
+                              labelText: l10n.categoryLabel,
+                            ),
+                            items: MemoryCategory.values
+                                .map(
+                                  (category) => DropdownMenuItem(
+                                    value: category,
+                                    child: Text(category.localizedLabel(l10n)),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (value) => setState(
+                              () =>
+                                  _category = value ?? MemoryCategory.personal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _EditPanel(
+                      key: _sectionKeys[EditMemorySection.time],
+                      title: l10n.timePhotoGpsTitle,
+                      child: Column(
+                        children: [
+                          Material(
+                            type: MaterialType.transparency,
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: Icon(
+                                Icons.event_rounded,
+                                color: AppColors.gold,
+                              ),
+                              title: Text(
+                                DateFormat.yMMMd(
+                                  Localizations.localeOf(
+                                    context,
+                                  ).toLanguageTag(),
+                                ).format(_occurredAt ?? event.occurredAt),
+                              ),
+                              subtitle: Text(l10n.memoryDateLabel),
+                              trailing: const Icon(Icons.edit_calendar_rounded),
+                              onTap: () => _pickDate(event.occurredAt),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          _PhotoGpsStatus(
+                            latitude: _latitude,
+                            longitude: _longitude,
+                            placeName:
+                                _locationFromPhotos ||
+                                    _locationLabel.trim().isEmpty ||
+                                    isCoordinateLabel(_locationLabel)
+                                ? null
+                                : _locationLabel.trim(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _EditPanel(
+                      key: _sectionKeys[EditMemorySection.people],
+                      title: l10n.peopleTitle,
+                      child: MemoryPeopleEditor(
+                        people: _people,
+                        suggestedPeople: state.people
+                            .map(_personToDraft)
+                            .toList(),
+                        onChanged: (people) => setState(() => _people = people),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _EditPanel(
+                      key: _sectionKeys[EditMemorySection.gallery],
+                      title: l10n.galleryTitle,
+                      trailing: EqualWidthButtons(
+                        labelStyle: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                        ),
+                        chrome: 64,
+                        buttons: [
+                          (
+                            label: l10n.takePhoto,
+                            button: OutlinedButton.icon(
+                              onPressed: _isPicking ? null : _capturePhoto,
+                              icon: const Icon(Icons.photo_camera_rounded),
+                              label: Text(l10n.takePhoto),
+                            ),
+                          ),
+                          (
+                            label: l10n.addPhotos,
+                            button: OutlinedButton.icon(
+                              onPressed: _isPicking ? null : _pickPhotos,
+                              icon: _isPicking
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(
+                                      Icons.add_photo_alternate_rounded,
+                                    ),
+                              label: Text(l10n.addPhotos),
+                            ),
+                          ),
+                        ],
+                      ),
+                      child: _GalleryEditor(
+                        photos: _photos,
+                        placeName:
+                            _locationLabel.trim().isEmpty ||
+                                isCoordinateLabel(_locationLabel)
+                            ? null
+                            : _locationLabel.trim(),
+                        coverPhotoPath: _coverPhotoPath,
+                        onSetCover: (photo) =>
+                            setState(() => _coverPhotoPath = photo.localPath),
+                        onReplace: _replacePhoto,
+                        onRemove: _removePhoto,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -378,6 +424,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
       ..addAll(photos.map(_EditablePhoto.fromMemoryPhoto));
     if (!event.hasGeoPoint) _syncLocationFromPhotos();
     _people = people.map(_personToDraft).toList();
+    _savedSignature = _signature();
   }
 
   MemoryPersonDraft _personToDraft(MemoryPerson person) {
@@ -595,6 +642,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
     ScaffoldMessenger.of(
       context,
     ).showToast(context.l10n.memoryChangesSaved, kind: ToastKind.success);
+    _savedSignature = _signature();
     _backToPrevious(context);
   }
 }

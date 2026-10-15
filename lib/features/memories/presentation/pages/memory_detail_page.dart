@@ -1187,125 +1187,212 @@ class _ConnectedThreadPath extends StatelessWidget {
               context.l10n.noConnectedMemoriesYet,
               style: TextStyle(color: AppColors.muted, height: 1.45),
             )
-          : Column(
-              children: [
-                for (var index = 0; index < events.length; index++)
-                  _ConnectedMemoryNode(
-                    event: events[index],
-                    reason: state
-                        .connectionBetween(memoryId, events[index].id)
-                        ?.reason,
-                    isLast: index == events.length - 1,
-                  ),
-              ],
+          // The connected memories hang on a rope, like on the wall.
+          : SizedBox(
+              height: 292,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                clipBehavior: Clip.none,
+                itemCount: events.length,
+                itemBuilder: (context, index) => _ThreadPolaroid(
+                  event: events[index],
+                  reason: state
+                      .connectionBetween(memoryId, events[index].id)
+                      ?.reason,
+                  tilt: index.isEven ? -0.03 : 0.025,
+                ),
+              ),
             ),
     );
   }
 }
 
-class _ConnectedMemoryNode extends StatelessWidget {
-  const _ConnectedMemoryNode({
+/// One connected memory: a small photo on paper, pinned to the rope, with
+/// the reason for the thread underneath.
+class _ThreadPolaroid extends StatelessWidget {
+  const _ThreadPolaroid({
     required this.event,
     required this.reason,
-    required this.isLast,
+    required this.tilt,
   });
 
   final MemoryEvent event;
   final String? reason;
-  final bool isLast;
+  final double tilt;
+
+  static const _width = 156.0;
 
   @override
   Widget build(BuildContext context) {
-    final cleanReason = reason?.trim();
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(22),
-      onTap: () => context.push('/memories/${event.id}'),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              width: 34,
-              child: Column(
-                children: [
-                  Container(
-                    width: 16,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: event.feeling.color,
-                      boxShadow: [
-                        BoxShadow(
-                          color: event.feeling.color.withValues(alpha: 0.28),
-                          blurRadius: 14,
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (!isLast)
-                    Expanded(
-                      child: Container(
-                        width: 2,
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        color: AppColors.rope.withValues(alpha: 0.58),
-                      ),
-                    ),
-                ],
+    final why = reason?.trim();
+    final date = _formatDate(context, event.occurredAt);
+    return SizedBox(
+      width: _width + 16,
+      child: Semantics(
+        button: true,
+        label: [
+          event.title,
+          date,
+          if (why != null && why.isNotEmpty) why,
+        ].join(', '),
+        excludeSemantics: true,
+        child: GestureDetector(
+          onTap: () => context.push('/memories/${event.id}'),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // The rope runs through every item, so the pieces join up.
+              const Positioned(
+                left: 0,
+                right: 0,
+                top: 0,
+                height: 24,
+                child: CustomPaint(painter: _RopePainter()),
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: AppColors.wallInk.withValues(alpha: 0.28),
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: AppColors.line),
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(backgroundColor: event.coverColor),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              event.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              cleanReason?.isNotEmpty == true
-                                  ? cleanReason!
-                                  : _eventContextLabel(context, event),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: AppColors.muted,
-                                height: 1.25,
-                              ),
-                            ),
-                          ],
+              Positioned(
+                left: 8,
+                right: 8,
+                top: 12,
+                child: Column(
+                  children: [
+                    Transform.rotate(
+                      angle: tilt,
+                      alignment: Alignment.topCenter,
+                      child: _paper(context, date),
+                    ),
+                    if (why != null && why.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        '“$why”',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.muted,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w600,
+                          height: 1.3,
                         ),
                       ),
-                      const Icon(Icons.chevron_right_rounded),
+                    ],
+                  ],
+                ),
+              ),
+              // The pin, on the rope.
+              Positioned(
+                top: 8,
+                left: _width / 2 + 2,
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.gold,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.4),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
                     ],
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+
+  Widget _paper(BuildContext context, String date) {
+    final path = event.coverPhotoPath;
+    final isAsset = path?.startsWith('assets/') ?? false;
+    final exists = path != null && (isAsset || File(path).existsSync());
+    final fallback = ColoredBox(
+      color: event.coverColor,
+      child: Center(child: Icon(event.feeling.icon, color: AppColors.text)),
+    );
+    return Container(
+      width: _width,
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(6),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 14,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AspectRatio(
+            aspectRatio: 4 / 3,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(3),
+              child: !exists
+                  ? fallback
+                  : isAsset
+                  ? Image.asset(path, fit: BoxFit.cover)
+                  : Image.file(
+                      File(path),
+                      fit: BoxFit.cover,
+                      cacheWidth: 400,
+                      errorBuilder: (_, _, _) => fallback,
+                    ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            event.title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: AppColors.paperInk,
+              fontWeight: FontWeight.w900,
+              height: 1.15,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            date,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: AppColors.paperMuted,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A piece of rope across the item, sagging a little in the middle.
+class _RopePainter extends CustomPainter {
+  const _RopePainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = AppColors.rope.withValues(alpha: 0.85)
+      ..strokeWidth = 2.2
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    final path = Path()
+      ..moveTo(0, 8)
+      ..quadraticBezierTo(size.width / 2, 20, size.width, 8);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _RopePainter oldDelegate) => false;
 }
 
 class _ChapterPanel extends StatelessWidget {
@@ -1670,12 +1757,6 @@ String _heroSubtitle(BuildContext context, MemoryEvent event) {
   final date = _formatDate(context, event.occurredAt);
   if (!event.hasGeoPoint) return date;
   return '${event.locationDisplayLabel} • $date';
-}
-
-String _eventContextLabel(BuildContext context, MemoryEvent event) {
-  if (event.hasGeoPoint) return event.locationDisplayLabel;
-  final category = event.category.localizedLabel(context.l10n);
-  return '$category • ${_formatDate(context, event.occurredAt)}';
 }
 
 String _formatDate(BuildContext context, DateTime date) {

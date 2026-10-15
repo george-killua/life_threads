@@ -115,8 +115,12 @@ Future<void> _pumpEdit(
   await tester.pumpAndSettle();
 }
 
+/// Changes the title (Save is only active after a change), then taps Save
+/// in the top bar.
 Future<void> _tapSave(WidgetTester tester) async {
-  await tester.tap(find.text('Save memory'));
+  await tester.enterText(find.byType(TextFormField).first, 'Edited title');
+  await tester.pump();
+  await tester.tap(find.byKey(const ValueKey('top-bar-save')));
   await tester.pump();
   await tester.pump();
 }
@@ -163,6 +167,28 @@ void main() {
     expect(repo.saved!['cover'], isNull);
   });
 
+  testWidgets('leaving with changes asks before discarding them', (
+    tester,
+  ) async {
+    await _pumpEdit(tester, _state(_event()));
+    // Untouched: Save is off and back leaves without asking.
+    expect(
+      tester
+          .widget<ButtonStyleButton>(find.byKey(const ValueKey('top-bar-save')))
+          .onPressed,
+      isNull,
+    );
+    await tester.enterText(find.byType(TextFormField).first, 'Changed');
+    await tester.pump();
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Discard changes?'), findsOneWidget);
+    await tester.tap(find.text('Keep editing'));
+    await tester.pumpAndSettle();
+    expect(find.byType(EditMemoryPage), findsOneWidget);
+    expect(find.text('Changed'), findsOneWidget);
+  });
+
   testWidgets('a failed save re-enables the Save button', (tester) async {
     await _pumpEdit(tester, _state(_event()), fail: true);
     await _tapSave(tester);
@@ -172,10 +198,7 @@ void main() {
       findsOneWidget,
     );
     final button = tester.widget<ButtonStyleButton>(
-      find.ancestor(
-        of: find.text('Save memory'),
-        matching: find.bySubtype<ButtonStyleButton>(),
-      ),
+      find.byKey(const ValueKey('top-bar-save')),
     );
     expect(
       button.onPressed,

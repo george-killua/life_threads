@@ -207,6 +207,10 @@ class MemoryPersonDraft {
 /// A memory, note or nail taken off the wall, kept for "Undo" until the
 /// undo window has passed.
 class RemovedFromWall {
+  /// Nothing removed; for tests.
+  @visibleForTesting
+  const RemovedFromWall.empty() : this._();
+
   const RemovedFromWall._({
     this.events = const [],
     this.photos = const [],

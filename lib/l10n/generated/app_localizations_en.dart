@@ -1216,6 +1216,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutHelpSubtitle => 'Feedback, privacy, music, version';
 
   @override
+  String get discardChangesTitle => 'Discard changes?';
+
+  @override
+  String get discardChangesBody => 'What you changed here will be lost.';
+
+  @override
+  String get discardChanges => 'Discard';
+
+  @override
+  String get keepEditing => 'Keep editing';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -2953,6 +2965,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get familyPostNote =>
       'Everyone on this wall will see this memory. Photos are resized and encrypted on your phone before upload.';
+
+  @override
+  String get familyPost => 'Post';
 
   @override
   String get familyPostMemory => 'Post to the wall';

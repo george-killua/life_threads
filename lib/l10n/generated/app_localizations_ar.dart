@@ -1212,6 +1212,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get aboutHelpSubtitle => 'الملاحظات، الخصوصية، الموسيقى، الإصدار';
 
   @override
+  String get discardChangesTitle => 'تجاهل التغييرات؟';
+
+  @override
+  String get discardChangesBody => 'ستفقد ما غيّرته هنا.';
+
+  @override
+  String get discardChanges => 'تجاهل';
+
+  @override
+  String get keepEditing => 'متابعة التعديل';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -2981,6 +2993,9 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get familyPostNote =>
       'سيرى كل من على هذا الجدار هذه الذكرى. تُصغَّر الصور وتُشفَّر على هاتفك قبل رفعها.';
+
+  @override
+  String get familyPost => 'نشر';
 
   @override
   String get familyPostMemory => 'نشر على الجدار';

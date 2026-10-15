@@ -2265,6 +2265,30 @@ abstract class AppLocalizations {
   /// **'Feedback, privacy, music, version'**
   String get aboutHelpSubtitle;
 
+  /// No description provided for @discardChangesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes?'**
+  String get discardChangesTitle;
+
+  /// No description provided for @discardChangesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'What you changed here will be lost.'**
+  String get discardChangesBody;
+
+  /// No description provided for @discardChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get discardChanges;
+
+  /// No description provided for @keepEditing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get keepEditing;
+
   /// No description provided for @savedPhotosTitle.
   ///
   /// In en, this message translates to:
@@ -5132,6 +5156,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Everyone on this wall will see this memory. Photos are resized and encrypted on your phone before upload.'**
   String get familyPostNote;
+
+  /// No description provided for @familyPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get familyPost;
 
   /// No description provided for @familyPostMemory.
   ///

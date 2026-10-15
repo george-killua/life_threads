@@ -9,6 +9,7 @@ import 'package:photo_manager/photo_manager.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/logging/app_logger.dart';
+import '../../../../core/widgets/save_action.dart';
 import '../../../media/data/photo_library_service.dart';
 import '../../../media/data/picked_memory_photo.dart';
 import '../../../media/presentation/widgets/photo_grid_sheet.dart';
@@ -57,6 +58,40 @@ class _FamilyMemoryEditorPageState
   FamilyMemory? _original;
 
   bool get _isEditing => widget.memoryId != null;
+
+  /// Set when the user chose to discard, so leaving no longer asks.
+  var _discarded = false;
+
+  /// Something typed or picked that isn't posted yet.
+  bool get _hasChanges {
+    if (_discarded) return false;
+    final original = _original;
+    if (original == null) {
+      return _title.text.trim().isNotEmpty ||
+          _story.text.trim().isNotEmpty ||
+          _newPhotos.isNotEmpty;
+    }
+    return _title.text != original.title ||
+        _story.text != original.description ||
+        _place.text != original.locationLabel ||
+        _category != original.category ||
+        _feeling != original.feeling ||
+        _newPhotos.isNotEmpty ||
+        _keptPhotoIds.length != original.photoIds.length;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Typing changes whether leaving asks first.
+    for (final field in [_title, _story, _place]) {
+      field.addListener(_onTextChanged);
+    }
+  }
+
+  void _onTextChanged() {
+    if (mounted) setState(() {});
+  }
 
   @override
   void dispose() {
@@ -110,10 +145,27 @@ class _FamilyMemoryEditorPageState
     final locale = Localizations.localeOf(context).toLanguageTag();
     final date = _occurredAt ?? DateTime.now();
 
+    // Leaving with something typed or picked asks first.
     return PopScope(
-      canPop: !_isSaving,
+      canPop: !_isSaving && !_hasChanges,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop || _isSaving) return;
+        if (!await confirmDiscardChanges(context) || !context.mounted) return;
+        _discarded = true;
+        Navigator.of(context).pop();
+      },
       child: FamilyPageScaffold(
         title: _isEditing ? l10n.editMemoryTitle : l10n.familyAddMemory,
+        // Post (or Save) sits in the top bar, like on the other edit screens.
+        actions: [
+          SaveAction(
+            buttonKey: const ValueKey('family-memory-save'),
+            label: _isEditing ? null : l10n.familyPost,
+            enabled: true,
+            saving: _isSaving,
+            onSave: _save,
+          ),
+        ],
         children: [
           _PhotoStrip(
             familyId: widget.familyId,
@@ -204,24 +256,16 @@ class _FamilyMemoryEditorPageState
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 14),
-          SizedBox(
-            height: 54,
-            child: FilledButton.icon(
-              key: const ValueKey('family-memory-save'),
-              onPressed: _isSaving ? null : _save,
-              icon: _isSaving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2.4),
-                    )
-                  : const Icon(Icons.cloud_upload_rounded),
-              label: Text(
-                _isSaving ? l10n.familyUploading : l10n.familyPostMemory,
+          if (_isSaving) ...[
+            const SizedBox(height: 14),
+            Text(
+              l10n.familyUploading,
+              style: TextStyle(
+                color: AppColors.gold,
+                fontWeight: FontWeight.w800,
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -380,6 +424,7 @@ class _FamilyMemoryEditorPageState
         l10n.familyMemorySaved,
         kind: ToastKind.success,
       );
+      _discarded = true;
       context.pop();
     } on FamilyException catch (error) {
       if (!mounted) return;
@@ -439,6 +484,7 @@ class _FamilyMemoryEditorPageState
         l10n.familyMemorySaved,
         kind: ToastKind.success,
       );
+      _discarded = true;
       context.pop();
     } catch (error) {
       if (mounted) showFamilyError(context, error);

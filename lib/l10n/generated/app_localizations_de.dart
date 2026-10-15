@@ -1231,6 +1231,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get aboutHelpSubtitle => 'Feedback, Datenschutz, Musik, Version';
 
   @override
+  String get discardChangesTitle => 'Änderungen verwerfen?';
+
+  @override
+  String get discardChangesBody => 'Was du hier geändert hast, geht verloren.';
+
+  @override
+  String get discardChanges => 'Verwerfen';
+
+  @override
+  String get keepEditing => 'Weiter bearbeiten';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -2981,6 +2993,9 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get familyPostNote =>
       'Alle auf dieser Wand sehen diese Erinnerung. Fotos werden auf deinem Handy verkleinert und verschlüsselt, bevor sie hochgeladen werden.';
+
+  @override
+  String get familyPost => 'Posten';
 
   @override
   String get familyPostMemory => 'Auf die Wand posten';
