@@ -139,18 +139,23 @@ class _MemoryThumb extends StatelessWidget {
             PositionedDirectional(
               start: 4,
               bottom: 4,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                  color: AppColors.gold,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '$order',
-                  style: const TextStyle(
-                    color: AppColors.wallInk,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 11,
+              child: ExcludeSemantics(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 1,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.gold,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '$order',
+                    style: const TextStyle(
+                      color: AppColors.wallInk,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 11,
+                    ),
                   ),
                 ),
               ),
@@ -160,6 +165,8 @@ class _MemoryThumb extends StatelessWidget {
                 end: -8,
                 top: -8,
                 child: Semantics(
+                  // Its own node, so it can be reached apart from the photo.
+                  container: true,
                   button: true,
                   label: removeLabel,
                   excludeSemantics: true,
