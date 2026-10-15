@@ -1598,7 +1598,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get playStoreUnavailable => 'Der Store ist gerade nicht erreichbar';
 
   @override
-  String get productNotConfigured => 'Produkt nicht konfiguriert';
+  String get productNotConfigured => 'Premium ist gerade nicht verfügbar';
 
   @override
   String get purchasePending => 'Kauf ausstehend';
@@ -1608,6 +1608,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get restored => 'Wiederhergestellt';
+
+  @override
+  String get premiumTryAgain => 'Nochmal versuchen';
 
   @override
   String get purchaseFailed => 'Kauf fehlgeschlagen';

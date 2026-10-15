@@ -21,6 +21,7 @@ class FakeStore extends InAppPurchasePlatform with MockPlatformInterfaceMixin {
   final completed = <String>[];
   Duration restoreDeliveryDelay = Duration.zero;
   List<PurchaseDetails> Function() onRestore = () => [];
+  Object? queryError;
 
   @override
   Stream<List<PurchaseDetails>> get purchaseStream => controller.stream;
@@ -28,19 +29,21 @@ class FakeStore extends InAppPurchasePlatform with MockPlatformInterfaceMixin {
   Future<bool> isAvailable() async => true;
   @override
   Future<ProductDetailsResponse> queryProductDetails(Set<String> ids) async =>
-      ProductDetailsResponse(
-        productDetails: [
-          ProductDetails(
-            id: PremiumProductIds.monthlySubscription,
-            title: 'P',
-            description: 'P',
-            price: '€2.99',
-            rawPrice: 2.99,
-            currencyCode: 'EUR',
-          ),
-        ],
-        notFoundIDs: const [],
-      );
+      queryError != null
+      ? throw queryError!
+      : ProductDetailsResponse(
+          productDetails: [
+            ProductDetails(
+              id: PremiumProductIds.monthlySubscription,
+              title: 'P',
+              description: 'P',
+              price: '€2.99',
+              rawPrice: 2.99,
+              currencyCode: 'EUR',
+            ),
+          ],
+          notFoundIDs: const [],
+        );
   @override
   Future<void> completePurchase(PurchaseDetails p) async =>
       completed.add(p.productID);
@@ -87,6 +90,25 @@ void main() {
     container.dispose();
     debugDefaultTargetPlatformOverride = null;
   });
+
+  test(
+    'an offer that fails to load is a store problem, and can be retried',
+    () async {
+      store.queryError = PlatformException(code: 'network');
+      container.read(premiumBillingProvider);
+      await _settle();
+      var s = container.read(premiumBillingProvider);
+      // Not "Purchase failed": nothing was bought.
+      expect(s.status, PremiumPurchaseStatus.storeUnavailable);
+      expect(s.message, PremiumPurchaseMessage.loadFailed);
+
+      store.queryError = null;
+      await container.read(premiumBillingProvider.notifier).loadProduct();
+      s = container.read(premiumBillingProvider);
+      expect(s.status, PremiumPurchaseStatus.ready);
+      expect(s.canBuy, isTrue);
+    },
+  );
 
   test(
     'completePurchase is called for a purchase of an unknown productID',

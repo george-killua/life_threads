@@ -63,7 +63,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
 
       if (response.error != null) {
         state = PremiumPurchaseState(
-          status: PremiumPurchaseStatus.failed,
+          status: PremiumPurchaseStatus.storeUnavailable,
           message: PremiumPurchaseMessage.loadFailed,
         );
         return;
@@ -89,7 +89,7 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
       unawaited(restorePurchases(silent: true));
     } catch (_) {
       state = const PremiumPurchaseState(
-        status: PremiumPurchaseStatus.failed,
+        status: PremiumPurchaseStatus.storeUnavailable,
         message: PremiumPurchaseMessage.loadFailed,
       );
     }

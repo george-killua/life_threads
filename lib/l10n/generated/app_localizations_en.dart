@@ -1579,7 +1579,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playStoreUnavailable => 'The store is unavailable right now';
 
   @override
-  String get productNotConfigured => 'Product not configured';
+  String get productNotConfigured => 'Premium isn’t available right now';
 
   @override
   String get purchasePending => 'Purchase pending';
@@ -1589,6 +1589,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restored => 'Restored';
+
+  @override
+  String get premiumTryAgain => 'Try again';
 
   @override
   String get purchaseFailed => 'Purchase failed';

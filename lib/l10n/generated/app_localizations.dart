@@ -2928,7 +2928,7 @@ abstract class AppLocalizations {
   /// No description provided for @productNotConfigured.
   ///
   /// In en, this message translates to:
-  /// **'Product not configured'**
+  /// **'Premium isn’t available right now'**
   String get productNotConfigured;
 
   /// No description provided for @purchasePending.
@@ -2948,6 +2948,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Restored'**
   String get restored;
+
+  /// No description provided for @premiumTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get premiumTryAgain;
 
   /// No description provided for @purchaseFailed.
   ///

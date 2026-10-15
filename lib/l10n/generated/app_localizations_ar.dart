@@ -1568,7 +1568,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get playStoreUnavailable => 'المتجر غير متاح حالياً';
 
   @override
-  String get productNotConfigured => 'المنتج غير مهيأ';
+  String get productNotConfigured => 'Premium غير متاح حالياً';
 
   @override
   String get purchasePending => 'الشراء معلق';
@@ -1578,6 +1578,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get restored => 'تمت الاستعادة';
+
+  @override
+  String get premiumTryAgain => 'حاول مرة أخرى';
 
   @override
   String get purchaseFailed => 'فشل الشراء';

@@ -23,7 +23,19 @@ tags: [protocol, prm]
       TARGET: "View privacy policy"
       DIRECTION: DOWN
 - takeScreenshot: PRM-01_offer
-- assertVisible: "Subscribe to Premium"
+# With a store account: Subscribe. On a simulator the offer can't load,
+# so the button offers to try again, and nothing claims a failed purchase.
+- assertVisible: "Subscribe to Premium|Try again"
+- assertNotVisible: "Purchase failed"
+- runFlow:
+    when:
+      visible: "Try again"
+    commands:
+      - assertVisible: "(?s).*(store is unavailable|Premium isn.t available).*"
+      - tapOn: "Try again"
+      - extendedWaitUntil:
+          visible: "Try again|Subscribe to Premium"
+          timeout: 20000
 - assertVisible: "Restore subscription"
 - assertVisible: "View terms"
 # Renewal terms are shown next to the price (App Store rule 3.1.2).

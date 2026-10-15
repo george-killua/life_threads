@@ -59,6 +59,8 @@ class UpgradePage extends ConsumerWidget {
                 onRestore: () => ref
                     .read(premiumBillingProvider.notifier)
                     .restorePurchases(),
+                onRetry: () =>
+                    ref.read(premiumBillingProvider.notifier).loadProduct(),
                 onMockUnlock: showDebugUnlock
                     ? () => _unlockMockPremium(context, ref)
                     : null,
@@ -457,6 +459,7 @@ class _SubscriptionOfferCard extends StatelessWidget {
     required this.purchaseState,
     required this.onPurchase,
     required this.onRestore,
+    required this.onRetry,
     required this.onMockUnlock,
     required this.onContinue,
   });
@@ -465,6 +468,7 @@ class _SubscriptionOfferCard extends StatelessWidget {
   final PremiumPurchaseState purchaseState;
   final VoidCallback onPurchase;
   final VoidCallback onRestore;
+  final VoidCallback onRetry;
   final VoidCallback? onMockUnlock;
   final VoidCallback onContinue;
 
@@ -472,6 +476,12 @@ class _SubscriptionOfferCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final price = purchaseState.price ?? '€4.99';
     final canBuy = purchaseState.canBuy && !purchaseState.isBusy;
+    // The offer could not be loaded: the main button loads it again.
+    final canRetry =
+        !isPremium &&
+        !purchaseState.isBusy &&
+        (purchaseState.status == PremiumPurchaseStatus.storeUnavailable ||
+            purchaseState.status == PremiumPurchaseStatus.productUnavailable);
     final message = purchaseState.message;
 
     return Container(
@@ -524,12 +534,16 @@ class _SubscriptionOfferCard extends StatelessWidget {
                   ? onContinue
                   : canBuy
                   ? onPurchase
+                  : canRetry
+                  ? onRetry
                   : null,
               icon: Icon(
                 isPremium
                     ? Icons.check_rounded
                     : purchaseState.isBusy
                     ? Icons.hourglass_top_rounded
+                    : canRetry
+                    ? Icons.refresh_rounded
                     : Icons.lock_open_rounded,
               ),
               label: Text(
@@ -537,6 +551,8 @@ class _SubscriptionOfferCard extends StatelessWidget {
                     ? context.l10n.premiumActiveButton
                     : purchaseState.isBusy
                     ? context.l10n.processing
+                    : canRetry
+                    ? context.l10n.premiumTryAgain
                     : context.l10n.unlockPremium,
               ),
             ),
