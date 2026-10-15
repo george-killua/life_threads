@@ -1,0 +1,76 @@
+# LifeThreads – Changelog
+
+What changed in each TestFlight / Play build. Newest first.
+
+## 1.0.0 (20) – 15 October 2026
+
+**New**
+- **Yearly Premium plan** (`lifethreads_premium_yearly`, €34.99): shown
+  first on the Premium page with its saving ("Save 41%"); Monthly beside it.
+  Without a yearly product in the store, monthly is offered alone.
+- **Empty screens offer a next step**:
+  - New wall: "Move memories here" (pick memories from other walls).
+  - Timeline / map with nothing to show: "Add a memory", "Show all".
+  - Search: suggestions from your own places, people and years before
+    typing; "Clear search" when nothing matches.
+  - Bottom chip: a memory from this week in an earlier year ("This week,
+    3 years ago") when nothing happened on this date.
+  - Thread of the Year: progress per year ("2025 · 2 of 3 memories"),
+    "Add a memory", "Or make a story now".
+  - Stories: "Add a memory". Memory without people: "Who was there? Add
+    person". Without threads: "Connect".
+
+**Better**
+- Walls with hundreds of memories stay smooth: only cards near the screen
+  are built, card photos are decoded at card size (about 20× less memory),
+  the cards hang still with Reduce Motion.
+- Onboarding in 4 steps (privacy is one of the "How it works" cards).
+
+## 1.0.0 (19) – 15 October 2026
+
+(Build 18 has the same code; uploaded twice by mistake.)
+
+**New**
+- **Several walls** (Premium): More › New wall; the wall switcher lists
+  them with rename and delete (a deleted wall's memories go back to My
+  wall); "Move to wall…" in a memory's menu.
+- **Hidden memories**: hide from a memory's menu; View › Hidden memories
+  shows them after Face ID or the passcode. Left out of search, On this day,
+  Thread of the Year and stories.
+- **App lock** (free): Settings › Privacy › App lock with Face ID / Touch ID
+  / passcode; blurred in the app switcher; On this day notifications name no
+  memory while it is on.
+- **Search**: by title, place, person or year, ignoring case and accents.
+- **Undo** after deleting a memory, note or nail (instead of "Are you
+  sure?").
+- **Edit pencils** on the memory screen open the edit screen at that
+  section; **Open in Maps** on the Place card.
+- **Connected memories** as polaroids on a rope, with the reason for each
+  thread.
+- **Place names** ("Split, Croatia") instead of coordinates; older memories
+  get their names in the background.
+- **Timeline grouped by year** with headings that stay on top.
+
+**Better**
+- Fixed top bars on every screen; **Save** in the top bar of edit screens,
+  with "Discard changes?" when leaving.
+- **Settings** as a short list; Backup & data and About & help have their
+  own screens; Thread of the Year and Family walls are in the More menu.
+- The add button is a round "+" opening an "Add to your wall" sheet; the
+  View sheet's options fill the width.
+- Thread of the Year card and export buttons laid out evenly.
+- Large text sizes (up to 2×) without split words or cut-off labels.
+- Light haptics when a card lands, a thread connects or a memory is hung.
+- The demo wall speaks the app's language, also after a language change.
+- The Premium page no longer says "Purchase failed" when the store can't
+  load the offer; it offers "Try again".
+
+**Fixed**
+- A crash when naming a new wall.
+- Wrong accessibility frames on the wall (VoiceOver focus boxes and UI test
+  taps landed in the wrong place).
+- Thread of the Year preview unreadable for VoiceOver while playing.
+
+## 1.0.0 (17) – earlier
+
+See git history before commit `641dc73`.
