@@ -1410,6 +1410,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get peopleHint => 'من كان هناك؟';
 
   @override
+  String get premiumPlanYearly => 'سنوي';
+
+  @override
+  String get premiumPlanMonthly => 'شهري';
+
+  @override
+  String premiumYearlyWithPrice(String price) {
+    return 'Premium • $price/سنة';
+  }
+
+  @override
+  String premiumSavePercent(int percent) {
+    return 'وفّر $percent٪';
+  }
+
+  @override
+  String purchasesHandledYearly(String store) {
+    return 'يُخصم المبلغ من حسابك في $store. يتجدّد الاشتراك تلقائياً كل سنة ما لم تُلغِه قبل 24 ساعة على الأقل من نهاية الفترة الحالية. يمكنك إدارته أو إلغاؤه من إعدادات حسابك في $store.';
+  }
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

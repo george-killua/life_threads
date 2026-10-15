@@ -2553,6 +2553,36 @@ abstract class AppLocalizations {
   /// **'Who was there?'**
   String get peopleHint;
 
+  /// No description provided for @premiumPlanYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get premiumPlanYearly;
+
+  /// No description provided for @premiumPlanMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get premiumPlanMonthly;
+
+  /// No description provided for @premiumYearlyWithPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium • {price}/year'**
+  String premiumYearlyWithPrice(String price);
+
+  /// No description provided for @premiumSavePercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Save {percent}%'**
+  String premiumSavePercent(int percent);
+
+  /// No description provided for @purchasesHandledYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment is charged to your {store} account. The subscription renews automatically every year unless you cancel it at least 24 hours before the current period ends. Manage or cancel it in your {store} account settings.'**
+  String purchasesHandledYearly(String store);
+
   /// No description provided for @savedPhotosTitle.
   ///
   /// In en, this message translates to:

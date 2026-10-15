@@ -6,10 +6,14 @@ Launch with:
 
 ```text
 Free: 30 memories
-Premium: monthly subscription (store-managed auto-renew)
-Product ID: lifethreads_premium_monthly
-Suggested start price: €2.99 / month
+Premium yearly (shown first): lifethreads_premium_yearly, €34.99 / year
+Premium monthly: lifethreads_premium_monthly, €4.99 / month
+Both are auto-renewable subscriptions in one group ("LifeThreads Premium").
 ```
+
+The Premium page preselects the yearly plan and shows its saving against
+12 months ("Save 41%"), computed from the store prices. If the store has no
+yearly product yet, the page offers monthly alone.
 
 ## Why Subscription
 

@@ -27,6 +27,8 @@ class FakeStore extends InAppPurchasePlatform with MockPlatformInterfaceMixin {
   Stream<List<PurchaseDetails>> get purchaseStream => controller.stream;
   @override
   Future<bool> isAvailable() async => true;
+  bool offerYearly = false;
+
   @override
   Future<ProductDetailsResponse> queryProductDetails(Set<String> ids) async =>
       queryError != null
@@ -41,6 +43,15 @@ class FakeStore extends InAppPurchasePlatform with MockPlatformInterfaceMixin {
               rawPrice: 2.99,
               currencyCode: 'EUR',
             ),
+            if (offerYearly)
+              ProductDetails(
+                id: PremiumProductIds.yearlySubscription,
+                title: 'P',
+                description: 'P',
+                price: '€20.99',
+                rawPrice: 20.99,
+                currencyCode: 'EUR',
+              ),
           ],
           notFoundIDs: const [],
         );
@@ -90,6 +101,40 @@ void main() {
     container.dispose();
     debugDefaultTargetPlatformOverride = null;
   });
+
+  test('with a yearly plan it is chosen first, with its saving', () async {
+    store.offerYearly = true;
+    container.read(premiumBillingProvider);
+    await _settle();
+    final plans = container.read(premiumPlansProvider);
+    expect(plans.hasChoice, isTrue);
+    expect(plans.selected, PremiumPlan.yearly);
+    expect(plans.yearlyPrice, '€20.99');
+    // 20.99 against 12 x 2.99 = 35.88: 41 % less.
+    expect(plans.savingsPercent, 41);
+    expect(
+      container.read(premiumBillingProvider).productId,
+      PremiumProductIds.yearlySubscription,
+    );
+    container
+        .read(premiumBillingProvider.notifier)
+        .selectPlan(PremiumPlan.monthly);
+    expect(container.read(premiumPlansProvider).selected, PremiumPlan.monthly);
+    expect(container.read(premiumBillingProvider).price, '€2.99');
+  });
+
+  test(
+    'without a yearly plan in the store, monthly is offered alone',
+    () async {
+      container.read(premiumBillingProvider);
+      await _settle();
+      expect(container.read(premiumPlansProvider).hasChoice, isFalse);
+      expect(
+        container.read(premiumBillingProvider).productId,
+        PremiumProductIds.monthlySubscription,
+      );
+    },
+  );
 
   test(
     'an offer that fails to load is a store problem, and can be retried',

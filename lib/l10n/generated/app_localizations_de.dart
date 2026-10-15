@@ -1422,6 +1422,27 @@ class AppLocalizationsDe extends AppLocalizations {
   String get peopleHint => 'Wer war dabei?';
 
   @override
+  String get premiumPlanYearly => 'Jährlich';
+
+  @override
+  String get premiumPlanMonthly => 'Monatlich';
+
+  @override
+  String premiumYearlyWithPrice(String price) {
+    return 'Premium • $price/Jahr';
+  }
+
+  @override
+  String premiumSavePercent(int percent) {
+    return 'Spare $percent %';
+  }
+
+  @override
+  String purchasesHandledYearly(String store) {
+    return 'Die Zahlung wird über deinen $store-Account abgerechnet. Das Abo verlängert sich automatisch jedes Jahr, wenn du es nicht spätestens 24 Stunden vor Ende des laufenden Zeitraums kündigst. Verwalten oder kündigen kannst du es in den Account-Einstellungen von $store.';
+  }
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

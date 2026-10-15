@@ -9,6 +9,20 @@ import '../domain/premium_product.dart';
 import '../domain/premium_purchase_state.dart';
 import 'premium_entitlement_controller.dart';
 
+/// The plans on offer and the one chosen (yearly first).
+final premiumPlansProvider =
+    NotifierProvider<PremiumPlansController, PremiumPlans>(
+      PremiumPlansController.new,
+    );
+
+class PremiumPlansController extends Notifier<PremiumPlans> {
+  @override
+  PremiumPlans build() => const PremiumPlans();
+
+  // ignore: use_setters_to_change_properties
+  void set(PremiumPlans plans) => state = plans;
+}
+
 final premiumBillingProvider =
     NotifierProvider<PremiumBillingController, PremiumPurchaseState>(
       PremiumBillingController.new,
@@ -18,6 +32,8 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
   final InAppPurchase _store = InAppPurchase.instance;
   StreamSubscription<List<PurchaseDetails>>? _subscription;
   ProductDetails? _subscriptionProduct;
+  ProductDetails? _monthly;
+  ProductDetails? _yearly;
   Completer<void>? _restoreDelivery;
   Future<_RestoreOutcome>? _restoreInFlight;
 
@@ -77,7 +93,19 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
         return;
       }
 
-      _subscriptionProduct = _pickSubscriptionOffer(response.productDetails);
+      _monthly = _offerFor(
+        response.productDetails,
+        PremiumProductIds.monthlySubscription,
+      );
+      _yearly = _offerFor(
+        response.productDetails,
+        PremiumProductIds.yearlySubscription,
+      );
+      _subscriptionProduct =
+          _yearly ??
+          _monthly ??
+          _pickSubscriptionOffer(response.productDetails);
+      _publishPlans(_yearly != null ? PremiumPlan.yearly : PremiumPlan.monthly);
       state = PremiumPurchaseState(
         status: PremiumPurchaseStatus.ready,
         productId: _subscriptionProduct!.id,
@@ -331,6 +359,43 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
           ? PremiumPurchaseMessage.restored
           : PremiumPurchaseMessage.active,
     );
+  }
+
+  /// Chooses the plan to buy; the page shows its price.
+  void selectPlan(PremiumPlan plan) {
+    final product = plan == PremiumPlan.yearly ? _yearly : _monthly;
+    if (product == null) return;
+    _subscriptionProduct = product;
+    _publishPlans(plan);
+    state = state.copyWith(productId: product.id, price: product.price);
+  }
+
+  void _publishPlans(PremiumPlan selected) {
+    final monthly = _monthly;
+    final yearly = _yearly;
+    int? savings;
+    if (monthly != null && yearly != null && monthly.rawPrice > 0) {
+      savings = ((1 - yearly.rawPrice / (monthly.rawPrice * 12)) * 100).floor();
+      if (savings <= 0) savings = null;
+    }
+    ref
+        .read(premiumPlansProvider.notifier)
+        .set(
+          PremiumPlans(
+            monthlyPrice: monthly?.price,
+            yearlyPrice: yearly?.price,
+            savingsPercent: savings,
+            selected: selected,
+          ),
+        );
+  }
+
+  ProductDetails? _offerFor(List<ProductDetails> products, String id) {
+    final matching = [
+      for (final product in products)
+        if (product.id == id) product,
+    ];
+    return matching.isEmpty ? null : _pickSubscriptionOffer(matching);
   }
 
   ProductDetails _pickSubscriptionOffer(List<ProductDetails> products) {

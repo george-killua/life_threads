@@ -11,6 +11,7 @@ import '../../../../core/localization/app_localizations_x.dart';
 import '../../../memories/data/memory_repository.dart';
 import '../../../wall/presentation/widgets/wall_background.dart';
 import '../../data/premium_billing_controller.dart';
+import '../../domain/premium_product.dart';
 import '../../data/premium_entitlement_controller.dart';
 import '../../domain/premium_entitlement.dart';
 import '../../domain/premium_feature.dart';
@@ -59,6 +60,10 @@ class UpgradePage extends ConsumerWidget {
                 _SubscriptionOfferCard(
                   isPremium: isPremium,
                   purchaseState: purchaseState,
+                  plans: ref.watch(premiumPlansProvider),
+                  onSelectPlan: (plan) => ref
+                      .read(premiumBillingProvider.notifier)
+                      .selectPlan(plan),
                   onPurchase: () => ref
                       .read(premiumBillingProvider.notifier)
                       .buySubscription(),
@@ -439,6 +444,8 @@ class _SubscriptionOfferCard extends StatelessWidget {
     required this.onRetry,
     required this.onMockUnlock,
     required this.onContinue,
+    required this.plans,
+    required this.onSelectPlan,
   });
 
   final bool isPremium;
@@ -447,6 +454,8 @@ class _SubscriptionOfferCard extends StatelessWidget {
   final VoidCallback onRestore;
   final VoidCallback onRetry;
   final VoidCallback? onMockUnlock;
+  final PremiumPlans plans;
+  final ValueChanged<PremiumPlan> onSelectPlan;
   final VoidCallback onContinue;
 
   @override
@@ -497,9 +506,20 @@ class _SubscriptionOfferCard extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
+          if (!isPremium && plans.hasChoice) ...[
+            const SizedBox(height: 14),
+            // Yearly first: the better deal.
+            _PlanPicker(plans: plans, onSelect: onSelectPlan),
+          ],
           if (!isPremium) ...[
             const SizedBox(height: 14),
-            _PricePill(price: price, purchaseState: purchaseState),
+            _PricePill(
+              price: price,
+              purchaseState: purchaseState,
+              yearly:
+                  plans.selected == PremiumPlan.yearly &&
+                  plans.yearlyPrice != null,
+            ),
           ],
           const SizedBox(height: 18),
           SizedBox(
@@ -560,7 +580,9 @@ class _SubscriptionOfferCard extends StatelessWidget {
           ],
           const SizedBox(height: 10),
           Text(
-            context.l10n.purchasesHandledByGooglePlay(_storeName),
+            plans.selected == PremiumPlan.yearly && plans.yearlyPrice != null
+                ? context.l10n.purchasesHandledYearly(_storeName)
+                : context.l10n.purchasesHandledByGooglePlay(_storeName),
             style: TextStyle(
               color: AppColors.paperMuted,
               fontSize: 12,
@@ -618,10 +640,15 @@ final _cardOutlined = ButtonStyle(
 );
 
 class _PricePill extends StatelessWidget {
-  const _PricePill({required this.price, required this.purchaseState});
+  const _PricePill({
+    required this.price,
+    required this.purchaseState,
+    this.yearly = false,
+  });
 
   final String price;
   final PremiumPurchaseState purchaseState;
+  final bool yearly;
 
   @override
   Widget build(BuildContext context) {
@@ -643,7 +670,9 @@ class _PricePill extends StatelessWidget {
           Expanded(
             child: Text(
               purchaseState.status == PremiumPurchaseStatus.ready
-                  ? context.l10n.lifetimeUnlockWithPrice(price)
+                  ? yearly
+                        ? context.l10n.premiumYearlyWithPrice(price)
+                        : context.l10n.lifetimeUnlockWithPrice(price)
                   : _statusLabel(context, purchaseState.status),
               style: TextStyle(
                 color: AppColors.paperInk,
@@ -844,6 +873,135 @@ class _BillingReadyNotice extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Yearly or monthly, side by side; yearly first, with its saving.
+class _PlanPicker extends StatelessWidget {
+  const _PlanPicker({required this.plans, required this.onSelect});
+
+  final PremiumPlans plans;
+  final ValueChanged<PremiumPlan> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final savings = plans.savingsPercent;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: _PlanOption(
+            key: const ValueKey('premium-plan-yearly'),
+            title: l10n.premiumPlanYearly,
+            price: plans.yearlyPrice!,
+            badge: savings == null ? null : l10n.premiumSavePercent(savings),
+            selected: plans.selected == PremiumPlan.yearly,
+            onTap: () => onSelect(PremiumPlan.yearly),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _PlanOption(
+            key: const ValueKey('premium-plan-monthly'),
+            title: l10n.premiumPlanMonthly,
+            price: plans.monthlyPrice!,
+            selected: plans.selected == PremiumPlan.monthly,
+            onTap: () => onSelect(PremiumPlan.monthly),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PlanOption extends StatelessWidget {
+  const _PlanOption({
+    super.key,
+    required this.title,
+    required this.price,
+    required this.selected,
+    required this.onTap,
+    this.badge,
+  });
+
+  final String title;
+  final String price;
+  final String? badge;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(18),
+      side: BorderSide(
+        color: selected
+            ? AppColors.gold
+            : AppColors.paperInk.withValues(alpha: 0.2),
+        width: selected ? 2 : 1,
+      ),
+    );
+    return Semantics(
+      button: true,
+      selected: selected,
+      inMutuallyExclusiveGroup: true,
+      child: Material(
+        color: selected
+            ? AppColors.gold.withValues(alpha: 0.16)
+            : Colors.transparent,
+        shape: shape,
+        child: InkWell(
+          customBorder: shape,
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: AppColors.paperInk,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  price,
+                  style: TextStyle(
+                    color: AppColors.paperInk,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                if (badge != null) ...[
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.gold,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                    child: Text(
+                      badge!,
+                      style: TextStyle(
+                        color: AppColors.paperInk,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

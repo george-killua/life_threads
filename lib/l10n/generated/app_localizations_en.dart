@@ -1406,6 +1406,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get peopleHint => 'Who was there?';
 
   @override
+  String get premiumPlanYearly => 'Yearly';
+
+  @override
+  String get premiumPlanMonthly => 'Monthly';
+
+  @override
+  String premiumYearlyWithPrice(String price) {
+    return 'Premium • $price/year';
+  }
+
+  @override
+  String premiumSavePercent(int percent) {
+    return 'Save $percent%';
+  }
+
+  @override
+  String purchasesHandledYearly(String store) {
+    return 'Payment is charged to your $store account. The subscription renews automatically every year unless you cancel it at least 24 hours before the current period ends. Manage or cancel it in your $store account settings.';
+  }
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

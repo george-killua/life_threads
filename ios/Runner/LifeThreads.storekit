@@ -1,57 +1,73 @@
 {
-  "identifier" : "6B2F4C3E-7A1D-4E2B-9C5F-1D8E3A7B9F20",
-  "nonRenewingSubscriptions" : [
-
-  ],
-  "products" : [
-
-  ],
-  "settings" : {
-    "_storefront" : "AUT"
+  "identifier": "6B2F4C3E-7A1D-4E2B-9C5F-1D8E3A7B9F20",
+  "nonRenewingSubscriptions": [],
+  "products": [],
+  "settings": {
+    "_storefront": "AUT"
   },
-  "subscriptionGroups" : [
+  "subscriptionGroups": [
     {
-      "id" : "22466945",
-      "localizations" : [
-
-      ],
-      "name" : "LifeThreads Premium",
-      "subscriptions" : [
+      "id": "22466945",
+      "localizations": [],
+      "name": "LifeThreads Premium",
+      "subscriptions": [
         {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "4.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "6821782801",
-          "introductoryOffer" : null,
-          "localizations" : [
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "4.99",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "6821782801",
+          "introductoryOffer": null,
+          "localizations": [
             {
-              "description" : "Unlimited memories, stories, Thread of the Year and family walls.",
-              "displayName" : "LifeThreads Premium",
-              "locale" : "en_US"
+              "description": "Unlimited memories, stories, Thread of the Year and family walls.",
+              "displayName": "LifeThreads Premium",
+              "locale": "en_US"
             },
             {
-              "description" : "Unbegrenzte Erinnerungen, Stories, Faden des Jahres und Familienwände.",
-              "displayName" : "LifeThreads Premium",
-              "locale" : "de"
+              "description": "Unbegrenzte Erinnerungen, Stories, Faden des Jahres und Familienwände.",
+              "displayName": "LifeThreads Premium",
+              "locale": "de"
             }
           ],
-          "productID" : "lifethreads_premium_monthly",
-          "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "LifeThreads Premium Monthly",
-          "subscriptionGroupID" : "22466945",
-          "type" : "RecurringSubscription"
+          "productID": "lifethreads_premium_monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "LifeThreads Premium Monthly",
+          "subscriptionGroupID": "22466945",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "34.99",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "6821782802",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Unlimited memories, stories, Thread of the Year and family walls.",
+              "displayName": "LifeThreads Premium",
+              "locale": "en_US"
+            },
+            {
+              "description": "Unbegrenzte Erinnerungen, Stories, Faden des Jahres und Familienwände.",
+              "displayName": "LifeThreads Premium",
+              "locale": "de"
+            }
+          ],
+          "productID": "lifethreads_premium_yearly",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "LifeThreads Premium Yearly",
+          "subscriptionGroupID": "22466945",
+          "type": "RecurringSubscription"
         }
       ]
     }
   ],
-  "version" : {
-    "major" : 4,
-    "minor" : 0
+  "version": {
+    "major": 4,
+    "minor": 0
   }
 }
