@@ -13,7 +13,7 @@ _Last updated: 15 October 2026_
 | # | Step | Who | Status |
 |---|---|---|---|
 | 1 | Push all work; upload build **1.0.0 (20)** to TestFlight | Claude | ✅ |
-| 2 | Create the yearly plan `lifethreads_premium_yearly` (€34.99) in App Store Connect and Play Console, and let the server accept it – see [store_setup_yearly.md](store_setup_yearly.md) | both | ⏳ Chrome extension not connected |
+| 2 | Create the yearly plan `lifethreads_premium_yearly` (€34.99) in App Store Connect and Play Console, and let the server accept it – see [store_setup_yearly.md](store_setup_yearly.md) | both | 🔄 Both stores done (App Store: submit with the next app version). Left: server accepts the product (George, section 3) |
 | 3 | Publish privacy policy, terms and Premium page on gkcoding.dev (ready in the website repo; one `rsync` – see [store_setup_yearly.md](store_setup_yearly.md#4-website)) | George | ⏳ |
 | 4 | Join the App Store Small Business Program; check Google's 15 % service fee | George | ⏳ |
 | 5 | Test on a real iPhone: Face ID lock, hidden memories, a sandbox purchase | George | ⏳ |

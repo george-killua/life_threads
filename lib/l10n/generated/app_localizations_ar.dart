@@ -122,7 +122,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get premiumLockedBody =>
-      'اشتراك شهري: ذكريات غير محدودة، ومظاهر Premium، وتخطيطات متقدمة.';
+      'سنوي أو شهري: ذكريات غير محدودة، عدة جدران، قصص، مظاهر وتخطيطات.';
 
   @override
   String get activeBadge => 'مفعّل';
@@ -1709,7 +1709,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lifetimeActive => 'الاشتراك مفعّل';
 
   @override
-  String get oneTimeLifetimeUnlock => 'اشتراك شهري';
+  String get oneTimeLifetimeUnlock => 'سنوي أو شهري';
 
   @override
   String get premiumHeroActiveTitle => 'جدار ذكرياتك غير محدود.';
@@ -1764,7 +1764,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String onePurchaseBody(String store) {
-    return 'اشتراك شهري للقصص مع الموسيقى، وخيط السنة، وجدران العائلة، وذكريات بلا حدود. يمكنك الإلغاء في أي وقت من إعدادات $store.';
+    return 'اشتراك سنوي أو شهري للقصص مع الموسيقى، وخيط السنة، وجدران العائلة، وذكريات بلا حدود. يمكنك الإلغاء في أي وقت من إعدادات $store.';
   }
 
   @override

@@ -39,7 +39,7 @@
   "oneFreeBadge": "1 free",
   "premiumTitle": "Premium",
   "premiumActiveBody": "Premium subscription is active.",
-  "premiumLockedBody": "Monthly subscription: unlimited memories, premium themes and advanced layouts.",
+  "premiumLockedBody": "Yearly or monthly: unlimited memories, several walls, stories, themes and layouts.",
   "activeBadge": "Active",
   "openPremium": "Open Premium",
   "appVersionTitle": "App version",
@@ -655,7 +655,7 @@
   "premiumPageTitle": "LifeThreads Premium",
   "developmentUnlockEnabled": "Development Premium unlock enabled.",
   "lifetimeActive": "Subscription active",
-  "oneTimeLifetimeUnlock": "Monthly subscription",
+  "oneTimeLifetimeUnlock": "Yearly or monthly",
   "premiumHeroActiveTitle": "Your memory wall is unlimited.",
   "premiumHeroLockedTitle": "Turn your memories into stories.",
   "premiumHeroActiveBody": "Your Premium subscription is active. Stories with music, Thread of the Year, family walls and unlimited memories are yours.",
@@ -671,7 +671,7 @@
   "benefitLayoutsBody": "More ways to arrange threads, timelines, anchors, and memory clusters.",
   "lifetimeUnlock": "Premium subscription",
   "premiumActiveOnDevice": "Premium is active on this device.",
-  "onePurchaseBody": "Subscribe monthly for stories with music, Thread of the Year, family walls and unlimited memories. Cancel anytime in your {store} settings.",
+  "onePurchaseBody": "Subscribe yearly or monthly for stories with music, Thread of the Year, family walls and unlimited memories. Cancel anytime in your {store} settings.",
   "@onePurchaseBody": {
     "placeholders": {
       "store": {

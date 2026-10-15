@@ -122,7 +122,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumLockedBody =>
-      'Monthly subscription: unlimited memories, premium themes and advanced layouts.';
+      'Yearly or monthly: unlimited memories, several walls, stories, themes and layouts.';
 
   @override
   String get activeBadge => 'Active';
@@ -1707,7 +1707,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lifetimeActive => 'Subscription active';
 
   @override
-  String get oneTimeLifetimeUnlock => 'Monthly subscription';
+  String get oneTimeLifetimeUnlock => 'Yearly or monthly';
 
   @override
   String get premiumHeroActiveTitle => 'Your memory wall is unlimited.';
@@ -1762,7 +1762,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String onePurchaseBody(String store) {
-    return 'Subscribe monthly for stories with music, Thread of the Year, family walls and unlimited memories. Cancel anytime in your $store settings.';
+    return 'Subscribe yearly or monthly for stories with music, Thread of the Year, family walls and unlimited memories. Cancel anytime in your $store settings.';
   }
 
   @override

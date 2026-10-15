@@ -313,7 +313,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumLockedBody.
   ///
   /// In en, this message translates to:
-  /// **'Monthly subscription: unlimited memories, premium themes and advanced layouts.'**
+  /// **'Yearly or monthly: unlimited memories, several walls, stories, themes and layouts.'**
   String get premiumLockedBody;
 
   /// No description provided for @activeBadge.
@@ -3102,7 +3102,7 @@ abstract class AppLocalizations {
   /// No description provided for @oneTimeLifetimeUnlock.
   ///
   /// In en, this message translates to:
-  /// **'Monthly subscription'**
+  /// **'Yearly or monthly'**
   String get oneTimeLifetimeUnlock;
 
   /// No description provided for @premiumHeroActiveTitle.
@@ -3198,7 +3198,7 @@ abstract class AppLocalizations {
   /// No description provided for @onePurchaseBody.
   ///
   /// In en, this message translates to:
-  /// **'Subscribe monthly for stories with music, Thread of the Year, family walls and unlimited memories. Cancel anytime in your {store} settings.'**
+  /// **'Subscribe yearly or monthly for stories with music, Thread of the Year, family walls and unlimited memories. Cancel anytime in your {store} settings.'**
   String onePurchaseBody(String store);
 
   /// No description provided for @premiumActiveButton.

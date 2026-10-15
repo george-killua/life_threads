@@ -122,7 +122,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get premiumLockedBody =>
-      'Monatsabo: unbegrenzte Erinnerungen, Premium-Designs und erweiterte Layouts.';
+      'Jährlich oder monatlich: unbegrenzte Erinnerungen, mehrere Wände, Storys, Designs und Layouts.';
 
   @override
   String get activeBadge => 'Aktiv';
@@ -1725,7 +1725,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get lifetimeActive => 'Abo aktiv';
 
   @override
-  String get oneTimeLifetimeUnlock => 'Monatsabo';
+  String get oneTimeLifetimeUnlock => 'Jährlich oder monatlich';
 
   @override
   String get premiumHeroActiveTitle => 'Deine Erinnerungswand ist unbegrenzt.';
@@ -1781,7 +1781,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String onePurchaseBody(String store) {
-    return 'Monatliches Abo für Storys mit Musik, den Faden des Jahres, Familienwände und unbegrenzte Erinnerungen. Jederzeit in den Einstellungen von $store kündbar.';
+    return 'Jährliches oder monatliches Abo für Storys mit Musik, den Faden des Jahres, Familienwände und unbegrenzte Erinnerungen. Jederzeit in den Einstellungen von $store kündbar.';
   }
 
   @override
