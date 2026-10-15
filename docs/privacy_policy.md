@@ -1,6 +1,6 @@
 # LifeThreads Privacy Policy
 
-Effective date: October 12, 2026
+Effective date: October 15, 2026
 
 LifeThreads is developed by GK Coding.
 
@@ -67,6 +67,8 @@ LifeThreads may store location information when you choose a photo that contains
 LifeThreads does not request background location access. The app does not track your live location in the background.
 
 If you open map features, LifeThreads loads map tiles from OpenFreeMap, using OpenMapTiles and OpenStreetMap data. Map tile requests may reveal technical information, such as your IP address and the requested map area, to the map tile provider. This is necessary to display the map.
+
+To show a place name such as “Split, Croatia” instead of coordinates, LifeThreads asks your phone's built-in geocoding service for the name of a memory's photo location: Apple's on iPhone and iPad, Google's on Android. The coordinates are sent for this lookup, without your photos, stories or other memory content, and only the place name is stored with the memory. Offline, the coordinates are kept and the name is looked up later.
 
 ## 6. Local Storage
 
@@ -155,6 +157,7 @@ Starting a family wall needs an active Premium subscription of its owner. When y
 LifeThreads uses internet access for:
 
 - loading map tiles when map features are opened
+- looking up place names for photo locations with Apple's or Google's geocoding service
 - communicating with Google Play Billing for optional purchases and purchase restoration
 - uploading encrypted shared memory capsules when you choose cloud sharing
 - downloading shared memory capsules when you open a LifeThreads share link
@@ -174,6 +177,7 @@ The current version does not include advertising SDKs or analytics SDKs.
 Third-party services may process limited technical data when their features are used:
 
 - OpenFreeMap may receive map tile requests when map views are opened.
+- Apple (on iPhone and iPad) or Google (on Android) receive a photo's coordinates when LifeThreads looks up its place name.
 - Google Play or Apple may process purchase-related information when you buy or restore premium unlocks.
 - Apple (Sign in with Apple) or Google (Google Sign-In) process your sign-in when you use family walls.
 - GK Coding infrastructure processes encrypted memory capsule uploads and downloads, temporary wall display snapshots, and encrypted family wall data only when you choose those features.

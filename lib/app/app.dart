@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/localization/locale_controller.dart';
 import '../features/capsule/presentation/widgets/memory_capsule_deep_link_listener.dart';
 import '../features/family/presentation/widgets/family_invite_link_listener.dart';
+import '../features/memories/data/memory_repository.dart';
 import '../features/on_this_day/data/on_this_day_scheduler.dart';
 import '../features/premium/data/premium_billing_controller.dart';
 import '../features/wall/data/wall_theme_controller.dart';
@@ -26,6 +27,17 @@ class LifeThreadsApp extends ConsumerWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted) _refreshAll(context);
       });
+    });
+    // The demo wall speaks the app's language, also after a change.
+    ref.listen(localeControllerProvider, (previous, next) {
+      final before = previous?.asData?.value;
+      if (!next.hasValue || before == next.value) return;
+      ref
+          .read(memoryRepositoryProvider.notifier)
+          .localizeDemoWall(
+            next.value ?? WidgetsBinding.instance.platformDispatcher.locale,
+          )
+          .ignore();
     });
     // Keep the store listener alive for the whole app session: purchases can
     // be delivered at any time (approved pending payments, interrupted

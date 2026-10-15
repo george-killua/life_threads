@@ -62,3 +62,11 @@ tags: [protocol, wal]
     timeout: 20000
 - assertVisible: "Summer in Split.*"
 - takeScreenshot: WAL-01_on_the_wall
+
+# WAL-07: the place gets its name from the photo's GPS, not coordinates.
+- tapOn: "Summer in Split.*"
+- extendedWaitUntil:
+    visible: "(?s).*Split, Croatia.*"
+    timeout: 20000
+- takeScreenshot: WAL-07_place_name
+- tapOn: "Back"

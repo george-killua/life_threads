@@ -12,6 +12,7 @@ import '../../../../core/localization/app_localizations_x.dart';
 import '../../../media/data/photo_library_service.dart';
 import '../../../media/data/picked_memory_photo.dart';
 import '../../data/memory_repository.dart';
+import '../../data/place_names.dart';
 import '../../domain/memory_category.dart';
 import '../../domain/memory_event.dart';
 import '../../domain/memory_feeling.dart';
@@ -476,9 +477,22 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
 
-    final locationLabel = _locationFromPhotos
-        ? _locationLabelFromGps(_latitude, _longitude)
+    // A place from photo GPS, or a saved place that is only coordinates,
+    // gets its name (the coordinates stay when offline).
+    final hasCoordinates = _latitude != null && _longitude != null;
+    final locationLabel =
+        hasCoordinates &&
+            (_locationFromPhotos || isCoordinateLabel(_locationLabel))
+        ? await placeLabelFor(
+            ref.read(placeNameLookupProvider),
+            _latitude,
+            _longitude,
+            Localizations.localeOf(context),
+          )
+        : _locationFromPhotos
+        ? ''
         : _locationLabel;
+    if (!mounted) return;
 
     try {
       await ref
@@ -513,11 +527,6 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
     setState(() => _isSaving = false);
     if (context.mounted) _backToPrevious(context);
   }
-}
-
-String _locationLabelFromGps(double? latitude, double? longitude) {
-  if (latitude == null || longitude == null) return '';
-  return '${latitude.toStringAsFixed(5)}, ${longitude.toStringAsFixed(5)}';
 }
 
 class _EditablePhoto {

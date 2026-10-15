@@ -10,7 +10,9 @@ import 'package:uuid/uuid.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../core/database/app_database.dart' as db;
 import '../../../core/database/database_provider.dart';
+import '../../../core/localization/locale_controller.dart';
 import '../../../core/storage/app_storage_paths.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../backup/domain/backup_models.dart';
 import '../../onboarding/onboarding_preferences.dart';
 import '../../wall/domain/wall_item.dart';
@@ -22,6 +24,7 @@ import '../domain/memory_photo.dart';
 import '../domain/memory_person.dart' as person_model;
 import '../domain/memory_type.dart';
 import 'memory_seed_data.dart';
+import 'place_names.dart';
 
 final memoryRepositoryProvider =
     AsyncNotifierProvider<MemoryRepository, MemoryState>(MemoryRepository.new);
@@ -211,7 +214,138 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     await _seedIfEmpty();
     await _replaceLegacyDemoWall();
     await _syncDemoAssetCovers();
+    await _localizeDemoRows(await _appLocale());
     return _loadState();
+  }
+
+  /// The app's language: the one chosen in Settings, or the phone's.
+  Future<Locale> _appLocale() async {
+    final selected = await ref.read(localeControllerProvider.future);
+    return selected ?? WidgetsBinding.instance.platformDispatcher.locale;
+  }
+
+  /// Rewrites the demo wall in [locale] after a language change. Only demo
+  /// texts the user left as they were change; edited ones stay.
+  Future<void> localizeDemoWall(Locale locale) async {
+    await future;
+    if (await _localizeDemoRows(locale)) state = AsyncData(await _loadState());
+  }
+
+  /// Returns whether anything changed.
+  Future<bool> _localizeDemoRows(Locale locale) async {
+    final target = MemorySeedData.localizationsForLocale(locale);
+    final languages = AppLocalizations.supportedLocales
+        .map(lookupAppLocalizations)
+        .toList();
+
+    /// [current] in the target language, when it is the demo text of [id]
+    /// in any language; otherwise null.
+    String? translate(
+      String id,
+      String current,
+      Map<String, String> Function(AppLocalizations l10n) texts,
+    ) {
+      final wanted = texts(target)[id];
+      if (wanted == null || wanted == current) return null;
+      final untouched = languages.any((l10n) => texts(l10n)[id] == current);
+      return untouched ? wanted : null;
+    }
+
+    Map<String, String> field<T>(
+      List<T> Function(AppLocalizations) list,
+      String Function(T) id,
+      String Function(T) value,
+      AppLocalizations l10n,
+    ) => {for (final item in list(l10n)) id(item): value(item)};
+
+    var changed = false;
+    final events = await (_database.select(
+      _database.memoryEvents,
+    )..where((row) => row.id.isIn(MemorySeedData.eventIds))).get();
+    for (final row in events) {
+      final title = translate(
+        row.id,
+        row.title,
+        (l) => field(
+          MemorySeedData.localizedEvents,
+          (e) => e.id,
+          (e) => e.title,
+          l,
+        ),
+      );
+      final description = translate(
+        row.id,
+        row.description,
+        (l) => field(
+          MemorySeedData.localizedEvents,
+          (e) => e.id,
+          (e) => e.description,
+          l,
+        ),
+      );
+      final place = translate(
+        row.id,
+        row.locationLabel,
+        (l) => field(
+          MemorySeedData.localizedEvents,
+          (e) => e.id,
+          (e) => e.locationLabel,
+          l,
+        ),
+      );
+      if (title == null && description == null && place == null) continue;
+      changed = true;
+      await (_database.update(
+        _database.memoryEvents,
+      )..where((r) => r.id.equals(row.id))).write(
+        db.MemoryEventsCompanion(
+          title: title == null ? const Value.absent() : Value(title),
+          description: description == null
+              ? const Value.absent()
+              : Value(description),
+          locationLabel: place == null ? const Value.absent() : Value(place),
+        ),
+      );
+    }
+    final connections = await _database
+        .select(_database.memoryConnections)
+        .get();
+    for (final row in connections) {
+      final label = translate(
+        row.id,
+        row.label,
+        (l) => field(
+          MemorySeedData.localizedConnections,
+          (c) => c.id,
+          (c) => c.label,
+          l,
+        ),
+      );
+      if (label == null) continue;
+      changed = true;
+      await (_database.update(_database.memoryConnections)
+            ..where((r) => r.id.equals(row.id)))
+          .write(db.MemoryConnectionsCompanion(label: Value(label)));
+    }
+    final people = await _database.select(_database.memoryPeople).get();
+    for (final row in people) {
+      final relationship = translate(
+        row.id,
+        row.relationship,
+        (l) => field(
+          MemorySeedData.localizedPeople,
+          (p) => p.id,
+          (p) => p.relationship,
+          l,
+        ),
+      );
+      if (relationship == null) continue;
+      changed = true;
+      await (_database.update(_database.memoryPeople)
+            ..where((r) => r.id.equals(row.id)))
+          .write(db.MemoryPeopleCompanion(relationship: Value(relationship)));
+    }
+    return changed;
   }
 
   Future<void> addMemory(NewMemoryDraft draft) async {
@@ -741,6 +875,50 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     );
   }
 
+  /// Gives memories whose place is only coordinates (saved offline, or
+  /// before place names existed) their place name. A few per call, and it
+  /// stops at the first miss: the phone's geocoder limits how often it may
+  /// be asked, and offline the next launch tries again.
+  Future<void> nameCoordinatePlaces(
+    PlaceNameLookup lookup,
+    Locale locale, {
+    int limit = 20,
+  }) async {
+    final current = state.value ?? await future;
+    final unnamed = current.events
+        .where(
+          (event) =>
+              event.hasGeoPoint && isCoordinateLabel(event.locationLabel),
+        )
+        .take(limit)
+        .toList();
+    for (final event in unnamed) {
+      final name = await lookup.nameFor(
+        event.latitude!,
+        event.longitude!,
+        locale,
+      );
+      if (name == null) return;
+      await (_database.update(_database.memoryEvents)
+            ..where((row) => row.id.equals(event.id)))
+          .write(db.MemoryEventsCompanion(locationLabel: Value(name)));
+      final latest = state.value;
+      if (latest == null) continue;
+      state = AsyncData(
+        MemoryState(
+          events: [
+            for (final e in latest.events)
+              if (e.id == event.id) e.copyWith(locationLabel: name) else e,
+          ],
+          connections: latest.connections,
+          photos: latest.photos,
+          people: latest.people,
+          wallItems: latest.wallItems,
+        ),
+      );
+    }
+  }
+
   Future<void> moveWallItem(String id, Offset position) async {
     final current = state.value;
     if (current != null) {
@@ -1089,9 +1267,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
   }
 
   Future<void> _insertDemoRows() async {
-    final l10n = MemorySeedData.localizationsForLocale(
-      WidgetsBinding.instance.platformDispatcher.locale,
-    );
+    final l10n = MemorySeedData.localizationsForLocale(await _appLocale());
     for (final event in MemorySeedData.localizedEvents(l10n)) {
       await _database
           .into(_database.memoryEvents)

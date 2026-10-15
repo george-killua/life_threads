@@ -49,6 +49,7 @@ dependencies:
   story_video_encoder:
     path: packages/story_video_encoder
   audioplayers: ^6.8.1
+  geocoding: ^5.0.0
 
 
 dev_dependencies:

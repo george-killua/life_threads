@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ import '../../../map/presentation/widgets/lifethreads_map_provider.dart';
 import '../../../media/data/photo_library_service.dart';
 import '../../../media/data/picked_memory_photo.dart';
 import '../../../memories/data/memory_repository.dart';
+import '../../../memories/data/place_names.dart';
 import '../../../memories/presentation/memory_l10n.dart';
 import '../../../memories/domain/memory_category.dart';
 import '../../../memories/domain/memory_event.dart';
@@ -101,6 +103,24 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       vsync: this,
       duration: const Duration(seconds: 7),
     )..repeat();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _namePlacesOnce());
+  }
+
+  static var _placesNamed = false;
+
+  /// Once per app start: memories saved offline get their place names.
+  void _namePlacesOnce() {
+    if (_placesNamed || !mounted) return;
+    _placesNamed = true;
+    unawaited(
+      ref
+          .read(memoryRepositoryProvider.notifier)
+          .nameCoordinatePlaces(
+            ref.read(placeNameLookupProvider),
+            Localizations.localeOf(context),
+          )
+          .catchError((Object _) {}),
+    );
   }
 
   @override
@@ -962,9 +982,13 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
     final title =
         _cleanPhotoTitle(picked.title) ?? context.l10n.quickPhotoMemory;
-    final locationLabel = picked.hasLocation
-        ? '${picked.latitude!.toStringAsFixed(5)}, ${picked.longitude!.toStringAsFixed(5)}'
-        : '';
+    // Looked up while the photo is placed on the wall.
+    final locationLabel = placeLabelFor(
+      ref.read(placeNameLookupProvider),
+      picked.hasLocation ? picked.latitude : null,
+      picked.hasLocation ? picked.longitude : null,
+      Localizations.localeOf(context),
+    );
     final position = await _previewPlacement(
       context,
       title: context.l10n.hangQuickPhoto,
@@ -974,6 +998,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       initialPosition: _defaultDropPosition(context),
     );
     if (!context.mounted || position == null) return;
+    final place = await locationLabel;
+    if (!context.mounted) return;
 
     await repository.addMemory(
       NewMemoryDraft(
@@ -983,7 +1009,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
         memoryType: MemoryType.moment,
         feeling: MemoryFeeling.warm,
         occurredAt: picked.capturedAt,
-        locationLabel: locationLabel,
+        locationLabel: place,
         latitude: picked.latitude,
         longitude: picked.longitude,
         coverPhotoPath: picked.localPath,

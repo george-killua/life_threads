@@ -15,6 +15,7 @@ import '../../../media/presentation/widgets/photo_grid_sheet.dart';
 import '../../../premium/data/premium_entitlement_controller.dart';
 import '../../../premium/domain/premium_entitlement.dart';
 import '../../data/memory_repository.dart';
+import '../../data/place_names.dart';
 import '../../domain/memory_category.dart';
 import '../../domain/memory_feeling.dart';
 import '../../domain/memory_type.dart';
@@ -539,7 +540,13 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     final description = _descriptionController.text.trim().isEmpty
         ? context.l10n.savedFromTodaysPrompt
         : _descriptionController.text.trim();
-    final locationLabel = _locationLabelFromGps(_latitude, _longitude);
+    final locationLabel = await placeLabelFor(
+      ref.read(placeNameLookupProvider),
+      _latitude,
+      _longitude,
+      Localizations.localeOf(context),
+    );
+    if (!mounted) return;
 
     final repository = ref.read(memoryRepositoryProvider.notifier);
     await repository.addMemory(
@@ -606,11 +613,6 @@ String? _cleanPhotoTitle(String? title) {
       : value;
   final cleaned = withoutExtension.replaceAll(RegExp(r'[_-]+'), ' ').trim();
   return cleaned.isEmpty ? null : cleaned;
-}
-
-String _locationLabelFromGps(double? latitude, double? longitude) {
-  if (latitude == null || longitude == null) return '';
-  return '${latitude.toStringAsFixed(5)}, ${longitude.toStringAsFixed(5)}';
 }
 
 class _PhotoGpsStatus extends StatelessWidget {

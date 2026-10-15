@@ -12,6 +12,7 @@ import '../../../../core/logging/app_logger.dart';
 import '../../../media/data/photo_library_service.dart';
 import '../../../media/data/picked_memory_photo.dart';
 import '../../../media/presentation/widgets/photo_grid_sheet.dart';
+import '../../../memories/data/place_names.dart';
 import '../../../memories/domain/memory_category.dart';
 import '../../../memories/domain/memory_feeling.dart';
 import '../../../memories/presentation/memory_l10n.dart';
@@ -296,11 +297,21 @@ class _FamilyMemoryEditorPageState
       _latitude = located.latitude;
       _longitude = located.longitude;
       if (_place.text.trim().isEmpty) {
-        _place.text =
-            '${located.latitude!.toStringAsFixed(5)}, '
-            '${located.longitude!.toStringAsFixed(5)}';
+        _place.text = coordinateLabel(located.latitude!, located.longitude!);
+        _nameThePlace(located.latitude!, located.longitude!);
       }
     }
+  }
+
+  /// Replaces the coordinates in the place field with the place's name,
+  /// unless the field was changed in the meantime.
+  Future<void> _nameThePlace(double latitude, double longitude) async {
+    final coordinates = _place.text;
+    final name = await ref
+        .read(placeNameLookupProvider)
+        .nameFor(latitude, longitude, Localizations.localeOf(context));
+    if (!mounted || name == null || _place.text != coordinates) return;
+    setState(() => _place.text = name);
   }
 
   Future<void> _pickDate() async {

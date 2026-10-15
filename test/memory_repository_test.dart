@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:life_threads/core/database/app_database.dart' as db;
@@ -8,12 +9,26 @@ import 'package:life_threads/core/database/database_provider.dart';
 import 'package:life_threads/features/backup/domain/backup_models.dart';
 import 'package:life_threads/features/memories/data/memory_repository.dart';
 import 'package:life_threads/features/memories/data/memory_seed_data.dart';
+import 'package:life_threads/features/memories/data/place_names.dart';
+import 'package:life_threads/l10n/generated/app_localizations.dart';
 import 'package:life_threads/features/memories/domain/memory_category.dart';
 import 'package:life_threads/features/memories/domain/memory_feeling.dart';
 import 'package:life_threads/features/memories/domain/memory_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late Directory docs;
+
+class _FakePlaces implements PlaceNameLookup {
+  _FakePlaces(this.names);
+  final Map<double, String> names;
+  final asked = <double>[];
+
+  @override
+  Future<String?> nameFor(double latitude, double longitude, Locale locale) {
+    asked.add(latitude);
+    return Future.value(names[latitude]);
+  }
+}
 
 ProviderContainer _container() {
   final container = ProviderContainer();
@@ -388,5 +403,100 @@ void main() {
         .map((e) => e.title);
     expect(result.memoryCount, 1);
     expect(titles, unorderedEquals(['Split', 'New one']));
+  });
+
+  test('places saved as coordinates get their names later', () async {
+    SharedPreferences.setMockInitialValues({});
+    final container = _container();
+    final repository = container.read(memoryRepositoryProvider.notifier);
+    await container.read(memoryRepositoryProvider.future);
+    await repository.clearDemoWall();
+    NewMemoryDraft located(String title, double lat, String label) =>
+        NewMemoryDraft(
+          title: title,
+          description: '',
+          category: MemoryCategory.travel,
+          memoryType: MemoryType.moment,
+          feeling: MemoryFeeling.warm,
+          occurredAt: DateTime(2025, 7, 1),
+          locationLabel: label,
+          latitude: lat,
+          longitude: 16.44032,
+        );
+    await repository.addMemory(located('Split', 43.5081, '43.50810, 16.44032'));
+    await repository.addMemory(located('Named', 44.0, 'Grandma\'s house'));
+    await repository.addMemory(located('Offline', 45.0, '45.00000, 16.44032'));
+
+    final places = _FakePlaces({43.5081: 'Split, Croatia'});
+    await repository.nameCoordinatePlaces(places, const Locale('en'));
+
+    String place(String title) => container
+        .read(memoryRepositoryProvider)
+        .requireValue
+        .events
+        .firstWhere((e) => e.title == title)
+        .locationLabel;
+    expect(place('Split'), 'Split, Croatia');
+    // A name the user gave is never replaced.
+    expect(place('Named'), "Grandma's house");
+    expect(places.asked, isNot(contains(44.0)));
+    // No name found (offline): the coordinates stay for the next try.
+    expect(place('Offline'), '45.00000, 16.44032');
+
+    // Saved in the database, not only in memory.
+    container.dispose();
+    final reloaded = ProviderContainer();
+    final events = (await reloaded.read(
+      memoryRepositoryProvider.future,
+    )).events;
+    expect(
+      events.firstWhere((e) => e.title == 'Split').locationLabel,
+      'Split, Croatia',
+    );
+    reloaded.dispose();
+  });
+
+  test('the demo wall speaks the app language, also after a change', () async {
+    SharedPreferences.setMockInitialValues({
+      'demo_wall_enabled': true,
+      'selected_locale_code': 'de',
+    });
+    final de = lookupAppLocalizations(const Locale('de'));
+    final en = lookupAppLocalizations(const Locale('en'));
+    final container = _container();
+    addTearDown(container.dispose);
+    final repository = container.read(memoryRepositoryProvider.notifier);
+    final seeded = await container.read(memoryRepositoryProvider.future);
+    expect(seeded.findEvent('demo-newborn')!.title, de.demoNewbornTitle);
+
+    // The user renames one demo memory, then switches to English.
+    final dance = seeded.findEvent('demo-first-dance')!;
+    await repository.updateMemory(
+      id: dance.id,
+      title: 'Unser Tanz',
+      description: dance.description,
+      category: dance.category,
+      memoryType: dance.memoryType,
+      feeling: dance.feeling,
+      occurredAt: dance.occurredAt,
+      locationLabel: dance.locationLabel,
+    );
+    await repository.localizeDemoWall(const Locale('en'));
+
+    final state = container.read(memoryRepositoryProvider).requireValue;
+    expect(state.findEvent('demo-newborn')!.title, en.demoNewbornTitle);
+    expect(state.findEvent('demo-first-dance')!.title, 'Unser Tanz');
+    expect(
+      state.findEvent('demo-first-dance')!.description,
+      en.demoFirstDanceStory,
+    );
+    expect(
+      state.connections.map((c) => c.label),
+      contains(en.demoThreadFirstDanceToFirstHome),
+    );
+    expect(
+      state.people.map((p) => p.relationship),
+      contains(en.demoRelationGrandpa),
+    );
   });
 }
