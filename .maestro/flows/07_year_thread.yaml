@@ -57,3 +57,11 @@ tags: [protocol, yr]
 - tapOn: "Preview"
 - waitForAnimationToEnd
 - takeScreenshot: YR-01_preview
+# While the film plays, the preview stays readable (VoiceOver, UI tests).
+- assertVisible: "Preview"
+- assertVisible: "Pause|Play"
+- tapOn: "Close"
+- extendedWaitUntil:
+    notVisible: "Pause|Play"
+    timeout: 10000
+- assertVisible: "Export image"

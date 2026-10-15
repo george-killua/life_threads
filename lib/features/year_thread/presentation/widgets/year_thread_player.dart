@@ -92,21 +92,28 @@ class _YearThreadPlayerState extends State<YearThreadPlayer>
         Flexible(
           child: AspectRatio(
             aspectRatio: 9 / 16,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(22),
-              child: GestureDetector(
-                onTap: _toggle,
-                child: FittedBox(
-                  child: SizedBox.fromSize(
-                    size: StoryCanvas.storyLogicalSize,
-                    child: MediaQuery(
-                      data: MediaQuery.of(context).copyWith(
-                        size: StoryCanvas.storyLogicalSize,
-                        textScaler: TextScaler.noScaling,
-                      ),
-                      child: Builder(
-                        builder: (context) =>
-                            _film.buildFrame(context, _frameTime),
+            // One image for VoiceOver: the moving frame changes every tick,
+            // which flooded the accessibility tree (and stalled UI tests).
+            child: Semantics(
+              image: true,
+              label: l10n.yearThreadPreview,
+              excludeSemantics: true,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: GestureDetector(
+                  onTap: _toggle,
+                  child: FittedBox(
+                    child: SizedBox.fromSize(
+                      size: StoryCanvas.storyLogicalSize,
+                      child: MediaQuery(
+                        data: MediaQuery.of(context).copyWith(
+                          size: StoryCanvas.storyLogicalSize,
+                          textScaler: TextScaler.noScaling,
+                        ),
+                        child: Builder(
+                          builder: (context) =>
+                              _film.buildFrame(context, _frameTime),
+                        ),
                       ),
                     ),
                   ),
@@ -130,6 +137,12 @@ class _YearThreadPlayerState extends State<YearThreadPlayer>
                 value: total == Duration.zero
                     ? 0
                     : _position.inMicroseconds / total.inMicroseconds,
+                // Whole seconds, so the value read out changes once a second.
+                semanticFormatterCallback: (value) => _seconds(
+                  Duration(
+                    microseconds: (total.inMicroseconds * value).round(),
+                  ),
+                ),
                 onChanged: (value) => _seek(
                   Duration(
                     microseconds: (total.inMicroseconds * value).round(),

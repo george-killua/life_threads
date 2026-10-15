@@ -132,21 +132,21 @@ Future<void> _switchMode(
   AppLocalizations l10n,
 ) async {
   await _go(tester, '/wall');
-  await tester.tap(find.text(l10n.wallControls));
+  await tester.tap(find.text(l10n.wallViewButton));
   await _settle(tester);
-  // Only look inside the app (the store caption can say "Map" too); the view
-  // row comes before the layout row, which also has "Timeline".
-  await tester.tap(
-    find
-        .descendant(
-          of: find.byType(MaterialApp),
-          matching: find.text(modeLabel),
-        )
-        .first,
-  );
+  // Only look inside the app (the store caption can say "Map" too); the
+  // "Show as" row comes before the "Arrange" row, which also has "Timeline".
+  final mode = find
+      .descendant(of: find.byType(MaterialApp), matching: find.text(modeLabel))
+      .first;
+  await tester.tap(mode);
   await _settle(tester);
   _log('mode switched to $modeLabel');
-  await tester.tap(find.byTooltip(l10n.hideControlsTooltip));
+  // Close the View sheet if it is still open.
+  final sheet = find.text(l10n.wallShowAs);
+  if (sheet.evaluate().isNotEmpty) {
+    Navigator.of(tester.element(sheet.first)).pop();
+  }
   await _settle(tester);
 }
 

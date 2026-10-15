@@ -88,7 +88,7 @@ class StoreFrame extends StatelessWidget {
     return Directionality(
       textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
       child: DecoratedBox(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -174,7 +174,7 @@ class _Caption extends StatelessWidget {
           DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(99),
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 colors: [AppColors.amber, AppColors.gold],
               ),
               boxShadow: [
