@@ -4,9 +4,11 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/widgets/equal_width_buttons.dart';
 import '../../../../core/widgets/top_bar_page.dart';
+import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/logging/app_logger.dart';
@@ -99,15 +101,9 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
                   children: [
                     if (year == null)
-                      _Panel(
-                        child: Text(
-                          l10n.yearThreadNoYears,
-                          style: TextStyle(
-                            color: AppColors.muted,
-                            height: 1.45,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                      _NoYearYet(
+                        almost: YearThread.almostYears(state),
+                        hasMemories: state.visibleEvents.isNotEmpty,
                       )
                     else
                       ..._editor(context, years, YearThread.year(state, year)),
@@ -868,3 +864,118 @@ class _Panel extends StatelessWidget {
 
 /// Non-breaking spaces, so a part like "2 places" never splits over lines.
 String _keepTogether(String part) => part.replaceAll(' ', '\u00A0');
+
+/// Before any year has enough memories: how close each year is, and what
+/// to do now, instead of an empty screen.
+class _NoYearYet extends StatelessWidget {
+  const _NoYearYet({required this.almost, required this.hasMemories});
+
+  final List<({int year, int count})> almost;
+  final bool hasMemories;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _Panel(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 72,
+                child: AspectRatio(
+                  aspectRatio: 9 / 16,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: const YearThreadBackdrop(),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.yearThreadFirstTitle,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.yearThreadNoYears,
+                      style: TextStyle(
+                        color: AppColors.muted,
+                        height: 1.4,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        // How close each year is.
+        for (final entry in almost.take(3)) ...[
+          const SizedBox(height: 10),
+          _Panel(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '${entry.year}',
+                      style: TextStyle(
+                        color: AppColors.gold,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        l10n.yearThreadProgress(entry.count),
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(99),
+                  child: LinearProgressIndicator(
+                    value: entry.count / YearThread.minMemories,
+                    minHeight: 8,
+                    color: AppColors.gold,
+                    backgroundColor: AppColors.line,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        const SizedBox(height: 18),
+        FilledButton.icon(
+          key: const ValueKey('year-thread-add-memory'),
+          onPressed: () => context.push(RouteNames.addMemory),
+          icon: const Icon(Icons.add_rounded),
+          label: Text(l10n.yearThreadAddMemory),
+        ),
+        if (hasMemories) ...[
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: () => context.push(RouteNames.createStory),
+            icon: const Icon(Icons.auto_stories_rounded),
+            label: Text(l10n.yearThreadStoryInstead),
+          ),
+        ],
+      ],
+    );
+  }
+}

@@ -1346,6 +1346,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get showHiddenReason => 'Show hidden memories';
 
   @override
+  String get yearThreadFirstTitle => 'Your first Thread of the Year';
+
+  @override
+  String yearThreadProgress(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count of 3 memories',
+      one: '1 of 3 memories',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get yearThreadStoryInstead => 'Or make a story now';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

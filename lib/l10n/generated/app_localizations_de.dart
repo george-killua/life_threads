@@ -1362,6 +1362,23 @@ class AppLocalizationsDe extends AppLocalizations {
   String get showHiddenReason => 'Ausgeblendete Erinnerungen zeigen';
 
   @override
+  String get yearThreadFirstTitle => 'Dein erster Faden des Jahres';
+
+  @override
+  String yearThreadProgress(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count von 3 Erinnerungen',
+      one: '1 von 3 Erinnerungen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get yearThreadStoryInstead => 'Oder jetzt eine Story machen';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

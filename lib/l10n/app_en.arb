@@ -510,6 +510,16 @@
       }
     }
   },
+  "yearThreadFirstTitle": "Your first Thread of the Year",
+  "yearThreadProgress": "{count, plural, =1{1 of 3 memories} other{{count} of 3 memories}}",
+  "yearThreadStoryInstead": "Or make a story now",
+  "@yearThreadProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "savedPhotosTitle": "{count, plural, =1{1 saved photo} other{{count} saved photos}}",
   "peopleEyebrow": "People",
   "partOfMemory": "Part of this memory",

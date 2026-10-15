@@ -263,6 +263,22 @@ void main() {
       expect(find.text('Your film is ready'), findsNothing);
     });
 
+    testWidgets('before a year has 3 memories it shows how close it is', (
+      tester,
+    ) async {
+      final state = yearState([
+        yearMemory('a', DateTime(2025, 3, 1), title: 'One'),
+        yearMemory('b', DateTime(2025, 6, 1), title: 'Two'),
+        yearMemory('c', DateTime(2024, 6, 1), title: 'Three'),
+      ]);
+      await pumpPage(tester, isPremium: false, state: state);
+      expect(find.text('Your first Thread of the Year'), findsOneWidget);
+      expect(find.text('2 of 3 memories'), findsOneWidget);
+      expect(find.text('1 of 3 memories'), findsOneWidget);
+      expect(find.text('Add a memory'), findsOneWidget);
+      expect(find.text('Or make a story now'), findsOneWidget);
+    });
+
     testWidgets('memories can be removed, swapped and added back', (
       tester,
     ) async {

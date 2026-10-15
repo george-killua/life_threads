@@ -2481,6 +2481,24 @@ abstract class AppLocalizations {
   /// **'Show hidden memories'**
   String get showHiddenReason;
 
+  /// No description provided for @yearThreadFirstTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your first Thread of the Year'**
+  String get yearThreadFirstTitle;
+
+  /// No description provided for @yearThreadProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 of 3 memories} other{{count} of 3 memories}}'**
+  String yearThreadProgress(int count);
+
+  /// No description provided for @yearThreadStoryInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Or make a story now'**
+  String get yearThreadStoryInstead;
+
   /// No description provided for @savedPhotosTitle.
   ///
   /// In en, this message translates to:

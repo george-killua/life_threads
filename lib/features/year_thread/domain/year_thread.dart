@@ -171,6 +171,20 @@ abstract final class YearThread {
     ]..sort((a, b) => b.compareTo(a));
   }
 
+  /// Years that don't have enough memories yet, with how many they have,
+  /// newest first (for the empty screen: "2025 · 2 of 3 memories").
+  static List<({int year, int count})> almostYears(MemoryState state) {
+    final counts = <int, int>{};
+    for (final event in state.visibleEvents) {
+      if (MemorySeedData.isDemoEventId(event.id)) continue;
+      counts.update(event.occurredAt.year, (n) => n + 1, ifAbsent: () => 1);
+    }
+    return [
+      for (final entry in counts.entries)
+        if (entry.value < minMemories) (year: entry.key, count: entry.value),
+    ]..sort((a, b) => b.year.compareTo(a.year));
+  }
+
   /// The year Thread of the Year is about in December (this year) and
   /// January (the year that just ended); null the rest of the year.
   static int? seasonYear(DateTime now) => switch (now.month) {

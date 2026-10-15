@@ -1345,6 +1345,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get showHiddenReason => 'إظهار الذكريات المخفية';
 
   @override
+  String get yearThreadFirstTitle => 'أول خيط للعام';
+
+  @override
+  String yearThreadProgress(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count من 3 ذكريات',
+      two: 'ذكريان من 3',
+      one: 'ذكرى واحدة من 3',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get yearThreadStoryInstead => 'أو اصنع قصة الآن';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
