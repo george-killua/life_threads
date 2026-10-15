@@ -191,20 +191,34 @@ class SettingsPage extends ConsumerWidget {
                         : null,
                   ),
                 ],
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        l10n.onThisDayReminderSwitch,
-                        style: const TextStyle(fontWeight: FontWeight.w800),
+                // One control for screen readers ("Daily reminder, switch"),
+                // and the whole row toggles like a list tile.
+                child: Semantics(
+                  container: true,
+                  child: MergeSemantics(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () =>
+                          _setOnThisDayReminders(context, ref, !remindersOn),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              l10n.onThisDayReminderSwitch,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                          Switch.adaptive(
+                            value: remindersOn,
+                            onChanged: (value) =>
+                                _setOnThisDayReminders(context, ref, value),
+                          ),
+                        ],
                       ),
                     ),
-                    Switch.adaptive(
-                      value: remindersOn,
-                      onChanged: (value) =>
-                          _setOnThisDayReminders(context, ref, value),
-                    ),
-                  ],
+                  ),
                 ),
               ),
               _SettingsCard(
