@@ -22,6 +22,7 @@ PROTOCOL = [
     ("WAL-07", "People and places"),
     ("WAL-08", "Free limit"),
     ("WAL-09", "Search, walls and hidden memories"),
+    ("WAL-10", "Edit pencils, rename and delete a wall"),
     ("PRM-01", "Premium page"),
     ("PRM-02", "Subscribe"),
     ("PRM-03", "Restore"),
@@ -45,6 +46,7 @@ PROTOCOL = [
     ("SET-01", "Themes and name"),
     ("SET-02", "Language and text size"),
     ("SET-03", "Offline and restart"),
+    ("SET-05", "App lock"),
     ("SET-04", "Overall impression"),
 ]
 
