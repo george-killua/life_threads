@@ -116,6 +116,31 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     WidgetsBinding.instance.addPostFrameCallback((_) => _namePlacesOnce());
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // "Reduce Motion": the cards hang still.
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _windController.stop();
+    } else if (!_windController.isAnimating) {
+      _windController.repeat();
+    }
+  }
+
+  /// The part of the board on screen, with a margin of about two cards, in
+  /// board coordinates.
+  Rect _visibleBoardRect(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final inverse = Matrix4.tryInvert(_wallController.value);
+    if (inverse == null) return Rect.largest;
+    final topLeft = MatrixUtils.transformPoint(inverse, Offset.zero);
+    final bottomRight = MatrixUtils.transformPoint(
+      inverse,
+      Offset(size.width, size.height),
+    );
+    return Rect.fromPoints(topLeft, bottomRight).inflate(480);
+  }
+
   static var _placesNamed = false;
 
   /// Once per app start: memories saved offline get their place names.
@@ -263,9 +288,19 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                           child: SizedBox(
                             width: _boardSize.width,
                             height: _boardSize.height,
+                            // Rebuilt with the wind and while panning or
+                            // zooming: only the cards near the screen are
+                            // built, so a wall of hundreds stays smooth.
                             child: AnimatedBuilder(
-                              animation: _windController,
+                              animation: Listenable.merge([
+                                _windController,
+                                _wallController,
+                              ]),
                               builder: (context, _) {
+                                final visible = _visibleBoardRect(context);
+                                bool onScreen(Offset position, String id) =>
+                                    id == _draggingNodeId ||
+                                    visible.contains(position);
                                 return Stack(
                                   clipBehavior: Clip.none,
                                   children: [
@@ -296,87 +331,99 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                       ),
                                     ),
                                     for (final item in displayWallItems)
-                                      switch (item.type) {
-                                        WallItemType.text => WallTextNoteWidget(
-                                          item: _toBoardLocalWallItem(item),
+                                      if (onScreen(
+                                        _toBoardLocal(item.wallPosition),
+                                        item.id,
+                                      ))
+                                        switch (item.type) {
+                                          WallItemType.text =>
+                                            WallTextNoteWidget(
+                                              item: _toBoardLocalWallItem(item),
+                                              windValue: _windController.value,
+                                              isDragging:
+                                                  _draggingNodeId == item.id,
+                                              onLongPress: () => _showTextMenu(
+                                                context,
+                                                state,
+                                                item,
+                                              ),
+                                              onEdit: () => _editTextNote(
+                                                context,
+                                                repository,
+                                                item,
+                                              ),
+                                              onPointerDown: _lockWallGestures,
+                                              onPointerUp: _unlockWallGestures,
+                                              onDragStart: () => _startDrag(
+                                                item.id,
+                                                item.wallPosition,
+                                                _DragTargetKind.wallItem,
+                                              ),
+                                              onDragUpdate: (delta) =>
+                                                  _updateDrag(item.id, delta),
+                                              onDragEnd: () =>
+                                                  _endDrag(repository, item.id),
+                                            ),
+                                          WallItemType.nail => WallNailWidget(
+                                            item: _toBoardLocalWallItem(item),
+                                            isDragging:
+                                                _draggingNodeId == item.id,
+                                            onLongPress: () => _showNailMenu(
+                                              context,
+                                              state,
+                                              item,
+                                            ),
+                                            onPointerDown: _lockWallGestures,
+                                            onPointerUp: _unlockWallGestures,
+                                            onDragStart: () => _startDrag(
+                                              item.id,
+                                              item.wallPosition,
+                                              _DragTargetKind.wallItem,
+                                            ),
+                                            onDragUpdate: (delta) =>
+                                                _updateDrag(item.id, delta),
+                                            onDragEnd: () =>
+                                                _endDrag(repository, item.id),
+                                          ),
+                                        },
+                                    for (final event in filteredEvents)
+                                      if (onScreen(
+                                        _toBoardLocal(event.wallPosition),
+                                        event.id,
+                                      ))
+                                        MemoryCard(
+                                          event: _toBoardLocalMemory(event),
                                           windValue: _windController.value,
                                           isDragging:
-                                              _draggingNodeId == item.id,
-                                          onLongPress: () => _showTextMenu(
+                                              _draggingNodeId == event.id,
+                                          hasConnection: connectedMemoryIds
+                                              .contains(event.id),
+                                          onTap: () {
+                                            _markHintSeen();
+                                            _pushRoute('/memories/${event.id}');
+                                          },
+                                          onLongPress: () => _showMemoryMenu(
                                             context,
-                                            state,
-                                            item,
+                                            event.id,
                                           ),
-                                          onEdit: () => _editTextNote(
-                                            context,
-                                            repository,
-                                            item,
+                                          onEdit: () => _pushRoute(
+                                            '/memories/${event.id}/edit',
+                                          ),
+                                          onConnect: () => _pushRoute(
+                                            '/memories/${event.id}/connections',
                                           ),
                                           onPointerDown: _lockWallGestures,
                                           onPointerUp: _unlockWallGestures,
                                           onDragStart: () => _startDrag(
-                                            item.id,
-                                            item.wallPosition,
-                                            _DragTargetKind.wallItem,
+                                            event.id,
+                                            event.wallPosition,
+                                            _DragTargetKind.memory,
                                           ),
                                           onDragUpdate: (delta) =>
-                                              _updateDrag(item.id, delta),
+                                              _updateDrag(event.id, delta),
                                           onDragEnd: () =>
-                                              _endDrag(repository, item.id),
+                                              _endDrag(repository, event.id),
                                         ),
-                                        WallItemType.nail => WallNailWidget(
-                                          item: _toBoardLocalWallItem(item),
-                                          isDragging:
-                                              _draggingNodeId == item.id,
-                                          onLongPress: () => _showNailMenu(
-                                            context,
-                                            state,
-                                            item,
-                                          ),
-                                          onPointerDown: _lockWallGestures,
-                                          onPointerUp: _unlockWallGestures,
-                                          onDragStart: () => _startDrag(
-                                            item.id,
-                                            item.wallPosition,
-                                            _DragTargetKind.wallItem,
-                                          ),
-                                          onDragUpdate: (delta) =>
-                                              _updateDrag(item.id, delta),
-                                          onDragEnd: () =>
-                                              _endDrag(repository, item.id),
-                                        ),
-                                      },
-                                    for (final event in filteredEvents)
-                                      MemoryCard(
-                                        event: _toBoardLocalMemory(event),
-                                        windValue: _windController.value,
-                                        isDragging: _draggingNodeId == event.id,
-                                        hasConnection: connectedMemoryIds
-                                            .contains(event.id),
-                                        onTap: () {
-                                          _markHintSeen();
-                                          _pushRoute('/memories/${event.id}');
-                                        },
-                                        onLongPress: () =>
-                                            _showMemoryMenu(context, event.id),
-                                        onEdit: () => _pushRoute(
-                                          '/memories/${event.id}/edit',
-                                        ),
-                                        onConnect: () => _pushRoute(
-                                          '/memories/${event.id}/connections',
-                                        ),
-                                        onPointerDown: _lockWallGestures,
-                                        onPointerUp: _unlockWallGestures,
-                                        onDragStart: () => _startDrag(
-                                          event.id,
-                                          event.wallPosition,
-                                          _DragTargetKind.memory,
-                                        ),
-                                        onDragUpdate: (delta) =>
-                                            _updateDrag(event.id, delta),
-                                        onDragEnd: () =>
-                                            _endDrag(repository, event.id),
-                                      ),
                                   ],
                                 );
                               },

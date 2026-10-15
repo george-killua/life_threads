@@ -407,9 +407,14 @@ class _CardImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final path = event.coverPhotoPath;
+    // Decoded at about the size it is shown (sharp up to the wall's 2x zoom),
+    // not at camera size: hundreds of cards stay light in memory.
+    final cacheWidth = (190 * MediaQuery.devicePixelRatioOf(context) * 1.2)
+        .round();
     if (_isAssetPath(path)) {
       return Image.asset(
         path!,
+        cacheWidth: cacheWidth,
         fit: BoxFit.cover,
         filterQuality: FilterQuality.medium,
         errorBuilder: (_, _, _) => _buildPlaceholder(),
@@ -420,6 +425,7 @@ class _CardImage extends StatelessWidget {
     if (path != null && path.isNotEmpty) {
       return Image.file(
         File(path),
+        cacheWidth: cacheWidth,
         fit: BoxFit.cover,
         filterQuality: FilterQuality.medium,
         errorBuilder: (_, _, _) => _buildPlaceholder(),
