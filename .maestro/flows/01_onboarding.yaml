@@ -1,5 +1,5 @@
 # INS-02 Onboarding, INS-03 Demo wall
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 name: INS-02/03 Onboarding and demo wall
 tags: [protocol, ins]
 ---
@@ -15,6 +15,7 @@ tags: [protocol, ins]
 - tapOn:
     text: "Your name"
 - inputText: "Lina"
+- runFlow: ../subflows/hide_keyboard.yaml
 - tapOn: "What should we call you?"  # closes the keyboard
 - assertVisible: "Nice to meet you, Lina."
 - tapOn: "Next"

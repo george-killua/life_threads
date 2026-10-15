@@ -1,6 +1,6 @@
 # YR-01 Thread of the Year: choose a year, length and music, export the
 # film and an image, save, preview.
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 name: YR-01 Thread of the Year
 tags: [protocol, yr]
 ---

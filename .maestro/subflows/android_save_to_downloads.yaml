@@ -1,5 +1,5 @@
 # Android share sheet: save the shared file to Downloads through Files.
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 ---
 - extendedWaitUntil:
     visible: "Files|Save to Files|Drive"

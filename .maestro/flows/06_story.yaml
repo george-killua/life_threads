@@ -1,6 +1,6 @@
 # STO-01 Choose memories, STO-02 Story image, STO-03 Reorder/add/remove,
 # STO-04 Video with music, STO-05 Share and save
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 name: STO-01..05 Create Story
 tags: [protocol, sto]
 ---
@@ -86,16 +86,19 @@ tags: [protocol, sto]
     visible: "Saved to your photos."
     timeout: 180000
 - takeScreenshot: STO-05_saved
+- extendedWaitUntil:
+    notVisible: "Saved to your photos."
+    timeout: 20000
 - tapOn: "Share"
 - runFlow:
     when:
       platform: iOS
     commands:
       - extendedWaitUntil:
-          visible: "Close"
+          visible: "Close|Schließen"
           timeout: 120000
       - takeScreenshot: STO-05_share_sheet
-      - tapOn: "Close"
+      - tapOn: "Close|Schließen"
 - runFlow:
     when:
       platform: Android

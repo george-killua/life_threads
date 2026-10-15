@@ -1,6 +1,6 @@
 # WAL-03 Move around the wall, WAL-04 Connect two memories with a thread,
 # WAL-05 Open, edit and delete, WAL-06 Timeline and map
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 name: WAL-03/04/05/06 Wall, threads, edit and delete, timeline and map
 tags: [protocol, wal]
 ---
@@ -26,7 +26,7 @@ tags: [protocol, wal]
 - takeScreenshot: WAL-03_moved
 - stopApp
 - launchApp:
-    appId: ${APP_ID}
+    appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
     arguments:
       "-AppleLanguages": "(en)"
 - extendedWaitUntil:
@@ -48,6 +48,7 @@ tags: [protocol, wal]
     visible: "Why are they connected?"
     timeout: 10000
 - inputText: "Same summer, two adventures"
+- runFlow: ../subflows/hide_keyboard.yaml
 - tapOn: "Save Reason"
 - assertVisible: ".*Same summer, two adventures.*"
 - takeScreenshot: WAL-04_thread_reason
@@ -72,6 +73,7 @@ tags: [protocol, wal]
 - tapOn: "Summer in Split"
 - eraseText: 30
 - inputText: "Summer by the sea"
+- runFlow: ../subflows/hide_keyboard.yaml
 - tapOn: "Edit Memory"
 - runFlow:
     file: ../subflows/scroll_to.yaml
@@ -88,6 +90,11 @@ tags: [protocol, wal]
       TARGET: ".*Summer by the sea.*"
       DIRECTION: UP
 - takeScreenshot: WAL-05_edited
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "Back"
+      DIRECTION: UP
 - tapOn: "Back"
 - extendedWaitUntil:
     visible: "Summer by the sea.*"

@@ -1,8 +1,8 @@
 # Opens LifeThreads like a fresh install, in English.
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 ---
 - launchApp:
-    appId: ${APP_ID}
+    appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
     clearState: true
     clearKeychain: true
     permissions:

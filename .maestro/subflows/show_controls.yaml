@@ -1,5 +1,5 @@
 # Opens the wall controls if they are collapsed.
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 ---
 - runFlow:
     when:

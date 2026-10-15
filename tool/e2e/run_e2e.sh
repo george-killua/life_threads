@@ -81,7 +81,7 @@ prepare_ios() {
 }
 
 android_serial() {
-  "$ADB" devices | awk '/^emulator-/{print $1; exit}'
+  "$ADB" devices | awk '/^emulator-.*\tdevice$/{print $1; exit}'
 }
 
 prepare_android() {
@@ -89,10 +89,21 @@ prepare_android() {
     log "Creating emulator $AVD"
     echo no | "$SDK/cmdline-tools/latest/bin/avdmanager" create avd -n "$AVD" -k "$AVD_IMAGE" -d pixel_7 >/dev/null
   fi
+  # An emulator that shows up as "offline" is restarted.
+  if "$ADB" devices | grep -q "emulator-.*offline"; then
+    log "Emulator offline, restarting it"
+    "$ADB" emu kill >/dev/null 2>&1 || true
+    sleep 5
+  fi
   if [[ -z "$(android_serial)" ]]; then
     log "Starting emulator $AVD"
+    # Leftovers of an emulator that was killed make the next one wait on a
+    # crash-report dialog or refuse to start.
+    rm -f /tmp/android-"$USER"/emu-crash-*.db
+    find "$HOME/.android/avd/$AVD.avd" -name "*.lock" -delete 2>/dev/null || true
     nohup "$SDK/emulator/emulator" -avd "$AVD" -no-audio -no-boot-anim -no-snapshot-save \
-      -wipe-data -gpu host -memory 4096 -cores 4 >"$OUT/emulator.log" 2>&1 &
+      -wipe-data -gpu host -memory 4096 -cores 4 >"$OUT/emulator.log" 2>&1 </dev/null &
+    disown
   fi
   "$ADB" wait-for-device
   until [[ "$("$ADB" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; do sleep 2; done
@@ -102,8 +113,10 @@ prepare_android() {
   "$ADB" -s "$ANDROID_SERIAL" shell settings put global animator_duration_scale 0
   "$ADB" -s "$ANDROID_SERIAL" shell rm -rf /sdcard/Pictures/LifeThreadsE2E
   "$ADB" -s "$ANDROID_SERIAL" shell mkdir -p /sdcard/Pictures/LifeThreadsE2E
+  sleep 1
   for f in "$PHOTOS"/*.jpg; do
-    "$ADB" -s "$ANDROID_SERIAL" push "$f" /sdcard/Pictures/LifeThreadsE2E/ >/dev/null
+    "$ADB" -s "$ANDROID_SERIAL" push "$f" /sdcard/Pictures/LifeThreadsE2E/ >/dev/null \
+      || { sleep 2; "$ADB" -s "$ANDROID_SERIAL" push "$f" /sdcard/Pictures/LifeThreadsE2E/ >/dev/null; }
     "$ADB" -s "$ANDROID_SERIAL" shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE \
       -d "file:///sdcard/Pictures/LifeThreadsE2E/$(basename "$f")" >/dev/null
   done
@@ -120,65 +133,45 @@ prepare_android() {
       --bind data1:s:"Kate Bell" >/dev/null
     "$ADB" -s "$ANDROID_SERIAL" shell content insert --uri content://com.android.contacts/data \
       --bind raw_contact_id:i:"$raw" --bind mimetype:s:vnd.android.cursor.item/phone_v2 \
-      --bind data1:s:"(555) 564-8583" --bind data2:i:2 >/dev/null
+      --bind "data1:s:'(555) 564-8583'" --bind data2:i:2 >/dev/null
   fi
 }
 
 # ------------------------------------------------------------------ build
 
+# The app builds are copied to build/e2e/app: `flutter test` later builds its
+# own test version of the app into the same output folders.
+APPS="$ROOT/build/e2e/app"
+
 build_ios() {
   log "Building iOS (simulator, debug)"
   flutter build ios --simulator --debug >"$OUT/build-ios.log" 2>&1 || { log "iOS build failed, see $OUT/build-ios.log"; return 1; }
+  mkdir -p "$APPS" && rm -rf "$APPS/Runner.app" && cp -R build/ios/iphonesimulator/Runner.app "$APPS/"
 }
 
 build_android() {
   log "Building Android (debug APK)"
   flutter build apk --debug >"$OUT/build-android.log" 2>&1 || { log "Android build failed, see $OUT/build-android.log"; return 1; }
+  mkdir -p "$APPS" && cp build/app/outputs/flutter-apk/app-debug.apk "$APPS/lifethreads-debug.apk"
 }
 
 # ------------------------------------------------------------------- runs
 
 # Dates as the photo picker labels them ("Photo from Oct 15, 2025").
-eval "$(python3 - <<'PY'
-import datetime
-today = datetime.date.today()
-try:
-    ago = today.replace(year=today.year - 1)
-except ValueError:
-    ago = today.replace(year=today.year - 1, day=28)
-fmt = lambda d: d.strftime("%b ") + str(d.day) + d.strftime(", %Y")
-print(f'PHOTO_YEAR_AGO="{fmt(ago)}"')
-print(f'PHOTO_SUMMIT="{fmt(datetime.date(ago.year, 7, 20))}"')
-print(f'PHOTO_GARDEN="{fmt(datetime.date(ago.year, 5, 18))}"')
-print(f'LAST_YEAR="{ago.year}"')
-PY
-)"
+eval "$(python3 tool/e2e/dates.py)"
 
 maestro_env=(
   -e "PHOTO_YEAR_AGO=$PHOTO_YEAR_AGO" -e "PHOTO_SUMMIT=$PHOTO_SUMMIT"
-  -e "PHOTO_GARDEN=$PHOTO_GARDEN" -e "PHOTO_SALZBURG=Jun 12, 2021"
-  -e "PHOTO_LINZ=Sep 3, 2022" -e "PHOTO_GRAZ=Dec 23, 2023" -e "LAST_YEAR=$LAST_YEAR"
+  -e "PHOTO_GARDEN=$PHOTO_GARDEN" -e "LAST_YEAR=$LAST_YEAR"
 )
 
-run_platform() {
-  local platform="$1" device="$2" app_id="$3"
-  local dir="$OUT/$platform"
-  mkdir -p "$dir"
-  local target=".maestro/flows"
-  [[ -n "$FLOW" ]] && target=".maestro/flows/$FLOW.yaml"
-  log "$platform: Maestro flows on $device"
-  maestro --device "$device" test "$target" \
-    -e "APP_ID=$app_id" -e "PLATFORM=$platform" "${maestro_env[@]}" \
-    --format junit --output "$dir/maestro-junit.xml" \
-    --test-output-dir "$dir/maestro" >"$dir/maestro.log" 2>&1
-  echo $? >"$dir/maestro.exit"
-  if [[ -z "$FLOW" ]]; then
-    log "$platform: Flutter integration tests (Premium purchase, family walls)"
-    flutter test integration_test/app_e2e_test.dart -d "$device" \
-      --reporter expanded >"$dir/flutter.log" 2>&1
-    echo $? >"$dir/flutter.exit"
-  fi
-  log "$platform: done"
+flutter_tests() {
+  local platform="$1" device="$2"
+  mkdir -p "$OUT/$platform"
+  log "$platform: Flutter integration tests (Premium purchase, family walls)"
+  flutter test integration_test/app_e2e_test.dart -d "$device" \
+    --reporter expanded >"$OUT/$platform/flutter.log" 2>&1
+  echo $? >"$OUT/$platform/flutter.exit"
 }
 
 # ------------------------------------------------------------------- main
@@ -186,27 +179,59 @@ run_platform() {
 log "Output: $OUT"
 python3 tool/e2e/make_photos.py "$PHOTOS" >/dev/null
 
+# 1. Prepare and build both platforms at the same time.
 pids=()
 if (( RUN_IOS )); then
   ( prepare_ios
     if (( BUILD )); then build_ios || exit 1; fi
-    xcrun simctl install "$IOS_UDID" build/ios/iphonesimulator/Runner.app
-    xcrun simctl privacy "$IOS_UDID" grant photos "$IOS_APP_ID"
-    xcrun simctl privacy "$IOS_UDID" grant photos-add "$IOS_APP_ID"
-    xcrun simctl privacy "$IOS_UDID" grant contacts "$IOS_APP_ID"
-    run_platform iOS "$IOS_UDID" "$IOS_APP_ID"
+    xcrun simctl install "$IOS_UDID" "$APPS/Runner.app"
+    for service in photos photos-add contacts; do
+      xcrun simctl privacy "$IOS_UDID" grant "$service" "$IOS_APP_ID"
+    done
+    echo "$IOS_UDID" >"$OUT/.ios_device"
   ) &
   pids+=($!)
 fi
 if (( RUN_ANDROID )); then
   ( prepare_android
     if (( BUILD )); then build_android || exit 1; fi
-    "$ADB" -s "$ANDROID_SERIAL" install -r -g build/app/outputs/flutter-apk/app-debug.apk >/dev/null
-    run_platform Android "$ANDROID_SERIAL" "$ANDROID_APP_ID"
+    "$ADB" -s "$ANDROID_SERIAL" install -r -g "$APPS/lifethreads-debug.apk" >/dev/null
+    echo "$ANDROID_SERIAL" >"$OUT/.android_device"
   ) &
   pids+=($!)
 fi
 for pid in "${pids[@]}"; do wait "$pid"; done
+
+devices=()
+[[ -f "$OUT/.ios_device" ]] && devices+=("$(cat "$OUT/.ios_device")")
+[[ -f "$OUT/.android_device" ]] && devices+=("$(cat "$OUT/.android_device")")
+if (( ${#devices[@]} == 0 )); then log "No device ready."; exit 1; fi
+device_list="$(IFS=,; echo "${devices[*]}")"
+
+# 2. Maestro: one process drives both devices in parallel, every flow on each.
+#    (Two separate Maestro processes get in each other's way.)
+target=".maestro/flows"
+[[ -n "$FLOW" ]] && target=".maestro/flows/$FLOW.yaml"
+log "Maestro flows on ${device_list}"
+maestro test --device "$device_list" --shard-all "${#devices[@]}" "$target" \
+  "${maestro_env[@]}" --format junit --output "$OUT/maestro-junit.xml" \
+  --test-output-dir "$OUT/maestro" >"$OUT/maestro.log" 2>&1
+echo $? >"$OUT/maestro.exit"
+
+# 3. Flutter integration tests, both devices at the same time.
+if [[ -z "$FLOW" ]]; then
+  pids=()
+  [[ -f "$OUT/.ios_device" ]] && { flutter_tests iOS "$(cat "$OUT/.ios_device")" & pids+=($!); }
+  [[ -f "$OUT/.android_device" ]] && { flutter_tests Android "$(cat "$OUT/.android_device")" & pids+=($!); }
+  for pid in "${pids[@]}"; do wait "$pid"; done
+  # Two installs at the same moment can fail; such a run is retried alone.
+  for platform in iOS Android; do
+    if grep -q "Unable to start the app" "$OUT/$platform/flutter.log" 2>/dev/null; then
+      log "$platform: retrying the Flutter tests"
+      flutter_tests "$platform" "$(cat "$OUT/.$(echo "$platform" | tr '[:upper:]' '[:lower:]')_device")"
+    fi
+  done
+fi
 
 python3 tool/e2e/report.py "$OUT"
 log "Report: $OUT/report.md"

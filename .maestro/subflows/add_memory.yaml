@@ -1,6 +1,6 @@
 # Adds a memory through "Save a moment" with one photo from the gallery.
 # env: TITLE, STORY, PHOTO (date label, e.g. "Oct 15, 2025"), FEELING
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 ---
 - runFlow:
     when:
@@ -18,8 +18,10 @@ appId: ${APP_ID}
     timeout: 15000
 - tapOn: "Moment"
 - inputText: ${TITLE}
+- runFlow: hide_keyboard.yaml
 - tapOn: "What made it worth keeping?"
 - inputText: ${STORY}
+- runFlow: hide_keyboard.yaml
 - tapOn: "Save it before it fades"   # closes the keyboard
 - tapOn: "Pick"
 - extendedWaitUntil:

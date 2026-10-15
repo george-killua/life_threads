@@ -1,5 +1,5 @@
 # Pans the wall until the card "Summer in Split" (or its new title) is on screen.
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 ---
 - repeat:
     while:

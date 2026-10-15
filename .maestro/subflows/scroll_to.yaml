@@ -1,6 +1,6 @@
 # Swipes the screen up (or down with DIRECTION=UP) until TARGET is visible.
 # env: TARGET, DIRECTION (DOWN by default)
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 ---
 - runFlow:
     when:

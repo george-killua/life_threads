@@ -1,6 +1,6 @@
 # SET-01 Themes and name, SET-02 Language (German and Arabic),
 # SET-03 Restart keeps everything
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 name: SET-01/02/03 Name, themes, language, restart
 tags: [protocol, set]
 ---
@@ -12,6 +12,7 @@ tags: [protocol, set]
 - tapOn: "Lina"
 - eraseText: 10
 - inputText: "Lina Maria"
+- runFlow: ../subflows/hide_keyboard.yaml
 - tapOn: "Settings"
 - tapOn: "Save"
 - assertVisible: "Name updated."
@@ -73,7 +74,7 @@ tags: [protocol, set]
 # SET-03: close the app completely and open it again.
 - stopApp
 - launchApp:
-    appId: ${APP_ID}
+    appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
     arguments:
       "-AppleLanguages": "(en)"
 - extendedWaitUntil:

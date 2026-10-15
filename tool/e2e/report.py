@@ -70,11 +70,23 @@ def ids_in(name):
     return found
 
 
-def maestro_results(path):
+def suite_platform(suite, out):
+    """iOS or Android for a JUnit test suite, from its device."""
+    device = suite.get("device", "")
+    ios_udid = open(os.path.join(out, ".ios_device")).read().strip() if os.path.exists(os.path.join(out, ".ios_device")) else ""
+    if "iPhone" in device or "iPad" in device or (ios_udid and ios_udid in device):
+        return "iOS"
+    return "Android"
+
+
+def maestro_results(path, out, platform_name):
     results = {}
     if not os.path.exists(path):
         return results
-    for case in ET.parse(path).getroot().iter("testcase"):
+    root = ET.parse(path).getroot()
+    suites = [root] if root.tag == "testsuite" else list(root.iter("testsuite"))
+    cases = [case for suite in suites if suite_platform(suite, out) == platform_name for case in suite.iter("testcase")]
+    for case in cases:
         failed = case.find("failure") is not None or case.find("error") is not None
         for pid in ids_in(case.get("name", "")):
             if results.get(pid) != "FAIL":
@@ -97,7 +109,7 @@ def flutter_results(path):
 
 
 def platform(out, name):
-    merged = maestro_results(os.path.join(out, name, "maestro-junit.xml"))
+    merged = maestro_results(os.path.join(out, "maestro-junit.xml"), out, name)
     for pid, value in flutter_results(os.path.join(out, name, "flutter.log")).items():
         if merged.get(pid) != "FAIL":
             merged[pid] = value
@@ -140,8 +152,8 @@ def main():
         "",
         "## Files",
         "",
-        "- `<platform>/maestro/`: screenshots per step and Maestro logs",
-        "- `<platform>/maestro-junit.xml`: Maestro results",
+        "- `maestro/`: screenshots per step and Maestro logs, per device",
+        "- `maestro-junit.xml`: Maestro results (one test suite per device)",
         "- `<platform>/flutter.log`: Premium purchase and family wall tests",
     ]
     with open(os.path.join(out, "report.md"), "w") as report:

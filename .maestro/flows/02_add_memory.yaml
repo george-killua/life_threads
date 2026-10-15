@@ -1,6 +1,6 @@
 # WAL-01 Add a memory with photos, WAL-02 Photo permission,
 # WAL-07 People (from contacts) and place (from photo GPS)
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 name: WAL-01/02/07 Add a memory with photos, a person and a place
 tags: [protocol, wal]
 ---
@@ -11,8 +11,10 @@ tags: [protocol, wal]
     timeout: 15000
 - tapOn: "Moment"
 - inputText: "Summer in Split"
+- runFlow: ../subflows/hide_keyboard.yaml
 - tapOn: "What made it worth keeping?"
 - inputText: "Barefoot until the sun went down."
+- runFlow: ../subflows/hide_keyboard.yaml
 - tapOn: "Save it before it fades"
 - tapOn: "Pick"
 # WAL-02: the app asks for photo access through the system dialog
@@ -48,6 +50,7 @@ tags: [protocol, wal]
     timeout: 15000
 - tapOn: "Relationship"
 - inputText: "Sister"
+- runFlow: ../subflows/hide_keyboard.yaml
 - tapOn: "Add person"
 - tapOn: "Save"
 - assertVisible: ".*Kate Bell.*"

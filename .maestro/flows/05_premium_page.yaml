@@ -1,7 +1,7 @@
 # PRM-01 Premium page: what Premium includes, renewal terms, Terms and
 # Privacy links, Subscribe and Restore. (PRM-02/03/04, the purchase itself,
 # run in the Flutter tests with a stand-in store.)
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 name: PRM-01 Premium page
 tags: [protocol, prm]
 ---

@@ -1,7 +1,7 @@
 # A fresh wall with three memories from last year (Thread of the Year needs
 # at least three in one year): Summer in Split (one year ago today), Above
 # the clouds and Grandpa's garden.
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 ---
 - runFlow: fresh_wall.yaml
 - runFlow:

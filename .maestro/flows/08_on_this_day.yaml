@@ -1,6 +1,6 @@
 # OTD-01 On this day: a memory from exactly one year ago comes back on the
 # wall and in its chapter; the daily reminder can be switched on.
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 name: OTD-01 On this day
 tags: [protocol, otd]
 ---

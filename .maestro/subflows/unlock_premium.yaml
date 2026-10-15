@@ -1,6 +1,6 @@
 # Unlocks Premium with the debug build's test switch (simulators have no
 # store account). The real purchase flow is covered by the Flutter tests.
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 ---
 - runFlow: open_settings.yaml
 - runFlow:

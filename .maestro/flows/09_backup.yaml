@@ -1,6 +1,6 @@
 # BAK-01 Back up everything (encrypted), BAK-02 Restore it: nothing is
 # duplicated, and a deleted memory comes back.
-appId: ${APP_ID}
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 name: BAK-01/02 Backup and restore
 tags: [protocol, bak]
 ---
@@ -16,6 +16,7 @@ tags: [protocol, bak]
     timeout: 10000
 - tapOn: "Archive password (optional)"
 - inputText: "Lina-2026"
+- runFlow: ../subflows/hide_keyboard.yaml
 - tapOn: "Export backup"
 - assertVisible: ".*cannot be recovered.*"
 - tapOn: "Export"
@@ -56,6 +57,7 @@ tags: [protocol, bak]
 - tapOn: "Import Archive"
 - tapOn: "Archive password"
 - inputText: "Lina-2026"
+- runFlow: ../subflows/hide_keyboard.yaml
 - tapOn: "Import Archive"
 - tapOn: "Choose Archive"
 - runFlow:
