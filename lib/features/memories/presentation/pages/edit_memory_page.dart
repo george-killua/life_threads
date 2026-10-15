@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -590,6 +590,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
     if (!mounted) return;
     setState(() => _isSaving = false);
     if (!context.mounted) return;
+    HapticFeedback.lightImpact();
     // Shown on the screen it returns to, so it is clear the edit worked.
     ScaffoldMessenger.of(
       context,

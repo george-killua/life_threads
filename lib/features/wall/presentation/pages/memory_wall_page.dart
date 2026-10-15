@@ -733,6 +733,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
         save = repository.moveWallItem(nodeId, position);
     }
 
+    // The card lands on the wall.
+    HapticFeedback.lightImpact();
+
     // End the drag now, not after the save: a slow write must not clear a
     // drag the user has started on another node in the meantime.
     _draggingNodeId = null;
@@ -1007,6 +1010,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     final place = await locationLabel;
     if (!context.mounted) return;
 
+    // Hung on the wall.
+    HapticFeedback.mediumImpact();
     await repository.addMemory(
       NewMemoryDraft(
         title: title,
@@ -1488,6 +1493,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                         selectedIds.remove(event.id);
                       }
                     });
+                    if (value) HapticFeedback.mediumImpact();
                     repository.setConnection(
                       fromId: nail.id,
                       toId: event.id,
@@ -1513,29 +1519,111 @@ class _TimelineView extends StatelessWidget {
   Widget build(BuildContext context) {
     final sorted = [...events]
       ..sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
+    // Newest year first; each year's heading stays at the top while its
+    // memories scroll by.
+    final years = <int, List<MemoryEvent>>{};
+    for (final event in sorted) {
+      years.putIfAbsent(event.occurredAt.year, () => []).add(event);
+    }
 
-    return ListView(
-      padding: EdgeInsets.fromLTRB(20, topPadding, 20, 120),
-      children: [
-        _ViewTitle(
-          icon: Icons.timeline_rounded,
-          title: context.l10n.timelineTitle,
-          subtitle: context.l10n.timelineSubtitle,
-        ),
-        const SizedBox(height: 18),
-        if (sorted.isEmpty)
-          _EmptyModePanel(
-            icon: Icons.timeline_rounded,
-            title: context.l10n.noMemoriesFilter,
-            subtitle: context.l10n.noMemoriesFilterBody,
-          )
-        else
-          for (var index = 0; index < sorted.length; index++)
-            _TimelineMemoryTile(
-              event: sorted[index],
-              isLast: index == sorted.length - 1,
+    // Starts below the wall's top bar, so the year headings pin under it.
+    return Padding(
+      padding: EdgeInsets.only(top: topPadding),
+      child: ClipRect(
+        child: CustomScrollView(
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+              sliver: SliverToBoxAdapter(
+                child: _ViewTitle(
+                  icon: Icons.timeline_rounded,
+                  title: context.l10n.timelineTitle,
+                  subtitle: context.l10n.timelineSubtitle,
+                ),
+              ),
             ),
-      ],
+            if (sorted.isEmpty)
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
+                sliver: SliverToBoxAdapter(
+                  child: _EmptyModePanel(
+                    icon: Icons.timeline_rounded,
+                    title: context.l10n.noMemoriesFilter,
+                    subtitle: context.l10n.noMemoriesFilterBody,
+                  ),
+                ),
+              )
+            else
+              for (final MapEntry(key: year, value: memories) in years.entries)
+                SliverMainAxisGroup(
+                  slivers: [
+                    PinnedHeaderSliver(
+                      child: _TimelineYearHeader(
+                        year: year,
+                        count: memories.length,
+                      ),
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(20, 4, 20, 18),
+                      sliver: SliverList.list(
+                        children: [
+                          for (var i = 0; i < memories.length; i++)
+                            _TimelineMemoryTile(
+                              event: memories[i],
+                              isLast: i == memories.length - 1,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+            const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A year in the timeline, pinned while that year's memories scroll by.
+class _TimelineYearHeader extends StatelessWidget {
+  const _TimelineYearHeader({required this.year, required this.count});
+
+  final int year;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      header: true,
+      child: ColoredBox(
+        color: AppColors.wallInk.withValues(alpha: 0.94),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                '$year',
+                style: TextStyle(
+                  color: AppColors.gold,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                context.l10n.yearThreadMemories(count),
+                style: TextStyle(
+                  color: AppColors.muted,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -455,7 +455,9 @@ class _PremiumBanner extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        isPremium ? l10n.premiumActiveBody : l10n.premiumLockedBody,
+                        isPremium
+                            ? l10n.premiumActiveBody
+                            : l10n.premiumLockedBody,
                         style: TextStyle(
                           color: AppColors.muted,
                           fontWeight: FontWeight.w700,

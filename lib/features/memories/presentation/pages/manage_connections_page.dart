@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
@@ -70,6 +71,8 @@ class ManageConnectionsPage extends ConsumerWidget {
                       );
                       if (!context.mounted || reason == null) return;
 
+                      // The thread ties the two memories together.
+                      HapticFeedback.mediumImpact();
                       await repository.setMemoryConnection(
                         memoryId: memoryId,
                         otherMemoryId: event.id,
