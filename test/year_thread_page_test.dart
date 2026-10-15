@@ -153,7 +153,11 @@ void main() {
     testWidgets('lists the suggested memories of the year', (tester) async {
       await pumpPage(tester, isPremium: false);
 
-      expect(find.text('2025 · 8 memories · 5 places'), findsOneWidget);
+      // Each part keeps together (non-breaking spaces).
+      expect(
+        find.text('2025 · 8\u00A0memories · 5\u00A0places'),
+        findsOneWidget,
+      );
       expect(find.text('8 of 12'), findsOneWidget);
       expect(find.text('Our first dance'), findsOneWidget);
       expect(find.text('A quiet Sunday'), findsOneWidget);
