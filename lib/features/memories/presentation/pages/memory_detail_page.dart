@@ -361,17 +361,29 @@ class _CinematicHero extends StatelessWidget {
                 children: [
                   _GlassIconButton(
                     icon: Icons.arrow_back_rounded,
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).backButtonTooltip,
                     onTap: onBack,
                   ),
                   const Spacer(),
                   _GlassIconButton(
                     icon: Icons.inventory_2_rounded,
+                    tooltip: context.l10n.shareMemoryCapsule,
                     onTap: onShareCapsule,
                   ),
                   const SizedBox(width: 8),
-                  _GlassIconButton(icon: Icons.edit_rounded, onTap: onEdit),
+                  _GlassIconButton(
+                    icon: Icons.edit_rounded,
+                    tooltip: context.l10n.editMemoryTooltip,
+                    onTap: onEdit,
+                  ),
                   const SizedBox(width: 8),
-                  _GlassIconButton(icon: Icons.hub_rounded, onTap: onConnect),
+                  _GlassIconButton(
+                    icon: Icons.hub_rounded,
+                    tooltip: context.l10n.connectMemoryTooltip,
+                    onTap: onConnect,
+                  ),
                 ],
               ),
             ),
@@ -527,27 +539,36 @@ class _FeelingBadge extends StatelessWidget {
 }
 
 class _GlassIconButton extends StatelessWidget {
-  const _GlassIconButton({required this.icon, required this.onTap});
+  const _GlassIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
 
   final IconData icon;
+  final String tooltip;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.wallInk.withValues(alpha: 0.54),
-      shape: const CircleBorder(),
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: Container(
-          width: 46,
-          height: 46,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+    // The tooltip also names the button for VoiceOver and TalkBack.
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: AppColors.wallInk.withValues(alpha: 0.54),
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+            ),
+            child: Icon(icon, color: AppColors.text),
           ),
-          child: Icon(icon, color: AppColors.text),
         ),
       ),
     );
@@ -1316,6 +1337,9 @@ class _PhotoPreviewPageState extends State<_PhotoPreviewPage> {
                 children: [
                   IconButton.filledTonal(
                     onPressed: () => Navigator.of(context).pop(),
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).closeButtonTooltip,
                     icon: const Icon(Icons.close_rounded),
                   ),
                   const SizedBox(width: 10),

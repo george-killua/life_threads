@@ -103,6 +103,7 @@ class _UpgradeTopBar extends StatelessWidget {
       children: [
         IconButton(
           onPressed: onBack,
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back_rounded),
         ),
         const SizedBox(width: 8),

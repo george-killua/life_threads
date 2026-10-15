@@ -125,6 +125,9 @@ class _CapsuleCinemaPageState extends State<CapsuleCinemaPage>
                           IconButton(
                             onPressed: () =>
                                 _finish(CapsuleCinemaResult.dismiss),
+                            tooltip: MaterialLocalizations.of(
+                              context,
+                            ).closeButtonTooltip,
                             icon: const Icon(Icons.close_rounded),
                             color: AppColors.text,
                           ),

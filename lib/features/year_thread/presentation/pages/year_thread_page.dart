@@ -97,6 +97,9 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
                     children: [
                       IconButton(
                         onPressed: () => Navigator.of(context).maybePop(),
+                        tooltip: MaterialLocalizations.of(
+                          context,
+                        ).backButtonTooltip,
                         icon: const Icon(Icons.arrow_back_rounded),
                       ),
                       const SizedBox(width: 8),

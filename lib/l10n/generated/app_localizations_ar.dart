@@ -455,6 +455,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get useSelected => 'استخدام المحدد';
 
   @override
+  String photoGridItem(String date) {
+    return 'صورة من $date';
+  }
+
+  @override
   String get noPhotosFound => 'لم يتم العثور على صور.';
 
   @override
@@ -3096,4 +3101,25 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get familyReportEvidenceNote =>
       'لمراجعة البلاغ تتلقى GK Coding عنوان هذه الذكرى وقصتها مع بلاغك. لا تُرسل صورها أبداً.';
+
+  @override
+  String get moveLeft => 'تحريك لليسار';
+
+  @override
+  String get moveUp => 'تحريك للأعلى';
+
+  @override
+  String get moveDown => 'تحريك للأسفل';
+
+  @override
+  String get moveRight => 'تحريك لليمين';
+
+  @override
+  String get showPassword => 'إظهار كلمة المرور';
+
+  @override
+  String get hidePassword => 'إخفاء كلمة المرور';
+
+  @override
+  String get removePerson => 'إزالة الشخص';
 }

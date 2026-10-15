@@ -2776,7 +2776,7 @@ class _PlacementControls {
       children: [
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: _moveRow(),
+          child: _moveRow(context),
         ),
         const SizedBox(height: 10),
         Align(alignment: Alignment.centerRight, child: _actionRow(context)),
@@ -2785,27 +2785,33 @@ class _PlacementControls {
   }
 
   Widget wide(BuildContext context) {
-    return Row(children: [_moveRow(), const Spacer(), _actionRow(context)]);
+    return Row(
+      children: [_moveRow(context), const Spacer(), _actionRow(context)],
+    );
   }
 
-  Widget _moveRow() {
+  Widget _moveRow(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         _MoveButton(
           icon: Icons.keyboard_arrow_left_rounded,
+          label: context.l10n.moveLeft,
           onTap: () => onMove(const Offset(-80, 0)),
         ),
         _MoveButton(
           icon: Icons.keyboard_arrow_up_rounded,
+          label: context.l10n.moveUp,
           onTap: () => onMove(const Offset(0, -80)),
         ),
         _MoveButton(
           icon: Icons.keyboard_arrow_down_rounded,
+          label: context.l10n.moveDown,
           onTap: () => onMove(const Offset(0, 80)),
         ),
         _MoveButton(
           icon: Icons.keyboard_arrow_right_rounded,
+          label: context.l10n.moveRight,
           onTap: () => onMove(const Offset(80, 0)),
         ),
       ],
@@ -2847,16 +2853,25 @@ class _MiniGridPainter extends CustomPainter {
 }
 
 class _MoveButton extends StatelessWidget {
-  const _MoveButton({required this.icon, required this.onTap});
+  const _MoveButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   final IconData icon;
+  final String label;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(right: 6),
-      child: IconButton.filledTonal(onPressed: onTap, icon: Icon(icon)),
+      child: IconButton.filledTonal(
+        onPressed: onTap,
+        tooltip: label,
+        icon: Icon(icon),
+      ),
     );
   }
 }

@@ -194,6 +194,11 @@
   "cinemaConnectedThread": "Connected thread",
   "cinemaInviteTitle": "Add this memory to your wall?",
   "useSelected": "Use selected",
+  "photoGridItem": "Photo from {date}",
+  "@photoGridItem": {
+    "description": "Screen reader label of a photo in the photo picker.",
+    "placeholders": {"date": {"type": "String"}}
+  },
   "noPhotosFound": "No photos found.",
   "manage": "Manage",
   "manageAccess": "Manage access",
@@ -1407,5 +1412,12 @@
   "familyErrorNameTooLong": "That name is too long. Please use a shorter one.",
   "familyErrorPhotoUnreadable": "One of the photos could not be read. Remove it and try again.",
   "familyErrorTooLarge": "This is too large to upload. Try fewer or smaller photos.",
-  "familyReportEvidenceNote": "To review it, GK Coding receives this memory's title and story with your report. Its photos are never sent."
+  "familyReportEvidenceNote": "To review it, GK Coding receives this memory's title and story with your report. Its photos are never sent.",
+  "moveLeft": "Move left",
+  "moveUp": "Move up",
+  "moveDown": "Move down",
+  "moveRight": "Move right",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "removePerson": "Remove person"
 }
