@@ -43,8 +43,8 @@ review screenshot and notes. It goes to review with the next app version
    Play's "Set prices" dialog takes the price **before VAT** and adds the
    country's VAT on top: typing 34.99 gives €41.99 in Austria. So Austria
    was set with 29.16 (+20 % = €34.99) and Germany with 29.40 (+19 % =
-   €34.99). Other euro countries got converted prices (about €41.99–43.99);
-   set them the same way if they should be €34.99 too.
+   €34.99). Other euro countries keep Play's converted prices (about
+   €41.99–43.99) – decided 15 October 2026, leave them as they are.
 6. **Activate** the base plan.
 
 Status 15 October 2026: done – subscription `lifethreads_premium_yearly`,
