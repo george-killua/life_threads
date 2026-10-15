@@ -111,7 +111,8 @@ prepare_android() {
   "$ADB" -s "$ANDROID_SERIAL" shell settings put global window_animation_scale 0
   "$ADB" -s "$ANDROID_SERIAL" shell settings put global transition_animation_scale 0
   "$ADB" -s "$ANDROID_SERIAL" shell settings put global animator_duration_scale 0
-  "$ADB" -s "$ANDROID_SERIAL" shell rm -rf /sdcard/Pictures/LifeThreadsE2E
+  # Overwrite instead of deleting the folder: right after a delete, Android's
+  # media storage can refuse new files for a moment.
   "$ADB" -s "$ANDROID_SERIAL" shell mkdir -p /sdcard/Pictures/LifeThreadsE2E
   sleep 1
   for f in "$PHOTOS"/*.jpg; do
