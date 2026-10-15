@@ -348,7 +348,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tutorialShowBoardText =>
-      'Öffne lifethreads.gkcoding.dev/display auf einem anderen Bildschirm, tippe in den Wand-Steuerungen auf QR und scanne den Code, um ein temporäres schreibgeschütztes Board zu zeigen.';
+      'Öffne lifethreads.gkcoding.dev/display auf einem anderen Bildschirm, wähle Mehr › Wand anzeigen und scanne den Code, um ein temporäres schreibgeschütztes Board zu zeigen.';
 
   @override
   String get tutorialBackupTitle => 'Backup behalten';

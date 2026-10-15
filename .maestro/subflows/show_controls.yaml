@@ -1,8 +1,0 @@
-# Opens the wall controls if they are collapsed.
-appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
----
-- runFlow:
-    when:
-      visible: "Wall Controls"
-    commands:
-      - tapOn: "Wall Controls"

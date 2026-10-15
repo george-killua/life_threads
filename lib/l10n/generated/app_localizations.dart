@@ -697,7 +697,7 @@ abstract class AppLocalizations {
   /// No description provided for @tutorialShowBoardText.
   ///
   /// In en, this message translates to:
-  /// **'Open lifethreads.gkcoding.dev/display on another screen, tap the QR button in Wall Controls, and scan the code to show a temporary read-only board.'**
+  /// **'Open lifethreads.gkcoding.dev/display on another screen, choose More › Display wall, and scan the code to show a temporary read-only board.'**
   String get tutorialShowBoardText;
 
   /// No description provided for @tutorialBackupTitle.

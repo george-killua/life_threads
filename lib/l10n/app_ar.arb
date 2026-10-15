@@ -98,7 +98,7 @@
   "tutorialArrangeTitle": "رتّب الجدار",
   "tutorialArrangeText": "اسحب البطاقات والملاحظات والمسامير إلى مكانها. الروابط الحقيقية ترسم الحبال خلف العناصر.",
   "tutorialShowBoardTitle": "اعرض اللوحة",
-  "tutorialShowBoardText": "افتح lifethreads.gkcoding.dev/display على شاشة أخرى، اضغط زر QR في أدوات الجدار، ثم امسح الرمز لعرض لوحة مؤقتة للقراءة فقط.",
+  "tutorialShowBoardText": "افتح lifethreads.gkcoding.dev/display على شاشة أخرى، اختر المزيد ‹ عرض الجدار، ثم امسح الرمز لعرض لوحة مؤقتة للقراءة فقط.",
   "tutorialBackupTitle": "احتفظ بنسخة احتياطية",
   "tutorialBackupText": "قبل تغيير هاتفك، صدّر نسخة احتياطية من الإعدادات واحفظ الملف في مكان آمن.",
   "scanDisplayQr": "مسح QR للعرض",

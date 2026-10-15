@@ -346,7 +346,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tutorialShowBoardText =>
-      'افتح lifethreads.gkcoding.dev/display على شاشة أخرى، اضغط زر QR في أدوات الجدار، ثم امسح الرمز لعرض لوحة مؤقتة للقراءة فقط.';
+      'افتح lifethreads.gkcoding.dev/display على شاشة أخرى، اختر المزيد ‹ عرض الجدار، ثم امسح الرمز لعرض لوحة مؤقتة للقراءة فقط.';
 
   @override
   String get tutorialBackupTitle => 'احتفظ بنسخة احتياطية';

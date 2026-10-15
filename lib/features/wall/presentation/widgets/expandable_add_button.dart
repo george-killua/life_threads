@@ -25,11 +25,95 @@ class ExpandableAddButton extends StatefulWidget {
 }
 
 class _ExpandableAddButtonState extends State<ExpandableAddButton> {
-  // The menu floats above the button in the overlay, so opening it doesn't
-  // take width from the memory card beside the button.
-  final _menu = OverlayPortalController()..show();
-  final _link = LayerLink();
-  bool _isOpen = false;
+  // The menu opens in its own popup route above the button, so it doesn't
+  // take width from the memory card beside the button. An OverlayPortal or a
+  // LayerLink here made iOS report every accessibility frame on the wall at
+  // a third of its size (VoiceOver, UI tests); a route doesn't.
+  final _buttonKey = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    return KeyedSubtree(
+      key: _buttonKey,
+      child: _AddButton(
+        open: false,
+        turns: const AlwaysStoppedAnimation(0),
+        heroTag: 'wall-add-menu',
+        buttonKey: const ValueKey('wall-add-button'),
+        onPressed: _open,
+      ),
+    );
+  }
+
+  Future<void> _open() async {
+    final navigator = Navigator.of(context);
+    final button = _buttonKey.currentContext?.findRenderObject() as RenderBox?;
+    final overlay = navigator.overlay?.context.findRenderObject() as RenderBox?;
+    if (button == null || overlay == null) return;
+    final anchor =
+        button.localToGlobal(Offset.zero, ancestor: overlay) & button.size;
+    final l10n = context.l10n;
+    final action = await navigator.push(
+      _AddMenuRoute(
+        anchor: anchor,
+        barrierLabel: MaterialLocalizations.of(
+          context,
+        ).modalBarrierDismissLabel,
+        items: [
+          (
+            icon: Icons.auto_stories_rounded,
+            label: l10n.expandableMemory,
+            subtitle: l10n.expandableMemorySubtitle,
+            action: widget.onAddEvent,
+          ),
+          (
+            icon: Icons.add_photo_alternate_rounded,
+            label: l10n.expandableQuickPhoto,
+            subtitle: l10n.expandableQuickPhotoSubtitle,
+            action: widget.onAddQuickPhoto,
+          ),
+          (
+            icon: Icons.sticky_note_2_rounded,
+            label: l10n.expandableTextNote,
+            subtitle: l10n.expandableTextNoteSubtitle,
+            action: widget.onAddText,
+          ),
+          (
+            icon: Icons.push_pin_rounded,
+            label: l10n.expandableNail,
+            subtitle: l10n.expandableNailSubtitle,
+            action: widget.onAddNail,
+          ),
+        ],
+      ),
+    );
+    action?.call();
+  }
+}
+
+typedef _AddMenuItem = ({
+  IconData icon,
+  String label,
+  String subtitle,
+  VoidCallback action,
+});
+
+/// The add button; the menu route draws a copy of it over it, turned into
+/// "Close".
+class _AddButton extends StatelessWidget {
+  const _AddButton({
+    required this.open,
+    required this.turns,
+    required this.onPressed,
+    this.heroTag,
+    this.buttonKey,
+  });
+
+  final bool open;
+  final Animation<double> turns;
+  final VoidCallback onPressed;
+  final Object? heroTag;
+  final Key? buttonKey;
 
   @override
   Widget build(BuildContext context) {
@@ -37,122 +121,127 @@ class _ExpandableAddButtonState extends State<ExpandableAddButton> {
     final compact =
         MediaQuery.sizeOf(context).width <
         ExpandableAddButton.compactBelowWidth;
-    final icon = AnimatedRotation(
-      turns: _isOpen ? 0.125 : 0,
-      duration: const Duration(milliseconds: 180),
+    final icon = RotationTransition(
+      turns: turns,
       child: const Icon(Icons.add_rounded),
     );
-
-    return OverlayPortal(
-      controller: _menu,
-      overlayChildBuilder: _buildMenu,
-      child: CompositedTransformTarget(
-        link: _link,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.28),
-                blurRadius: 28,
-                offset: const Offset(0, 12),
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.36),
-                blurRadius: 24,
-                offset: const Offset(0, 14),
-              ),
-            ],
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.28),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
           ),
-          // On a small phone the label ("Hinzufügen") would squeeze the
-          // memory card beside it, so the button shows only the icon.
-          child: compact
-              ? FloatingActionButton(
-                  key: const ValueKey('wall-add-button'),
-                  heroTag: 'wall-add-menu',
-                  tooltip: _isOpen ? l10n.close : l10n.add,
-                  onPressed: _toggle,
-                  child: icon,
-                )
-              : FloatingActionButton.extended(
-                  key: const ValueKey('wall-add-button'),
-                  heroTag: 'wall-add-menu',
-                  onPressed: _toggle,
-                  icon: icon,
-                  label: Text(_isOpen ? l10n.close : l10n.add),
-                ),
-        ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.36),
+            blurRadius: 24,
+            offset: const Offset(0, 14),
+          ),
+        ],
       ),
+      // On a small phone the label ("Hinzufügen") would squeeze the
+      // memory card beside it, so the button shows only the icon.
+      child: compact
+          ? FloatingActionButton(
+              key: buttonKey,
+              heroTag: heroTag,
+              tooltip: open ? l10n.close : l10n.add,
+              onPressed: onPressed,
+              child: icon,
+            )
+          : FloatingActionButton.extended(
+              key: buttonKey,
+              heroTag: heroTag,
+              onPressed: onPressed,
+              icon: icon,
+              label: Text(open ? l10n.close : l10n.add),
+            ),
     );
   }
+}
 
-  /// The menu's bottom end corner sits 10 pt above the button's top end
-  /// corner.
-  Widget _buildMenu(BuildContext context) {
-    final l10n = context.l10n;
+/// The open menu: its bottom end corner sits 10 pt above the button's top
+/// end corner, with a Close button where the add button is. Pops with the
+/// chosen action, or null.
+class _AddMenuRoute extends PopupRoute<VoidCallback> {
+  _AddMenuRoute({
+    required this.anchor,
+    required this.items,
+    required this.barrierLabel,
+  });
+
+  final Rect anchor;
+  final List<_AddMenuItem> items;
+
+  @override
+  final String barrierLabel;
+
+  @override
+  Color? get barrierColor => Colors.transparent;
+
+  @override
+  bool get barrierDismissible => true;
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 190);
+
+  @override
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    final size = MediaQuery.sizeOf(context);
     final rtl = Directionality.of(context) == TextDirection.rtl;
-    return Align(
-      alignment: Alignment.topLeft,
-      child: CompositedTransformFollower(
-        link: _link,
-        showWhenUnlinked: false,
-        targetAnchor: rtl ? Alignment.topLeft : Alignment.topRight,
-        followerAnchor: rtl ? Alignment.bottomLeft : Alignment.bottomRight,
-        offset: const Offset(0, -10),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.sizeOf(context).width - 40,
-          ),
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 190),
-            switchInCurve: Curves.easeOutCubic,
-            switchOutCurve: Curves.easeInCubic,
-            child: _isOpen
-                ? Column(
-                    key: const ValueKey('actions'),
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
+    final curved = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+    return Stack(
+      children: [
+        Positioned(
+          left: rtl ? anchor.left : null,
+          right: rtl ? null : size.width - anchor.right,
+          bottom: size.height - anchor.top + 10,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: size.width - 40),
+            child: FadeTransition(
+              opacity: curved,
+              child: ScaleTransition(
+                scale: Tween(begin: 0.96, end: 1.0).animate(curved),
+                alignment: rtl ? Alignment.bottomLeft : Alignment.bottomRight,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    for (final item in items)
                       _ActionChipButton(
-                        icon: Icons.auto_stories_rounded,
-                        label: l10n.expandableMemory,
-                        subtitle: l10n.expandableMemorySubtitle,
-                        onTap: () => _run(widget.onAddEvent),
+                        icon: item.icon,
+                        label: item.label,
+                        subtitle: item.subtitle,
+                        onTap: () => Navigator.of(context).pop(item.action),
                       ),
-                      _ActionChipButton(
-                        icon: Icons.add_photo_alternate_rounded,
-                        label: l10n.expandableQuickPhoto,
-                        subtitle: l10n.expandableQuickPhotoSubtitle,
-                        onTap: () => _run(widget.onAddQuickPhoto),
-                      ),
-                      _ActionChipButton(
-                        icon: Icons.sticky_note_2_rounded,
-                        label: l10n.expandableTextNote,
-                        subtitle: l10n.expandableTextNoteSubtitle,
-                        onTap: () => _run(widget.onAddText),
-                      ),
-                      _ActionChipButton(
-                        icon: Icons.push_pin_rounded,
-                        label: l10n.expandableNail,
-                        subtitle: l10n.expandableNailSubtitle,
-                        onTap: () => _run(widget.onAddNail),
-                      ),
-                    ],
-                  )
-                : const SizedBox.shrink(key: ValueKey('closed')),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
-      ),
+        Positioned.fromRect(
+          rect: anchor,
+          child: _AddButton(
+            open: true,
+            turns: Tween(begin: 0.0, end: 0.125).animate(curved),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ),
+      ],
     );
-  }
-
-  void _toggle() => setState(() => _isOpen = !_isOpen);
-
-  void _run(VoidCallback action) {
-    setState(() => _isOpen = false);
-    action();
   }
 }
 

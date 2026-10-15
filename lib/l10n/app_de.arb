@@ -98,7 +98,7 @@
   "tutorialArrangeTitle": "Wand arrangieren",
   "tutorialArrangeText": "Ziehe Karten, Notizen und Nägel an ihren Platz. Echte Verbindungen zeichnen Seile hinter den Elementen.",
   "tutorialShowBoardTitle": "Board anzeigen",
-  "tutorialShowBoardText": "Öffne lifethreads.gkcoding.dev/display auf einem anderen Bildschirm, tippe in den Wand-Steuerungen auf QR und scanne den Code, um ein temporäres schreibgeschütztes Board zu zeigen.",
+  "tutorialShowBoardText": "Öffne lifethreads.gkcoding.dev/display auf einem anderen Bildschirm, wähle Mehr › Wand anzeigen und scanne den Code, um ein temporäres schreibgeschütztes Board zu zeigen.",
   "tutorialBackupTitle": "Backup behalten",
   "tutorialBackupText": "Bevor du das Handy wechselst, exportiere in den Einstellungen ein Backup und bewahre die Datei sicher auf.",
   "scanDisplayQr": "Display-QR scannen",

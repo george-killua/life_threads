@@ -364,80 +364,86 @@ class _OptionFrame extends StatelessWidget {
     final line = Theme.of(context).colorScheme.outline;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(22),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.all(11),
-          decoration: BoxDecoration(
-            color: selected
-                ? accent.withValues(alpha: 0.16)
-                : Colors.black.withValues(alpha: 0.22),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: selected ? accent.withValues(alpha: 0.7) : line,
-            ),
-          ),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(14),
-                child: SizedBox(width: 84, height: 58, child: leading),
+      // Its own button, so it is not merged into a surrounding card.
+      child: Semantics(
+        container: true,
+        button: true,
+        selected: selected,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(22),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            padding: const EdgeInsets.all(11),
+            decoration: BoxDecoration(
+              color: selected
+                  ? accent.withValues(alpha: 0.16)
+                  : Colors.black.withValues(alpha: 0.22),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(
+                color: selected ? accent.withValues(alpha: 0.7) : line,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            title,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 15,
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: SizedBox(width: 84, height: 58, child: leading),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 15,
+                              ),
                             ),
                           ),
-                        ),
-                        if (trailing != null)
-                          Icon(trailing, color: accent, size: 22)
-                        else if (locked)
-                          Icon(lockIcon, color: accent, size: 17)
-                        else if (selected)
-                          Icon(
-                            Icons.check_circle_rounded,
+                          if (trailing != null)
+                            Icon(trailing, color: accent, size: 22)
+                          else if (locked)
+                            Icon(lockIcon, color: accent, size: 17)
+                          else if (selected)
+                            Icon(
+                              Icons.check_circle_rounded,
+                              color: accent,
+                              size: 18,
+                            ),
+                        ],
+                      ),
+                      if (badge != null) ...[
+                        const SizedBox(height: 3),
+                        Text(
+                          badge!,
+                          style: TextStyle(
                             color: accent,
-                            size: 18,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w800,
                           ),
+                        ),
                       ],
-                    ),
-                    if (badge != null) ...[
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 4),
                       Text(
-                        badge!,
+                        description,
                         style: TextStyle(
-                          color: accent,
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w800,
+                          color: AppColors.muted,
+                          height: 1.3,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        color: AppColors.muted,
-                        height: 1.3,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

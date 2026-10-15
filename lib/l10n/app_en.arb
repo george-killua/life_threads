@@ -145,7 +145,7 @@
   "tutorialArrangeTitle": "Arrange the wall",
   "tutorialArrangeText": "Drag cards, notes, and nails into place. Real connections draw ropes behind the items.",
   "tutorialShowBoardTitle": "Show the board",
-  "tutorialShowBoardText": "Open lifethreads.gkcoding.dev/display on another screen, tap the QR button in Wall Controls, and scan the code to show a temporary read-only board.",
+  "tutorialShowBoardText": "Open lifethreads.gkcoding.dev/display on another screen, choose More › Display wall, and scan the code to show a temporary read-only board.",
   "tutorialBackupTitle": "Keep a backup",
   "tutorialBackupText": "Before you change phones, export a backup in Settings and keep the file somewhere safe.",
   "scanDisplayQr": "Scan display QR",
