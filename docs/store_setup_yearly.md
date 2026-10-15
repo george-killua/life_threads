@@ -48,8 +48,19 @@ review screenshot and notes. It goes to review with the next app version
 6. **Activate** the base plan.
 
 Status 15 October 2026: done – subscription `lifethreads_premium_yearly`,
-base plan `yearly` active, 14-day grace period. Benefits not added yet
-(optional).
+base plan `yearly` active, 14-day grace period. Benefits (max. 40
+characters each) and names saved in three languages:
+
+| | English (default) | German | Arabic |
+|---|---|---|---|
+| Name | LifeThreads Premium (yearly) | LifeThreads Premium (jährlich) | LifeThreads Premium (سنوي) |
+| 1 | Unlimited memories | Unbegrenzte Erinnerungen | ذكريات بلا حدود |
+| 2 | Several walls and hidden memories | Mehrere Wände, Erinnerungen ausblenden | عدة جدران وذكريات مخفية |
+| 3 | Stories, films and Thread of the Year | Stories, Filme und Faden des Jahres | قصص وأفلام وخيط العام |
+| 4 | Family walls, end-to-end encrypted | Familienwände, durchgehend verschlüsselt | جدران العائلة بتشفير تام بين الطرفين |
+
+The monthly subscription still has its older four English benefits only
+(no "several walls", no translations); worth aligning later.
 
 ## 3. Server (VPS) – family walls must accept the yearly plan
 
