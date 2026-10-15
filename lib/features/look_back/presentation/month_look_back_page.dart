@@ -99,11 +99,25 @@ class _MonthLookBackPageState extends ConsumerState<MonthLookBackPage> {
             ],
             body: lookBack == null
                 ? const Center(child: CircularProgressIndicator())
+                : lookBack.isEmpty
+                // In the middle of the screen; scrolls at large text sizes.
+                ? LayoutBuilder(
+                    builder: (context, constraints) => SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: (constraints.maxHeight - 40).clamp(
+                            0,
+                            double.infinity,
+                          ),
+                        ),
+                        child: Center(child: _EmptyMonth(monthName: monthName)),
+                      ),
+                    ),
+                  )
                 : ListView(
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-                    children: lookBack.isEmpty
-                        ? [_EmptyMonth(monthName: monthName)]
-                        : _contents(context, lookBack),
+                    children: _contents(context, lookBack),
                   ),
           ),
         ),
@@ -166,8 +180,10 @@ class _EmptyMonth extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return Padding(
-      padding: const EdgeInsets.only(top: 32),
+      // Sits a little above the middle, where the eye expects it.
+      padding: const EdgeInsets.only(bottom: 48),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.calendar_month_rounded, size: 44, color: AppColors.gold),
           const SizedBox(height: 14),
