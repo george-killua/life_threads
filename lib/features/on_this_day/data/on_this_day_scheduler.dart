@@ -82,7 +82,11 @@ class OnThisDayScheduler extends Notifier<void> {
       return;
     }
 
-    final events = ref.watch(memoryRepositoryProvider).asData?.value.events;
+    final events = ref
+        .watch(memoryRepositoryProvider)
+        .asData
+        ?.value
+        .visibleEvents;
     final selectedLocale = ref.watch(localeControllerProvider);
     final lock = ref.watch(appLockProvider);
     // Wait for all three, so start-up schedules once.

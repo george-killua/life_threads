@@ -6,7 +6,7 @@ import '../memories/domain/memory_event.dart';
 List<MemoryEvent> searchMemories(MemoryState state, String query) {
   final words = _fold(query).split(RegExp(r'\s+')).where((w) => w.isNotEmpty);
   if (words.isEmpty) return const [];
-  final results = state.events.where((event) {
+  final results = state.visibleEvents.where((event) {
     final haystack = _fold(
       [
         event.title,

@@ -38,6 +38,7 @@ class BackupImportData {
     required this.connections,
     required this.wallItems,
     required this.photoPaths,
+    this.walls = const [],
   });
 
   final List<Map<String, Object?>> events;
@@ -46,6 +47,9 @@ class BackupImportData {
   final List<Map<String, Object?>> connections;
   final List<Map<String, Object?>> wallItems;
   final Map<String, String> photoPaths;
+
+  /// Named walls besides "My wall"; missing in older backups.
+  final List<Map<String, Object?>> walls;
 }
 
 class BackupValidationException implements Exception {

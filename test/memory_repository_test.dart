@@ -549,4 +549,86 @@ void main() {
     await repo.forget(await repo.removeMemory(id));
     expect(file.existsSync(), isFalse);
   });
+
+  test('walls: create, move a memory, hide it, delete the wall', () async {
+    SharedPreferences.setMockInitialValues({});
+    final container = _container();
+    addTearDown(container.dispose);
+    final repo = container.read(memoryRepositoryProvider.notifier);
+    await container.read(memoryRepositoryProvider.future);
+    MemoryState current() => container.read(memoryRepositoryProvider).value!;
+
+    final travel = await repo.createWall('Travel 2025');
+    expect(current().walls.single.name, 'Travel 2025');
+    await repo.addMemory(_draft('At home'));
+    await repo.addMemory(
+      NewMemoryDraft(
+        title: 'Split',
+        description: '',
+        category: MemoryCategory.travel,
+        memoryType: MemoryType.moment,
+        feeling: MemoryFeeling.warm,
+        occurredAt: DateTime(2025, 7, 1),
+        locationLabel: '',
+        wallId: travel,
+      ),
+    );
+    String id(String title) =>
+        current().events.firstWhere((e) => e.title == title).id;
+
+    expect(current().onWall(null).events.map((e) => e.title), ['At home']);
+    expect(current().onWall(travel).events.map((e) => e.title), ['Split']);
+
+    await repo.moveMemoryToWall(id('At home'), travel);
+    expect(current().onWall(null).events, isEmpty);
+    expect(current().onWall(travel).events, hasLength(2));
+
+    // Hidden: off the wall and out of search etc., unless asked for.
+    await repo.setHidden(id('Split'), hidden: true);
+    expect(current().onWall(travel).events.map((e) => e.title), ['At home']);
+    expect(current().onWall(travel, includeHidden: true).events, hasLength(2));
+    expect(current().visibleEvents.map((e) => e.title), ['At home']);
+
+    // Deleting the wall moves everything back to My wall.
+    await repo.deleteWall(travel);
+    expect(current().walls, isEmpty);
+    expect(current().onWall(null, includeHidden: true).events, hasLength(2));
+  });
+
+  test('a backup keeps walls and hidden memories', () async {
+    SharedPreferences.setMockInitialValues({});
+    final container = _container();
+    addTearDown(container.dispose);
+    final repo = container.read(memoryRepositoryProvider.notifier);
+    await container.read(memoryRepositoryProvider.future);
+
+    final result = await repo.importBackup(
+      const BackupImportData(
+        walls: [
+          {'id': 'w1', 'name': 'Our kids', 'createdAt': 1},
+        ],
+        events: [
+          {
+            'id': 'e1',
+            'title': 'First steps',
+            'occurredAt': 1000,
+            'createdAt': 1000,
+            'wallId': 'w1',
+            'hidden': true,
+          },
+        ],
+        photos: [],
+        people: [],
+        connections: [],
+        wallItems: [],
+        photoPaths: {},
+      ),
+    );
+    expect(result.memoryCount, 1);
+    final state = container.read(memoryRepositoryProvider).value!;
+    expect(state.walls.single.name, 'Our kids');
+    final event = state.events.single;
+    expect(event.wallId, state.walls.single.id);
+    expect(event.hidden, isTrue);
+  });
 }

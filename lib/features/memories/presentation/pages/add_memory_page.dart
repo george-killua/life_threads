@@ -17,6 +17,7 @@ import '../../../premium/data/premium_entitlement_controller.dart';
 import '../../../premium/domain/premium_entitlement.dart';
 import '../../data/memory_repository.dart';
 import '../../data/place_names.dart';
+import '../../../wall/data/current_wall.dart';
 import '../../domain/memory_category.dart';
 import '../../domain/memory_feeling.dart';
 import '../../domain/memory_type.dart';
@@ -565,6 +566,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
         connectedEventId: _connectedEventId,
         connectionReason: _connectionReasonController.text.trim(),
         people: _people,
+        wallId: activeWallId(ref),
         photos: [
           for (final photo in _photos)
             MemoryPhotoDraft(

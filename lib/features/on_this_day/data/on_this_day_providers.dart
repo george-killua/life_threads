@@ -17,7 +17,11 @@ final onThisDayTodayProvider = Provider<DateTime>((ref) {
 
 /// Today's On this day memories, most years ago first.
 final onThisDayMatchesProvider = Provider<List<OnThisDayMatch>>((ref) {
-  final events = ref.watch(memoryRepositoryProvider).asData?.value.events;
+  final events = ref
+      .watch(memoryRepositoryProvider)
+      .asData
+      ?.value
+      .visibleEvents;
   if (events == null) return const [];
   return OnThisDay.matchesOn(ref.watch(onThisDayTodayProvider), events);
 });

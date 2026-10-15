@@ -180,6 +180,28 @@ class $MemoryEventsTable extends MemoryEvents
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _wallIdMeta = const VerificationMeta('wallId');
+  @override
+  late final GeneratedColumn<String> wallId = GeneratedColumn<String>(
+    'wall_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _hiddenMeta = const VerificationMeta('hidden');
+  @override
+  late final GeneratedColumn<bool> hidden = GeneratedColumn<bool>(
+    'hidden',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("hidden" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -198,6 +220,8 @@ class $MemoryEventsTable extends MemoryEvents
     latitude,
     longitude,
     coverPhotoPath,
+    wallId,
+    hidden,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -336,6 +360,18 @@ class $MemoryEventsTable extends MemoryEvents
         ),
       );
     }
+    if (data.containsKey('wall_id')) {
+      context.handle(
+        _wallIdMeta,
+        wallId.isAcceptableOrUnknown(data['wall_id']!, _wallIdMeta),
+      );
+    }
+    if (data.containsKey('hidden')) {
+      context.handle(
+        _hiddenMeta,
+        hidden.isAcceptableOrUnknown(data['hidden']!, _hiddenMeta),
+      );
+    }
     return context;
   }
 
@@ -409,6 +445,14 @@ class $MemoryEventsTable extends MemoryEvents
         DriftSqlType.string,
         data['${effectivePrefix}cover_photo_path'],
       ),
+      wallId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}wall_id'],
+      ),
+      hidden: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}hidden'],
+      )!,
     );
   }
 
@@ -435,6 +479,12 @@ class MemoryEvent extends DataClass implements Insertable<MemoryEvent> {
   final double? latitude;
   final double? longitude;
   final String? coverPhotoPath;
+
+  /// The personal wall it hangs on; null for "My wall".
+  final String? wallId;
+
+  /// Hidden memories show only after Face ID (the View sheet).
+  final bool hidden;
   const MemoryEvent({
     required this.id,
     required this.title,
@@ -452,6 +502,8 @@ class MemoryEvent extends DataClass implements Insertable<MemoryEvent> {
     this.latitude,
     this.longitude,
     this.coverPhotoPath,
+    this.wallId,
+    required this.hidden,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -478,6 +530,10 @@ class MemoryEvent extends DataClass implements Insertable<MemoryEvent> {
     if (!nullToAbsent || coverPhotoPath != null) {
       map['cover_photo_path'] = Variable<String>(coverPhotoPath);
     }
+    if (!nullToAbsent || wallId != null) {
+      map['wall_id'] = Variable<String>(wallId);
+    }
+    map['hidden'] = Variable<bool>(hidden);
     return map;
   }
 
@@ -505,6 +561,10 @@ class MemoryEvent extends DataClass implements Insertable<MemoryEvent> {
       coverPhotoPath: coverPhotoPath == null && nullToAbsent
           ? const Value.absent()
           : Value(coverPhotoPath),
+      wallId: wallId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(wallId),
+      hidden: Value(hidden),
     );
   }
 
@@ -530,6 +590,8 @@ class MemoryEvent extends DataClass implements Insertable<MemoryEvent> {
       latitude: serializer.fromJson<double?>(json['latitude']),
       longitude: serializer.fromJson<double?>(json['longitude']),
       coverPhotoPath: serializer.fromJson<String?>(json['coverPhotoPath']),
+      wallId: serializer.fromJson<String?>(json['wallId']),
+      hidden: serializer.fromJson<bool>(json['hidden']),
     );
   }
   @override
@@ -552,6 +614,8 @@ class MemoryEvent extends DataClass implements Insertable<MemoryEvent> {
       'latitude': serializer.toJson<double?>(latitude),
       'longitude': serializer.toJson<double?>(longitude),
       'coverPhotoPath': serializer.toJson<String?>(coverPhotoPath),
+      'wallId': serializer.toJson<String?>(wallId),
+      'hidden': serializer.toJson<bool>(hidden),
     };
   }
 
@@ -572,6 +636,8 @@ class MemoryEvent extends DataClass implements Insertable<MemoryEvent> {
     Value<double?> latitude = const Value.absent(),
     Value<double?> longitude = const Value.absent(),
     Value<String?> coverPhotoPath = const Value.absent(),
+    Value<String?> wallId = const Value.absent(),
+    bool? hidden,
   }) => MemoryEvent(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -591,6 +657,8 @@ class MemoryEvent extends DataClass implements Insertable<MemoryEvent> {
     coverPhotoPath: coverPhotoPath.present
         ? coverPhotoPath.value
         : this.coverPhotoPath,
+    wallId: wallId.present ? wallId.value : this.wallId,
+    hidden: hidden ?? this.hidden,
   );
   MemoryEvent copyWithCompanion(MemoryEventsCompanion data) {
     return MemoryEvent(
@@ -622,6 +690,8 @@ class MemoryEvent extends DataClass implements Insertable<MemoryEvent> {
       coverPhotoPath: data.coverPhotoPath.present
           ? data.coverPhotoPath.value
           : this.coverPhotoPath,
+      wallId: data.wallId.present ? data.wallId.value : this.wallId,
+      hidden: data.hidden.present ? data.hidden.value : this.hidden,
     );
   }
 
@@ -643,7 +713,9 @@ class MemoryEvent extends DataClass implements Insertable<MemoryEvent> {
           ..write('locationLabel: $locationLabel, ')
           ..write('latitude: $latitude, ')
           ..write('longitude: $longitude, ')
-          ..write('coverPhotoPath: $coverPhotoPath')
+          ..write('coverPhotoPath: $coverPhotoPath, ')
+          ..write('wallId: $wallId, ')
+          ..write('hidden: $hidden')
           ..write(')'))
         .toString();
   }
@@ -666,6 +738,8 @@ class MemoryEvent extends DataClass implements Insertable<MemoryEvent> {
     latitude,
     longitude,
     coverPhotoPath,
+    wallId,
+    hidden,
   );
   @override
   bool operator ==(Object other) =>
@@ -686,7 +760,9 @@ class MemoryEvent extends DataClass implements Insertable<MemoryEvent> {
           other.locationLabel == this.locationLabel &&
           other.latitude == this.latitude &&
           other.longitude == this.longitude &&
-          other.coverPhotoPath == this.coverPhotoPath);
+          other.coverPhotoPath == this.coverPhotoPath &&
+          other.wallId == this.wallId &&
+          other.hidden == this.hidden);
 }
 
 class MemoryEventsCompanion extends UpdateCompanion<MemoryEvent> {
@@ -706,6 +782,8 @@ class MemoryEventsCompanion extends UpdateCompanion<MemoryEvent> {
   final Value<double?> latitude;
   final Value<double?> longitude;
   final Value<String?> coverPhotoPath;
+  final Value<String?> wallId;
+  final Value<bool> hidden;
   final Value<int> rowid;
   const MemoryEventsCompanion({
     this.id = const Value.absent(),
@@ -724,6 +802,8 @@ class MemoryEventsCompanion extends UpdateCompanion<MemoryEvent> {
     this.latitude = const Value.absent(),
     this.longitude = const Value.absent(),
     this.coverPhotoPath = const Value.absent(),
+    this.wallId = const Value.absent(),
+    this.hidden = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   MemoryEventsCompanion.insert({
@@ -743,6 +823,8 @@ class MemoryEventsCompanion extends UpdateCompanion<MemoryEvent> {
     this.latitude = const Value.absent(),
     this.longitude = const Value.absent(),
     this.coverPhotoPath = const Value.absent(),
+    this.wallId = const Value.absent(),
+    this.hidden = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        title = Value(title),
@@ -771,6 +853,8 @@ class MemoryEventsCompanion extends UpdateCompanion<MemoryEvent> {
     Expression<double>? latitude,
     Expression<double>? longitude,
     Expression<String>? coverPhotoPath,
+    Expression<String>? wallId,
+    Expression<bool>? hidden,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -790,6 +874,8 @@ class MemoryEventsCompanion extends UpdateCompanion<MemoryEvent> {
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
       if (coverPhotoPath != null) 'cover_photo_path': coverPhotoPath,
+      if (wallId != null) 'wall_id': wallId,
+      if (hidden != null) 'hidden': hidden,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -811,6 +897,8 @@ class MemoryEventsCompanion extends UpdateCompanion<MemoryEvent> {
     Value<double?>? latitude,
     Value<double?>? longitude,
     Value<String?>? coverPhotoPath,
+    Value<String?>? wallId,
+    Value<bool>? hidden,
     Value<int>? rowid,
   }) {
     return MemoryEventsCompanion(
@@ -830,6 +918,8 @@ class MemoryEventsCompanion extends UpdateCompanion<MemoryEvent> {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       coverPhotoPath: coverPhotoPath ?? this.coverPhotoPath,
+      wallId: wallId ?? this.wallId,
+      hidden: hidden ?? this.hidden,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -885,6 +975,12 @@ class MemoryEventsCompanion extends UpdateCompanion<MemoryEvent> {
     if (coverPhotoPath.present) {
       map['cover_photo_path'] = Variable<String>(coverPhotoPath.value);
     }
+    if (wallId.present) {
+      map['wall_id'] = Variable<String>(wallId.value);
+    }
+    if (hidden.present) {
+      map['hidden'] = Variable<bool>(hidden.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -910,6 +1006,8 @@ class MemoryEventsCompanion extends UpdateCompanion<MemoryEvent> {
           ..write('latitude: $latitude, ')
           ..write('longitude: $longitude, ')
           ..write('coverPhotoPath: $coverPhotoPath, ')
+          ..write('wallId: $wallId, ')
+          ..write('hidden: $hidden, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2285,6 +2383,15 @@ class $WallItemsTable extends WallItems
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _wallIdMeta = const VerificationMeta('wallId');
+  @override
+  late final GeneratedColumn<String> wallId = GeneratedColumn<String>(
+    'wall_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -2294,6 +2401,7 @@ class $WallItemsTable extends WallItems
     wallX,
     wallY,
     colorValue,
+    wallId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2360,6 +2468,12 @@ class $WallItemsTable extends WallItems
     } else if (isInserting) {
       context.missing(_colorValueMeta);
     }
+    if (data.containsKey('wall_id')) {
+      context.handle(
+        _wallIdMeta,
+        wallId.isAcceptableOrUnknown(data['wall_id']!, _wallIdMeta),
+      );
+    }
     return context;
   }
 
@@ -2397,6 +2511,10 @@ class $WallItemsTable extends WallItems
         DriftSqlType.int,
         data['${effectivePrefix}color_value'],
       )!,
+      wallId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}wall_id'],
+      ),
     );
   }
 
@@ -2414,6 +2532,9 @@ class WallItem extends DataClass implements Insertable<WallItem> {
   final double wallX;
   final double wallY;
   final int colorValue;
+
+  /// The personal wall it hangs on; null for "My wall".
+  final String? wallId;
   const WallItem({
     required this.id,
     required this.type,
@@ -2422,6 +2543,7 @@ class WallItem extends DataClass implements Insertable<WallItem> {
     required this.wallX,
     required this.wallY,
     required this.colorValue,
+    this.wallId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2433,6 +2555,9 @@ class WallItem extends DataClass implements Insertable<WallItem> {
     map['wall_x'] = Variable<double>(wallX);
     map['wall_y'] = Variable<double>(wallY);
     map['color_value'] = Variable<int>(colorValue);
+    if (!nullToAbsent || wallId != null) {
+      map['wall_id'] = Variable<String>(wallId);
+    }
     return map;
   }
 
@@ -2445,6 +2570,9 @@ class WallItem extends DataClass implements Insertable<WallItem> {
       wallX: Value(wallX),
       wallY: Value(wallY),
       colorValue: Value(colorValue),
+      wallId: wallId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(wallId),
     );
   }
 
@@ -2461,6 +2589,7 @@ class WallItem extends DataClass implements Insertable<WallItem> {
       wallX: serializer.fromJson<double>(json['wallX']),
       wallY: serializer.fromJson<double>(json['wallY']),
       colorValue: serializer.fromJson<int>(json['colorValue']),
+      wallId: serializer.fromJson<String?>(json['wallId']),
     );
   }
   @override
@@ -2474,6 +2603,7 @@ class WallItem extends DataClass implements Insertable<WallItem> {
       'wallX': serializer.toJson<double>(wallX),
       'wallY': serializer.toJson<double>(wallY),
       'colorValue': serializer.toJson<int>(colorValue),
+      'wallId': serializer.toJson<String?>(wallId),
     };
   }
 
@@ -2485,6 +2615,7 @@ class WallItem extends DataClass implements Insertable<WallItem> {
     double? wallX,
     double? wallY,
     int? colorValue,
+    Value<String?> wallId = const Value.absent(),
   }) => WallItem(
     id: id ?? this.id,
     type: type ?? this.type,
@@ -2493,6 +2624,7 @@ class WallItem extends DataClass implements Insertable<WallItem> {
     wallX: wallX ?? this.wallX,
     wallY: wallY ?? this.wallY,
     colorValue: colorValue ?? this.colorValue,
+    wallId: wallId.present ? wallId.value : this.wallId,
   );
   WallItem copyWithCompanion(WallItemsCompanion data) {
     return WallItem(
@@ -2505,6 +2637,7 @@ class WallItem extends DataClass implements Insertable<WallItem> {
       colorValue: data.colorValue.present
           ? data.colorValue.value
           : this.colorValue,
+      wallId: data.wallId.present ? data.wallId.value : this.wallId,
     );
   }
 
@@ -2517,14 +2650,23 @@ class WallItem extends DataClass implements Insertable<WallItem> {
           ..write('createdAt: $createdAt, ')
           ..write('wallX: $wallX, ')
           ..write('wallY: $wallY, ')
-          ..write('colorValue: $colorValue')
+          ..write('colorValue: $colorValue, ')
+          ..write('wallId: $wallId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, type, content, createdAt, wallX, wallY, colorValue);
+  int get hashCode => Object.hash(
+    id,
+    type,
+    content,
+    createdAt,
+    wallX,
+    wallY,
+    colorValue,
+    wallId,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2535,7 +2677,8 @@ class WallItem extends DataClass implements Insertable<WallItem> {
           other.createdAt == this.createdAt &&
           other.wallX == this.wallX &&
           other.wallY == this.wallY &&
-          other.colorValue == this.colorValue);
+          other.colorValue == this.colorValue &&
+          other.wallId == this.wallId);
 }
 
 class WallItemsCompanion extends UpdateCompanion<WallItem> {
@@ -2546,6 +2689,7 @@ class WallItemsCompanion extends UpdateCompanion<WallItem> {
   final Value<double> wallX;
   final Value<double> wallY;
   final Value<int> colorValue;
+  final Value<String?> wallId;
   final Value<int> rowid;
   const WallItemsCompanion({
     this.id = const Value.absent(),
@@ -2555,6 +2699,7 @@ class WallItemsCompanion extends UpdateCompanion<WallItem> {
     this.wallX = const Value.absent(),
     this.wallY = const Value.absent(),
     this.colorValue = const Value.absent(),
+    this.wallId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   WallItemsCompanion.insert({
@@ -2565,6 +2710,7 @@ class WallItemsCompanion extends UpdateCompanion<WallItem> {
     required double wallX,
     required double wallY,
     required int colorValue,
+    this.wallId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        type = Value(type),
@@ -2581,6 +2727,7 @@ class WallItemsCompanion extends UpdateCompanion<WallItem> {
     Expression<double>? wallX,
     Expression<double>? wallY,
     Expression<int>? colorValue,
+    Expression<String>? wallId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2591,6 +2738,7 @@ class WallItemsCompanion extends UpdateCompanion<WallItem> {
       if (wallX != null) 'wall_x': wallX,
       if (wallY != null) 'wall_y': wallY,
       if (colorValue != null) 'color_value': colorValue,
+      if (wallId != null) 'wall_id': wallId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2603,6 +2751,7 @@ class WallItemsCompanion extends UpdateCompanion<WallItem> {
     Value<double>? wallX,
     Value<double>? wallY,
     Value<int>? colorValue,
+    Value<String?>? wallId,
     Value<int>? rowid,
   }) {
     return WallItemsCompanion(
@@ -2613,6 +2762,7 @@ class WallItemsCompanion extends UpdateCompanion<WallItem> {
       wallX: wallX ?? this.wallX,
       wallY: wallY ?? this.wallY,
       colorValue: colorValue ?? this.colorValue,
+      wallId: wallId ?? this.wallId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2641,6 +2791,9 @@ class WallItemsCompanion extends UpdateCompanion<WallItem> {
     if (colorValue.present) {
       map['color_value'] = Variable<int>(colorValue.value);
     }
+    if (wallId.present) {
+      map['wall_id'] = Variable<String>(wallId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2657,6 +2810,266 @@ class WallItemsCompanion extends UpdateCompanion<WallItem> {
           ..write('wallX: $wallX, ')
           ..write('wallY: $wallY, ')
           ..write('colorValue: $colorValue, ')
+          ..write('wallId: $wallId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PersonalWallsTable extends PersonalWalls
+    with TableInfo<$PersonalWallsTable, PersonalWall> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PersonalWallsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'personal_walls';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PersonalWall> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PersonalWall map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PersonalWall(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PersonalWallsTable createAlias(String alias) {
+    return $PersonalWallsTable(attachedDatabase, alias);
+  }
+}
+
+class PersonalWall extends DataClass implements Insertable<PersonalWall> {
+  final String id;
+  final String name;
+  final int createdAt;
+  const PersonalWall({
+    required this.id,
+    required this.name,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  PersonalWallsCompanion toCompanion(bool nullToAbsent) {
+    return PersonalWallsCompanion(
+      id: Value(id),
+      name: Value(name),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory PersonalWall.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PersonalWall(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'createdAt': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  PersonalWall copyWith({String? id, String? name, int? createdAt}) =>
+      PersonalWall(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  PersonalWall copyWithCompanion(PersonalWallsCompanion data) {
+    return PersonalWall(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PersonalWall(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PersonalWall &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.createdAt == this.createdAt);
+}
+
+class PersonalWallsCompanion extends UpdateCompanion<PersonalWall> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<int> createdAt;
+  final Value<int> rowid;
+  const PersonalWallsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PersonalWallsCompanion.insert({
+    required String id,
+    required String name,
+    required int createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       createdAt = Value(createdAt);
+  static Insertable<PersonalWall> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<int>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PersonalWallsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<int>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return PersonalWallsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PersonalWallsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2672,6 +3085,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $MemoryConnectionsTable(this);
   late final $MemoryPeopleTable memoryPeople = $MemoryPeopleTable(this);
   late final $WallItemsTable wallItems = $WallItemsTable(this);
+  late final $PersonalWallsTable personalWalls = $PersonalWallsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2682,6 +3096,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     memoryConnections,
     memoryPeople,
     wallItems,
+    personalWalls,
   ];
 }
 
@@ -2703,6 +3118,8 @@ typedef $$MemoryEventsTableCreateCompanionBuilder =
       Value<double?> latitude,
       Value<double?> longitude,
       Value<String?> coverPhotoPath,
+      Value<String?> wallId,
+      Value<bool> hidden,
       Value<int> rowid,
     });
 typedef $$MemoryEventsTableUpdateCompanionBuilder =
@@ -2723,6 +3140,8 @@ typedef $$MemoryEventsTableUpdateCompanionBuilder =
       Value<double?> latitude,
       Value<double?> longitude,
       Value<String?> coverPhotoPath,
+      Value<String?> wallId,
+      Value<bool> hidden,
       Value<int> rowid,
     });
 
@@ -2812,6 +3231,16 @@ class $$MemoryEventsTableFilterComposer
 
   ColumnFilters<String> get coverPhotoPath => $composableBuilder(
     column: $table.coverPhotoPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get wallId => $composableBuilder(
+    column: $table.wallId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get hidden => $composableBuilder(
+    column: $table.hidden,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2904,6 +3333,16 @@ class $$MemoryEventsTableOrderingComposer
     column: $table.coverPhotoPath,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get wallId => $composableBuilder(
+    column: $table.wallId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get hidden => $composableBuilder(
+    column: $table.hidden,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$MemoryEventsTableAnnotationComposer
@@ -2974,6 +3413,12 @@ class $$MemoryEventsTableAnnotationComposer
     column: $table.coverPhotoPath,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get wallId =>
+      $composableBuilder(column: $table.wallId, builder: (column) => column);
+
+  GeneratedColumn<bool> get hidden =>
+      $composableBuilder(column: $table.hidden, builder: (column) => column);
 }
 
 class $$MemoryEventsTableTableManager
@@ -3023,6 +3468,8 @@ class $$MemoryEventsTableTableManager
                 Value<double?> latitude = const Value.absent(),
                 Value<double?> longitude = const Value.absent(),
                 Value<String?> coverPhotoPath = const Value.absent(),
+                Value<String?> wallId = const Value.absent(),
+                Value<bool> hidden = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MemoryEventsCompanion(
                 id: id,
@@ -3041,6 +3488,8 @@ class $$MemoryEventsTableTableManager
                 latitude: latitude,
                 longitude: longitude,
                 coverPhotoPath: coverPhotoPath,
+                wallId: wallId,
+                hidden: hidden,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3061,6 +3510,8 @@ class $$MemoryEventsTableTableManager
                 Value<double?> latitude = const Value.absent(),
                 Value<double?> longitude = const Value.absent(),
                 Value<String?> coverPhotoPath = const Value.absent(),
+                Value<String?> wallId = const Value.absent(),
+                Value<bool> hidden = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MemoryEventsCompanion.insert(
                 id: id,
@@ -3079,10 +3530,21 @@ class $$MemoryEventsTableTableManager
                 latitude: latitude,
                 longitude: longitude,
                 coverPhotoPath: coverPhotoPath,
+                wallId: wallId,
+                hidden: hidden,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$MemoryEventsTable, MemoryEvent>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $MemoryEventsTable,
+                    MemoryEvent
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -3362,7 +3824,16 @@ class $$MemoryPhotosTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$MemoryPhotosTable, MemoryPhoto>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $MemoryPhotosTable,
+                    MemoryPhoto
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -3554,7 +4025,16 @@ class $$MemoryConnectionsTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$MemoryConnectionsTable, MemoryConnection>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $MemoryConnectionsTable,
+                    MemoryConnection
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -3779,7 +4259,16 @@ class $$MemoryPeopleTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$MemoryPeopleTable, MemoryPeopleData>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $MemoryPeopleTable,
+                    MemoryPeopleData
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -3812,6 +4301,7 @@ typedef $$WallItemsTableCreateCompanionBuilder =
       required double wallX,
       required double wallY,
       required int colorValue,
+      Value<String?> wallId,
       Value<int> rowid,
     });
 typedef $$WallItemsTableUpdateCompanionBuilder =
@@ -3823,6 +4313,7 @@ typedef $$WallItemsTableUpdateCompanionBuilder =
       Value<double> wallX,
       Value<double> wallY,
       Value<int> colorValue,
+      Value<String?> wallId,
       Value<int> rowid,
     });
 
@@ -3867,6 +4358,11 @@ class $$WallItemsTableFilterComposer
 
   ColumnFilters<int> get colorValue => $composableBuilder(
     column: $table.colorValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get wallId => $composableBuilder(
+    column: $table.wallId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -3914,6 +4410,11 @@ class $$WallItemsTableOrderingComposer
     column: $table.colorValue,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get wallId => $composableBuilder(
+    column: $table.wallId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$WallItemsTableAnnotationComposer
@@ -3947,6 +4448,9 @@ class $$WallItemsTableAnnotationComposer
     column: $table.colorValue,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get wallId =>
+      $composableBuilder(column: $table.wallId, builder: (column) => column);
 }
 
 class $$WallItemsTableTableManager
@@ -3984,6 +4488,7 @@ class $$WallItemsTableTableManager
                 Value<double> wallX = const Value.absent(),
                 Value<double> wallY = const Value.absent(),
                 Value<int> colorValue = const Value.absent(),
+                Value<String?> wallId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => WallItemsCompanion(
                 id: id,
@@ -3993,6 +4498,7 @@ class $$WallItemsTableTableManager
                 wallX: wallX,
                 wallY: wallY,
                 colorValue: colorValue,
+                wallId: wallId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -4004,6 +4510,7 @@ class $$WallItemsTableTableManager
                 required double wallX,
                 required double wallY,
                 required int colorValue,
+                Value<String?> wallId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => WallItemsCompanion.insert(
                 id: id,
@@ -4013,10 +4520,20 @@ class $$WallItemsTableTableManager
                 wallX: wallX,
                 wallY: wallY,
                 colorValue: colorValue,
+                wallId: wallId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$WallItemsTable, WallItem>(table),
+                  BaseReferences<_$AppDatabase, $WallItemsTable, WallItem>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -4037,6 +4554,177 @@ typedef $$WallItemsTableProcessedTableManager =
       WallItem,
       PrefetchHooks Function()
     >;
+typedef $$PersonalWallsTableCreateCompanionBuilder =
+    PersonalWallsCompanion Function({
+      required String id,
+      required String name,
+      required int createdAt,
+      Value<int> rowid,
+    });
+typedef $$PersonalWallsTableUpdateCompanionBuilder =
+    PersonalWallsCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<int> createdAt,
+      Value<int> rowid,
+    });
+
+class $$PersonalWallsTableFilterComposer
+    extends Composer<_$AppDatabase, $PersonalWallsTable> {
+  $$PersonalWallsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PersonalWallsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PersonalWallsTable> {
+  $$PersonalWallsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PersonalWallsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PersonalWallsTable> {
+  $$PersonalWallsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$PersonalWallsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PersonalWallsTable,
+          PersonalWall,
+          $$PersonalWallsTableFilterComposer,
+          $$PersonalWallsTableOrderingComposer,
+          $$PersonalWallsTableAnnotationComposer,
+          $$PersonalWallsTableCreateCompanionBuilder,
+          $$PersonalWallsTableUpdateCompanionBuilder,
+          (
+            PersonalWall,
+            BaseReferences<_$AppDatabase, $PersonalWallsTable, PersonalWall>,
+          ),
+          PersonalWall,
+          PrefetchHooks Function()
+        > {
+  $$PersonalWallsTableTableManager(_$AppDatabase db, $PersonalWallsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PersonalWallsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PersonalWallsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PersonalWallsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PersonalWallsCompanion(
+                id: id,
+                name: name,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                required int createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PersonalWallsCompanion.insert(
+                id: id,
+                name: name,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PersonalWallsTable, PersonalWall>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $PersonalWallsTable,
+                    PersonalWall
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PersonalWallsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PersonalWallsTable,
+      PersonalWall,
+      $$PersonalWallsTableFilterComposer,
+      $$PersonalWallsTableOrderingComposer,
+      $$PersonalWallsTableAnnotationComposer,
+      $$PersonalWallsTableCreateCompanionBuilder,
+      $$PersonalWallsTableUpdateCompanionBuilder,
+      (
+        PersonalWall,
+        BaseReferences<_$AppDatabase, $PersonalWallsTable, PersonalWall>,
+      ),
+      PersonalWall,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4051,4 +4739,6 @@ class $AppDatabaseManager {
       $$MemoryPeopleTableTableManager(_db, _db.memoryPeople);
   $$WallItemsTableTableManager get wallItems =>
       $$WallItemsTableTableManager(_db, _db.wallItems);
+  $$PersonalWallsTableTableManager get personalWalls =>
+      $$PersonalWallsTableTableManager(_db, _db.personalWalls);
 }

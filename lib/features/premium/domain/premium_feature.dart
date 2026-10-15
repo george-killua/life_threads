@@ -7,7 +7,8 @@ enum PremiumFeature {
   storyImage,
   storyVideo,
   threadOfTheYear,
-  familyWall;
+  familyWall,
+  walls;
 
   String label(AppLocalizations l10n) => switch (this) {
     PremiumFeature.onThisDay => l10n.onThisDayTitle,
@@ -15,5 +16,6 @@ enum PremiumFeature {
     PremiumFeature.storyVideo => l10n.premiumFeatureStoryVideo,
     PremiumFeature.threadOfTheYear => l10n.premiumFeatureThreadOfTheYear,
     PremiumFeature.familyWall => l10n.premiumFeatureFamilyWall,
+    PremiumFeature.walls => l10n.premiumFeatureWalls,
   };
 }

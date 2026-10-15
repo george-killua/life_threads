@@ -478,6 +478,38 @@
       }
     }
   },
+  "premiumFeatureWalls": "More walls",
+  "newWall": "New wall",
+  "wallNameLabel": "Wall name",
+  "newWallHint": "e.g. Travel 2025",
+  "createWall": "Create",
+  "renameWall": "Rename",
+  "deleteWall": "Delete wall",
+  "deleteWallQuestion": "Delete “{name}”?",
+  "deleteWallBody": "Its memories move to My wall; nothing is lost.",
+  "personalWallSubtitle": "Your wall, on this device",
+  "wallOptions": "Wall options",
+  "moveToWall": "Move to wall…",
+  "movedToWall": "Moved to {name}.",
+  "hideMemory": "Hide",
+  "unhideMemory": "Show again",
+  "memoryHiddenToast": "Hidden. Find it under View › Hidden memories.",
+  "showHiddenMemories": "Hidden memories",
+  "showHiddenReason": "Show hidden memories",
+  "@deleteWallQuestion": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@movedToWall": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "savedPhotosTitle": "{count, plural, =1{1 saved photo} other{{count} saved photos}}",
   "peopleEyebrow": "People",
   "partOfMemory": "Part of this memory",

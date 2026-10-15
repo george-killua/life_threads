@@ -21,6 +21,8 @@ class MemoryEvent {
     this.latitude,
     this.longitude,
     this.coverPhotoPath,
+    this.wallId,
+    this.hidden = false,
   });
 
   final String id;
@@ -38,6 +40,12 @@ class MemoryEvent {
   final double? latitude;
   final double? longitude;
   final String? coverPhotoPath;
+
+  /// The personal wall it hangs on; null for "My wall".
+  final String? wallId;
+
+  /// Shown only after Face ID, from the View sheet.
+  final bool hidden;
 
   bool get hasGeoPoint {
     final lat = latitude;
@@ -73,6 +81,8 @@ class MemoryEvent {
     double? latitude,
     double? longitude,
     String? coverPhotoPath,
+    Object? wallId = _unchanged,
+    bool? hidden,
   }) {
     return MemoryEvent(
       id: id ?? this.id,
@@ -90,6 +100,11 @@ class MemoryEvent {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       coverPhotoPath: coverPhotoPath ?? this.coverPhotoPath,
+      wallId: identical(wallId, _unchanged) ? this.wallId : wallId as String?,
+      hidden: hidden ?? this.hidden,
     );
   }
 }
+
+/// copyWith's "leave as it is" for fields that can be set to null.
+const _unchanged = Object();

@@ -151,7 +151,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text('$error')),
         data: (state) {
-          final memories = _selection.resolve(state.events);
+          final memories = _selection.resolve(state.visibleEvents);
           if (_editing && memories.isNotEmpty) {
             // Started from a memory: its story is the first caption. Set
             // before the caption field exists, so no listener fires.
@@ -159,16 +159,16 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
               _captionReady = true;
               _caption.text = defaultStoryCaption(memories);
             }
-            return _buildEditor(context, memories, state.events);
+            return _buildEditor(context, memories, state.visibleEvents);
           }
           return _StoryMemoryPicker(
-            events: state.events,
+            events: state.visibleEvents,
             selection: _selection,
             onChanged: (selection) => setState(() => _selection = selection),
             onContinue: () => setState(() {
               if (!_captionEdited) {
                 _caption.text = defaultStoryCaption(
-                  _selection.resolve(state.events),
+                  _selection.resolve(state.visibleEvents),
                 );
               }
               _captionReady = true;

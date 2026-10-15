@@ -85,78 +85,82 @@ class _MemoryCardState extends State<MemoryCard> {
             child: Transform.rotate(
               angle: widget.event.rotation + sway,
               alignment: Alignment.topCenter,
-              child: Column(
-                children: [
-                  if (widget.hasConnection)
-                    _HangingThread(isDragging: widget.isDragging)
-                  else
-                    const SizedBox(height: 34),
-                  SizedBox(
-                    width: 190,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        WallDragListener(
-                          onDragStart: widget.onDragStart,
-                          onDragUpdate: widget.onDragUpdate,
-                          onDragEnd: widget.onDragEnd,
-                          onPointerDown: () {
-                            _suppressTap = false;
-                            widget.onPointerDown();
-                          },
-                          onPointerUp: widget.onPointerUp,
-                          onDraggingChanged: (dragging) {
-                            if (dragging) _suppressTap = true;
-                          },
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () {
-                              if (_suppressTap) return;
-                              widget.onTap();
+              // A hidden memory, shown from the View sheet, stays faded.
+              child: Opacity(
+                opacity: widget.event.hidden ? 0.5 : 1,
+                child: Column(
+                  children: [
+                    if (widget.hasConnection)
+                      _HangingThread(isDragging: widget.isDragging)
+                    else
+                      const SizedBox(height: 34),
+                    SizedBox(
+                      width: 190,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          WallDragListener(
+                            onDragStart: widget.onDragStart,
+                            onDragUpdate: widget.onDragUpdate,
+                            onDragEnd: widget.onDragEnd,
+                            onPointerDown: () {
+                              _suppressTap = false;
+                              widget.onPointerDown();
                             },
-                            onLongPress: () {
-                              if (_suppressTap) return;
-                              widget.onLongPress();
+                            onPointerUp: widget.onPointerUp,
+                            onDraggingChanged: (dragging) {
+                              if (dragging) _suppressTap = true;
                             },
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                _PhotoPaper(
-                                  event: widget.event,
-                                  isDragging: widget.isDragging,
-                                  footnote: widget.footnote,
-                                ),
-                                _Tape(isDragging: widget.isDragging),
-                                if (widget.hasConnection)
-                                  _Pin(isDragging: widget.isDragging),
-                              ],
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                if (_suppressTap) return;
+                                widget.onTap();
+                              },
+                              onLongPress: () {
+                                if (_suppressTap) return;
+                                widget.onLongPress();
+                              },
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  _PhotoPaper(
+                                    event: widget.event,
+                                    isDragging: widget.isDragging,
+                                    footnote: widget.footnote,
+                                  ),
+                                  _Tape(isDragging: widget.isDragging),
+                                  if (widget.hasConnection)
+                                    _Pin(isDragging: widget.isDragging),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        if (widget.showActions)
-                          Positioned(
-                            top: 10,
-                            right: 10,
-                            child: Row(
-                              children: [
-                                _CardActionButton(
-                                  icon: Icons.edit_rounded,
-                                  onTap: widget.onEdit,
-                                  tooltip: context.l10n.editMemoryTooltip,
-                                ),
-                                const SizedBox(width: 7),
-                                _CardActionButton(
-                                  icon: Icons.hub_rounded,
-                                  onTap: widget.onConnect,
-                                  tooltip: context.l10n.connectMemoryTooltip,
-                                ),
-                              ],
+                          if (widget.showActions)
+                            Positioned(
+                              top: 10,
+                              right: 10,
+                              child: Row(
+                                children: [
+                                  _CardActionButton(
+                                    icon: Icons.edit_rounded,
+                                    onTap: widget.onEdit,
+                                    tooltip: context.l10n.editMemoryTooltip,
+                                  ),
+                                  const SizedBox(width: 7),
+                                  _CardActionButton(
+                                    icon: Icons.hub_rounded,
+                                    onTap: widget.onConnect,
+                                    tooltip: context.l10n.connectMemoryTooltip,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

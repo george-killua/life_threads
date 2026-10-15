@@ -21,6 +21,7 @@ import '../../../backup/presentation/widgets/archive_password_dialog.dart';
 import '../../../display/data/wall_display_service.dart';
 import '../../../display/presentation/pages/wall_display_scanner_page.dart';
 import '../../../family/presentation/family_providers.dart';
+import '../../../app_lock/app_lock.dart';
 import '../../../family/presentation/widgets/wall_switcher.dart';
 import '../../../map/presentation/widgets/lifethreads_map_provider.dart';
 import '../../../media/data/photo_library_service.dart';
@@ -43,6 +44,7 @@ import '../../domain/wall_item.dart';
 import '../../domain/wall_layout.dart';
 import '../widgets/expandable_add_button.dart';
 import '../widgets/memory_card.dart';
+import '../../data/current_wall.dart';
 import '../../data/wall_theme_controller.dart';
 import '../widgets/rope_painter.dart';
 import '../widgets/wall_background.dart';
@@ -73,6 +75,13 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
   late final AnimationController _windController;
   final TransformationController _wallController = TransformationController();
+
+  /// The wall whose memories are on screen (null: "My wall").
+  String? _shownWallId;
+
+  /// Hidden memories are shown (after Face ID, from the View sheet).
+  var _showHidden = false;
+
   bool _didSetInitialViewport = false;
   bool _isRouteTransitioning = false;
   bool _isCapturingPhotos = false;
@@ -133,13 +142,17 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   @override
   Widget build(BuildContext context) {
     final memoryState = ref.watch(memoryRepositoryProvider);
+    final currentWall = ref.watch(currentWallProvider);
     final entitlement = ref.watch(premiumEntitlementProvider).asData?.value;
     final repository = ref.read(memoryRepositoryProvider.notifier);
     final backupReminder = ref.watch(backupReminderProvider).asData?.value;
     final onThisDay = ref.watch(onThisDayMatchesProvider).firstOrNull;
     // Only once family walls were used on this device; otherwise the wall
     // never touches the family service.
-    final showWallSwitcher = ref.watch(switchableFamiliesProvider).isNotEmpty;
+    // Also once one has walls of one's own.
+    final showWallSwitcher =
+        ref.watch(switchableFamiliesProvider).isNotEmpty ||
+        (memoryState.asData?.value.walls.isNotEmpty ?? false);
 
     return Scaffold(
       body: WallBackground(
@@ -147,7 +160,17 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
           child: memoryState.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, _) => _WallError(message: error.toString()),
-            data: (state) {
+            data: (allState) {
+              // One wall at a time: "My wall" or a named wall, hidden
+              // memories only once shown from the View sheet.
+              final wallId = allState.walls.any((w) => w.id == currentWall)
+                  ? currentWall
+                  : null;
+              if (wallId != _shownWallId) {
+                _shownWallId = wallId;
+                _didSetInitialViewport = false;
+              }
+              final state = allState.onWall(wallId, includeHidden: _showHidden);
               final filteredEvents = WallLayoutEngine.apply(
                 events: state.events
                     .where((event) => _filter.matches(event.category))
@@ -185,9 +208,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
               };
               final hasWallContent =
                   state.events.isNotEmpty || state.wallItems.isNotEmpty;
+              // The free limit counts the memories on every wall.
               final canCreateMemory =
-                  entitlement?.canCreateMemory(state.events.length) ??
-                  state.events.length < PremiumEntitlement.freeMemoryLimit;
+                  entitlement?.canCreateMemory(allState.events.length) ??
+                  allState.events.length < PremiumEntitlement.freeMemoryLimit;
 
               if (_mode == _WallViewMode.wall) {
                 _setInitialViewport(context, boardEvents, boardWallItems);
@@ -401,6 +425,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                           _MoreAction.yearThread => _pushRoute(
                             RouteNames.yearThread,
                           ),
+                          _MoreAction.newWall => createNewWall(context),
                           _MoreAction.familyWalls => _pushRoute(
                             RouteNames.familyWalls,
                           ),
@@ -650,6 +675,27 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     ref.read(wallHintSeenProvider.notifier).markSeen();
   }
 
+  /// Whether the wall on screen has hidden memories.
+  bool _wallHasHidden() {
+    final all = ref.read(memoryRepositoryProvider).asData?.value;
+    return all?.events.any((e) => e.hidden && e.wallId == _shownWallId) ??
+        false;
+  }
+
+  /// Showing hidden memories asks for Face ID (or the passcode) first,
+  /// where the phone has one. Returns whether they are shown now.
+  Future<bool> _setShowHidden(bool show) async {
+    if (show) {
+      final auth = ref.read(appLockAuthProvider);
+      final reason = context.l10n.showHiddenReason;
+      if (await auth.isAvailable() && !await auth.authenticate(reason)) {
+        return false;
+      }
+    }
+    if (mounted) setState(() => _showHidden = show);
+    return show;
+  }
+
   Future<void> _showViewSheet(BuildContext context) {
     return showModalBottomSheet<void>(
       context: context,
@@ -659,9 +705,12 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
         mode: _mode,
         layout: _layoutMode,
         filter: _filter,
+        hasHidden: _wallHasHidden(),
+        showHidden: _showHidden,
         onModeChanged: (mode) => setState(() => _mode = mode),
         onLayoutChanged: (layout) => setState(() => _layoutMode = layout),
         onFilterChanged: (filter) => setState(() => _filter = filter),
+        onShowHiddenChanged: _setShowHidden,
       ),
     );
   }
@@ -926,7 +975,11 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       initialPosition: _defaultDropPosition(context),
     );
     if (!context.mounted || position == null) return;
-    await repository.addTextNote(text: trimmed, position: position);
+    await repository.addTextNote(
+      text: trimmed,
+      position: position,
+      wallId: activeWallId(ref),
+    );
   }
 
   Future<void> _createNail(
@@ -942,7 +995,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       initialPosition: _defaultDropPosition(context),
     );
     if (!context.mounted || position == null) return;
-    await repository.addNail(position: position);
+    await repository.addNail(position: position, wallId: activeWallId(ref));
   }
 
   Future<void> _createQuickPhotoMemory(
@@ -1026,6 +1079,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
         longitude: picked.longitude,
         coverPhotoPath: picked.localPath,
         wallPosition: position,
+        wallId: activeWallId(ref),
         photos: [
           MemoryPhotoDraft(
             localPath: picked.localPath,
@@ -1248,6 +1302,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
   Future<void> _showMemoryMenu(BuildContext context, String memoryId) async {
     final repository = ref.read(memoryRepositoryProvider.notifier);
+    final all = ref.read(memoryRepositoryProvider).asData?.value;
+    final memory = all?.findEvent(memoryId);
+    final hasOwnWalls = all?.walls.isNotEmpty ?? false;
     final action = await showModalBottomSheet<_MemoryAction>(
       context: context,
       showDragHandle: true,
@@ -1274,6 +1331,26 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
               leading: const Icon(Icons.auto_stories_rounded),
               title: Text(context.l10n.createStory),
               onTap: () => Navigator.of(context).pop(_MemoryAction.story),
+            ),
+            if (hasOwnWalls)
+              ListTile(
+                leading: const Icon(Icons.drive_file_move_rounded),
+                title: Text(context.l10n.moveToWall),
+                onTap: () =>
+                    Navigator.of(context).pop(_MemoryAction.moveToWall),
+              ),
+            ListTile(
+              leading: Icon(
+                memory?.hidden ?? false
+                    ? Icons.visibility_rounded
+                    : Icons.visibility_off_rounded,
+              ),
+              title: Text(
+                memory?.hidden ?? false
+                    ? context.l10n.unhideMemory
+                    : context.l10n.hideMemory,
+              ),
+              onTap: () => Navigator.of(context).pop(_MemoryAction.hide),
             ),
             ListTile(
               leading: const Icon(
@@ -1302,6 +1379,14 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
         await _pushRoute('/memories/$memoryId/connections');
       case _MemoryAction.story:
         await _pushRoute(RouteNames.createStory, extra: memoryId);
+      case _MemoryAction.moveToWall:
+        await _moveToWall(context, repository, memoryId);
+      case _MemoryAction.hide:
+        final hide = !(memory?.hidden ?? false);
+        final messenger = ScaffoldMessenger.of(context);
+        final hiddenText = context.l10n.memoryHiddenToast;
+        await repository.setHidden(memoryId, hidden: hide);
+        if (hide) messenger.showToast(hiddenText);
       case _MemoryAction.delete:
         await _removeWithUndo(
           context,
@@ -1310,6 +1395,57 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
           context.l10n.memoryDeletedToast,
         );
     }
+  }
+
+  /// Moves a memory to "My wall" or another wall of one's own.
+  Future<void> _moveToWall(
+    BuildContext context,
+    MemoryRepository repository,
+    String memoryId,
+  ) async {
+    final l10n = context.l10n;
+    final all = ref.read(memoryRepositoryProvider).asData?.value;
+    final memory = all?.findEvent(memoryId);
+    if (all == null || memory == null) return;
+    final target = await showModalBottomSheet<({String? id, String name})>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(
+                l10n.moveToWall,
+                style: const TextStyle(fontWeight: FontWeight.w900),
+              ),
+            ),
+            if (memory.wallId != null)
+              ListTile(
+                leading: const Icon(Icons.person_rounded),
+                title: Text(l10n.myWall),
+                onTap: () => Navigator.of(
+                  sheetContext,
+                ).pop((id: null, name: l10n.myWall)),
+              ),
+            for (final wall in all.walls)
+              if (wall.id != memory.wallId)
+                ListTile(
+                  leading: const Icon(Icons.dashboard_rounded),
+                  title: Text(wall.name),
+                  onTap: () => Navigator.of(
+                    sheetContext,
+                  ).pop((id: wall.id, name: wall.name)),
+                ),
+          ],
+        ),
+      ),
+    );
+    if (target == null || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final moved = l10n.movedToWall(target.name);
+    await repository.moveMemoryToWall(memoryId, target.id);
+    messenger.showToast(moved, kind: ToastKind.success);
   }
 
   /// Removes at once and offers "Undo" for a few seconds, instead of asking
@@ -2029,7 +2165,15 @@ class _EmptyModePanel extends StatelessWidget {
   }
 }
 
-enum _MoreAction { story, yearThread, familyWalls, display, help, settings }
+enum _MoreAction {
+  story,
+  yearThread,
+  newWall,
+  familyWalls,
+  display,
+  help,
+  settings,
+}
 
 /// One row at the top of the wall: which wall, how it is shown, and a
 /// menu for everything else. It never grows over the cards.
@@ -2278,6 +2422,11 @@ class _WallMoreButton extends StatelessWidget {
             l10n.yearThreadTitle,
           ),
           item(
+            _MoreAction.newWall,
+            Icons.dashboard_customize_rounded,
+            l10n.newWall,
+          ),
+          item(
             _MoreAction.familyWalls,
             Icons.diversity_1_rounded,
             l10n.familyWallsTitle,
@@ -2313,6 +2462,9 @@ class _WallViewSheet extends StatefulWidget {
     required this.onModeChanged,
     required this.onLayoutChanged,
     required this.onFilterChanged,
+    required this.hasHidden,
+    required this.showHidden,
+    required this.onShowHiddenChanged,
   });
 
   final _WallViewMode mode;
@@ -2322,6 +2474,14 @@ class _WallViewSheet extends StatefulWidget {
   final ValueChanged<WallLayoutMode> onLayoutChanged;
   final ValueChanged<WallFilter> onFilterChanged;
 
+  /// The wall has hidden memories; the switch shows only then.
+  final bool hasHidden;
+  final bool showHidden;
+
+  /// Returns whether hidden memories are shown after the change (Face ID
+  /// can refuse).
+  final Future<bool> Function(bool show) onShowHiddenChanged;
+
   @override
   State<_WallViewSheet> createState() => _WallViewSheetState();
 }
@@ -2330,6 +2490,7 @@ class _WallViewSheetState extends State<_WallViewSheet> {
   late var _mode = widget.mode;
   late var _layout = widget.layout;
   late var _filter = widget.filter;
+  late var _showHidden = widget.showHidden;
 
   @override
   Widget build(BuildContext context) {
@@ -2421,6 +2582,29 @@ class _WallViewSheetState extends State<_WallViewSheet> {
                   ),
               ],
             ),
+            if (widget.hasHidden) ...[
+              const SizedBox(height: 14),
+              // Hidden memories show only after Face ID or the passcode.
+              MergeSemantics(
+                child: SwitchListTile.adaptive(
+                  key: const ValueKey('wall-show-hidden'),
+                  contentPadding: EdgeInsets.zero,
+                  secondary: Icon(
+                    Icons.visibility_off_rounded,
+                    color: AppColors.gold,
+                  ),
+                  title: Text(
+                    l10n.showHiddenMemories,
+                    style: const TextStyle(fontWeight: FontWeight.w900),
+                  ),
+                  value: _showHidden,
+                  onChanged: (value) async {
+                    final shown = await widget.onShowHiddenChanged(value);
+                    if (mounted) setState(() => _showHidden = shown);
+                  },
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -3402,7 +3586,7 @@ enum _WallViewMode {
 
 enum _DragTargetKind { memory, wallItem }
 
-enum _MemoryAction { open, edit, connect, story, delete }
+enum _MemoryAction { open, edit, connect, story, moveToWall, hide, delete }
 
 enum _TextAction { edit, delete }
 

@@ -1287,6 +1287,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchTooltip => 'Search memories';
 
   @override
+  String get premiumFeatureWalls => 'More walls';
+
+  @override
+  String get newWall => 'New wall';
+
+  @override
+  String get wallNameLabel => 'Wall name';
+
+  @override
+  String get newWallHint => 'e.g. Travel 2025';
+
+  @override
+  String get createWall => 'Create';
+
+  @override
+  String get renameWall => 'Rename';
+
+  @override
+  String get deleteWall => 'Delete wall';
+
+  @override
+  String deleteWallQuestion(String name) {
+    return 'Delete “$name”?';
+  }
+
+  @override
+  String get deleteWallBody => 'Its memories move to My wall; nothing is lost.';
+
+  @override
+  String get personalWallSubtitle => 'Your wall, on this device';
+
+  @override
+  String get wallOptions => 'Wall options';
+
+  @override
+  String get moveToWall => 'Move to wall…';
+
+  @override
+  String movedToWall(String name) {
+    return 'Moved to $name.';
+  }
+
+  @override
+  String get hideMemory => 'Hide';
+
+  @override
+  String get unhideMemory => 'Show again';
+
+  @override
+  String get memoryHiddenToast =>
+      'Hidden. Find it under View › Hidden memories.';
+
+  @override
+  String get showHiddenMemories => 'Hidden memories';
+
+  @override
+  String get showHiddenReason => 'Show hidden memories';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

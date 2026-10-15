@@ -25,6 +25,12 @@ class MemoryEvents extends Table {
   RealColumn get longitude => real().nullable()();
   TextColumn get coverPhotoPath => text().nullable()();
 
+  /// The personal wall it hangs on; null for "My wall".
+  TextColumn get wallId => text().nullable()();
+
+  /// Hidden memories show only after Face ID (the View sheet).
+  BoolColumn get hidden => boolean().withDefault(const Constant(false))();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
@@ -75,6 +81,19 @@ class WallItems extends Table {
   RealColumn get wallY => real()();
   IntColumn get colorValue => integer()();
 
+  /// The personal wall it hangs on; null for "My wall".
+  TextColumn get wallId => text().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+/// Extra named walls (Premium), besides "My wall".
+class PersonalWalls extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  IntColumn get createdAt => integer()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
@@ -86,13 +105,14 @@ class WallItems extends Table {
     MemoryConnections,
     MemoryPeople,
     WallItems,
+    PersonalWalls,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -109,6 +129,12 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 5) {
         await migrator.createTable(memoryPeople);
+      }
+      if (from < 6) {
+        await migrator.createTable(personalWalls);
+        await migrator.addColumn(memoryEvents, memoryEvents.wallId);
+        await migrator.addColumn(memoryEvents, memoryEvents.hidden);
+        await migrator.addColumn(wallItems, wallItems.wallId);
       }
     },
   );

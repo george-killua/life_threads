@@ -2373,6 +2373,114 @@ abstract class AppLocalizations {
   /// **'Search memories'**
   String get searchTooltip;
 
+  /// No description provided for @premiumFeatureWalls.
+  ///
+  /// In en, this message translates to:
+  /// **'More walls'**
+  String get premiumFeatureWalls;
+
+  /// No description provided for @newWall.
+  ///
+  /// In en, this message translates to:
+  /// **'New wall'**
+  String get newWall;
+
+  /// No description provided for @wallNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wall name'**
+  String get wallNameLabel;
+
+  /// No description provided for @newWallHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Travel 2025'**
+  String get newWallHint;
+
+  /// No description provided for @createWall.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get createWall;
+
+  /// No description provided for @renameWall.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get renameWall;
+
+  /// No description provided for @deleteWall.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete wall'**
+  String get deleteWall;
+
+  /// No description provided for @deleteWallQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete “{name}”?'**
+  String deleteWallQuestion(String name);
+
+  /// No description provided for @deleteWallBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Its memories move to My wall; nothing is lost.'**
+  String get deleteWallBody;
+
+  /// No description provided for @personalWallSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your wall, on this device'**
+  String get personalWallSubtitle;
+
+  /// No description provided for @wallOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Wall options'**
+  String get wallOptions;
+
+  /// No description provided for @moveToWall.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to wall…'**
+  String get moveToWall;
+
+  /// No description provided for @movedToWall.
+  ///
+  /// In en, this message translates to:
+  /// **'Moved to {name}.'**
+  String movedToWall(String name);
+
+  /// No description provided for @hideMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get hideMemory;
+
+  /// No description provided for @unhideMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Show again'**
+  String get unhideMemory;
+
+  /// No description provided for @memoryHiddenToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden. Find it under View › Hidden memories.'**
+  String get memoryHiddenToast;
+
+  /// No description provided for @showHiddenMemories.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden memories'**
+  String get showHiddenMemories;
+
+  /// No description provided for @showHiddenReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Show hidden memories'**
+  String get showHiddenReason;
+
   /// No description provided for @savedPhotosTitle.
   ///
   /// In en, this message translates to:

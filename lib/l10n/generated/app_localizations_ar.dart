@@ -1287,6 +1287,64 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchTooltip => 'البحث في الذكريات';
 
   @override
+  String get premiumFeatureWalls => 'جدران إضافية';
+
+  @override
+  String get newWall => 'جدار جديد';
+
+  @override
+  String get wallNameLabel => 'اسم الجدار';
+
+  @override
+  String get newWallHint => 'مثلاً: رحلات 2025';
+
+  @override
+  String get createWall => 'إنشاء';
+
+  @override
+  String get renameWall => 'إعادة تسمية';
+
+  @override
+  String get deleteWall => 'حذف الجدار';
+
+  @override
+  String deleteWallQuestion(String name) {
+    return 'حذف «$name»؟';
+  }
+
+  @override
+  String get deleteWallBody => 'تنتقل ذكرياته إلى جداري؛ لن يضيع شيء.';
+
+  @override
+  String get personalWallSubtitle => 'جدارك، على هذا الجهاز';
+
+  @override
+  String get wallOptions => 'خيارات الجدار';
+
+  @override
+  String get moveToWall => 'نقل إلى جدار…';
+
+  @override
+  String movedToWall(String name) {
+    return 'نُقلت إلى $name.';
+  }
+
+  @override
+  String get hideMemory => 'إخفاء';
+
+  @override
+  String get unhideMemory => 'إظهار مجدداً';
+
+  @override
+  String get memoryHiddenToast => 'أُخفيت. تجدها في العرض › الذكريات المخفية.';
+
+  @override
+  String get showHiddenMemories => 'الذكريات المخفية';
+
+  @override
+  String get showHiddenReason => 'إظهار الذكريات المخفية';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

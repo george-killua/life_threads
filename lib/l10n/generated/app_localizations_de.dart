@@ -1302,6 +1302,66 @@ class AppLocalizationsDe extends AppLocalizations {
   String get searchTooltip => 'Erinnerungen suchen';
 
   @override
+  String get premiumFeatureWalls => 'Weitere Wände';
+
+  @override
+  String get newWall => 'Neue Wand';
+
+  @override
+  String get wallNameLabel => 'Name der Wand';
+
+  @override
+  String get newWallHint => 'z. B. Reisen 2025';
+
+  @override
+  String get createWall => 'Erstellen';
+
+  @override
+  String get renameWall => 'Umbenennen';
+
+  @override
+  String get deleteWall => 'Wand löschen';
+
+  @override
+  String deleteWallQuestion(String name) {
+    return '„$name“ löschen?';
+  }
+
+  @override
+  String get deleteWallBody =>
+      'Ihre Erinnerungen kommen auf Meine Wand; nichts geht verloren.';
+
+  @override
+  String get personalWallSubtitle => 'Deine Wand, auf diesem Gerät';
+
+  @override
+  String get wallOptions => 'Wand-Optionen';
+
+  @override
+  String get moveToWall => 'Auf andere Wand…';
+
+  @override
+  String movedToWall(String name) {
+    return 'Auf $name verschoben.';
+  }
+
+  @override
+  String get hideMemory => 'Ausblenden';
+
+  @override
+  String get unhideMemory => 'Wieder zeigen';
+
+  @override
+  String get memoryHiddenToast =>
+      'Ausgeblendet. Zu finden unter Ansicht › Ausgeblendete Erinnerungen.';
+
+  @override
+  String get showHiddenMemories => 'Ausgeblendete Erinnerungen';
+
+  @override
+  String get showHiddenReason => 'Ausgeblendete Erinnerungen zeigen';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -5,11 +5,15 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
+import '../../../memories/data/memory_repository.dart';
+import '../../../premium/domain/premium_feature.dart';
+import '../../../premium/presentation/premium_gate.dart';
+import '../../../wall/data/current_wall.dart';
 import '../../domain/family_models.dart';
 import '../family_providers.dart';
 
-/// A pill naming the wall on screen ("My wall" or a family wall) that opens
-/// the wall switcher.
+/// A pill naming the wall on screen ("My wall", one of one's own named
+/// walls, or a family wall) that opens the wall switcher.
 class WallSwitcherButton extends ConsumerWidget {
   const WallSwitcherButton({super.key, this.currentFamilyId, this.label});
 
@@ -24,8 +28,16 @@ class WallSwitcherButton extends ConsumerWidget {
     final l10n = context.l10n;
     final families = ref.watch(familiesProvider).asData?.value ?? const [];
     final current = families.where((f) => f.id == currentFamilyId).firstOrNull;
+    final walls =
+        ref.watch(memoryRepositoryProvider).asData?.value.walls ?? const [];
+    final ownWall = walls
+        .where((w) => w.id == ref.watch(currentWallProvider))
+        .firstOrNull;
     final text =
-        label ?? (currentFamilyId == null ? l10n.myWall : current?.name ?? '');
+        label ??
+        (currentFamilyId == null
+            ? ownWall?.name ?? l10n.myWall
+            : current?.name ?? '');
     return Semantics(
       button: true,
       label: l10n.switchWall,
@@ -92,7 +104,8 @@ class WallSwitcherButton extends ConsumerWidget {
   }
 }
 
-/// Lists "My wall" and the family walls; opens the chosen one.
+/// Lists "My wall", one's own named walls and the family walls; opens the
+/// chosen one, or makes a new wall (Premium).
 Future<void> showWallSwitcher(
   BuildContext context,
   String? currentFamilyId,
@@ -104,9 +117,26 @@ Future<void> showWallSwitcher(
     builder: (_) => _WallSwitcherSheet(currentFamilyId: currentFamilyId),
   );
   if (choice == null || !context.mounted) return;
+  final container = ProviderScope.containerOf(context, listen: false);
+  final currentWall = container.read(currentWallProvider.notifier);
   switch (choice) {
     case _MyWall():
-      if (currentFamilyId != null) context.go(RouteNames.wall);
+      await currentWall.select(null);
+      if (currentFamilyId != null && context.mounted) {
+        context.go(RouteNames.wall);
+      }
+    case _OwnWall(:final wallId):
+      await currentWall.select(wallId);
+      if (currentFamilyId != null && context.mounted) {
+        context.go(RouteNames.wall);
+      }
+    case _NewWall():
+      await createNewWall(context);
+      if (currentFamilyId != null && context.mounted) {
+        context.go(RouteNames.wall);
+      }
+    case _WallOptions(:final wallId):
+      await _showWallOptions(context, wallId);
     case _FamilyWall(:final familyId):
       if (familyId == currentFamilyId) return;
       final location = RouteNames.familyWallFor(familyId);
@@ -134,6 +164,150 @@ class _FamilyWall extends _WallChoice {
   final String familyId;
 }
 
+class _OwnWall extends _WallChoice {
+  const _OwnWall(this.wallId);
+
+  final String wallId;
+}
+
+class _NewWall extends _WallChoice {
+  const _NewWall();
+}
+
+class _WallOptions extends _WallChoice {
+  const _WallOptions(this.wallId);
+
+  final String wallId;
+}
+
+/// Asks for a name and makes a new wall of one's own (Premium), then shows
+/// it.
+Future<void> createNewWall(BuildContext context) async {
+  if (!await requirePremium(context, PremiumFeature.walls)) return;
+  if (!context.mounted) return;
+  final name = await _askWallName(context, title: context.l10n.newWall);
+  if (name == null || !context.mounted) return;
+  final container = ProviderScope.containerOf(context, listen: false);
+  final id = await container
+      .read(memoryRepositoryProvider.notifier)
+      .createWall(name);
+  await container.read(currentWallProvider.notifier).select(id);
+}
+
+Future<void> _showWallOptions(BuildContext context, String wallId) async {
+  final l10n = context.l10n;
+  final container = ProviderScope.containerOf(context, listen: false);
+  final wall = container
+      .read(memoryRepositoryProvider)
+      .asData
+      ?.value
+      .walls
+      .where((w) => w.id == wallId)
+      .firstOrNull;
+  if (wall == null) return;
+  final action = await showModalBottomSheet<String>(
+    context: context,
+    showDragHandle: true,
+    builder: (sheetContext) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.edit_rounded),
+            title: Text(l10n.renameWall),
+            onTap: () => Navigator.of(sheetContext).pop('rename'),
+          ),
+          ListTile(
+            leading: Icon(Icons.delete_outline_rounded, color: AppColors.error),
+            title: Text(
+              l10n.deleteWall,
+              style: TextStyle(color: AppColors.error),
+            ),
+            onTap: () => Navigator.of(sheetContext).pop('delete'),
+          ),
+        ],
+      ),
+    ),
+  );
+  if (action == null || !context.mounted) return;
+  final repository = container.read(memoryRepositoryProvider.notifier);
+  if (action == 'rename') {
+    final name = await _askWallName(
+      context,
+      title: l10n.renameWall,
+      initial: wall.name,
+    );
+    if (name != null) await repository.renameWall(wallId, name);
+    return;
+  }
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: Text(l10n.deleteWallQuestion(wall.name)),
+      content: Text(l10n.deleteWallBody),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          child: Text(l10n.delete),
+        ),
+      ],
+    ),
+  );
+  if (confirmed != true) return;
+  if (container.read(currentWallProvider) == wallId) {
+    await container.read(currentWallProvider.notifier).select(null);
+  }
+  await repository.deleteWall(wallId);
+}
+
+Future<String?> _askWallName(
+  BuildContext context, {
+  required String title,
+  String initial = '',
+}) {
+  final l10n = context.l10n;
+  final controller = TextEditingController(text: initial);
+  return showDialog<String>(
+    context: context,
+    builder: (dialogContext) {
+      void submit() {
+        final name = controller.text.trim();
+        if (name.isNotEmpty) Navigator.of(dialogContext).pop(name);
+      }
+
+      return AlertDialog(
+        title: Text(title),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+          maxLength: 40,
+          onSubmitted: (_) => submit(),
+          decoration: InputDecoration(
+            labelText: l10n.wallNameLabel,
+            hintText: l10n.newWallHint,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: submit,
+            child: Text(initial.isEmpty ? l10n.createWall : l10n.save),
+          ),
+        ],
+      );
+    },
+  ).whenComplete(controller.dispose);
+}
+
 class _ManageWalls extends _WallChoice {
   const _ManageWalls();
 }
@@ -147,6 +321,10 @@ class _WallSwitcherSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final families = ref.watch(familiesProvider).asData?.value ?? const [];
+    final walls =
+        ref.watch(memoryRepositoryProvider).asData?.value.walls ?? const [];
+    final currentWall = ref.watch(currentWallProvider);
+    final onOwnWall = currentFamilyId == null;
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
@@ -168,8 +346,27 @@ class _WallSwitcherSheet extends ConsumerWidget {
               icon: Icons.person_rounded,
               title: l10n.myWall,
               subtitle: l10n.myWallSubtitle,
-              selected: currentFamilyId == null,
+              selected:
+                  onOwnWall &&
+                  (currentWall == null ||
+                      !walls.any((w) => w.id == currentWall)),
               onTap: () => Navigator.of(context).pop(const _MyWall()),
+            ),
+            for (final wall in walls)
+              _ChoiceTile(
+                icon: Icons.dashboard_rounded,
+                title: wall.name,
+                subtitle: l10n.personalWallSubtitle,
+                selected: onOwnWall && currentWall == wall.id,
+                onTap: () => Navigator.of(context).pop(_OwnWall(wall.id)),
+                onOptions: () =>
+                    Navigator.of(context).pop(_WallOptions(wall.id)),
+              ),
+            _ChoiceTile(
+              icon: Icons.add_rounded,
+              title: l10n.newWall,
+              selected: false,
+              onTap: () => Navigator.of(context).pop(const _NewWall()),
             ),
             for (final family in families)
               _ChoiceTile(
@@ -181,13 +378,15 @@ class _WallSwitcherSheet extends ConsumerWidget {
                 selected: currentFamilyId == family.id,
                 onTap: () => Navigator.of(context).pop(_FamilyWall(family.id)),
               ),
-            Divider(color: AppColors.line),
-            _ChoiceTile(
-              icon: Icons.tune_rounded,
-              title: l10n.familyWallsManage,
-              selected: false,
-              onTap: () => Navigator.of(context).pop(const _ManageWalls()),
-            ),
+            if (families.isNotEmpty) ...[
+              Divider(color: AppColors.line),
+              _ChoiceTile(
+                icon: Icons.tune_rounded,
+                title: l10n.familyWallsManage,
+                selected: false,
+                onTap: () => Navigator.of(context).pop(const _ManageWalls()),
+              ),
+            ],
           ],
         ),
       ),
@@ -202,6 +401,7 @@ class _ChoiceTile extends StatelessWidget {
     required this.selected,
     required this.onTap,
     this.subtitle,
+    this.onOptions,
   });
 
   final IconData icon;
@@ -209,6 +409,9 @@ class _ChoiceTile extends StatelessWidget {
   final String? subtitle;
   final bool selected;
   final VoidCallback onTap;
+
+  /// Rename or delete (one's own walls).
+  final VoidCallback? onOptions;
 
   @override
   Widget build(BuildContext context) {
@@ -220,9 +423,18 @@ class _ChoiceTile extends StatelessWidget {
       leading: Icon(icon, color: AppColors.gold),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
       subtitle: subtitle == null ? null : Text(subtitle!),
-      trailing: selected
-          ? Icon(Icons.check_rounded, color: AppColors.amber)
-          : null,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (selected) Icon(Icons.check_rounded, color: AppColors.amber),
+          if (onOptions != null)
+            IconButton(
+              tooltip: context.l10n.wallOptions,
+              onPressed: onOptions,
+              icon: const Icon(Icons.more_horiz_rounded),
+            ),
+        ],
+      ),
     );
   }
 }

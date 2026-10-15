@@ -20,6 +20,7 @@ class WallItem {
     required this.createdAt,
     required this.wallPosition,
     required this.color,
+    this.wallId,
   });
 
   final String id;
@@ -28,6 +29,9 @@ class WallItem {
   final DateTime createdAt;
   final Offset wallPosition;
   final Color color;
+
+  /// The personal wall it hangs on; null for "My wall".
+  final String? wallId;
 
   WallItem copyWith({
     String? id,
@@ -44,6 +48,7 @@ class WallItem {
       createdAt: createdAt ?? this.createdAt,
       wallPosition: wallPosition ?? this.wallPosition,
       color: color ?? this.color,
+      wallId: wallId,
     );
   }
 }

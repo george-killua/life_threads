@@ -23,6 +23,7 @@ import '../domain/memory_feeling.dart';
 import '../domain/memory_photo.dart';
 import '../domain/memory_person.dart' as person_model;
 import '../domain/memory_type.dart';
+import '../domain/personal_wall.dart';
 import 'memory_seed_data.dart';
 import 'place_names.dart';
 
@@ -36,6 +37,7 @@ class MemoryState {
     required this.photos,
     required this.people,
     required this.wallItems,
+    this.walls = const [],
   });
 
   final List<MemoryEvent> events;
@@ -43,6 +45,42 @@ class MemoryState {
   final List<MemoryPhoto> photos;
   final List<person_model.MemoryPerson> people;
   final List<WallItem> wallItems;
+
+  /// The walls of one's own besides "My wall" (Premium), oldest first.
+  final List<PersonalWall> walls;
+
+  /// What one wall shows: its memories (hidden ones only with
+  /// [includeHidden]), notes and nails, and the threads between them.
+  /// [wallId] null is "My wall".
+  MemoryState onWall(String? wallId, {bool includeHidden = false}) {
+    final shown = [
+      for (final event in events)
+        if (event.wallId == wallId && (includeHidden || !event.hidden)) event,
+    ];
+    final items = [
+      for (final item in wallItems)
+        if (item.wallId == wallId) item,
+    ];
+    final ids = {for (final e in shown) e.id, for (final i in items) i.id};
+    return MemoryState(
+      events: shown,
+      connections: [
+        for (final c in connections)
+          if (ids.contains(c.fromEventId) && ids.contains(c.toEventId)) c,
+      ],
+      photos: photos,
+      people: people,
+      wallItems: items,
+      walls: walls,
+    );
+  }
+
+  /// Memories that aren't hidden, on every wall: for search, On this day
+  /// and Thread of the Year.
+  List<MemoryEvent> get visibleEvents => [
+    for (final event in events)
+      if (!event.hidden) event,
+  ];
 
   MemoryEvent? findEvent(String id) {
     for (final event in events) {
@@ -151,6 +189,7 @@ class NewMemoryDraft {
     this.wallPosition,
     this.photos = const [],
     this.people = const [],
+    this.wallId,
   });
 
   final String title;
@@ -168,6 +207,9 @@ class NewMemoryDraft {
   final Offset? wallPosition;
   final List<MemoryPhotoDraft> photos;
   final List<MemoryPersonDraft> people;
+
+  /// The personal wall to hang it on; null for "My wall".
+  final String? wallId;
 }
 
 class MemoryPhotoDraft {
@@ -399,6 +441,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
         latitude: draft.latitude,
         longitude: draft.longitude,
         coverPhotoPath: draft.coverPhotoPath,
+        wallId: draft.wallId,
       );
 
       await _database.transaction(() async {
@@ -582,6 +625,64 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     return removed;
   }
 
+  /// A new named wall (Premium); returns its id.
+  Future<String> createWall(String name) async {
+    final id = _uuid.v4();
+    await _database
+        .into(_database.personalWalls)
+        .insert(
+          db.PersonalWallsCompanion.insert(
+            id: id,
+            name: name.trim(),
+            createdAt: DateTime.now().millisecondsSinceEpoch,
+          ),
+        );
+    state = await AsyncValue.guard(_loadState);
+    return id;
+  }
+
+  Future<void> renameWall(String id, String name) async {
+    await (_database.update(_database.personalWalls)
+          ..where((row) => row.id.equals(id)))
+        .write(db.PersonalWallsCompanion(name: Value(name.trim())));
+    state = await AsyncValue.guard(_loadState);
+  }
+
+  /// Deletes a wall; its memories, notes and nails move to "My wall", so
+  /// nothing is lost.
+  Future<void> deleteWall(String id) async {
+    await _database.transaction(() async {
+      await (_database.update(_database.memoryEvents)
+            ..where((row) => row.wallId.equals(id)))
+          .write(const db.MemoryEventsCompanion(wallId: Value(null)));
+      await (_database.update(_database.wallItems)
+            ..where((row) => row.wallId.equals(id)))
+          .write(const db.WallItemsCompanion(wallId: Value(null)));
+      await (_database.delete(
+        _database.personalWalls,
+      )..where((row) => row.id.equals(id))).go();
+    });
+    state = await AsyncValue.guard(_loadState);
+  }
+
+  /// Moves a memory to another wall ([wallId] null: "My wall"). Its threads
+  /// to memories that stay behind are kept, and show again if both meet on
+  /// one wall.
+  Future<void> moveMemoryToWall(String memoryId, String? wallId) async {
+    await (_database.update(_database.memoryEvents)
+          ..where((row) => row.id.equals(memoryId)))
+        .write(db.MemoryEventsCompanion(wallId: Value(wallId)));
+    state = await AsyncValue.guard(_loadState);
+  }
+
+  /// Hides a memory (shown only after Face ID) or shows it again.
+  Future<void> setHidden(String memoryId, {required bool hidden}) async {
+    await (_database.update(_database.memoryEvents)
+          ..where((row) => row.id.equals(memoryId)))
+        .write(db.MemoryEventsCompanion(hidden: Value(hidden)));
+    state = await AsyncValue.guard(_loadState);
+  }
+
   /// Takes a note or nail off the wall, with its threads; [restore] undoes.
   Future<RemovedFromWall> removeWallItem(String id) async {
     late RemovedFromWall removed;
@@ -743,6 +844,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       await _database.delete(_database.memoryPeople).go();
       await _database.delete(_database.wallItems).go();
       await _database.delete(_database.memoryEvents).go();
+      await _database.delete(_database.personalWalls).go();
     });
 
     final photosDir = await AppStoragePaths.memoryPhotosDirectory();
@@ -846,6 +948,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
   Future<void> addTextNote({
     required String text,
     required Offset position,
+    String? wallId,
   }) async {
     final now = DateTime.now();
     await _database
@@ -859,12 +962,13 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
             wallX: position.dx,
             wallY: position.dy,
             colorValue: BrandColors.cardDark.toARGB32(),
+            wallId: Value(wallId),
           ),
         );
     state = await AsyncValue.guard(_loadState);
   }
 
-  Future<void> addNail({required Offset position}) async {
+  Future<void> addNail({required Offset position, String? wallId}) async {
     final now = DateTime.now();
     await _database
         .into(_database.wallItems)
@@ -877,6 +981,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
             wallX: position.dx,
             wallY: position.dy,
             colorValue: BrandColors.gold.toARGB32(),
+            wallId: Value(wallId),
           ),
         );
     state = await AsyncValue.guard(_loadState);
@@ -964,6 +1069,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
           photos: current.photos,
           people: current.people,
           wallItems: current.wallItems,
+          walls: current.walls,
         ),
       );
     }
@@ -1017,6 +1123,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
           photos: latest.photos,
           people: latest.people,
           wallItems: latest.wallItems,
+          walls: latest.walls,
         ),
       );
     }
@@ -1090,6 +1197,41 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
             ([row.fromEventId, row.toEventId]..sort()).join('|'),
         };
 
+        // Walls first: one with the same id or name is reused.
+        final wallIdMap = <String, String>{};
+        final existingWalls = await _database
+            .select(_database.personalWalls)
+            .get();
+        for (final wall in backup.walls) {
+          final sourceId = _stringValue(wall, 'id');
+          final name = _stringValue(wall, 'name', fallback: 'Wall');
+          final same = existingWalls
+              .where((row) => row.id == sourceId || row.name == name)
+              .firstOrNull;
+          if (same != null) {
+            wallIdMap[sourceId] = same.id;
+            continue;
+          }
+          await _database
+              .into(_database.personalWalls)
+              .insert(
+                db.PersonalWallsCompanion.insert(
+                  id: sourceId,
+                  name: name,
+                  createdAt: _intValue(
+                    wall,
+                    'createdAt',
+                    fallback: DateTime.now().millisecondsSinceEpoch,
+                  ),
+                ),
+              );
+          wallIdMap[sourceId] = sourceId;
+        }
+        String? wallOf(Map<String, Object?> row) {
+          final id = _nullableString(row, 'wallId');
+          return id == null ? null : wallIdMap[id];
+        }
+
         for (final event in backup.events) {
           final sourceId = _stringValue(event, 'id');
           final existingId = existingEventIds.contains(sourceId)
@@ -1160,6 +1302,8 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
                             documentsPath,
                           ),
                   ),
+                  wallId: Value(wallOf(event)),
+                  hidden: Value(event['hidden'] == true),
                 ),
               );
           eventCount++;
@@ -1202,6 +1346,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
                     'colorValue',
                     fallback: BrandColors.cardDark.toARGB32(),
                   ),
+                  wallId: Value(wallOf(item)),
                 ),
               );
           wallItemCount++;
@@ -1323,8 +1468,19 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     final photoRows = await _database.select(_database.memoryPhotos).get();
     final peopleRows = await _database.select(_database.memoryPeople).get();
     final wallItemRows = await _database.select(_database.wallItems).get();
+    final wallRows = await (_database.select(
+      _database.personalWalls,
+    )..orderBy([(row) => OrderingTerm.asc(row.createdAt)])).get();
 
     return MemoryState(
+      walls: [
+        for (final row in wallRows)
+          PersonalWall(
+            id: row.id,
+            name: row.name,
+            createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
+          ),
+      ],
       events: eventRows
           .map((row) => _eventFromRow(row, documentsPath))
           .toList(),
@@ -1446,6 +1602,8 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       latitude: Value(event.latitude),
       longitude: Value(event.longitude),
       coverPhotoPath: Value(coverPhotoPath),
+      wallId: Value(event.wallId),
+      hidden: Value(event.hidden),
     );
   }
 
@@ -1483,6 +1641,8 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
         row.coverPhotoPath,
         documentsPath,
       ),
+      wallId: row.wallId,
+      hidden: row.hidden,
     );
   }
 
@@ -1528,6 +1688,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
       wallPosition: Offset(row.wallX, row.wallY),
       color: Color(row.colorValue),
+      wallId: row.wallId,
     );
   }
 

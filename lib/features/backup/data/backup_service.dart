@@ -128,6 +128,16 @@ class BackupService {
                   'coverPhotoPath': event.coverPhotoPath == null
                       ? null
                       : localToArchivePath[event.coverPhotoPath],
+                  'wallId': event.wallId,
+                  'hidden': event.hidden,
+                },
+            ],
+            'walls': [
+              for (final wall in state.walls)
+                {
+                  'id': wall.id,
+                  'name': wall.name,
+                  'createdAt': wall.createdAt.millisecondsSinceEpoch,
                 },
             ],
             'photos': [
@@ -175,6 +185,7 @@ class BackupService {
                   'wallX': item.wallPosition.dx,
                   'wallY': item.wallPosition.dy,
                   'colorValue': item.color.toARGB32(),
+                  'wallId': item.wallId,
                 },
             ],
           }),
@@ -301,6 +312,7 @@ class BackupService {
         connections: _mapList(payload['connections']),
         wallItems: _mapList(payload['wallItems']),
         photoPaths: restoredPhotoPaths,
+        walls: _optionalMapList(payload['walls']),
       );
     } on FormatException {
       throw const BackupValidationException(

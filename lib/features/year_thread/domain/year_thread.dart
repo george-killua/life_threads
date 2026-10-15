@@ -161,7 +161,7 @@ abstract final class YearThread {
   /// not count.
   static List<int> availableYears(MemoryState state) {
     final counts = <int, int>{};
-    for (final event in state.events) {
+    for (final event in state.visibleEvents) {
       if (MemorySeedData.isDemoEventId(event.id)) continue;
       counts.update(event.occurredAt.year, (n) => n + 1, ifAbsent: () => 1);
     }
@@ -180,7 +180,7 @@ abstract final class YearThread {
   };
 
   static YearThreadYear year(MemoryState state, int year) {
-    final eventIds = {for (final event in state.events) event.id};
+    final eventIds = {for (final event in state.visibleEvents) event.id};
     final threads = <String, int>{};
     for (final connection in state.connections) {
       // Threads to notes and nails do not make a memory more central.
@@ -192,7 +192,7 @@ abstract final class YearThread {
       threads.update(connection.toEventId, (n) => n + 1, ifAbsent: () => 1);
     }
     final memories = [
-      for (final event in state.events)
+      for (final event in state.visibleEvents)
         if (event.occurredAt.year == year &&
             !MemorySeedData.isDemoEventId(event.id))
           YearThreadMemory(
