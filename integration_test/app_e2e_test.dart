@@ -35,10 +35,8 @@ Future<void> scrollTo(WidgetTester tester, Finder finder) async {
 }
 
 Future<void> openSettings(WidgetTester tester) async {
-  if (find.byTooltip('Settings').evaluate().isEmpty) {
-    await tapText(tester, 'Wall Controls');
-  }
-  await tapOn(tester, find.byTooltip('Settings'));
+  await tapOn(tester, find.byTooltip('More'));
+  await tapText(tester, 'Settings');
   await waitFor(tester, find.text('Your name'));
 }
 

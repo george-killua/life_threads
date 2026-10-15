@@ -5,7 +5,7 @@ name: SET-01/02/03 Name, themes, language, restart
 tags: [protocol, set]
 ---
 - runFlow: ../subflows/fresh_wall.yaml
-- assertVisible: "Welcome, Lina.|Wall Controls"
+- assertVisible: "More"
 
 # SET-01: change the name.
 - runFlow: ../subflows/open_settings.yaml
@@ -18,30 +18,26 @@ tags: [protocol, set]
 - assertVisible: "Name updated."
 
 # SET-01: a Premium theme is locked for free users, then works with Premium.
-- runFlow:
-    file: ../subflows/scroll_to.yaml
-    env:
-      TARGET: "(?s)Midnight Archive.*"
-- tapOn: "(?s)Midnight Archive.*"
+- runFlow: ../subflows/open_themes.yaml
+- tapOn: "Midnight Archive.*"
+- extendedWaitUntil:
+    visible: "Unlock with Premium"
+    timeout: 10000
 - takeScreenshot: SET-01_theme_locked
-- runFlow:
-    when:
-      visible: "(?s).*LifeThreads Premium.*"
-    commands:
-      - tapOn: "Back"
+- tapOn:
+    point: 50%, 8%
+- tapOn: "Back"
 - runFlow: ../subflows/leave_settings.yaml
 - runFlow: ../subflows/unlock_premium.yaml
 - runFlow: ../subflows/open_settings.yaml
-- runFlow:
-    file: ../subflows/scroll_to.yaml
-    env:
-      TARGET: "(?s)Midnight Archive.*"
-- tapOn: "(?s)Midnight Archive.*"
+- runFlow: ../subflows/open_themes.yaml
+- tapOn: "Midnight Archive.*"
+- tapOn: "Use this theme"
 - assertVisible: ".*Midnight Archive selected.*"
 - takeScreenshot: SET-01_theme_midnight
+- tapOn: "Back"
 - runFlow: ../subflows/leave_settings.yaml
-- runFlow: ../subflows/show_controls.yaml
-- assertVisible: "Welcome, Lina Maria."
+- assertVisible: "More"
 - takeScreenshot: SET-01_wall_midnight
 
 # SET-02: German, then Arabic (right to left), then back to English.
@@ -78,7 +74,12 @@ tags: [protocol, set]
     arguments:
       "-AppleLanguages": "(en)"
 - extendedWaitUntil:
-    visible: "Wall Controls|Hide controls"
+    visible: "More"
     timeout: 90000
-- runFlow: ../subflows/show_controls.yaml
-- assertVisible: "Welcome, Lina Maria."
+- runFlow: ../subflows/open_settings.yaml
+- assertVisible: "Lina Maria"
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "(?s).*Midnight Archive.*"
+- takeScreenshot: SET-03_after_restart

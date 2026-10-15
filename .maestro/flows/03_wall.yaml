@@ -30,7 +30,7 @@ tags: [protocol, wal]
     arguments:
       "-AppleLanguages": "(en)"
 - extendedWaitUntil:
-    visible: "Wall Controls"
+    visible: "More"
     timeout: 90000
 - runFlow: ../subflows/find_card.yaml
 
@@ -109,24 +109,35 @@ tags: [protocol, wal]
 - takeScreenshot: WAL-05_deleted
 
 # WAL-06: timeline, map and the category filter.
-- runFlow: ../subflows/show_controls.yaml
-- tapOn: "Timeline"
+- runFlow:
+    file: ../subflows/view.yaml
+    env:
+      OPTION: "Timeline"
 - extendedWaitUntil:
     visible: ".*Summer by the sea.*"
     timeout: 10000
 - assertVisible: ".*Above the clouds.*"
 - assertNotVisible: ".*Grandpa's garden.*"
 - takeScreenshot: WAL-06_timeline
-- runFlow: ../subflows/show_controls.yaml
-- tapOn: "Map"
+- runFlow:
+    file: ../subflows/view.yaml
+    env:
+      OPTION: "Map"
 - extendedWaitUntil:
     visible: "Memory Map"
     timeout: 10000
 - takeScreenshot: WAL-06_map
-- runFlow: ../subflows/show_controls.yaml
-- tapOn: "Wall"
-- runFlow: ../subflows/show_controls.yaml
-- tapOn: "Travel"
+- runFlow:
+    file: ../subflows/view.yaml
+    env:
+      OPTION: "Wall"
+- runFlow:
+    file: ../subflows/view.yaml
+    env:
+      OPTION: "Travel"
 - assertNotVisible: "Summer by the sea.*"
-- tapOn: "All"
+- runFlow:
+    file: ../subflows/view.yaml
+    env:
+      OPTION: "All"
 - assertVisible: "Summer by the sea.*"

@@ -23,6 +23,9 @@ class ThemesPage extends StatelessWidget {
               Row(
                 children: [
                   IconButton(
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).backButtonTooltip,
                     onPressed: () => context.pop(),
                     icon: const Icon(Icons.arrow_back_rounded),
                   ),

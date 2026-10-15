@@ -6,8 +6,10 @@ tags: [protocol, sto]
 ---
 - runFlow: ../subflows/three_memories.yaml
 - runFlow: ../subflows/unlock_premium.yaml
-- runFlow: ../subflows/show_controls.yaml
-- tapOn: "Create story"
+- runFlow:
+    file: ../subflows/more.yaml
+    env:
+      ITEM: "Create story"
 
 # STO-01: choose memories.
 - extendedWaitUntil:

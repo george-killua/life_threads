@@ -1,0 +1,11 @@
+# Opens the Themes screen from Settings (Settings must be open).
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- runFlow:
+    file: scroll_to.yaml
+    env:
+      TARGET: "(?s).*See all themes.*"
+- tapOn: "(?s).*See all themes.*"
+- extendedWaitUntil:
+    visible: "Warm Memory Room.*"
+    timeout: 10000

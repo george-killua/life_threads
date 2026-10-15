@@ -1,0 +1,5 @@
+# Picks ITEM in the wall's More menu (Create story, Display wall, Tutorial, Settings).
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- tapOn: "More"
+- tapOn: "${ITEM}"

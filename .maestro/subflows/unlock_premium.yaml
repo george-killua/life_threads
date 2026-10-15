@@ -31,4 +31,3 @@ appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding
     when:
       visible: "Open Premium|(?s)Your name.*"
     file: leave_settings.yaml
-- runFlow: hide_controls.yaml

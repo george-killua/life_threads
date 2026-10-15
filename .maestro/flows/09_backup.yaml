@@ -69,18 +69,21 @@ tags: [protocol, bak]
       - takeScreenshot: BAK-02_imported
       - tapOn: "Done"
       - runFlow: ../subflows/leave_settings.yaml
-      - runFlow: ../subflows/show_controls.yaml
-      - tapOn: "Timeline"
+      - runFlow:
+          file: ../subflows/view.yaml
+          env:
+            OPTION: "Timeline"
       - extendedWaitUntil:
           visible: ".*Summer in Split.*"
           timeout: 10000
-      # Restored, and nothing doubled: each memory exactly once.
-      - assertVisible: ".*Above the clouds.*"
+      # Restored, and nothing doubled: each memory exactly once in the
+      # timeline (the "1 year ago today" chip also names Summer in Split).
+      - assertVisible: "(?s).*Above the clouds.*Moment.*"
       - assertNotVisible:
-          text: ".*Above the clouds.*"
+          text: "(?s).*Above the clouds.*Moment.*"
           index: 1
       - assertNotVisible:
-          text: ".*Summer in Split.*"
+          text: "(?s).*Summer in Split.*Moment.*"
           index: 1
       - takeScreenshot: BAK-02_timeline
 
@@ -133,8 +136,10 @@ tags: [protocol, bak]
       - takeScreenshot: BAK-02_imported
       - tapOn: "Done"
       - runFlow: ../subflows/leave_settings.yaml
-      - runFlow: ../subflows/show_controls.yaml
-      - tapOn: "Timeline"
+      - runFlow:
+          file: ../subflows/view.yaml
+          env:
+            OPTION: "Timeline"
       - extendedWaitUntil:
           visible: ".*Summer in Split.*"
           timeout: 10000

@@ -1,0 +1,18 @@
+# Picks OPTION in the wall's View sheet (Wall/Timeline/Map, Freeform/By date/...,
+# All/Family/Travel/Personal), then closes the sheet.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- tapOn: "View"
+- extendedWaitUntil:
+    visible: "Show as"
+    timeout: 10000
+- tapOn: "${OPTION}"
+- runFlow:
+    when:
+      visible: "Show as"
+    commands:
+      - tapOn:
+          point: 50%, 8%
+- extendedWaitUntil:
+    notVisible: "Show as"
+    timeout: 10000
