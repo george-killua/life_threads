@@ -15,7 +15,9 @@ appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding
     when:
       platform: Android
     commands:
+      # The search field opens the keyboard over the list.
+      - hideKeyboard
       - extendedWaitUntil:
-          visible: "Kate Bell"
+          visible: "Kate Bell.*"
           timeout: 15000
-      - tapOn: "Kate Bell"
+      - tapOn: "Kate Bell.*"

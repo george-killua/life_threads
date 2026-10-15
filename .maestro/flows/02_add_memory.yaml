@@ -35,8 +35,9 @@ tags: [protocol, wal]
 - assertVisible: "How should this feel when it returns?.*|.*How should this feel.*"
 - tapOn: "Warm.*"
 - tapOn: "Continue"
-# WAL-07: date (the earliest photo) and GPS come from the photos' EXIF.
-- assertVisible: ".*${PHOTO_GARDEN}.*"
+# WAL-07: date and GPS come from the photos' EXIF (the date of the cover
+# photo, which is the first picked photo in the gallery's order).
+- assertVisible: "(?s).*(${PHOTO_GARDEN}|${PHOTO_YEAR_AGO}).*"
 - assertVisible: ".*Photo GPS detected.*"
 - takeScreenshot: WAL-07_date_and_place
 - tapOn: "Continue"

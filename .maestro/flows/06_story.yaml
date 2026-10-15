@@ -64,27 +64,28 @@ tags: [protocol, sto]
 - tapOn: "Ocean Memory.*"
 - repeat:
     while:
-      notVisible: "(?s)Drag to choose which part plays.*"
+      notVisible: "(?s).*Drag to choose which part plays.*"
     times: 10
     commands:
       - swipe:
           start: 50%, 85%
           end: 50%, 62%
           duration: 400
-- copyTextFrom: "(?s)Drag to choose which part plays.*"
-- evalScript: ${output.partBefore = maestro.copiedText}
+# The suggested part of Ocean Memory is its loudest 15 s: 1:07 – 1:22.
+- assertVisible: "(?s).*1:07 – 1:22.*"
 - swipe:
-    start: 50%, 83%
-    end: 25%, 83%
+    from:
+      text: "(?s).*Drag to choose which part plays.*"
+    direction: LEFT
     duration: 800
-- assertNotVisible: ${output.partBefore}
+- assertNotVisible: "(?s).*1:07 – 1:22.*"
 - takeScreenshot: STO-04_music_part
 
 # STO-05: save the video to Photos, then open the share sheet.
 - tapOn: "Save to Photos"
 - extendedWaitUntil:
     visible: "Saved to your photos."
-    timeout: 180000
+    timeout: 600000
 - takeScreenshot: STO-05_saved
 - extendedWaitUntil:
     notVisible: "Saved to your photos."

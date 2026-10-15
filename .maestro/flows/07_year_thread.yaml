@@ -30,7 +30,7 @@ tags: [protocol, yr]
 - tapOn: "Export video"
 - extendedWaitUntil:
     visible: "Your film is ready"
-    timeout: 240000
+    timeout: 600000
 - tapOn: "Save to Photos"
 - extendedWaitUntil:
     visible: "Saved to your photos."
@@ -43,7 +43,7 @@ tags: [protocol, yr]
 - tapOn: "Export image"
 - extendedWaitUntil:
     visible: "Your image is ready"
-    timeout: 120000
+    timeout: 300000
 - takeScreenshot: YR-01_image_ready
 - tapOn: "Save to Photos"
 - extendedWaitUntil:

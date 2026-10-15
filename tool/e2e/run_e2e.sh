@@ -120,21 +120,21 @@ prepare_android() {
     "$ADB" -s "$ANDROID_SERIAL" shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE \
       -d "file:///sdcard/Pictures/LifeThreadsE2E/$(basename "$f")" >/dev/null
   done
-  # A contact for "add a person from contacts" (iOS simulators ship with some).
-  if ! "$ADB" -s "$ANDROID_SERIAL" shell content query --uri content://com.android.contacts/contacts \
-      --projection display_name 2>/dev/null | grep -q "Kate Bell"; then
-    "$ADB" -s "$ANDROID_SERIAL" shell content insert --uri content://com.android.contacts/raw_contacts \
-      --bind account_type:n: --bind account_name:n: >/dev/null
-    local raw
-    raw="$("$ADB" -s "$ANDROID_SERIAL" shell content query --uri content://com.android.contacts/raw_contacts \
-      --projection _id | tail -1 | sed -E 's/.*_id=([0-9]+).*/\1/')"
-    "$ADB" -s "$ANDROID_SERIAL" shell content insert --uri content://com.android.contacts/data \
-      --bind raw_contact_id:i:"$raw" --bind mimetype:s:vnd.android.cursor.item/name \
-      --bind data1:s:"Kate Bell" >/dev/null
-    "$ADB" -s "$ANDROID_SERIAL" shell content insert --uri content://com.android.contacts/data \
-      --bind raw_contact_id:i:"$raw" --bind mimetype:s:vnd.android.cursor.item/phone_v2 \
-      --bind "data1:s:'(555) 564-8583'" --bind data2:i:2 >/dev/null
-  fi
+  # An encrypted backup made on an iPhone, restored in the backup flow.
+  "$ADB" -s "$ANDROID_SERIAL" push "$ROOT/tool/e2e/fixtures/lifethreads_e2e_backup.zip" /sdcard/Download/ >/dev/null
+  "$ADB" -s "$ANDROID_SERIAL" shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE \
+    -d file:///sdcard/Download/lifethreads_e2e_backup.zip >/dev/null
+  # A contact for "add a person from contacts" (iOS simulators ship with
+  # some). The contacts are wiped first so every run has the same one.
+  "$ADB" -s "$ANDROID_SERIAL" shell pm clear com.android.providers.contacts >/dev/null
+  "$ADB" -s "$ANDROID_SERIAL" shell content insert --uri content://com.android.contacts/raw_contacts \
+    --bind account_type:n: --bind account_name:n: >/dev/null
+  "$ADB" -s "$ANDROID_SERIAL" shell content insert --uri content://com.android.contacts/data \
+    --bind raw_contact_id:i:1 --bind mimetype:s:vnd.android.cursor.item/name \
+    --bind "data1:s:'Kate Bell'" --bind "data2:s:Kate" --bind "data3:s:Bell" >/dev/null
+  "$ADB" -s "$ANDROID_SERIAL" shell content insert --uri content://com.android.contacts/data \
+    --bind raw_contact_id:i:1 --bind mimetype:s:vnd.android.cursor.item/phone_v2 \
+    --bind "data1:s:'(555) 564-8583'" --bind data2:i:2 >/dev/null
 }
 
 # ------------------------------------------------------------------ build
