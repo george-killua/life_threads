@@ -1,0 +1,84 @@
+# SET-01 Themes and name, SET-02 Language (German and Arabic),
+# SET-03 Restart keeps everything
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+name: SET-01/02/03 Name, themes, language, restart
+tags: [protocol, set]
+---
+- runFlow: ../subflows/fresh_wall.yaml
+- assertVisible: "Welcome, Lina.|Wall Controls"
+
+# SET-01: change the name.
+- runFlow: ../subflows/open_settings.yaml
+- tapOn: "Lina"
+- eraseText: 10
+- inputText: "Lina Maria"
+- runFlow: ../subflows/hide_keyboard.yaml
+- tapOn: "Settings"
+- tapOn: "Save"
+- assertVisible: "Name updated."
+
+# SET-01: a Premium theme is locked for free users, then works with Premium.
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "(?s)Midnight Archive.*"
+- tapOn: "(?s)Midnight Archive.*"
+- takeScreenshot: SET-01_theme_locked
+- runFlow:
+    when:
+      visible: "(?s).*LifeThreads Premium.*"
+    commands:
+      - tapOn: "Back"
+- runFlow: ../subflows/leave_settings.yaml
+- runFlow: ../subflows/unlock_premium.yaml
+- runFlow: ../subflows/open_settings.yaml
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "(?s)Midnight Archive.*"
+- tapOn: "(?s)Midnight Archive.*"
+- assertVisible: ".*Midnight Archive selected.*"
+- takeScreenshot: SET-01_theme_midnight
+- runFlow: ../subflows/leave_settings.yaml
+- runFlow: ../subflows/show_controls.yaml
+- assertVisible: "Welcome, Lina Maria."
+- takeScreenshot: SET-01_wall_midnight
+
+# SET-02: German, then Arabic (right to left), then back to English.
+- runFlow: ../subflows/open_settings.yaml
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "Deutsch"
+- tapOn: "Deutsch"
+- extendedWaitUntil:
+    visible: "Einstellungen"
+    timeout: 10000
+- assertVisible: "Sprache.*|(?s)Sprache.*"
+- takeScreenshot: SET-02_german
+- tapOn: "العربية"
+- extendedWaitUntil:
+    visible: "الإعدادات"
+    timeout: 10000
+- takeScreenshot: SET-02_arabic
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "English"
+      DIRECTION: UP
+- tapOn: "English"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 10000
+
+# SET-03: close the app completely and open it again.
+- stopApp
+- launchApp:
+    appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+    arguments:
+      "-AppleLanguages": "(en)"
+- extendedWaitUntil:
+    visible: "Wall Controls|Hide controls"
+    timeout: 90000
+- runFlow: ../subflows/show_controls.yaml
+- assertVisible: "Welcome, Lina Maria."

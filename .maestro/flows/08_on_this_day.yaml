@@ -1,0 +1,42 @@
+# OTD-01 On this day: a memory from exactly one year ago comes back on the
+# wall and in its chapter; the daily reminder can be switched on.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+name: OTD-01 On this day
+tags: [protocol, otd]
+---
+- runFlow: ../subflows/fresh_wall.yaml
+- runFlow:
+    file: ../subflows/add_memory.yaml
+    env:
+      TITLE: "Summer in Split"
+      STORY: "Barefoot until the sun went down."
+      PHOTO: ${PHOTO_YEAR_AGO}
+      FEELING: "Warm.*"
+- extendedWaitUntil:
+    visible: "(?s)1 year ago today.*Summer in Split.*"
+    timeout: 15000
+- takeScreenshot: OTD-01_wall
+# With Premium the memory opens as its own On this day chapter.
+- runFlow: ../subflows/unlock_premium.yaml
+- tapOn: "(?s)1 year ago today.*"
+- extendedWaitUntil:
+    visible: "Summer in Split"
+    timeout: 10000
+- assertVisible: "(?s).*(1 year ago|A year ago|One year ago).*"
+- takeScreenshot: OTD-01_chapter
+- tapOn: "Back"
+- runFlow: ../subflows/open_settings.yaml
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "Daily reminder"
+- tapOn: "Daily reminder"
+- runFlow:
+    when:
+      visible: "Allow|Erlauben"
+    commands:
+      - tapOn: "Allow|Erlauben"
+- extendedWaitUntil:
+    visible: "(?s)At \\d.*"
+    timeout: 10000
+- takeScreenshot: OTD-01_reminder_on

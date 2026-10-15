@@ -1,0 +1,8 @@
+# Collapses the wall controls if they are open.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- runFlow:
+    when:
+      visible: "Hide controls"
+    commands:
+      - tapOn: "Hide controls"

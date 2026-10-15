@@ -1,0 +1,23 @@
+# Picks "Kate Bell" in the system contact picker.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - extendedWaitUntil:
+          visible: "Kate Bell"
+          timeout: 15000
+      # The iOS picker runs in its own process: tap where the row is.
+      - tapOn:
+          point: "50%,39%"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      # The search field opens the keyboard over the list.
+      - hideKeyboard
+      - extendedWaitUntil:
+          visible: "Kate Bell.*"
+          timeout: 15000
+      - tapOn: "Kate Bell.*"

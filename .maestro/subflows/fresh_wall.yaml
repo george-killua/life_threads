@@ -1,0 +1,20 @@
+# Fresh install, onboarding with the name Lina, empty private wall.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- runFlow: launch_fresh.yaml
+- extendedWaitUntil:
+    visible: "Build your living wall."
+    timeout: 120000
+- tapOn: "Next"
+- tapOn: "Next"
+- tapOn:
+    text: "Your name"
+- inputText: "Lina"
+- runFlow: hide_keyboard.yaml
+- tapOn: "What should we call you?"
+- tapOn: "Next"
+- tapOn: "Next"
+- tapOn: "Start fresh"
+- extendedWaitUntil:
+    visible: "Start with one thing from today"
+    timeout: 20000

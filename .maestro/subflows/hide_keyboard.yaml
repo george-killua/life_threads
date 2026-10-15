@@ -1,0 +1,9 @@
+# Closes the Android keyboard, which otherwise covers the next field.
+# (On iOS the flows tap a heading instead: hideKeyboard is unreliable there.)
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard

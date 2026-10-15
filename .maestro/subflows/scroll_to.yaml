@@ -1,0 +1,31 @@
+# Swipes the screen up (or down with DIRECTION=UP) until TARGET is visible.
+# env: TARGET, DIRECTION (DOWN by default)
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- runFlow:
+    when:
+      true: ${DIRECTION != 'UP'}
+    commands:
+      - repeat:
+          while:
+            notVisible: ${TARGET}
+          times: 12
+          commands:
+            - swipe:
+                start: 50%, 72%
+                end: 50%, 42%
+                duration: 400
+- runFlow:
+    when:
+      true: ${DIRECTION == 'UP'}
+    commands:
+      - repeat:
+          while:
+            notVisible: ${TARGET}
+          times: 12
+          commands:
+            - swipe:
+                start: 50%, 35%
+                end: 50%, 65%
+                duration: 400
+- assertVisible: ${TARGET}

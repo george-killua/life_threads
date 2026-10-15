@@ -1,0 +1,42 @@
+# WAL-08 Free limit: 30 memories, then the app offers Premium.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+name: WAL-08 Free memory limit
+tags: [protocol, wal, slow]
+---
+- runFlow: ../subflows/fresh_wall.yaml
+- evalScript: ${output.count = 0}
+- repeat:
+    times: 30
+    commands:
+      - evalScript: ${output.count = output.count + 1}
+      - runFlow:
+          when:
+            visible: "Save a moment"
+          commands:
+            - tapOn: "Save a moment"
+      - runFlow:
+          when:
+            notVisible: "Save a moment"
+          commands:
+            - tapOn: "Add"
+            - tapOn: "Memory Full guided story.*"
+      - extendedWaitUntil:
+          visible: "Save it before it fades"
+          timeout: 15000
+      - tapOn: "Moment"
+      - inputText: "Moment ${output.count}"
+      - runFlow: ../subflows/hide_keyboard.yaml
+      - tapOn: "Save it before it fades"
+      - tapOn: "Save now"
+      - extendedWaitUntil:
+          notVisible: "Save it before it fades"
+          timeout: 15000
+# The 31st memory: the app explains the free limit on the Premium page.
+- tapOn: "Add"
+- tapOn: "Memory Full guided story.*"
+- extendedWaitUntil:
+    visible: ".*LifeThreads Premium.*"
+    timeout: 15000
+- assertVisible: "(?s).*30 / 30.*"
+- assertVisible: "(?s).*Free includes 30 memories.*"
+- takeScreenshot: WAL-08_free_limit

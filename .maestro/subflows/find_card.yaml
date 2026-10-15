@@ -1,0 +1,12 @@
+# Pans the wall until the card "Summer in Split" (or its new title) is on screen.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- repeat:
+    while:
+      notVisible: "Summer in Split.*|Summer by the sea.*"
+    times: 8
+    commands:
+      - swipe:
+          start: 25%, 62%
+          end: 85%, 62%
+- assertVisible: "Summer in Split.*|Summer by the sea.*"

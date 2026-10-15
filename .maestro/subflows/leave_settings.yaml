@@ -1,0 +1,9 @@
+# Scrolls Settings to the top and goes back to the wall.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- runFlow:
+    file: scroll_to.yaml
+    env:
+      TARGET: "Back"
+      DIRECTION: UP
+- tapOn: "Back"

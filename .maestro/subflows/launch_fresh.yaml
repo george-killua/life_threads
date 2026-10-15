@@ -1,0 +1,13 @@
+# Opens LifeThreads like a fresh install, in English.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- launchApp:
+    appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+    arguments:
+      # iOS: run the app in English whatever the simulator language is.
+      "-AppleLanguages": "(en)"
+      "-AppleLocale": "en_US"
