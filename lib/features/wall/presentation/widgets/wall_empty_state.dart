@@ -9,11 +9,15 @@ class WallEmptyState extends StatelessWidget {
     required this.onAdd,
     required this.onQuickPhoto,
     required this.onTakePhotos,
+    this.onMoveHere,
   });
 
   final VoidCallback onAdd;
   final VoidCallback onQuickPhoto;
   final VoidCallback? onTakePhotos;
+
+  /// On a new wall of one's own: bring memories over from other walls.
+  final VoidCallback? onMoveHere;
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +95,16 @@ class WallEmptyState extends StatelessWidget {
                   icon: const Icon(Icons.add_photo_alternate_rounded),
                   label: Text(context.l10n.usePhoto),
                 ),
+                if (onMoveHere != null)
+                  TextButton.icon(
+                    key: const ValueKey('wall-move-here'),
+                    onPressed: onMoveHere,
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.amber,
+                    ),
+                    icon: const Icon(Icons.drive_file_move_rounded),
+                    label: Text(context.l10n.moveMemoriesHere),
+                  ),
               ],
             ),
           ],

@@ -3,7 +3,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/logging/app_logger.dart';
@@ -667,13 +669,27 @@ class _StoryMemoryPickerState extends State<_StoryMemoryPicker> {
     final selection = widget.selection;
     final onChanged = widget.onChanged;
     if (events.isEmpty) {
+      // Not a dead end: one tap to the first memory.
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
-          child: Text(
-            l10n.storyNoMemories,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.muted, height: 1.4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.auto_stories_rounded, color: AppColors.gold, size: 44),
+              const SizedBox(height: 14),
+              Text(
+                l10n.storyNoMemories,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppColors.muted, height: 1.4),
+              ),
+              const SizedBox(height: 18),
+              FilledButton.icon(
+                onPressed: () => context.push(RouteNames.addMemory),
+                icon: const Icon(Icons.add_rounded),
+                label: Text(l10n.addAMemory),
+              ),
+            ],
           ),
         ),
       );

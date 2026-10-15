@@ -1363,6 +1363,53 @@ class AppLocalizationsAr extends AppLocalizations {
   String get yearThreadStoryInstead => 'أو اصنع قصة الآن';
 
   @override
+  String get moveMemoriesHere => 'انقل ذكريات إلى هنا';
+
+  @override
+  String get moveMemoriesTitle => 'اختر ذكريات لنقلها إلى هنا';
+
+  @override
+  String moveSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'نقل $count ذكرى',
+      few: 'نقل $count ذكريات',
+      two: 'نقل ذكريين',
+      one: 'نقل ذكرى واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get showAllMemories => 'إظهار الكل';
+
+  @override
+  String get addAMemory => 'أضف ذكرى';
+
+  @override
+  String get mapAddPhotoMemory => 'أضف صورة مع مكانها';
+
+  @override
+  String get searchSuggestions => 'جرّب شيئاً من ذكرياتك';
+
+  @override
+  String thisWeekYearsAgo(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: 'هذا الأسبوع قبل $years سنة',
+      few: 'هذا الأسبوع قبل $years سنوات',
+      two: 'هذا الأسبوع قبل سنتين',
+      one: 'هذا الأسبوع قبل سنة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get peopleHint => 'من كان هناك؟';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

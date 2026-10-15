@@ -2499,6 +2499,60 @@ abstract class AppLocalizations {
   /// **'Or make a story now'**
   String get yearThreadStoryInstead;
 
+  /// No description provided for @moveMemoriesHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Move memories here'**
+  String get moveMemoriesHere;
+
+  /// No description provided for @moveMemoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose memories to move here'**
+  String get moveMemoriesTitle;
+
+  /// No description provided for @moveSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Move 1 memory} other{Move {count} memories}}'**
+  String moveSelected(int count);
+
+  /// No description provided for @showAllMemories.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all'**
+  String get showAllMemories;
+
+  /// No description provided for @addAMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a memory'**
+  String get addAMemory;
+
+  /// No description provided for @mapAddPhotoMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a photo with its place'**
+  String get mapAddPhotoMemory;
+
+  /// No description provided for @searchSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Try one of yours'**
+  String get searchSuggestions;
+
+  /// No description provided for @thisWeekYearsAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{years, plural, =1{This week, 1 year ago} other{This week, {years} years ago}}'**
+  String thisWeekYearsAgo(int years);
+
+  /// No description provided for @peopleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Who was there?'**
+  String get peopleHint;
+
   /// No description provided for @savedPhotosTitle.
   ///
   /// In en, this message translates to:

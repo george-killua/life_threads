@@ -520,6 +520,29 @@
       }
     }
   },
+  "moveMemoriesHere": "Move memories here",
+  "moveMemoriesTitle": "Choose memories to move here",
+  "moveSelected": "{count, plural, =1{Move 1 memory} other{Move {count} memories}}",
+  "showAllMemories": "Show all",
+  "addAMemory": "Add a memory",
+  "mapAddPhotoMemory": "Add a photo with its place",
+  "@moveSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchSuggestions": "Try one of yours",
+  "thisWeekYearsAgo": "{years, plural, =1{This week, 1 year ago} other{This week, {years} years ago}}",
+  "@thisWeekYearsAgo": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+  "peopleHint": "Who was there?",
   "savedPhotosTitle": "{count, plural, =1{1 saved photo} other{{count} saved photos}}",
   "peopleEyebrow": "People",
   "partOfMemory": "Part of this memory",

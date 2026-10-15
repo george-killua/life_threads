@@ -69,4 +69,11 @@ void main() {
   test('an empty search shows nothing', () {
     expect(_ids('   '), isEmpty);
   });
+
+  test('suggestions come from your own places, people and years', () {
+    final suggestions = searchSuggestions(_state);
+    expect(suggestions, containsAll(['Split', 'Heiligenblut am Großglockner']));
+    expect(suggestions, contains('Kate Bell'));
+    expect(suggestions, containsAll(['2025', '2023']));
+  });
 }

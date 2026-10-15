@@ -28,6 +28,7 @@ import '../../../media/data/photo_library_service.dart';
 import '../../../media/data/picked_memory_photo.dart';
 import '../../../memories/data/memory_repository.dart';
 import '../../../memories/data/place_names.dart';
+import '../../../memories/domain/personal_wall.dart';
 import '../../../memories/presentation/memory_l10n.dart';
 import '../../../memories/domain/memory_category.dart';
 import '../../../memories/domain/memory_event.dart';
@@ -226,6 +227,13 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                   children: [
                     if (!hasWallContent)
                       WallEmptyState(
+                        onMoveHere:
+                            wallId != null &&
+                                allState.visibleEvents.any(
+                                  (e) => e.wallId != wallId,
+                                )
+                            ? () => _moveMemoriesHere(context, wallId)
+                            : null,
                         onAdd: () => _pushRoute(RouteNames.addMemory),
                         onQuickPhoto: () => _guardMemoryCreation(
                           canCreateMemory,
@@ -381,6 +389,13 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                         child: _TimelineView(
                           events: filteredEvents,
                           topPadding: _topBarSpace,
+                          onAdd: () => _guardMemoryCreation(
+                            canCreateMemory,
+                            () => _pushRoute(RouteNames.addMemory),
+                          ),
+                          onShowAll: _filter == WallFilter.all
+                              ? null
+                              : () => setState(() => _filter = WallFilter.all),
                         ),
                       )
                     else
@@ -388,6 +403,13 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                         child: _MapView(
                           events: filteredEvents,
                           topPadding: _topBarSpace,
+                          onAdd: () => _guardMemoryCreation(
+                            canCreateMemory,
+                            () => _pushRoute(RouteNames.addMemory),
+                          ),
+                          onShowAll: _filter == WallFilter.all
+                              ? null
+                              : () => setState(() => _filter = WallFilter.all),
                         ),
                       ),
                     if (_mode == _WallViewMode.wall &&
@@ -494,10 +516,15 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                               child: _MemoryRitualCard(
                                 // A memory from this day in an earlier year
                                 // comes first.
+                                // Then one from this week in an earlier year.
                                 event:
                                     onThisDay?.memory ??
+                                    _thisWeekEarlier(state.events)?.memory ??
                                     _memoryToRevisit(state.events),
                                 yearsAgo: onThisDay?.yearsAgo,
+                                weekYearsAgo: onThisDay == null
+                                    ? _thisWeekEarlier(state.events)?.years
+                                    : null,
                                 onSave: () => _guardMemoryCreation(
                                   canCreateMemory,
                                   () => _pushRoute(RouteNames.addMemory),
@@ -604,6 +631,35 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
           : null,
       pendingDragPosition: _pendingDragPosition,
     );
+  }
+
+  /// A memory from within 3 days of today's date in an earlier year (the
+  /// nearest date, then the most recent year), when none is from today.
+  ({MemoryEvent memory, int years})? _thisWeekEarlier(
+    List<MemoryEvent> events,
+  ) {
+    final today = ref.read(onThisDayClockProvider)();
+    ({MemoryEvent memory, int years, int distance})? best;
+    for (final event in events) {
+      final years = today.year - event.occurredAt.year;
+      if (years < 1) continue;
+      final sameDay = DateTime(
+        today.year,
+        event.occurredAt.month,
+        event.occurredAt.day,
+      );
+      final distance = sameDay
+          .difference(DateTime(today.year, today.month, today.day))
+          .inDays
+          .abs();
+      if (distance == 0 || distance > 3) continue;
+      if (best == null ||
+          distance < best.distance ||
+          (distance == best.distance && years < best.years)) {
+        best = (memory: event, years: years, distance: distance);
+      }
+    }
+    return best == null ? null : (memory: best.memory, years: best.years);
   }
 
   MemoryEvent? _memoryToRevisit(List<MemoryEvent> events) {
@@ -1397,6 +1453,28 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     }
   }
 
+  /// On an empty wall of one's own: pick memories from other walls and move
+  /// them here.
+  Future<void> _moveMemoriesHere(BuildContext context, String wallId) async {
+    final all = ref.read(memoryRepositoryProvider).asData?.value;
+    if (all == null) return;
+    final candidates = [
+      for (final event in all.visibleEvents)
+        if (event.wallId != wallId) event,
+    ]..sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
+    final chosen = await showModalBottomSheet<Set<String>>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (_) => _MoveHereSheet(memories: candidates, walls: all.walls),
+    );
+    if (chosen == null || chosen.isEmpty) return;
+    final repository = ref.read(memoryRepositoryProvider.notifier);
+    for (final id in chosen) {
+      await repository.moveMemoryToWall(id, wallId);
+    }
+  }
+
   /// Moves a memory to "My wall" or another wall of one's own.
   Future<void> _moveToWall(
     BuildContext context,
@@ -1647,10 +1725,19 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 }
 
 class _TimelineView extends StatelessWidget {
-  const _TimelineView({required this.events, required this.topPadding});
+  const _TimelineView({
+    required this.events,
+    required this.topPadding,
+    required this.onAdd,
+    this.onShowAll,
+  });
 
   final List<MemoryEvent> events;
   final double topPadding;
+  final VoidCallback onAdd;
+
+  /// Set when a category filter hides everything.
+  final VoidCallback? onShowAll;
 
   @override
   Widget build(BuildContext context) {
@@ -1687,6 +1774,18 @@ class _TimelineView extends StatelessWidget {
                     icon: Icons.timeline_rounded,
                     title: context.l10n.noMemoriesFilter,
                     subtitle: context.l10n.noMemoriesFilterBody,
+                    primary: (
+                      label: context.l10n.addAMemory,
+                      icon: Icons.add_rounded,
+                      onTap: onAdd,
+                    ),
+                    secondary: onShowAll == null
+                        ? null
+                        : (
+                            label: context.l10n.showAllMemories,
+                            icon: Icons.filter_alt_off_rounded,
+                            onTap: onShowAll!,
+                          ),
                   ),
                 ),
               )
@@ -1896,10 +1995,19 @@ class _TimelineMemoryTile extends StatelessWidget {
 }
 
 class _MapView extends StatelessWidget {
-  const _MapView({required this.events, required this.topPadding});
+  const _MapView({
+    required this.events,
+    required this.topPadding,
+    required this.onAdd,
+    this.onShowAll,
+  });
 
   final List<MemoryEvent> events;
   final double topPadding;
+  final VoidCallback onAdd;
+
+  /// Set when a category filter hides everything.
+  final VoidCallback? onShowAll;
 
   @override
   Widget build(BuildContext context) {
@@ -1921,6 +2029,18 @@ class _MapView extends StatelessWidget {
                 icon: Icons.location_off_rounded,
                 title: context.l10n.noMappedMemories,
                 subtitle: context.l10n.noMappedMemoriesBody,
+                primary: (
+                  label: context.l10n.mapAddPhotoMemory,
+                  icon: Icons.add_location_alt_rounded,
+                  onTap: onAdd,
+                ),
+                secondary: onShowAll == null
+                    ? null
+                    : (
+                        label: context.l10n.showAllMemories,
+                        icon: Icons.filter_alt_off_rounded,
+                        onTap: onShowAll!,
+                      ),
               ),
             )
           else
@@ -2121,16 +2241,21 @@ class _ViewTitle extends StatelessWidget {
   }
 }
 
+/// An empty view never ends there: it says why, and offers what to do.
 class _EmptyModePanel extends StatelessWidget {
   const _EmptyModePanel({
     required this.icon,
     required this.title,
     required this.subtitle,
+    this.primary,
+    this.secondary,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
+  final ({String label, IconData icon, VoidCallback onTap})? primary;
+  final ({String label, IconData icon, VoidCallback onTap})? secondary;
 
   @override
   Widget build(BuildContext context) {
@@ -2158,6 +2283,28 @@ class _EmptyModePanel extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(color: AppColors.muted, height: 1.4),
             ),
+            if (primary != null) ...[
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: primary!.onTap,
+                  icon: Icon(primary!.icon),
+                  label: Text(primary!.label),
+                ),
+              ),
+            ],
+            if (secondary != null) ...[
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: secondary!.onTap,
+                  icon: Icon(secondary!.icon),
+                  label: Text(secondary!.label),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -2796,12 +2943,16 @@ class _MemoryRitualCard extends StatelessWidget {
     required this.onSave,
     required this.onOpen,
     this.yearsAgo,
+    this.weekYearsAgo,
   });
 
   final MemoryEvent? event;
 
   /// Set when [event] happened on this day [yearsAgo] years ago.
   final int? yearsAgo;
+
+  /// Set when [event] happened this week [weekYearsAgo] years ago.
+  final int? weekYearsAgo;
   final VoidCallback onSave;
   final ValueChanged<MemoryEvent> onOpen;
 
@@ -2857,6 +3008,8 @@ class _MemoryRitualCard extends StatelessWidget {
                               ? context.l10n.saveToday
                               : years != null
                               ? context.l10n.onThisDayYearsAgoToday(years)
+                              : weekYearsAgo != null
+                              ? context.l10n.thisWeekYearsAgo(weekYearsAgo!)
                               : context.l10n.rememberThis,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -3623,4 +3776,81 @@ String? _cleanPhotoTitle(String? title) {
   final withoutExtension = dotIndex > 0 ? value.substring(0, dotIndex) : value;
   final cleaned = withoutExtension.replaceAll(RegExp(r'[_-]+'), ' ').trim();
   return cleaned.isEmpty ? null : cleaned;
+}
+
+/// Memories from other walls to tick and move to this one.
+class _MoveHereSheet extends StatefulWidget {
+  const _MoveHereSheet({required this.memories, required this.walls});
+
+  final List<MemoryEvent> memories;
+  final List<PersonalWall> walls;
+
+  @override
+  State<_MoveHereSheet> createState() => _MoveHereSheetState();
+}
+
+class _MoveHereSheetState extends State<_MoveHereSheet> {
+  final _chosen = <String>{};
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    String wallName(String? id) =>
+        widget.walls.where((w) => w.id == id).firstOrNull?.name ?? l10n.myWall;
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.8,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: Text(
+                l10n.moveMemoriesTitle,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  for (final memory in widget.memories)
+                    CheckboxListTile(
+                      value: _chosen.contains(memory.id),
+                      onChanged: (on) => setState(
+                        () => on == true
+                            ? _chosen.add(memory.id)
+                            : _chosen.remove(memory.id),
+                      ),
+                      title: Text(
+                        memory.title,
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                      subtitle: Text(wallName(memory.wallId)),
+                    ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
+              child: FilledButton.icon(
+                key: const ValueKey('move-here-confirm'),
+                onPressed: _chosen.isEmpty
+                    ? null
+                    : () => Navigator.of(context).pop(_chosen),
+                icon: const Icon(Icons.drive_file_move_rounded),
+                label: Text(l10n.moveSelected(_chosen.length)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

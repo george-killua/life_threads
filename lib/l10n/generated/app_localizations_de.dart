@@ -1379,6 +1379,49 @@ class AppLocalizationsDe extends AppLocalizations {
   String get yearThreadStoryInstead => 'Oder jetzt eine Story machen';
 
   @override
+  String get moveMemoriesHere => 'Erinnerungen hierher holen';
+
+  @override
+  String get moveMemoriesTitle => 'Erinnerungen zum Verschieben wählen';
+
+  @override
+  String moveSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Erinnerungen verschieben',
+      one: '1 Erinnerung verschieben',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get showAllMemories => 'Alle zeigen';
+
+  @override
+  String get addAMemory => 'Erinnerung hinzufügen';
+
+  @override
+  String get mapAddPhotoMemory => 'Foto mit Ort hinzufügen';
+
+  @override
+  String get searchSuggestions => 'Probier etwas von dir';
+
+  @override
+  String thisWeekYearsAgo(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: 'Diese Woche vor $years Jahren',
+      one: 'Diese Woche vor 1 Jahr',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get peopleHint => 'Wer war dabei?';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

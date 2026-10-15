@@ -78,6 +78,17 @@ void main() {
       expect(find.text('Remember this'), findsNothing);
     });
 
+    testWidgets('a memory from this week in an earlier year comes next', (
+      tester,
+    ) async {
+      // Two days after the anniversary (12 October 2023).
+      await pumpWall(
+        tester,
+        overrides(isPremium: false, now: DateTime(2026, 10, 14, 10)),
+      );
+      expect(find.text('This week, 3 years ago'), findsOneWidget);
+    });
+
     testWidgets('falls back to Remember this without a match', (tester) async {
       await pumpWall(
         tester,

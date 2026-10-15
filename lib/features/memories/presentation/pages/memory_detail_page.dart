@@ -126,6 +126,21 @@ class MemoryDetailPage extends ConsumerWidget {
                                   ),
                                 ),
                               ),
+                            ] else ...[
+                              // An invitation instead of nothing.
+                              const SizedBox(height: 14),
+                              _HintRow(
+                                key: const ValueKey('memory-add-person-hint'),
+                                icon: Icons.person_add_alt_1_rounded,
+                                text: context.l10n.peopleHint,
+                                action: context.l10n.addPerson,
+                                onTap: () => context.push(
+                                  EditMemoryPage.location(
+                                    memoryId,
+                                    EditMemorySection.people,
+                                  ),
+                                ),
+                              ),
                             ],
                             if (attachedNotes.isNotEmpty) ...[
                               const SizedBox(height: 22),
@@ -1183,9 +1198,20 @@ class _ConnectedThreadPath extends StatelessWidget {
       eyebrow: context.l10n.threadsEyebrow,
       title: context.l10n.connectedMemories,
       child: events.isEmpty
-          ? Text(
-              context.l10n.noConnectedMemoriesYet,
-              style: TextStyle(color: AppColors.muted, height: 1.45),
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.l10n.noConnectedMemoriesYet,
+                  style: TextStyle(color: AppColors.muted, height: 1.45),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: onEdit,
+                  icon: const Icon(Icons.hub_rounded),
+                  label: Text(context.l10n.connect),
+                ),
+              ],
             )
           // The connected memories hang on a rope, like on the wall.
           : SizedBox(
@@ -1853,6 +1879,65 @@ class _DetailTopButtons extends StatelessWidget {
                 icon: Icons.hub_rounded,
                 tooltip: context.l10n.connectMemoryTooltip,
                 onTap: onConnect,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A quiet one-line invitation (e.g. "Who was there? Add person") where a
+/// section would otherwise be missing.
+class _HintRow extends StatelessWidget {
+  const _HintRow({
+    super.key,
+    required this.icon,
+    required this.text,
+    required this.action,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String text;
+  final String action;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20),
+      side: BorderSide(color: AppColors.line),
+    );
+    return Material(
+      color: AppColors.panelWarm.withValues(alpha: 0.6),
+      shape: shape,
+      child: InkWell(
+        customBorder: shape,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Icon(icon, color: AppColors.gold),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: AppColors.muted,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                action,
+                style: TextStyle(
+                  color: AppColors.amber,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ],
           ),

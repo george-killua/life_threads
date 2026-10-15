@@ -67,16 +67,37 @@ class _MemorySearchPageState extends ConsumerState<MemorySearchPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                // Before typing: suggestions from one's own memories.
+                if (!typed && state != null)
+                  _Suggestions(
+                    suggestions: searchSuggestions(state),
+                    onPick: (text) => setState(() {
+                      _query.text = text;
+                      _query.selection = TextSelection.collapsed(
+                        offset: text.length,
+                      );
+                    }),
+                  ),
                 if (typed && results.isEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 24),
-                    child: Text(
-                      l10n.searchNoResults,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.muted,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    child: Column(
+                      children: [
+                        Text(
+                          l10n.searchNoResults,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: AppColors.muted,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        OutlinedButton.icon(
+                          onPressed: () => setState(_query.clear),
+                          icon: const Icon(Icons.close_rounded),
+                          label: Text(l10n.searchClear),
+                        ),
+                      ],
                     ),
                   )
                 else if (typed)
@@ -183,6 +204,45 @@ class _ResultTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _Suggestions extends StatelessWidget {
+  const _Suggestions({required this.suggestions, required this.onPick});
+
+  final List<String> suggestions;
+  final ValueChanged<String> onPick;
+
+  @override
+  Widget build(BuildContext context) {
+    if (suggestions.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.l10n.searchSuggestions,
+          style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.w900),
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final suggestion in suggestions)
+              ActionChip(
+                label: Text(suggestion),
+                avatar: Icon(
+                  RegExp(r'^\d{4}$').hasMatch(suggestion)
+                      ? Icons.calendar_month_rounded
+                      : Icons.search_rounded,
+                  size: 18,
+                ),
+                onPressed: () => onPick(suggestion),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }

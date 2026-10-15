@@ -22,6 +22,37 @@ List<MemoryEvent> searchMemories(MemoryState state, String query) {
   return results;
 }
 
+/// What to suggest before anything is typed: the most frequent places
+/// (their town), people and the years of one's own memories.
+List<String> searchSuggestions(MemoryState state) {
+  final places = <String, int>{};
+  final people = <String, int>{};
+  final years = <int>{};
+  for (final event in state.visibleEvents) {
+    years.add(event.occurredAt.year);
+    final town = event.locationLabel.split(',').first.trim();
+    if (town.isNotEmpty && !RegExp(r'^-?\d').hasMatch(town)) {
+      places.update(town, (n) => n + 1, ifAbsent: () => 1);
+    }
+    for (final person in state.peopleForEvent(event.id)) {
+      final name = person.name.trim();
+      if (name.isNotEmpty) people.update(name, (n) => n + 1, ifAbsent: () => 1);
+    }
+  }
+  List<String> top(Map<String, int> counts, int n) =>
+      (counts.entries.toList()..sort((a, b) => b.value.compareTo(a.value)))
+          .take(n)
+          .map((e) => e.key)
+          .toList();
+  return [
+    ...top(places, 3),
+    ...top(people, 3),
+    ...(years.toList()..sort((a, b) => b.compareTo(a)))
+        .take(2)
+        .map((y) => '$y'),
+  ];
+}
+
 /// Lower case without accents, so "grossglockner" finds "Großglockner" and
 /// "cafe" finds "Café".
 String _fold(String text) {
