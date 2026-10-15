@@ -3406,4 +3406,124 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get removePerson => 'Person entfernen';
+
+  @override
+  String get draftKept =>
+      'Als Entwurf behalten – beim nächsten Mal ist er wieder da.';
+
+  @override
+  String get draftResumeTitle => 'Weitermachen, wo du aufgehört hast?';
+
+  @override
+  String draftResumeBody(String date) {
+    return 'Du hast am $date eine Erinnerung begonnen und noch nicht gespeichert.';
+  }
+
+  @override
+  String draftResumePhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos',
+      one: '1 Foto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get draftContinue => 'Weitermachen';
+
+  @override
+  String get draftStartNew => 'Neu beginnen';
+
+  @override
+  String get lookBackMenu => 'Monatsrückblick';
+
+  @override
+  String lookBackTitle(String month) {
+    return 'Dein $month';
+  }
+
+  @override
+  String get lookBackWallCardTitle => 'Dein Monat in Erinnerungen';
+
+  @override
+  String lookBackWallCardBody(String month, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Erinnerungen',
+      one: '1 Erinnerung',
+    );
+    return '$month: $_temp0';
+  }
+
+  @override
+  String lookBackMemories(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Erinnerungen',
+      one: '1 Erinnerung',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String lookBackPeople(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Personen',
+      one: '1 Person',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String lookBackPlaces(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Orte',
+      one: '1 Ort',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get lookBackPeopleHeading => 'Wer dabei war';
+
+  @override
+  String get lookBackPlacesHeading => 'Wo du warst';
+
+  @override
+  String lookBackEmpty(String month) {
+    return 'Aus $month ist noch nichts gespeichert.';
+  }
+
+  @override
+  String get lookBackEmptyHint =>
+      'Erinnerungen mit einem Datum in diesem Monat erscheinen hier.';
+
+  @override
+  String get lookBackPreviousMonth => 'Vorheriger Monat';
+
+  @override
+  String get lookBackNextMonth => 'Nächster Monat';
+
+  @override
+  String lookBackNotificationBody(String month, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Erinnerungen',
+      one: '1 Erinnerung',
+    );
+    return '$month: $_temp0 zum Zurückblicken.';
+  }
+
+  @override
+  String get lookBackNotificationPrivate =>
+      'Dein Monat in Erinnerungen ist bereit.';
 }

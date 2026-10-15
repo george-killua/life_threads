@@ -16,6 +16,7 @@ class RouteNames {
   static const manageConnections = '/memories/:id/connections';
   static const capsuleCinema = '/capsule/cinema';
   static const yearThread = '/year-thread';
+  static const lookBack = '/look-back';
   static const createStory = '/stories/new';
   static const familyWalls = '/family';
   static const familyAccount = '/family/account';
@@ -27,6 +28,8 @@ class RouteNames {
       '/family/wall/:familyId/memories/:memoryId/edit';
 
   static String yearThreadFor(int year) => '$yearThread?year=$year';
+  static String lookBackFor(int year, int month) =>
+      '$lookBack?year=$year&month=$month';
 
   static String familyWallFor(String familyId) =>
       '/family/wall/${Uri.encodeComponent(familyId)}';

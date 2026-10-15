@@ -5816,6 +5816,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove person'**
   String get removePerson;
+
+  /// No description provided for @draftKept.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept as a draft – it\'ll be here next time.'**
+  String get draftKept;
+
+  /// No description provided for @draftResumeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue where you left off?'**
+  String get draftResumeTitle;
+
+  /// No description provided for @draftResumeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You started a memory on {date} and didn\'t save it yet.'**
+  String draftResumeBody(String date);
+
+  /// No description provided for @draftResumePhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 photo} other{{count} photos}}'**
+  String draftResumePhotos(int count);
+
+  /// No description provided for @draftContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get draftContinue;
+
+  /// No description provided for @draftStartNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Start new'**
+  String get draftStartNew;
+
+  /// No description provided for @lookBackMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Look back on a month'**
+  String get lookBackMenu;
+
+  /// No description provided for @lookBackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your {month}'**
+  String lookBackTitle(String month);
+
+  /// No description provided for @lookBackWallCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your month in memories'**
+  String get lookBackWallCardTitle;
+
+  /// No description provided for @lookBackWallCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{month}: {count, plural, =1{1 memory} other{{count} memories}}'**
+  String lookBackWallCardBody(String month, int count);
+
+  /// No description provided for @lookBackMemories.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 memory} other{{count} memories}}'**
+  String lookBackMemories(int count);
+
+  /// No description provided for @lookBackPeople.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 person} other{{count} people}}'**
+  String lookBackPeople(int count);
+
+  /// No description provided for @lookBackPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 place} other{{count} places}}'**
+  String lookBackPlaces(int count);
+
+  /// No description provided for @lookBackPeopleHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Who was there'**
+  String get lookBackPeopleHeading;
+
+  /// No description provided for @lookBackPlacesHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Where you were'**
+  String get lookBackPlacesHeading;
+
+  /// No description provided for @lookBackEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing saved from {month} yet.'**
+  String lookBackEmpty(String month);
+
+  /// No description provided for @lookBackEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Memories dated in this month show up here.'**
+  String get lookBackEmptyHint;
+
+  /// No description provided for @lookBackPreviousMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous month'**
+  String get lookBackPreviousMonth;
+
+  /// No description provided for @lookBackNextMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Next month'**
+  String get lookBackNextMonth;
+
+  /// No description provided for @lookBackNotificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{month}: {count, plural, =1{1 memory} other{{count} memories}} to look back on.'**
+  String lookBackNotificationBody(String month, int count);
+
+  /// No description provided for @lookBackNotificationPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Your month in memories is ready.'**
+  String get lookBackNotificationPrivate;
 }
 
 class _AppLocalizationsDelegate

@@ -3409,4 +3409,139 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get removePerson => 'إزالة الشخص';
+
+  @override
+  String get draftKept => 'حُفظت كمسودة، وستجدها في المرة القادمة.';
+
+  @override
+  String get draftResumeTitle => 'هل تتابع من حيث توقفت؟';
+
+  @override
+  String draftResumeBody(String date) {
+    return 'بدأت ذكرى في $date ولم تحفظها بعد.';
+  }
+
+  @override
+  String draftResumePhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صورة',
+      many: '$count صورة',
+      few: '$count صور',
+      two: 'صورتان',
+      one: 'صورة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get draftContinue => 'متابعة';
+
+  @override
+  String get draftStartNew => 'ابدأ من جديد';
+
+  @override
+  String get lookBackMenu => 'نظرة على شهر';
+
+  @override
+  String lookBackTitle(String month) {
+    return 'ذكريات $month';
+  }
+
+  @override
+  String get lookBackWallCardTitle => 'شهرك في ذكريات';
+
+  @override
+  String lookBackWallCardBody(String month, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ذكرى',
+      many: '$count ذكرى',
+      few: '$count ذكريات',
+      two: 'ذكريان',
+      one: 'ذكرى واحدة',
+    );
+    return '$month: $_temp0';
+  }
+
+  @override
+  String lookBackMemories(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ذكرى',
+      many: '$count ذكرى',
+      few: '$count ذكريات',
+      two: 'ذكريان',
+      one: 'ذكرى واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String lookBackPeople(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count شخص',
+      many: '$count شخصًا',
+      few: '$count أشخاص',
+      two: 'شخصان',
+      one: 'شخص واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String lookBackPlaces(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مكان',
+      many: '$count مكانًا',
+      few: '$count أماكن',
+      two: 'مكانان',
+      one: 'مكان واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get lookBackPeopleHeading => 'من كان هناك';
+
+  @override
+  String get lookBackPlacesHeading => 'أين كنت';
+
+  @override
+  String lookBackEmpty(String month) {
+    return 'لم تُحفظ أي ذكرى من $month بعد.';
+  }
+
+  @override
+  String get lookBackEmptyHint => 'تظهر هنا الذكريات المؤرخة في هذا الشهر.';
+
+  @override
+  String get lookBackPreviousMonth => 'الشهر السابق';
+
+  @override
+  String get lookBackNextMonth => 'الشهر التالي';
+
+  @override
+  String lookBackNotificationBody(String month, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ذكرى',
+      many: '$count ذكرى',
+      few: '$count ذكريات',
+      two: 'ذكريان',
+      one: 'ذكرى واحدة',
+    );
+    return '$month: $_temp0 لتستعيدها.';
+  }
+
+  @override
+  String get lookBackNotificationPrivate => 'شهرك في ذكريات جاهز.';
 }

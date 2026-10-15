@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../app_lock/app_lock.dart';
+import '../../look_back/domain/month_look_back.dart';
 import '../../../core/localization/locale_controller.dart';
 import '../../../core/logging/app_logger.dart';
 import '../../../l10n/generated/app_localizations.dart';
@@ -50,6 +53,44 @@ List<OnThisDayNotification> onThisDayNotificationsFor(
         memoryId: reminder.matches.first.memory.id,
       ),
   ];
+}
+
+/// On the first of next month at [minuteOfDay]: the month of [now] to look
+/// back on, when it has memories. Rescheduled with every change, so the
+/// count stays current. Needs `initializeDateFormatting` for the locale.
+OnThisDayNotification? lookBackNotificationFor(
+  tz.TZDateTime now,
+  List<MemoryEvent> events,
+  int minuteOfDay,
+  AppLocalizations l10n, {
+  bool private = false,
+}) {
+  final count = events.where((event) {
+    final at = event.occurredAt.toLocal();
+    return at.year == now.year && at.month == now.month;
+  }).length;
+  if (count == 0) return null;
+  final next = MonthLookBack.nextMonth(now.year, now.month);
+  final at = tz.TZDateTime(
+    now.location,
+    next.year,
+    next.month,
+    1,
+    minuteOfDay ~/ 60,
+    minuteOfDay % 60,
+  );
+  final month = DateFormat.MMMM(
+    l10n.localeName,
+  ).format(DateTime(now.year, now.month));
+  return OnThisDayNotification(
+    id: LocalOnThisDayNotifications.lookBackId,
+    at: at,
+    title: l10n.lookBackWallCardTitle,
+    body: private
+        ? l10n.lookBackNotificationPrivate
+        : l10n.lookBackNotificationBody(month, count),
+    lookBack: (year: now.year, month: now.month),
+  );
 }
 
 /// Keeps the On this day notifications in step with the settings, Premium
@@ -116,13 +157,26 @@ class OnThisDayScheduler extends Notifier<void> {
     required bool private,
   }) async {
     final location = await notifications.localLocation();
+    // The month's name; the app may not have loaded it yet at start-up.
+    await initializeDateFormatting(l10n.localeName);
+    final localNow = tz.TZDateTime.from(now, location);
     final reminders = OnThisDay.upcoming(
-      now: tz.TZDateTime.from(now, location),
+      now: localNow,
       events: events,
       minuteOfDay: minuteOfDay,
     );
+    final lookBack = lookBackNotificationFor(
+      localNow,
+      events,
+      minuteOfDay,
+      l10n,
+      private: private,
+    );
     await notifications.replaceScheduled(
-      onThisDayNotificationsFor(reminders, l10n, private: private),
+      [
+        ...onThisDayNotificationsFor(reminders, l10n, private: private),
+        ?lookBack,
+      ],
       channelName: l10n.onThisDayTitle,
       channelDescription: l10n.onThisDayChannelDescription,
     );

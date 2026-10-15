@@ -197,7 +197,11 @@
   "photoGridItem": "Photo from {date}",
   "@photoGridItem": {
     "description": "Screen reader label of a photo in the photo picker.",
-    "placeholders": {"date": {"type": "String"}}
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "noPhotosFound": "No photos found.",
   "manage": "Manage",
@@ -1574,5 +1578,95 @@
   "moveRight": "Move right",
   "showPassword": "Show password",
   "hidePassword": "Hide password",
-  "removePerson": "Remove person"
+  "removePerson": "Remove person",
+  "draftKept": "Kept as a draft – it'll be here next time.",
+  "draftResumeTitle": "Continue where you left off?",
+  "draftResumeBody": "You started a memory on {date} and didn't save it yet.",
+  "@draftResumeBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "draftResumePhotos": "{count, plural, =1{1 photo} other{{count} photos}}",
+  "@draftResumePhotos": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "draftContinue": "Continue",
+  "draftStartNew": "Start new",
+  "lookBackMenu": "Look back on a month",
+  "lookBackTitle": "Your {month}",
+  "@lookBackTitle": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "lookBackWallCardTitle": "Your month in memories",
+  "lookBackWallCardBody": "{month}: {count, plural, =1{1 memory} other{{count} memories}}",
+  "@lookBackWallCardBody": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lookBackMemories": "{count, plural, =1{1 memory} other{{count} memories}}",
+  "@lookBackMemories": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lookBackPeople": "{count, plural, =1{1 person} other{{count} people}}",
+  "@lookBackPeople": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lookBackPlaces": "{count, plural, =1{1 place} other{{count} places}}",
+  "@lookBackPlaces": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lookBackPeopleHeading": "Who was there",
+  "lookBackPlacesHeading": "Where you were",
+  "lookBackEmpty": "Nothing saved from {month} yet.",
+  "@lookBackEmpty": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "lookBackEmptyHint": "Memories dated in this month show up here.",
+  "lookBackPreviousMonth": "Previous month",
+  "lookBackNextMonth": "Next month",
+  "lookBackNotificationBody": "{month}: {count, plural, =1{1 memory} other{{count} memories}} to look back on.",
+  "@lookBackNotificationBody": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lookBackNotificationPrivate": "Your month in memories is ready."
 }

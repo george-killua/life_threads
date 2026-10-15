@@ -5,6 +5,7 @@ import '../../features/backup/presentation/pages/archive_transfer_page.dart';
 import '../../features/capsule/domain/memory_capsule_models.dart';
 import '../../features/capsule/presentation/pages/capsule_cinema_page.dart';
 import '../../features/family/presentation/family_routes.dart';
+import '../../features/look_back/presentation/month_look_back_page.dart';
 import '../../features/media/data/picked_memory_photo.dart';
 import '../../features/memories/presentation/pages/add_memory_page.dart';
 import '../../features/memories/presentation/pages/edit_memory_page.dart';
@@ -115,6 +116,13 @@ class AppRouter {
         path: RouteNames.yearThread,
         builder: (context, state) => YearThreadPage(
           initialYear: int.tryParse(state.uri.queryParameters['year'] ?? ''),
+        ),
+      ),
+      GoRoute(
+        path: RouteNames.lookBack,
+        builder: (context, state) => MonthLookBackPage(
+          year: int.tryParse(state.uri.queryParameters['year'] ?? ''),
+          month: int.tryParse(state.uri.queryParameters['month'] ?? ''),
         ),
       ),
       GoRoute(

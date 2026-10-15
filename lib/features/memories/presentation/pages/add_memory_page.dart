@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import '../../../media/data/picked_memory_photo.dart';
 import '../../../media/presentation/widgets/photo_grid_sheet.dart';
 import '../../../premium/data/premium_entitlement_controller.dart';
 import '../../../premium/domain/premium_entitlement.dart';
+import '../../data/memory_draft_store.dart';
 import '../../data/memory_repository.dart';
 import '../../data/place_names.dart';
 import '../../../wall/data/current_wall.dart';
@@ -55,11 +57,20 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
   bool _isSaving = false;
   PermissionState? _photoPermission;
 
+  late final MemoryDraftStore _draftStore;
+  Timer? _draftTimer;
+  // False until an earlier draft was continued or set aside, so the empty
+  // form never overwrites it.
+  bool _draftReady = false;
+  bool _saved = false;
+
   static const _stepCount = 4;
 
   @override
   void initState() {
     super.initState();
+    _draftStore = ref.read(memoryDraftStoreProvider);
+    _connectionReasonController.addListener(_scheduleDraftSave);
     if (widget.initialPhotos.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -67,10 +78,20 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
         setState(() {});
       });
     }
+    _restoreDraft();
+  }
+
+  // Every change goes through setState, so this keeps the draft current.
+  @override
+  void setState(VoidCallback fn) {
+    super.setState(fn);
+    _scheduleDraftSave();
   }
 
   @override
   void dispose() {
+    _draftTimer?.cancel();
+    if (_draftReady && !_saved) _draftStore.save(_currentDraft());
     _titleController.dispose();
     _descriptionController.dispose();
     _connectionReasonController.dispose();
@@ -86,7 +107,12 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () => _backToWall(context),
+          onPressed: () {
+            if (_draftReady && _currentDraft().hasContent) {
+              ScaffoldMessenger.of(context).showToast(l10n.draftKept);
+            }
+            _backToWall(context);
+          },
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back_rounded),
         ),
@@ -277,6 +303,120 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
       ),
       _ => const SizedBox.shrink(),
     };
+  }
+
+  MemoryDraft _currentDraft() => MemoryDraft(
+    savedAt: DateTime.now(),
+    title: _titleController.text,
+    description: _descriptionController.text,
+    photos: _photos,
+    people: _people,
+    step: _step,
+    category: _category,
+    memoryType: _memoryType,
+    feeling: _feeling,
+    occurredAt: _occurredAt,
+    dateFromPhotos: _dateFromPhotos,
+    latitude: _latitude,
+    longitude: _longitude,
+    connectedEventId: _connectedEventId,
+    connectionReason: _connectionReasonController.text,
+  );
+
+  void _scheduleDraftSave() {
+    if (!_draftReady || _saved) return;
+    _draftTimer?.cancel();
+    _draftTimer = Timer(const Duration(milliseconds: 500), () {
+      if (!_saved) _draftStore.save(_currentDraft());
+    });
+  }
+
+  /// Offers an unsaved memory from earlier: continue it, or start new and
+  /// let it go.
+  Future<void> _restoreDraft() async {
+    final draft = await _draftStore.load();
+    if (!mounted) return;
+    final state = ref.read(memoryRepositoryProvider).asData?.value;
+    final entitlement = ref.read(premiumEntitlementProvider).asData?.value;
+    final limitReached =
+        state != null &&
+        !(entitlement?.canCreateMemory(state.events.length) ??
+            state.events.length < PremiumEntitlement.freeMemoryLimit);
+    if (draft == null || limitReached) {
+      // At the limit the draft waits for Premium untouched.
+      _draftReady = !limitReached;
+      return;
+    }
+    final l10n = context.l10n;
+    final title = draft.title.trim();
+    final resume = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.draftResumeTitle),
+        content: Text(
+          [
+            l10n.draftResumeBody(
+              DateFormat.yMMMd(
+                Localizations.localeOf(context).toLanguageTag(),
+              ).format(draft.savedAt),
+            ),
+            if (title.isNotEmpty) '“$title”',
+            if (draft.photos.isNotEmpty)
+              l10n.draftResumePhotos(draft.photos.length),
+          ].join('\n'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.draftStartNew),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.draftContinue),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    if (resume ?? false) {
+      _applyDraft(draft);
+    } else {
+      await _draftStore.clear(deletePhotosOf: draft);
+      if (!mounted) return;
+    }
+    _draftReady = true;
+    setState(() {});
+  }
+
+  void _applyDraft(MemoryDraft draft) {
+    _titleController.text = draft.title;
+    _descriptionController.text = draft.description;
+    _connectionReasonController.text = draft.connectionReason;
+    // Photos taken just now (quick capture) join the draft's.
+    final fresh = [..._photos];
+    _photos
+      ..clear()
+      ..addAll(draft.photos)
+      ..addAll(fresh);
+    _people = draft.people;
+    _step = draft.step.clamp(0, _stepCount - 1);
+    _category = draft.category;
+    _memoryType = draft.memoryType;
+    _feeling = draft.feeling;
+    _occurredAt = draft.occurredAt;
+    _dateFromPhotos = draft.dateFromPhotos;
+    _latitude = draft.latitude;
+    _longitude = draft.longitude;
+    final connected = draft.connectedEventId;
+    final events = ref.read(memoryRepositoryProvider).asData?.value.events;
+    _connectedEventId =
+        connected != null && (events?.any((e) => e.id == connected) ?? false)
+        ? connected
+        : null;
+    if (_occurredAt == null && _photos.isNotEmpty) {
+      _applyPhotoDefaults(_photos);
+    }
   }
 
   Future<void> _openPhotoPicker() async {
@@ -591,6 +731,9 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
       ).showToast(this.context.l10n.memorySaveFailed, kind: ToastKind.error);
       return;
     }
+    _saved = true;
+    _draftTimer?.cancel();
+    await _draftStore.clear();
     // Hung on the wall.
     HapticFeedback.mediumImpact();
     if (context.mounted) _backToWall(context);

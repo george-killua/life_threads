@@ -64,11 +64,17 @@ void main() {
 
     expect(notifications.scheduled, hasLength(1));
     final scheduled = notifications.scheduled.single;
-    expect([for (final n in scheduled) n.memoryId], ['today', 'in-a-week']);
     expect(
-      [for (final n in scheduled) (n.at.day, n.at.hour)],
-      [(12, 9), (19, 9)],
+      [for (final n in scheduled) n.memoryId],
+      ['today', 'in-a-week', null],
     );
+    expect(
+      [for (final n in scheduled) (n.at.month, n.at.day, n.at.hour)],
+      [(10, 12, 9), (10, 19, 9), (11, 1, 9)],
+    );
+    // October has a memory: the look-back on 1 November.
+    expect(scheduled.last.lookBack, (year: 2026, month: 10));
+    expect(scheduled.last.body, 'October: 1 memory to look back on.');
     expect(notifications.cancelCount, 0);
   });
 

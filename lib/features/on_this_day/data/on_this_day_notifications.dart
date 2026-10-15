@@ -6,23 +6,28 @@ import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../../app/router/app_router.dart';
+import '../../../app/router/route_names.dart';
 import '../../../core/logging/app_logger.dart';
 
 final onThisDayNotificationsProvider = Provider<OnThisDayNotifications>(
   (ref) => LocalOnThisDayNotifications(
     onOpenMemory: (memoryId) => AppRouter.router.push('/memories/$memoryId'),
+    onOpenLookBack: (year, month) =>
+        AppRouter.router.push(RouteNames.lookBackFor(year, month)),
   ),
 );
 
-/// A scheduled "On this day" notification.
+/// A scheduled "On this day" notification, or the monthly look-back that
+/// goes out with the same reminders.
 class OnThisDayNotification {
   const OnThisDayNotification({
     required this.id,
     required this.at,
     required this.title,
     required this.body,
-    required this.memoryId,
-  });
+    this.memoryId,
+    this.lookBack,
+  }) : assert((memoryId == null) != (lookBack == null));
 
   final int id;
   final tz.TZDateTime at;
@@ -30,7 +35,10 @@ class OnThisDayNotification {
   final String body;
 
   /// The memory a tap opens.
-  final String memoryId;
+  final String? memoryId;
+
+  /// Or the month a tap looks back on.
+  final ({int year, int month})? lookBack;
 }
 
 /// The device side of On this day reminders, behind an interface so the
@@ -54,21 +62,47 @@ abstract interface class OnThisDayNotifications {
 }
 
 class LocalOnThisDayNotifications implements OnThisDayNotifications {
-  LocalOnThisDayNotifications({required this.onOpenMemory});
+  LocalOnThisDayNotifications({
+    required this.onOpenMemory,
+    required this.onOpenLookBack,
+  });
 
-  /// Notification ids are [firstId] + day index; nothing else in the app
-  /// uses this range.
+  /// Notification ids are [firstId] + day index, and [lookBackId] for the
+  /// monthly look-back; nothing else in the app uses this range.
   static const firstId = 52000;
+  static const lookBackId = firstId + 40;
   static const _lastId = firstId + 63;
   static const _channelId = 'on_this_day';
   static const _payloadPrefix = 'on-this-day:';
+  static const _lookBackPrefix = 'look-back:';
 
   final ValueChanged<String> onOpenMemory;
+  final void Function(int year, int month) onOpenLookBack;
   final _plugin = FlutterLocalNotificationsPlugin();
   Future<void>? _ready;
   tz.Location? _location;
 
   static String payloadFor(String memoryId) => '$_payloadPrefix$memoryId';
+
+  static String payloadOf(OnThisDayNotification notification) {
+    final month = notification.lookBack;
+    return month != null
+        ? lookBackPayloadFor(month.year, month.month)
+        : payloadFor(notification.memoryId!);
+  }
+
+  static String lookBackPayloadFor(int year, int month) =>
+      '$_lookBackPrefix$year-$month';
+
+  static ({int year, int month})? lookBackFromPayload(String? payload) {
+    if (payload == null || !payload.startsWith(_lookBackPrefix)) return null;
+    final parts = payload.substring(_lookBackPrefix.length).split('-');
+    if (parts.length != 2) return null;
+    final year = int.tryParse(parts[0]);
+    final month = int.tryParse(parts[1]);
+    if (year == null || month == null || month < 1 || month > 12) return null;
+    return (year: year, month: month);
+  }
 
   static String? memoryIdFromPayload(String? payload) {
     if (payload == null || !payload.startsWith(_payloadPrefix)) return null;
@@ -127,7 +161,7 @@ class LocalOnThisDayNotifications implements OnThisDayNotifications {
         scheduledDate: notification.at,
         title: notification.title,
         body: notification.body,
-        payload: payloadFor(notification.memoryId),
+        payload: payloadOf(notification),
         // Inexact is fine for a daily nudge and needs no alarm permission.
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         notificationDetails: NotificationDetails(
@@ -175,6 +209,12 @@ class LocalOnThisDayNotifications implements OnThisDayNotifications {
   }
 
   void _open(String? payload) {
+    final month = lookBackFromPayload(payload);
+    if (month != null) {
+      AppLogger.event('look_back_opened');
+      onOpenLookBack(month.year, month.month);
+      return;
+    }
     final memoryId = memoryIdFromPayload(payload);
     if (memoryId == null) return;
     AppLogger.event('on_this_day_opened');

@@ -40,6 +40,7 @@ import '../../../onboarding/presentation/widgets/lifethreads_tutorial.dart';
 import '../../../premium/data/premium_entitlement_controller.dart';
 import '../../../premium/domain/premium_entitlement.dart';
 import '../../../year_thread/presentation/widgets/year_thread_wall_card.dart';
+import '../../../look_back/presentation/look_back_wall_card.dart';
 import '../../domain/wall_attachment_layout.dart';
 import '../../domain/wall_item.dart';
 import '../../domain/wall_layout.dart';
@@ -494,6 +495,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                           _MoreAction.yearThread => _pushRoute(
                             RouteNames.yearThread,
                           ),
+                          _MoreAction.lookBack => _pushRoute(
+                            RouteNames.lookBack,
+                          ),
                           _MoreAction.newWall => createNewWall(context),
                           _MoreAction.familyWalls => _pushRoute(
                             RouteNames.familyWalls,
@@ -544,12 +548,16 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                       ),
                     ),
                     if (hasWallContent && _mode == _WallViewMode.wall)
-                      // Thread of the Year, in December and January.
+                      // Thread of the Year in December and January; the
+                      // month before in the first week of a month.
                       const Positioned(
                         left: 20,
                         right: 20,
                         bottom: 100,
-                        child: YearThreadWallCard(),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [YearThreadWallCard(), LookBackWallCard()],
+                        ),
                       ),
                     if (hasWallContent)
                       Positioned(
@@ -2362,6 +2370,7 @@ class _EmptyModePanel extends StatelessWidget {
 enum _MoreAction {
   story,
   yearThread,
+  lookBack,
   newWall,
   familyWalls,
   display,
@@ -2614,6 +2623,11 @@ class _WallMoreButton extends StatelessWidget {
             _MoreAction.yearThread,
             Icons.movie_filter_rounded,
             l10n.yearThreadTitle,
+          ),
+          item(
+            _MoreAction.lookBack,
+            Icons.calendar_month_rounded,
+            l10n.lookBackMenu,
           ),
           item(
             _MoreAction.newWall,
