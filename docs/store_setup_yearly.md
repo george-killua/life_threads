@@ -64,8 +64,8 @@ The monthly subscription still has its older four English benefits only
 
 ## 3. Server (VPS) – family walls must accept the yearly plan
 
-The API only accepts the products listed in its environment. Today both
-lists contain only the monthly product. Log in with `ssh gkcoding-vps` (the
+The API only accepts the products listed in its environment. Before this
+step both lists contained only the monthly product. Log in with `ssh gkcoding-vps` (the
 host alias in `~/.ssh/config` picks the `gkcoding_vps_deploy` key; plain
 `deploy@217.160.247.224` fails with "Permission denied (publickey)"). On the
 VPS:
@@ -80,6 +80,9 @@ grep PRODUCT_IDS /opt/gkcoding/api/.env
 Check first that the API reads a comma-separated list (look for
 `PRODUCT_IDS` in the API source on the VPS). `build/configure_subscriptions.sh`
 should list both products too, for the next time it runs.
+
+Status 15 October 2026: done by George – both lists contain monthly and
+yearly, `gkcoding-api` restarted.
 
 ## 4. Website
 
