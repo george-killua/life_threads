@@ -33,10 +33,14 @@ tags: [protocol, wal, set]
     timeout: 10000
 - inputText: "Weekend"
 - tapOn: "Create"
+# A new wall opens empty and offers to move memories onto it.
+- extendedWaitUntil:
+    visible: "Move memories here"
+    timeout: 10000
+- tapOn: "Move memories here"
+- tapOn: "(?s)Summer in Split.*"
+- tapOn: "Move 1 memory"
 - runFlow: ../subflows/find_card.yaml
-- longPressOn: "Summer in Split.*"
-- tapOn: "Move to wall…"
-- tapOn: "Weekend"
 - tapOn: "(?s)Switch wall.*"
 - tapOn: "Wall options"
 - tapOn: "Rename"

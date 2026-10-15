@@ -73,8 +73,12 @@ Future<void> _openAdd(WidgetTester tester, GoRouter router) async {
   await tester.pumpAndSettle();
 }
 
-Future<void> _leave(WidgetTester tester) async {
+Future<void> _leave(WidgetTester tester, {bool expectKept = false}) async {
   await tester.tap(find.byTooltip('Back'));
+  if (expectKept) {
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Kept as a draft'), findsOneWidget);
+  }
   // Past the autosave delay and the toast.
   await tester.pump(const Duration(milliseconds: 600));
   await tester.pumpAndSettle(const Duration(seconds: 10));
@@ -180,7 +184,7 @@ void main() {
     expect(find.text('Continue where you left off?'), findsNothing);
 
     await tester.enterText(find.byType(TextField).first, 'Lisbon trip');
-    await _leave(tester);
+    await _leave(tester, expectKept: true);
     expect(find.text('WALL'), findsOneWidget);
 
     await _openAdd(tester, router);

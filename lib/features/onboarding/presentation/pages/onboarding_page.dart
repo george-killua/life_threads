@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
+import '../../../memories/data/memory_repository.dart';
 import '../../onboarding_preferences.dart';
 import '../widgets/onboarding_demo_wall_preview.dart';
 import '../../../../core/widgets/app_toast.dart';
@@ -249,6 +250,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       return;
     }
     ref.invalidate(userDisplayNameProvider);
+    // The memories may have been loaded before (the home screen widget reads
+    // them at start-up); load them again so the demo wall is set up now.
+    ref.invalidate(memoryRepositoryProvider);
 
     if (!mounted) return;
     setState(() => _isContinuing = false);

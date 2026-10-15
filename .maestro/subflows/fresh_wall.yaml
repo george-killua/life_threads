@@ -9,9 +9,21 @@ appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding
 - tapOn: "Next"
 - tapOn:
     text: "Your name"
+- waitForAnimationToEnd
 - inputText: "Lina"
 - runFlow: hide_keyboard.yaml
 - tapOn: "What should we call you?"
+# The keyboard sometimes isn't ready for the first letters (large text).
+- runFlow:
+    when:
+      notVisible: "(?s).*Lina.*"
+    commands:
+      - tapOn:
+          text: "Your name"
+      - waitForAnimationToEnd
+      - inputText: "Lina"
+      - runFlow: hide_keyboard.yaml
+      - tapOn: "What should we call you?"
 - tapOn: "Next"
 - tapOn: "Start fresh"
 - extendedWaitUntil:

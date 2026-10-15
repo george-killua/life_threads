@@ -17,9 +17,11 @@ tags: [protocol, wal]
 - runFlow: ../subflows/hide_keyboard.yaml
 - tapOn: "Save it before it fades"   # closes the keyboard (iOS)
 - tapOn: "Back"
-- extendedWaitUntil:
-    visible: "Kept as a draft.*"
-    timeout: 10000
+# The toast may be gone once the wall has settled (checked in
+# test/memory_draft_test.dart); the offer below is what matters.
+- assertVisible:
+    text: "Kept as a draft.*"
+    optional: true
 - tapOn: "Add"
 - tapOn: "Memory Full guided story.*"
 - extendedWaitUntil:
