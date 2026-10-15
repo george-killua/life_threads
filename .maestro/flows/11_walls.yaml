@@ -32,7 +32,7 @@ tags: [protocol, wal]
 - takeScreenshot: WAL-09_new_wall
 
 # Back to My wall, and move a memory to the new wall.
-- tapOn: "Switch wall"
+- tapOn: "(?s)Switch wall.*"
 - tapOn: "(?s)My wall.*"
 - runFlow: ../subflows/find_card.yaml
 - longPressOn: "Summer in Split.*"
@@ -41,7 +41,7 @@ tags: [protocol, wal]
 - extendedWaitUntil:
     notVisible: "Summer in Split.*"
     timeout: 10000
-- tapOn: "Switch wall"
+- tapOn: "(?s)Switch wall.*"
 - tapOn: "(?s)Travel 2025.*"
 - extendedWaitUntil:
     visible: "Summer in Split.*"
@@ -56,9 +56,9 @@ tags: [protocol, wal]
     timeout: 10000
 - tapOn: "View"
 - tapOn: "(?s)Hidden memories.*"
-- tapOn:
-    point: 50%, 8%
+# Hidden memories show only after Face ID or the passcode: the simulator
+# asks for its passcode.
 - extendedWaitUntil:
-    visible: "Summer in Split.*"
+    visible: "(?s).*Show hidden memories.*"
     timeout: 10000
-- takeScreenshot: WAL-09_hidden_shown
+- takeScreenshot: WAL-09_hidden_asks_passcode

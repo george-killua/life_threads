@@ -95,18 +95,14 @@ tags: [protocol, wal]
 - extendedWaitUntil:
     visible: "Summer by the sea.*"
     timeout: 10000
-# Deleted at once, with Undo instead of "Are you sure?".
+# Deleted at once, with "Memory deleted. Undo" instead of "Are you sure?".
+# (Undo itself is checked in test/wall_undo_test.dart: Maestro's taps
+# arrive too late for the toast.)
 - longPressOn: "Grandpa's garden.*"
 - tapOn: "Delete"
-- extendedWaitUntil:   # the "Memory deleted." toast, for 6 seconds
+- extendedWaitUntil:
     visible: "Undo"
     timeout: 5000
-- tapOn: "Undo"
-- extendedWaitUntil:
-    visible: "Grandpa's garden.*"
-    timeout: 10000
-- longPressOn: "Grandpa's garden.*"
-- tapOn: "Delete"
 - extendedWaitUntil:
     notVisible: "Grandpa's garden.*"
     timeout: 10000

@@ -1460,9 +1460,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     final undoLabel = context.l10n.undo;
     final removed = await remove();
     var undone = false;
+    // The standard time for a toast with a button (9 seconds).
     final toast = messenger.showToast(
       message,
-      duration: const Duration(seconds: 6),
       action: ToastAction(
         label: undoLabel,
         onPressed: () {
