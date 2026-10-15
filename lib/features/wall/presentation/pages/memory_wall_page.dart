@@ -2353,8 +2353,8 @@ class _MemoryRitualCard extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(13),
-        // German "Hinzufügen" on a small phone leaves little room: the text
-        // keeps it and the icon goes.
+        // With a large text size there is little room: the text keeps it
+        // and the icon goes.
         child: LayoutBuilder(
           builder: (context, constraints) => Row(
             children: [
