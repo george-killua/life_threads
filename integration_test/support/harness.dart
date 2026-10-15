@@ -267,7 +267,6 @@ Future<void> completeOnboarding(
   await tapText(tester, 'Next');
   await enterInto(tester, find.byType(TextField), name);
   await tapText(tester, 'Next');
-  await tapText(tester, 'Next');
   await tapText(
     tester,
     demo ? 'Preview demo wall' : 'Start fresh',

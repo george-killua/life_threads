@@ -44,10 +44,7 @@ void main() {
     await tester.pump();
     expect(find.text('Nice to meet you, George.'), findsOneWidget);
 
-    await tester.tap(find.text('Next'));
-    await tester.pumpAndSettle();
-    expect(find.text('Your memories stay private'), findsOneWidget);
-
+    // Privacy is one of the "How it works" cards, not a page of its own.
     await tester.tap(find.text('Next'));
     await tester.pumpAndSettle();
     expect(find.text('Choose how to begin'), findsOneWidget);

@@ -17,7 +17,9 @@ class OnboardingPage extends ConsumerStatefulWidget {
 }
 
 class _OnboardingPageState extends ConsumerState<OnboardingPage> {
-  static const _pageCount = 5;
+  // Short: the wall preview comes first, privacy is one of the "how it
+  // works" cards (not a page of its own).
+  static const _pageCount = 4;
 
   final _pageController = PageController();
   final _nameController = TextEditingController();
@@ -126,10 +128,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                       preview: _trimmedName.isEmpty
                           ? null
                           : l10n.onboardingNiceToMeetYou(_trimmedName),
-                    ),
-                    _PrivacyStep(
-                      title: l10n.storyPrivacyTitle,
-                      body: l10n.onboardingPrivacy,
                     ),
                     _GetStartedStep(
                       title: l10n.onboardingGetStartedTitle,
@@ -521,51 +519,6 @@ class _NameStep extends StatelessWidget {
             ),
           ),
         ],
-      ],
-    );
-  }
-}
-
-class _PrivacyStep extends StatelessWidget {
-  const _PrivacyStep({required this.title, required this.body});
-
-  final String title;
-  final String body;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(22, 12, 22, 12),
-      children: [
-        Container(
-          width: 72,
-          height: 72,
-          decoration: BoxDecoration(
-            color: AppColors.gold.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.gold.withValues(alpha: 0.32)),
-          ),
-          child: Icon(Icons.lock_rounded, color: AppColors.gold, size: 34),
-        ),
-        const SizedBox(height: 22),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.8,
-          ),
-        ),
-        const SizedBox(height: 14),
-        Text(
-          body,
-          style: TextStyle(
-            color: AppColors.muted,
-            fontSize: 17,
-            height: 1.45,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
       ],
     );
   }

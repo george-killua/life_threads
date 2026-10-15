@@ -1,0 +1,72 @@
+# WAL-10 Edit pencils on a memory, renaming and deleting a wall;
+# SET-05 App lock (the simulator asks for its passcode).
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+name: WAL-10 / SET-05 Edit pencils, wall rename and delete, app lock
+tags: [protocol, wal, set]
+---
+- runFlow: ../subflows/three_memories.yaml
+- runFlow: ../subflows/unlock_premium.yaml
+
+# WAL-10: a card's pencil opens the edit screen at that section.
+- runFlow: ../subflows/find_card.yaml
+- tapOn: "Summer in Split.*"
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "Edit Gallery"
+- tapOn: "Edit Gallery"
+- extendedWaitUntil:
+    visible: "Edit Memory"
+    timeout: 10000
+- assertVisible: "Add photos"
+- takeScreenshot: WAL-10_pencil_gallery
+- tapOn: "Back"
+- tapOn: "Back"
+
+# WAL-10: rename a wall, then delete it; its memories go back to My wall.
+- runFlow:
+    file: ../subflows/more.yaml
+    env:
+      ITEM: "New wall"
+- extendedWaitUntil:
+    visible: "(?s)Wall name.*"
+    timeout: 10000
+- inputText: "Weekend"
+- tapOn: "Create"
+- runFlow: ../subflows/find_card.yaml
+- longPressOn: "Summer in Split.*"
+- tapOn: "Move to wall…"
+- tapOn: "Weekend"
+- tapOn: "(?s)Switch wall.*"
+- tapOn: "Wall options"
+- tapOn: "Rename"
+- eraseText: 20
+- inputText: "Weekend trips"
+- tapOn: "Save"
+- extendedWaitUntil:
+    visible: "(?s)Switch wall.*Weekend trips.*"
+    timeout: 10000
+- takeScreenshot: WAL-10_renamed
+- tapOn: "(?s)Switch wall.*"
+- tapOn: "Wall options"
+- tapOn: "Delete wall"
+- assertVisible: ".*nothing is lost.*"
+- tapOn: "Delete"
+- extendedWaitUntil:
+    visible: "Grandpa's garden.*"
+    timeout: 10000
+- runFlow: ../subflows/find_card.yaml
+- assertVisible: "Summer in Split.*"
+- takeScreenshot: WAL-10_wall_deleted
+
+# SET-05: turning on the app lock asks the phone first.
+- runFlow: ../subflows/open_settings.yaml
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "(?s)App lock.*"
+- tapOn: "(?s)App lock.*"
+- extendedWaitUntil:
+    visible: "(?s).*Unlock your memories.*"
+    timeout: 10000
+- takeScreenshot: SET-05_app_lock_asks

@@ -13,7 +13,6 @@ appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding
 - runFlow: hide_keyboard.yaml
 - tapOn: "What should we call you?"
 - tapOn: "Next"
-- tapOn: "Next"
 - tapOn: "Start fresh"
 - extendedWaitUntil:
     visible: "Start with one thing from today"

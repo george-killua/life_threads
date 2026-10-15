@@ -19,8 +19,6 @@ tags: [protocol, ins]
 - tapOn: "What should we call you?"  # closes the keyboard
 - assertVisible: "Nice to meet you, Lina."
 - tapOn: "Next"
-- assertVisible: "Your memories stay private"
-- tapOn: "Next"
 - assertVisible: "Choose how to begin"
 - tapOn: "Preview demo wall"
 - extendedWaitUntil:
