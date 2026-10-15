@@ -1,0 +1,60 @@
+# WAL-01 Add a memory with photos, WAL-02 Photo permission,
+# WAL-07 People (from contacts) and place (from photo GPS)
+appId: ${APP_ID}
+name: WAL-01/02/07 Add a memory with photos, a person and a place
+tags: [protocol, wal]
+---
+- runFlow: ../subflows/fresh_wall.yaml
+- tapOn: "Save a moment"
+- extendedWaitUntil:
+    visible: "Save it before it fades"
+    timeout: 15000
+- tapOn: "Moment"
+- inputText: "Summer in Split"
+- tapOn: "What made it worth keeping?"
+- inputText: "Barefoot until the sun went down."
+- tapOn: "Save it before it fades"
+- tapOn: "Pick"
+# WAL-02: the app asks for photo access through the system dialog
+# (Maestro allows it), then shows its own picker.
+- extendedWaitUntil:
+    visible: "Select photos"
+    timeout: 60000
+- takeScreenshot: WAL-02_photo_picker
+- tapOn: "Photo from ${PHOTO_YEAR_AGO}"
+- tapOn: "Photo from ${PHOTO_GARDEN}"
+- assertVisible: ".*2 new.*|Use selected"
+- tapOn: "Use selected"
+- extendedWaitUntil:
+    visible: "Cover photo"
+    timeout: 30000
+- takeScreenshot: WAL-01_photos_added
+- tapOn: "Continue"
+- assertVisible: "How should this feel when it returns?.*|.*How should this feel.*"
+- tapOn: "Warm.*"
+- tapOn: "Continue"
+# WAL-07: date (the earliest photo) and GPS come from the photos' EXIF.
+- assertVisible: ".*${PHOTO_GARDEN}.*"
+- assertVisible: ".*Photo GPS detected.*"
+- takeScreenshot: WAL-07_date_and_place
+- tapOn: "Continue"
+# WAL-07: a person from the contacts.
+- tapOn: "Add person"
+- tapOn: "Choose from contacts"
+- runFlow:
+    file: ../subflows/pick_contact_kate.yaml
+- extendedWaitUntil:
+    visible: "Relationship"
+    timeout: 15000
+- tapOn: "Relationship"
+- inputText: "Sister"
+- tapOn: "Add person"
+- tapOn: "Save"
+- assertVisible: ".*Kate Bell.*"
+- takeScreenshot: WAL-07_person
+- tapOn: "Hang on wall"
+- extendedWaitUntil:
+    notVisible: "Save it before it fades"
+    timeout: 20000
+- assertVisible: "Summer in Split.*"
+- takeScreenshot: WAL-01_on_the_wall

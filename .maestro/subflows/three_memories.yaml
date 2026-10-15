@@ -1,0 +1,27 @@
+# A fresh wall with three memories from last year (Thread of the Year needs
+# at least three in one year): Summer in Split (one year ago today), Above
+# the clouds and Grandpa's garden.
+appId: ${APP_ID}
+---
+- runFlow: fresh_wall.yaml
+- runFlow:
+    file: add_memory.yaml
+    env:
+      TITLE: "Summer in Split"
+      STORY: "Barefoot until the sun went down."
+      PHOTO: ${PHOTO_YEAR_AGO}
+      FEELING: "Warm.*"
+- runFlow:
+    file: add_memory.yaml
+    env:
+      TITLE: "Above the clouds"
+      STORY: "We reached the summit at sunrise."
+      PHOTO: ${PHOTO_SUMMIT}
+      FEELING: "Proud.*"
+- runFlow:
+    file: add_memory.yaml
+    env:
+      TITLE: "Grandpa's garden"
+      STORY: "Four generations around one table."
+      PHOTO: ${PHOTO_GARDEN}
+      FEELING: "Nostalgic.*"

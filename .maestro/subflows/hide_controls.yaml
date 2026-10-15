@@ -1,0 +1,8 @@
+# Collapses the wall controls if they are open.
+appId: ${APP_ID}
+---
+- runFlow:
+    when:
+      visible: "Hide controls"
+    commands:
+      - tapOn: "Hide controls"

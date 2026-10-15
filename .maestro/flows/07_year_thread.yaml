@@ -1,0 +1,59 @@
+# YR-01 Thread of the Year: choose a year, length and music, export the
+# film and an image, save, preview.
+appId: ${APP_ID}
+name: YR-01 Thread of the Year
+tags: [protocol, yr]
+---
+- runFlow: ../subflows/three_memories.yaml
+- runFlow: ../subflows/unlock_premium.yaml
+- runFlow: ../subflows/open_settings.yaml
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "Make the film"
+- tapOn: "Make the film"
+- extendedWaitUntil:
+    visible: "Thread of the Year"
+    timeout: 10000
+- assertVisible: "${LAST_YEAR}"
+- assertVisible: "(?s).*3 memories.*"
+- assertVisible: "(?s)Grandpa's garden.*"
+- assertVisible: "(?s)Above the clouds.*"
+- tapOn: "Story · 20 s"
+- takeScreenshot: YR-01_setup
+
+# Export the film first (the preview is checked last, see the report).
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "Export video"
+- tapOn: "Export video"
+- extendedWaitUntil:
+    visible: "Your film is ready"
+    timeout: 240000
+- tapOn: "Save to Photos"
+- extendedWaitUntil:
+    visible: "Saved to your photos."
+    timeout: 60000
+- takeScreenshot: YR-01_film_saved
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "Export image"
+- tapOn: "Export image"
+- extendedWaitUntil:
+    visible: "Your image is ready"
+    timeout: 120000
+- takeScreenshot: YR-01_image_ready
+- tapOn: "Save to Photos"
+- extendedWaitUntil:
+    visible: "Saved to your photos."
+    timeout: 60000
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "Preview"
+      DIRECTION: UP
+- tapOn: "Preview"
+- waitForAnimationToEnd
+- takeScreenshot: YR-01_preview

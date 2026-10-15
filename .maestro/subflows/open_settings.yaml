@@ -1,0 +1,8 @@
+# Opens Settings from the wall controls.
+appId: ${APP_ID}
+---
+- runFlow: show_controls.yaml
+- tapOn: "Settings"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 10000

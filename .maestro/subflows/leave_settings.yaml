@@ -1,0 +1,9 @@
+# Scrolls Settings to the top and goes back to the wall.
+appId: ${APP_ID}
+---
+- runFlow:
+    file: scroll_to.yaml
+    env:
+      TARGET: "Back"
+      DIRECTION: UP
+- tapOn: "Back"

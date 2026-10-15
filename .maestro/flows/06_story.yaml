@@ -1,0 +1,107 @@
+# STO-01 Choose memories, STO-02 Story image, STO-03 Reorder/add/remove,
+# STO-04 Video with music, STO-05 Share and save
+appId: ${APP_ID}
+name: STO-01..05 Create Story
+tags: [protocol, sto]
+---
+- runFlow: ../subflows/three_memories.yaml
+- runFlow: ../subflows/unlock_premium.yaml
+- runFlow: ../subflows/show_controls.yaml
+- tapOn: "Create story"
+
+# STO-01: choose memories.
+- extendedWaitUntil:
+    visible: "Choose memories"
+    timeout: 10000
+- assertVisible: "0 of 6 chosen"
+- tapOn: "Summer in Split.*"
+- tapOn: "Above the clouds.*"
+- assertVisible: "2 of 6 chosen"
+- tapOn: "Summer in Split.*"
+- assertVisible: "1 of 6 chosen"
+- tapOn: "Summer in Split.*"
+- tapOn: "Continue"
+- extendedWaitUntil:
+    visible: "Your story"
+    timeout: 10000
+
+# STO-02: templates and caption.
+- tapOn: "Thread"
+- takeScreenshot: STO-02_thread
+- tapOn: "Collage"
+- takeScreenshot: STO-02_collage
+- tapOn: "Quote"
+- takeScreenshot: STO-02_quote
+- tapOn: "Single memory"
+- takeScreenshot: STO-02_single
+
+# STO-03: add a memory, remove one.
+- tapOn: "Add"
+- extendedWaitUntil:
+    visible: "Grandpa's garden.*"
+    timeout: 10000
+- tapOn: "Grandpa's garden.*"
+- extendedWaitUntil:
+    visible: "(?s)3\\. Grandpa's garden.*"
+    timeout: 10000
+- tapOn: "Remove Above the clouds from the story"
+- assertNotVisible: "(?s)\\d\\. Above the clouds.*"
+- assertVisible: "(?s)2\\. Grandpa's garden.*"
+- takeScreenshot: STO-03_reordered
+
+# STO-04: video with music and the song-part trimmer.
+- tapOn: "Collage"
+- tapOn: "(?s)Video.*"
+- repeat:
+    while:
+      notVisible: "Ocean Memory.*"
+    times: 8
+    commands:
+      - swipe:
+          start: 50%, 85%
+          end: 50%, 62%
+          duration: 400
+- tapOn: "Ocean Memory.*"
+- repeat:
+    while:
+      notVisible: "(?s)Drag to choose which part plays.*"
+    times: 10
+    commands:
+      - swipe:
+          start: 50%, 85%
+          end: 50%, 62%
+          duration: 400
+- copyTextFrom: "(?s)Drag to choose which part plays.*"
+- evalScript: ${output.partBefore = maestro.copiedText}
+- swipe:
+    start: 50%, 83%
+    end: 25%, 83%
+    duration: 800
+- assertNotVisible: ${output.partBefore}
+- takeScreenshot: STO-04_music_part
+
+# STO-05: save the video to Photos, then open the share sheet.
+- tapOn: "Save to Photos"
+- extendedWaitUntil:
+    visible: "Saved to your photos."
+    timeout: 180000
+- takeScreenshot: STO-05_saved
+- tapOn: "Share"
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - extendedWaitUntil:
+          visible: "Close"
+          timeout: 120000
+      - takeScreenshot: STO-05_share_sheet
+      - tapOn: "Close"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - extendedWaitUntil:
+          visible: "Nearby Share|Copy|Gmail|Drive|Messages"
+          timeout: 120000
+      - takeScreenshot: STO-05_share_sheet
+      - back

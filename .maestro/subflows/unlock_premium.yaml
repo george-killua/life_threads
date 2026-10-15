@@ -1,0 +1,34 @@
+# Unlocks Premium with the debug build's test switch (simulators have no
+# store account). The real purchase flow is covered by the Flutter tests.
+appId: ${APP_ID}
+---
+- runFlow: open_settings.yaml
+- runFlow:
+    file: scroll_to.yaml
+    env:
+      TARGET: "Open Premium"
+      DIRECTION: DOWN
+- tapOn: "Open Premium"
+- extendedWaitUntil:
+    visible: ".*LifeThreads Premium.*"
+    timeout: 10000
+- runFlow:
+    file: scroll_to.yaml
+    env:
+      TARGET: ".*debug mock unlock.*"
+      DIRECTION: DOWN
+- tapOn: ".*debug mock unlock.*"
+- extendedWaitUntil:
+    visible: ".*Premium Active.*|.*Premium is active.*"
+    timeout: 10000
+- runFlow:
+    file: scroll_to.yaml
+    env:
+      TARGET: "Back"
+      DIRECTION: UP
+- tapOn: "Back"
+- runFlow:
+    when:
+      visible: "Open Premium|(?s)Your name.*"
+    file: leave_settings.yaml
+- runFlow: hide_controls.yaml

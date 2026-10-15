@@ -1,0 +1,8 @@
+# Opens the wall controls if they are collapsed.
+appId: ${APP_ID}
+---
+- runFlow:
+    when:
+      visible: "Wall Controls"
+    commands:
+      - tapOn: "Wall Controls"

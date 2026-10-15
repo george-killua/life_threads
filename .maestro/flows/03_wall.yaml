@@ -1,0 +1,125 @@
+# WAL-03 Move around the wall, WAL-04 Connect two memories with a thread,
+# WAL-05 Open, edit and delete, WAL-06 Timeline and map
+appId: ${APP_ID}
+name: WAL-03/04/05/06 Wall, threads, edit and delete, timeline and map
+tags: [protocol, wal]
+---
+- runFlow: ../subflows/three_memories.yaml
+- assertVisible: "Summer in Split.*"
+# On this day: the photo from one year ago today comes back on the wall.
+- assertVisible: "1 year ago today.*"
+
+# WAL-03: pan the wall to the card off screen, drag it, reopen the app.
+- repeat:
+    while:
+      notVisible: "Grandpa's garden.*"
+    times: 6
+    commands:
+      - swipe:
+          start: 85%, 62%
+          end: 25%, 62%
+- assertVisible: "Grandpa's garden.*"
+- swipe:
+    from:
+      text: "Grandpa's garden.*"
+    direction: DOWN
+- takeScreenshot: WAL-03_moved
+- stopApp
+- launchApp:
+    appId: ${APP_ID}
+    arguments:
+      "-AppleLanguages": "(en)"
+- extendedWaitUntil:
+    visible: "Wall Controls"
+    timeout: 90000
+- runFlow: ../subflows/find_card.yaml
+
+# WAL-04: connect Summer in Split with Above the clouds.
+- tapOn: "Summer in Split.*"
+- extendedWaitUntil:
+    visible: "Connect"
+    timeout: 10000
+- tapOn: "Connect"
+- extendedWaitUntil:
+    visible: "Thread Reasons"
+    timeout: 10000
+- tapOn: "Above the clouds.*"
+- extendedWaitUntil:
+    visible: "Why are they connected?"
+    timeout: 10000
+- inputText: "Same summer, two adventures"
+- tapOn: "Save Reason"
+- assertVisible: ".*Same summer, two adventures.*"
+- takeScreenshot: WAL-04_thread_reason
+- tapOn: "Back"
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: ".*Same summer, two adventures.*"
+      DIRECTION: DOWN
+- takeScreenshot: WAL-04_connected_memories
+
+# WAL-05: edit the title, then delete a memory.
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "Edit story"
+      DIRECTION: UP
+- tapOn: "Edit story"
+- extendedWaitUntil:
+    visible: "Edit Memory"
+    timeout: 10000
+- tapOn: "Summer in Split"
+- eraseText: 30
+- inputText: "Summer by the sea"
+- tapOn: "Edit Memory"
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "Save memory"
+      DIRECTION: DOWN
+- tapOn: "Save memory"
+- extendedWaitUntil:
+    visible: "Edit story"
+    timeout: 10000
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: ".*Summer by the sea.*"
+      DIRECTION: UP
+- takeScreenshot: WAL-05_edited
+- tapOn: "Back"
+- extendedWaitUntil:
+    visible: "Summer by the sea.*"
+    timeout: 10000
+- longPressOn: "Grandpa's garden.*"
+- tapOn: "Delete"
+- assertVisible: "Delete memory?"
+- tapOn: "Delete"
+- extendedWaitUntil:
+    notVisible: "Grandpa's garden.*"
+    timeout: 10000
+- takeScreenshot: WAL-05_deleted
+
+# WAL-06: timeline, map and the category filter.
+- runFlow: ../subflows/show_controls.yaml
+- tapOn: "Timeline"
+- extendedWaitUntil:
+    visible: ".*Summer by the sea.*"
+    timeout: 10000
+- assertVisible: ".*Above the clouds.*"
+- assertNotVisible: ".*Grandpa's garden.*"
+- takeScreenshot: WAL-06_timeline
+- runFlow: ../subflows/show_controls.yaml
+- tapOn: "Map"
+- extendedWaitUntil:
+    visible: "Memory Map"
+    timeout: 10000
+- takeScreenshot: WAL-06_map
+- runFlow: ../subflows/show_controls.yaml
+- tapOn: "Wall"
+- runFlow: ../subflows/show_controls.yaml
+- tapOn: "Travel"
+- assertNotVisible: "Summer by the sea.*"
+- tapOn: "All"
+- assertVisible: "Summer by the sea.*"

@@ -1,0 +1,43 @@
+# WAL-08 Free limit: 30 memories, then the app offers Premium.
+appId: ${APP_ID}
+name: WAL-08 Free memory limit
+tags: [protocol, wal, slow]
+---
+- runFlow: ../subflows/fresh_wall.yaml
+- evalScript: ${output.count = 0}
+- repeat:
+    times: 30
+    commands:
+      - evalScript: ${output.count = output.count + 1}
+      - runFlow:
+          when:
+            visible: "Save a moment"
+          commands:
+            - tapOn: "Save a moment"
+      - runFlow:
+          when:
+            notVisible: "Save a moment"
+          commands:
+            - tapOn: "Add"
+            - tapOn: "Memory Full guided story.*"
+      - extendedWaitUntil:
+          visible: "Save it before it fades"
+          timeout: 15000
+      - tapOn: "Moment"
+      - inputText: "Moment ${output.count}"
+      - tapOn: "Save it before it fades"
+      - tapOn: "Save now"
+      - extendedWaitUntil:
+          notVisible: "Save it before it fades"
+          timeout: 15000
+- tapOn: "Add"
+- tapOn: "Memory Full guided story.*"
+- extendedWaitUntil:
+    visible: "Free memory limit reached"
+    timeout: 15000
+- assertVisible: ".*Free walls include 30 memories.*"
+- takeScreenshot: WAL-08_free_limit
+- tapOn: "View Premium"
+- extendedWaitUntil:
+    visible: ".*LifeThreads Premium.*"
+    timeout: 10000

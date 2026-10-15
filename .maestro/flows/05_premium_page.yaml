@@ -1,0 +1,35 @@
+# PRM-01 Premium page: what Premium includes, renewal terms, Terms and
+# Privacy links, Subscribe and Restore. (PRM-02/03/04, the purchase itself,
+# run in the Flutter tests with a stand-in store.)
+appId: ${APP_ID}
+name: PRM-01 Premium page
+tags: [protocol, prm]
+---
+- runFlow: ../subflows/fresh_wall.yaml
+- runFlow: ../subflows/open_settings.yaml
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "Open Premium"
+      DIRECTION: DOWN
+- tapOn: "Open Premium"
+- extendedWaitUntil:
+    visible: ".*LifeThreads Premium.*"
+    timeout: 10000
+- takeScreenshot: PRM-01_top
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "View privacy policy"
+      DIRECTION: DOWN
+- takeScreenshot: PRM-01_offer
+- assertVisible: "Subscribe to Premium"
+- assertVisible: "Restore subscription"
+- assertVisible: "View terms"
+# Renewal terms are shown next to the price (App Store rule 3.1.2).
+- assertVisible: ".*renews automatically every month.*"
+# No store account on a simulator: the page says so instead of crashing.
+- assertVisible: ".*could not be loaded from the store.*|.*not available.*|.*€.*"
+- tapOn: "View privacy policy"
+- waitForAnimationToEnd
+- takeScreenshot: PRM-01_privacy_link

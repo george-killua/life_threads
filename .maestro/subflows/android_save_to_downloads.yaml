@@ -1,0 +1,12 @@
+# Android share sheet: save the shared file to Downloads through Files.
+appId: ${APP_ID}
+---
+- extendedWaitUntil:
+    visible: "Files|Save to Files|Drive"
+    timeout: 60000
+- tapOn: "Files|Save to Files"
+- extendedWaitUntil:
+    visible: "SAVE|Save"
+    timeout: 20000
+- tapOn: "SAVE|Save"
+- waitForAnimationToEnd

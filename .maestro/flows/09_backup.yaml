@@ -1,0 +1,96 @@
+# BAK-01 Back up everything (encrypted), BAK-02 Restore it: nothing is
+# duplicated, and a deleted memory comes back.
+appId: ${APP_ID}
+name: BAK-01/02 Backup and restore
+tags: [protocol, bak]
+---
+- runFlow: ../subflows/three_memories.yaml
+- runFlow: ../subflows/open_settings.yaml
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "Export Archive"
+- tapOn: "Export Archive"
+- extendedWaitUntil:
+    visible: "Archive password (optional)"
+    timeout: 10000
+- tapOn: "Archive password (optional)"
+- inputText: "Lina-2026"
+- tapOn: "Export backup"
+- assertVisible: ".*cannot be recovered.*"
+- tapOn: "Export"
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - extendedWaitUntil:
+          visible: "Save to Files|In Dateien sichern"
+          timeout: 60000
+      - tapOn:
+          text: "Save to Files|In Dateien sichern"
+          index: 0
+      - extendedWaitUntil:
+          visible: "Save"
+          timeout: 15000
+      - tapOn: "Save"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - runFlow: ../subflows/android_save_to_downloads.yaml
+- takeScreenshot: BAK-01_exported
+
+# Delete one memory, then restore the backup.
+- runFlow: ../subflows/leave_settings.yaml
+- longPressOn: "Summer in Split.*"
+- tapOn: "Delete"
+- tapOn: "Delete"
+- extendedWaitUntil:
+    notVisible: "Summer in Split.*"
+    timeout: 10000
+- runFlow: ../subflows/open_settings.yaml
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "Import Archive"
+- tapOn: "Import Archive"
+- tapOn: "Archive password"
+- inputText: "Lina-2026"
+- tapOn: "Import Archive"
+- tapOn: "Choose Archive"
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - extendedWaitUntil:
+          visible: "lifethreads_encrypted_.*zip, zip.*"
+          timeout: 20000
+      - tapOn: "lifethreads_encrypted_.*zip, zip.*"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - extendedWaitUntil:
+          visible: "lifethreads_encrypted_.*"
+          timeout: 20000
+      - tapOn: "lifethreads_encrypted_.*"
+- extendedWaitUntil:
+    visible: "Archive imported"
+    timeout: 60000
+- takeScreenshot: BAK-02_imported
+- tapOn: "Done"
+- runFlow: ../subflows/leave_settings.yaml
+- runFlow: ../subflows/show_controls.yaml
+- tapOn: "Timeline"
+- extendedWaitUntil:
+    visible: ".*Summer in Split.*"
+    timeout: 10000
+# Restored, and nothing doubled: each memory exactly once.
+- assertVisible: ".*Above the clouds.*"
+- assertNotVisible:
+    text: ".*Above the clouds.*"
+    index: 1
+- assertNotVisible:
+    text: ".*Summer in Split.*"
+    index: 1
+- takeScreenshot: BAK-02_timeline

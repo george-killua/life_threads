@@ -1,0 +1,35 @@
+# INS-02 Onboarding, INS-03 Demo wall
+appId: ${APP_ID}
+name: INS-02/03 Onboarding and demo wall
+tags: [protocol, ins]
+---
+- runFlow: ../subflows/launch_fresh.yaml
+- extendedWaitUntil:
+    visible: "Build your living wall."
+    timeout: 120000
+- takeScreenshot: INS-02_welcome
+- tapOn: "Next"
+- assertVisible: "How it works"
+- tapOn: "Next"
+- assertVisible: "What should we call you?"
+- tapOn:
+    text: "Your name"
+- inputText: "Lina"
+- tapOn: "What should we call you?"  # closes the keyboard
+- assertVisible: "Nice to meet you, Lina."
+- tapOn: "Next"
+- assertVisible: "Your memories stay private"
+- tapOn: "Next"
+- assertVisible: "Choose how to begin"
+- tapOn: "Preview demo wall"
+- extendedWaitUntil:
+    visible: "Demo wall preview. Clear it when you are ready to start fresh."
+    timeout: 20000
+- takeScreenshot: INS-03_demo_wall
+- tapOn: "Clear demo"
+- assertVisible: "Clear demo wall?"
+- tapOn: "Start fresh"
+- extendedWaitUntil:
+    visible: "Start with one thing from today"
+    timeout: 15000
+- takeScreenshot: INS-03_empty_wall
