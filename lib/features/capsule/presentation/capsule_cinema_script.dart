@@ -3,20 +3,10 @@ import 'package:flutter/widgets.dart' show StringCharacters;
 import '../../memories/domain/memory_feeling.dart';
 import '../domain/memory_capsule_models.dart';
 
-enum CapsuleCinemaBeatKind {
-  seal,
-  cover,
-  story,
-  place,
-  thread,
-  invite,
-}
+enum CapsuleCinemaBeatKind { seal, cover, story, place, thread, invite }
 
 class CapsuleCinemaBeat {
-  const CapsuleCinemaBeat({
-    required this.kind,
-    required this.duration,
-  });
+  const CapsuleCinemaBeat({required this.kind, required this.duration});
 
   final CapsuleCinemaBeatKind kind;
   final Duration duration;

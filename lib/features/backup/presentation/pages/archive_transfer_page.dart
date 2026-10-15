@@ -20,6 +20,9 @@ class ArchiveTransferPage extends StatelessWidget {
                 children: [
                   IconButton(
                     onPressed: () => context.pop(),
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).backButtonTooltip,
                     icon: const Icon(Icons.arrow_back_rounded),
                   ),
                   const SizedBox(width: 8),

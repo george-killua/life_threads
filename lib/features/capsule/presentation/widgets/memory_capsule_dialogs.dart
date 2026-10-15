@@ -66,6 +66,9 @@ Future<String?> showMemoryCapsulePasswordDialog(
                       errorText: errorText,
                       suffixIcon: IconButton(
                         onPressed: () => setState(() => obscure = !obscure),
+                        tooltip: obscure
+                            ? l10n.showPassword
+                            : l10n.hidePassword,
                         icon: Icon(
                           obscure
                               ? Icons.visibility_rounded

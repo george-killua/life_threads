@@ -461,6 +461,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get useSelected => 'Use selected';
 
   @override
+  String photoGridItem(String date) {
+    return 'Photo from $date';
+  }
+
+  @override
   String get noPhotosFound => 'No photos found.';
 
   @override
@@ -2958,4 +2963,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get familyReportEvidenceNote =>
       'To review it, GK Coding receives this memory\'s title and story with your report. Its photos are never sent.';
+
+  @override
+  String get moveLeft => 'Move left';
+
+  @override
+  String get moveUp => 'Move up';
+
+  @override
+  String get moveDown => 'Move down';
+
+  @override
+  String get moveRight => 'Move right';
+
+  @override
+  String get showPassword => 'Show password';
+
+  @override
+  String get hidePassword => 'Hide password';
+
+  @override
+  String get removePerson => 'Remove person';
 }

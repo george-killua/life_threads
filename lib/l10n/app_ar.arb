@@ -133,6 +133,7 @@
   "cinemaConnectedThread": "خيط متصل",
   "cinemaInviteTitle": "إضافة هذه الذكرى إلى جدارك؟",
   "useSelected": "استخدام المحدد",
+  "photoGridItem": "صورة من {date}",
   "noPhotosFound": "لم يتم العثور على صور.",
   "manage": "إدارة",
   "manageAccess": "إدارة الوصول",
@@ -903,5 +904,12 @@
   "familyErrorNameTooLong": "هذا الاسم طويل جداً. يُرجى استخدام اسم أقصر.",
   "familyErrorPhotoUnreadable": "تعذّرت قراءة إحدى الصور. أزلها وحاول مجدداً.",
   "familyErrorTooLarge": "هذا كبير جداً للرفع. جرّب صوراً أقل أو أصغر.",
-  "familyReportEvidenceNote": "لمراجعة البلاغ تتلقى GK Coding عنوان هذه الذكرى وقصتها مع بلاغك. لا تُرسل صورها أبداً."
+  "familyReportEvidenceNote": "لمراجعة البلاغ تتلقى GK Coding عنوان هذه الذكرى وقصتها مع بلاغك. لا تُرسل صورها أبداً.",
+  "moveLeft": "تحريك لليسار",
+  "moveUp": "تحريك للأعلى",
+  "moveDown": "تحريك للأسفل",
+  "moveRight": "تحريك لليمين",
+  "showPassword": "إظهار كلمة المرور",
+  "hidePassword": "إخفاء كلمة المرور",
+  "removePerson": "إزالة الشخص"
 }

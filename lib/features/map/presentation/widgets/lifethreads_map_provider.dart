@@ -86,12 +86,13 @@ class _OpenFreeMapLayerState extends State<_OpenFreeMapLayer> {
   // failed fetch is retried the next time a map is shown.
   static Future<Style>? _style;
 
-  late final Future<Style> _future = _style ??= StyleReader(
-    uri: lifeThreadsOpenFreeMapStyleUrl,
-  ).read().catchError((Object error) {
-    _style = null;
-    throw error;
-  });
+  late final Future<Style> _future = _style ??=
+      StyleReader(uri: lifeThreadsOpenFreeMapStyleUrl).read().catchError((
+        Object error,
+      ) {
+        _style = null;
+        throw error;
+      });
 
   @override
   Widget build(BuildContext context) {

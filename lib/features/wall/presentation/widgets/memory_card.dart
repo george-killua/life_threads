@@ -383,11 +383,7 @@ class _Pin extends StatelessWidget {
     return Positioned(
       top: -44,
       left: 80,
-      child: MetallicBallPin(
-        size: 17,
-        showStem: false,
-        elevated: isDragging,
-      ),
+      child: MetallicBallPin(size: 17, showStem: false, elevated: isDragging),
     );
   }
 }

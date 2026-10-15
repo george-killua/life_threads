@@ -699,6 +699,7 @@ class _CoverPicker extends StatelessWidget {
                 if (onClear != null)
                   IconButton.filledTonal(
                     onPressed: isPicking ? null : onClear,
+                    tooltip: context.l10n.removePhoto,
                     icon: const Icon(Icons.close_rounded),
                   ),
                 FilledButton.icon(
@@ -873,7 +874,7 @@ class _GalleryPhotoTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${photo.width} x ${photo.height} • ${_shortDate(photo.capturedAt)}',
+                  '${photo.width} x ${photo.height} • ${_shortDate(context, photo.capturedAt)}',
                   style: const TextStyle(color: AppColors.muted, fontSize: 12),
                 ),
                 if (photo.hasLocation) ...[
@@ -920,9 +921,10 @@ class _GalleryPhotoTile extends StatelessWidget {
     );
   }
 
-  static String _shortDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
-  }
+  static String _shortDate(BuildContext context, DateTime date) =>
+      DateFormat.yMd(
+        Localizations.localeOf(context).toLanguageTag(),
+      ).format(date);
 }
 
 enum _PhotoAction { cover, replace, remove }

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import '../../../../app/theme/app_colors.dart';
@@ -91,45 +92,55 @@ class _PhotoGridSheetState extends State<PhotoGridSheet> {
                       final alreadyAdded = widget.initiallySelectedIds.contains(
                         asset.id,
                       );
-                      return GestureDetector(
-                        onTap: alreadyAdded
-                            ? null
-                            : () => setState(() {
-                                if (selected) {
-                                  _selectedIds.remove(asset.id);
-                                } else {
-                                  _selectedIds.add(asset.id);
-                                }
-                              }),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              _AssetThumbnail(asset: asset),
-                              if (selected || alreadyAdded)
-                                DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.wallInk.withValues(
-                                      alpha: alreadyAdded ? 0.62 : 0.36,
-                                    ),
-                                    border: Border.all(
-                                      color: alreadyAdded
-                                          ? AppColors.muted
-                                          : AppColors.gold,
-                                      width: 3,
+                      return Semantics(
+                        button: true,
+                        selected: selected || alreadyAdded,
+                        label: context.l10n.photoGridItem(
+                          DateFormat.yMMMd(
+                            Localizations.localeOf(context).toLanguageTag(),
+                          ).format(asset.createDateTime),
+                        ),
+                        excludeSemantics: true,
+                        child: GestureDetector(
+                          onTap: alreadyAdded
+                              ? null
+                              : () => setState(() {
+                                  if (selected) {
+                                    _selectedIds.remove(asset.id);
+                                  } else {
+                                    _selectedIds.add(asset.id);
+                                  }
+                                }),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                _AssetThumbnail(asset: asset),
+                                if (selected || alreadyAdded)
+                                  DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      color: AppColors.wallInk.withValues(
+                                        alpha: alreadyAdded ? 0.62 : 0.36,
+                                      ),
+                                      border: Border.all(
+                                        color: alreadyAdded
+                                            ? AppColors.muted
+                                            : AppColors.gold,
+                                        width: 3,
+                                      ),
                                     ),
                                   ),
+                                Positioned(
+                                  right: 7,
+                                  top: 7,
+                                  child: _SelectionBadge(
+                                    selected: selected,
+                                    alreadyAdded: alreadyAdded,
+                                  ),
                                 ),
-                              Positioned(
-                                right: 7,
-                                top: 7,
-                                child: _SelectionBadge(
-                                  selected: selected,
-                                  alreadyAdded: alreadyAdded,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       );

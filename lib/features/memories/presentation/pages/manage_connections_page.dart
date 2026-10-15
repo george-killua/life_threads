@@ -174,42 +174,50 @@ class _ConnectionReasonCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Row(
-            children: [
-              CircleAvatar(backgroundColor: event.coverColor),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      event.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                      ),
+          // The whole row toggles the thread, and screen readers announce
+          // the memory's name together with the switch.
+          MergeSemantics(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => onToggle(!isConnected),
+              child: Row(
+                children: [
+                  CircleAvatar(backgroundColor: event.coverColor),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          event.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          [
+                            event.category.localizedLabel(context.l10n),
+                            if (event.hasGeoPoint) event.locationDisplayLabel,
+                          ].join(' • '),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: AppColors.muted),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      [
-                        event.category.localizedLabel(context.l10n),
-                        if (event.hasGeoPoint) event.locationDisplayLabel,
-                      ].join(' • '),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: AppColors.muted),
-                    ),
-                  ],
-                ),
+                  ),
+                  Switch(
+                    value: isConnected,
+                    activeThumbColor: AppColors.gold,
+                    onChanged: onToggle,
+                  ),
+                ],
               ),
-              Switch(
-                value: isConnected,
-                activeThumbColor: AppColors.gold,
-                onChanged: onToggle,
-              ),
-            ],
+            ),
           ),
           if (isConnected) ...[
             const SizedBox(height: 12),

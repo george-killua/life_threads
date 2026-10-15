@@ -112,11 +112,7 @@ class _CapsuleCinemaPageState extends State<CapsuleCinemaPage>
                 duration: const Duration(milliseconds: 500),
                 child: KeyedSubtree(
                   key: ValueKey(beat.kind),
-                  child: _BeatContent(
-                    script: script,
-                    beat: beat,
-                    wind: wind,
-                  ),
+                  child: _BeatContent(script: script, beat: beat, wind: wind),
                 ),
               ),
               SafeArea(
@@ -129,6 +125,9 @@ class _CapsuleCinemaPageState extends State<CapsuleCinemaPage>
                           IconButton(
                             onPressed: () =>
                                 _finish(CapsuleCinemaResult.dismiss),
+                            tooltip: MaterialLocalizations.of(
+                              context,
+                            ).closeButtonTooltip,
                             icon: const Icon(Icons.close_rounded),
                             color: AppColors.text,
                           ),
@@ -145,8 +144,7 @@ class _CapsuleCinemaPageState extends State<CapsuleCinemaPage>
                           beat.kind == CapsuleCinemaBeatKind.invite)
                         _InviteBar(
                           onAdd: () => _finish(CapsuleCinemaResult.addToWall),
-                          onDismiss: () =>
-                              _finish(CapsuleCinemaResult.dismiss),
+                          onDismiss: () => _finish(CapsuleCinemaResult.dismiss),
                         ),
                     ],
                   ),
