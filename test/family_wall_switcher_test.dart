@@ -151,23 +151,16 @@ void main() {
     expect(find.byType(FamilyWallPage), findsNothing);
   });
 
-  testWidgets('Settings has a Family walls card that opens the walls', (
-    tester,
-  ) async {
+  testWidgets('the wall\'s More menu opens the family walls', (tester) async {
     await pumpApp(
       tester,
       service: withFamilies(),
       familyWallsUsed: false,
-      initialLocation: RouteNames.settings,
-    );
-    final card = find.byKey(const ValueKey('settings-family-walls'));
-    await tester.scrollUntilVisible(
-      card,
-      300,
-      scrollable: find.byType(Scrollable).first,
+      initialLocation: RouteNames.wall,
     );
     expect(serviceReads, 0);
-    await tapAndSettle(tester, find.text('Open family walls'));
+    await tapAndSettle(tester, find.byKey(const ValueKey('wall-more-button')));
+    await tapAndSettle(tester, find.text('Family walls').last);
     expect(find.byType(FamilyWallsPage), findsOneWidget);
     expect(find.text('Sunday Table'), findsOneWidget);
     expect(find.text('Cousins'), findsOneWidget);

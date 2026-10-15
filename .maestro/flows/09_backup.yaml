@@ -16,11 +16,7 @@ tags: [protocol, bak]
       platform: iOS
     commands:
       - runFlow: ../subflows/three_memories.yaml
-      - runFlow: ../subflows/open_settings.yaml
-      - runFlow:
-          file: ../subflows/scroll_to.yaml
-          env:
-            TARGET: "Export Archive"
+      - runFlow: ../subflows/open_backup.yaml
       - tapOn: "Export Archive"
       - extendedWaitUntil:
           visible: "Archive password (optional)"
@@ -42,17 +38,13 @@ tags: [protocol, bak]
       - tapOn: "Save"
       - takeScreenshot: BAK-01_exported
       # Delete one memory, then restore the backup.
-      - runFlow: ../subflows/leave_settings.yaml
+      - runFlow: ../subflows/leave_backup.yaml
       - longPressOn: "Summer in Split.*"
       - tapOn: "Delete"
       - extendedWaitUntil:
           notVisible: "Summer in Split.*"
           timeout: 10000
-      - runFlow: ../subflows/open_settings.yaml
-      - runFlow:
-          file: ../subflows/scroll_to.yaml
-          env:
-            TARGET: "Import Archive"
+      - runFlow: ../subflows/open_backup.yaml
       - tapOn: "Import Archive"
       - tapOn: "Archive password"
       - inputText: "Lina-2026"
@@ -67,7 +59,7 @@ tags: [protocol, bak]
           timeout: 60000
       - takeScreenshot: BAK-02_imported
       - tapOn: "Done"
-      - runFlow: ../subflows/leave_settings.yaml
+      - runFlow: ../subflows/leave_backup.yaml
       - runFlow:
           file: ../subflows/view.yaml
           env:
@@ -99,11 +91,7 @@ tags: [protocol, bak]
             STORY: "The first quiet hour in the new flat."
             PHOTO: ${PHOTO_GARDEN}
             FEELING: "Calm.*"
-      - runFlow: ../subflows/open_settings.yaml
-      - runFlow:
-          file: ../subflows/scroll_to.yaml
-          env:
-            TARGET: "Export Archive"
+      - runFlow: ../subflows/open_backup.yaml
       - tapOn: "Export Archive"
       - tapOn: "Archive password (optional)"
       - inputText: "Lina-2026"
@@ -116,10 +104,6 @@ tags: [protocol, bak]
       - takeScreenshot: BAK-01_share_sheet
       - back
       # Restore the backup made on an iPhone.
-      - runFlow:
-          file: ../subflows/scroll_to.yaml
-          env:
-            TARGET: "Import Archive"
       - tapOn: "Import Archive"
       - tapOn: "Archive password"
       - inputText: "Lina-2026"
@@ -134,7 +118,7 @@ tags: [protocol, bak]
           timeout: 60000
       - takeScreenshot: BAK-02_imported
       - tapOn: "Done"
-      - runFlow: ../subflows/leave_settings.yaml
+      - runFlow: ../subflows/leave_backup.yaml
       - runFlow:
           file: ../subflows/view.yaml
           env:

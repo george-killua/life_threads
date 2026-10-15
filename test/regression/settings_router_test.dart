@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:life_threads/app/app.dart';
+import 'package:life_threads/app/router/route_names.dart';
 import 'package:life_threads/app/router/app_router.dart';
 import 'package:life_threads/features/memories/data/memory_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -136,7 +137,7 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: LifeThreadsApp()));
     await tester.pump();
     await tester.pump();
-    AppRouter.router.go('/settings');
+    AppRouter.router.go(RouteNames.aboutHelp);
     await tester.runAsync(
       () => Future<void>.delayed(const Duration(milliseconds: 300)),
     );

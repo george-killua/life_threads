@@ -50,6 +50,14 @@ class AppRouter {
         builder: (context, state) => const ThemesPage(),
       ),
       GoRoute(
+        path: RouteNames.backupData,
+        builder: (context, state) => const BackupDataPage(),
+      ),
+      GoRoute(
+        path: RouteNames.aboutHelp,
+        builder: (context, state) => const AboutHelpPage(),
+      ),
+      GoRoute(
         path: RouteNames.upgrade,
         builder: (context, state) => UpgradePage(
           feature: state.extra is PremiumFeature

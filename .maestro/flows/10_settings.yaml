@@ -9,13 +9,14 @@ tags: [protocol, set]
 
 # SET-01: change the name.
 - runFlow: ../subflows/open_settings.yaml
+- tapOn: "(?s)Your name\n.*"
 - tapOn: "Lina"
 - eraseText: 10
 - inputText: "Lina Maria"
 - runFlow: ../subflows/hide_keyboard.yaml
-- tapOn: "Settings"
 - tapOn: "Save"
 - assertVisible: "Name updated."
+- assertVisible: "(?s)Your name\nLina Maria"
 
 # SET-01: a Premium theme is locked for free users, then works with Premium.
 - runFlow: ../subflows/open_themes.yaml
@@ -41,27 +42,22 @@ tags: [protocol, set]
 - takeScreenshot: SET-01_wall_midnight
 
 # SET-02: German, then Arabic (right to left), then back to English.
+# The language is picked in a sheet from the Language row.
 - runFlow: ../subflows/open_settings.yaml
-- runFlow:
-    file: ../subflows/scroll_to.yaml
-    env:
-      TARGET: "Deutsch"
+- tapOn: "(?s)Language\n.*"
 - tapOn: "Deutsch"
 - extendedWaitUntil:
     visible: "Einstellungen"
     timeout: 10000
-- assertVisible: "Sprache.*|(?s)Sprache.*"
+- assertVisible: "(?s)Sprache\nDeutsch"
 - takeScreenshot: SET-02_german
+- tapOn: "(?s)Sprache\n.*"
 - tapOn: "العربية"
 - extendedWaitUntil:
     visible: "الإعدادات"
     timeout: 10000
 - takeScreenshot: SET-02_arabic
-- runFlow:
-    file: ../subflows/scroll_to.yaml
-    env:
-      TARGET: "English"
-      DIRECTION: UP
+- tapOn: "(?s)اللغة\n.*"
 - tapOn: "English"
 - extendedWaitUntil:
     visible: "Settings"
@@ -77,9 +73,6 @@ tags: [protocol, set]
     visible: "More"
     timeout: 90000
 - runFlow: ../subflows/open_settings.yaml
-- assertVisible: "Lina Maria"
-- runFlow:
-    file: ../subflows/scroll_to.yaml
-    env:
-      TARGET: "(?s).*Midnight Archive.*"
+- assertVisible: "(?s)Your name\nLina Maria"
+- assertVisible: "(?s)Midnight Archive.*"
 - takeScreenshot: SET-03_after_restart

@@ -126,16 +126,20 @@ void main() {
     await tester.pump();
     await tester.pump();
 
+    // The name row shows the name; tapping it edits it in a sheet.
     expect(find.text('Your name'), findsWidgets);
     expect(find.text('George'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('settings-name')));
+    await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField).first, 'Alex');
     await tester.pump();
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 200));
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text('Name updated.'), findsOneWidget);
+    expect(find.text('Alex'), findsOneWidget);
     expect(await const OnboardingPreferences().getDisplayName(), 'Alex');
   });
 }

@@ -1,0 +1,8 @@
+# Opens the Premium page from the banner at the top of Settings (Settings
+# must be open).
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- tapOn: "(?s)Premium\n.*"
+- extendedWaitUntil:
+    visible: ".*LifeThreads Premium.*"
+    timeout: 10000

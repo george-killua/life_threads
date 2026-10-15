@@ -42,16 +42,15 @@ Future<void> openSettings(WidgetTester tester) async {
 
 Future<void> openPremiumPage(WidgetTester tester) async {
   await openSettings(tester);
-  await scrollTo(tester, find.text('Open Premium'));
-  await tapText(tester, 'Open Premium');
+  await tapOn(tester, find.byKey(const ValueKey('settings-premium')));
   await waitFor(tester, find.textContaining('LifeThreads Premium'));
 }
 
+/// Family walls are in the wall's More menu.
 Future<void> openFamilyWalls(WidgetTester tester) async {
-  await openSettings(tester);
-  await scrollTo(tester, find.text('Open family walls'));
-  await tapText(tester, 'Open family walls', settleMillis: 1200);
-  await waitGone(tester, find.text('Open family walls'));
+  await tapOn(tester, find.byTooltip('More'));
+  await tapText(tester, 'Family walls', settleMillis: 1200);
+  await waitGone(tester, find.byTooltip('More'));
 }
 
 void main() {

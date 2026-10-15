@@ -1210,6 +1210,27 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get settingsGroupYou => 'Du';
+
+  @override
+  String get settingsGroupReminders => 'Benachrichtigungen';
+
+  @override
+  String get settingsGroupMore => 'Mehr';
+
+  @override
+  String get backupDataTitle => 'Sicherung & Daten';
+
+  @override
+  String get backupDataSubtitle => 'Sichern, wiederherstellen, aufs neue Handy';
+
+  @override
+  String get aboutHelpTitle => 'Info & Hilfe';
+
+  @override
+  String get aboutHelpSubtitle => 'Feedback, Datenschutz, Musik, Version';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

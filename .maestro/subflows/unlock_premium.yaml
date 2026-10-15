@@ -3,15 +3,7 @@
 appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 ---
 - runFlow: open_settings.yaml
-- runFlow:
-    file: scroll_to.yaml
-    env:
-      TARGET: "Open Premium"
-      DIRECTION: DOWN
-- tapOn: "Open Premium"
-- extendedWaitUntil:
-    visible: ".*LifeThreads Premium.*"
-    timeout: 10000
+- runFlow: open_premium.yaml
 - runFlow:
     file: scroll_to.yaml
     env:
@@ -21,13 +13,8 @@ appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding
 - extendedWaitUntil:
     visible: ".*Premium Active.*|.*Premium is active.*"
     timeout: 10000
-- runFlow:
-    file: scroll_to.yaml
-    env:
-      TARGET: "Back"
-      DIRECTION: UP
 - tapOn: "Back"
 - runFlow:
     when:
-      visible: "Open Premium|(?s)Your name.*"
+      visible: "(?s)Your name.*"
     file: leave_settings.yaml

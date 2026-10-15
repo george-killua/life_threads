@@ -1,0 +1,8 @@
+# Opens Settings > Backup & data.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- runFlow: open_settings.yaml
+- tapOn: "(?s)Backup & data.*"
+- extendedWaitUntil:
+    visible: "Export Archive"
+    timeout: 10000

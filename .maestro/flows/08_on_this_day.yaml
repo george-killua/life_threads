@@ -26,11 +26,7 @@ tags: [protocol, otd]
 - takeScreenshot: OTD-01_chapter
 - tapOn: "Back"
 - runFlow: ../subflows/open_settings.yaml
-- runFlow:
-    file: ../subflows/scroll_to.yaml
-    env:
-      TARGET: "Daily reminder"
-- tapOn: "Daily reminder"
+- tapOn: "(?s)On this day\n.*"
 - runFlow:
     when:
       visible: "Allow|Erlauben"

@@ -7,15 +7,7 @@ tags: [protocol, prm]
 ---
 - runFlow: ../subflows/fresh_wall.yaml
 - runFlow: ../subflows/open_settings.yaml
-- runFlow:
-    file: ../subflows/scroll_to.yaml
-    env:
-      TARGET: "Open Premium"
-      DIRECTION: DOWN
-- tapOn: "Open Premium"
-- extendedWaitUntil:
-    visible: ".*LifeThreads Premium.*"
-    timeout: 10000
+- runFlow: ../subflows/open_premium.yaml
 - takeScreenshot: PRM-01_top
 - runFlow:
     file: ../subflows/scroll_to.yaml

@@ -1,0 +1,5 @@
+# Goes back from Backup & data to the wall.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+---
+- tapOn: "Back"
+- runFlow: leave_settings.yaml

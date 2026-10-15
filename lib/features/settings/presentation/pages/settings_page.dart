@@ -32,13 +32,15 @@ import '../../../wall/presentation/widgets/wall_background.dart';
 import '../../../wall/presentation/widgets/wall_theme_picker.dart';
 import '../../../../core/widgets/app_toast.dart';
 
+/// Settings: a short list. Backup and the app's information have screens
+/// of their own; Thread of the Year and family walls are in the wall's More
+/// menu.
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final memoryState = ref.watch(memoryRepositoryProvider);
     final entitlement = ref.watch(premiumEntitlementProvider).asData?.value;
     final selectedLocale = ref.watch(localeControllerProvider).asData?.value;
     final displayName = ref.watch(userDisplayNameProvider).asData?.value ?? '';
@@ -57,71 +59,110 @@ class SettingsPage extends ConsumerWidget {
             body: ListView(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
               children: [
-                _SettingsCard(
-                  icon: Icons.person_rounded,
-                  title: l10n.settingsNameTitle,
-                  body: l10n.settingsNameBody,
-                  child: _DisplayNameEditor(
-                    initialName: displayName,
-                    onSave: (name) async {
-                      await ref
-                          .read(userDisplayNameProvider.notifier)
-                          .setDisplayName(name);
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showToast(
-                        l10n.settingsNameSaved,
-                        kind: ToastKind.success,
-                      );
-                    },
-                  ),
+                _PremiumBanner(
+                  isPremium: isPremium,
+                  onTap: () => context.push(RouteNames.upgrade),
                 ),
-                _SettingsCard(
-                  icon: Icons.language_rounded,
-                  title: l10n.languageTitle,
-                  body: l10n.languageBody,
-                  child: _LanguageSelector(
-                    selectedLocale: selectedLocale,
-                    onSelect: (locale) => _selectLanguage(context, ref, locale),
-                  ),
-                ),
-                _SettingsCard(
-                  icon: Icons.lock_rounded,
-                  title: l10n.privacyTitle,
-                  body: l10n.privacyBody,
-                  actions: [
-                    _SettingsAction(
-                      label: l10n.viewPrivacyPolicy,
-                      icon: Icons.policy_rounded,
-                      onTap: () => _openExternalUrl(
-                        context,
-                        Uri.parse('https://gkcoding.dev/lifethreads/privacy'),
-                        eventName: 'privacy_policy_opened',
-                      ),
+                _SettingsGroup(
+                  title: l10n.settingsGroupYou,
+                  children: [
+                    _SettingsRow(
+                      key: const ValueKey('settings-name'),
+                      icon: Icons.person_rounded,
+                      title: l10n.settingsNameTitle,
+                      value: displayName,
+                      onTap: () => _editName(context, ref, displayName),
                     ),
-                    _SettingsAction(
-                      label: l10n.viewTerms,
-                      icon: Icons.gavel_rounded,
-                      onTap: () => _openExternalUrl(
-                        context,
-                        Uri.parse('https://gkcoding.dev/lifethreads/terms'),
-                        eventName: 'terms_opened',
-                      ),
+                    _SettingsRow(
+                      key: const ValueKey('settings-language'),
+                      icon: Icons.language_rounded,
+                      title: l10n.languageTitle,
+                      value: _languageLabel(l10n, selectedLocale),
+                      onTap: () =>
+                          _chooseLanguage(context, ref, selectedLocale),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(12, 12, 12, 2),
+                      child: WallThemeSummary(),
                     ),
                   ],
                 ),
-                _SettingsCard(
-                  icon: Icons.feedback_rounded,
-                  title: l10n.betaFeedbackTitle,
-                  body: l10n.betaFeedbackBody,
-                  badge: l10n.closedBetaBadge,
-                  actions: [
-                    _SettingsAction(
-                      label: l10n.sendFeedback,
-                      icon: Icons.mail_outline_rounded,
-                      onTap: () => _showBetaFeedback(context),
+                _SettingsGroup(
+                  title: l10n.settingsGroupReminders,
+                  children: [
+                    _SettingsRow(
+                      icon: Icons.event_repeat_rounded,
+                      title: l10n.onThisDayTitle,
+                      value: isPremium
+                          ? l10n.onThisDayReminderSwitch
+                          : l10n.premiumBadge,
+                      // One control for screen readers, and the whole row
+                      // toggles like a list tile.
+                      mergeSemantics: true,
+                      onTap: () =>
+                          _setOnThisDayReminders(context, ref, !remindersOn),
+                      trailing: Switch.adaptive(
+                        value: remindersOn,
+                        onChanged: (value) =>
+                            _setOnThisDayReminders(context, ref, value),
+                      ),
+                    ),
+                    if (remindersOn)
+                      _SettingsRow(
+                        icon: Icons.schedule_rounded,
+                        title: l10n.onThisDayReminderAt(
+                          onThisDay.time.format(context),
+                        ),
+                        onTap: () =>
+                            _pickOnThisDayTime(context, ref, onThisDay),
+                      ),
+                  ],
+                ),
+                _SettingsGroup(
+                  title: l10n.settingsGroupMore,
+                  children: [
+                    _SettingsRow(
+                      key: const ValueKey('settings-backup-data'),
+                      icon: Icons.enhanced_encryption_rounded,
+                      title: l10n.backupDataTitle,
+                      value: l10n.backupDataSubtitle,
+                      onTap: () => context.push(RouteNames.backupData),
+                    ),
+                    _SettingsRow(
+                      key: const ValueKey('settings-about-help'),
+                      icon: Icons.info_rounded,
+                      title: l10n.aboutHelpTitle,
+                      value: l10n.aboutHelpSubtitle,
+                      onTap: () => context.push(RouteNames.aboutHelp),
                     ),
                   ],
                 ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Backup and restore, moving to a new phone, and (last, in red) clearing
+/// everything.
+class BackupDataPage extends ConsumerWidget {
+  const BackupDataPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final memoryState = ref.watch(memoryRepositoryProvider);
+    return Scaffold(
+      body: WallBackground(
+        child: SafeArea(
+          child: TopBarPage(
+            title: l10n.backupDataTitle,
+            body: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+              children: [
                 _SettingsCard(
                   icon: Icons.enhanced_encryption_rounded,
                   title: l10n.backupArchiveTitle,
@@ -152,122 +193,82 @@ class SettingsPage extends ConsumerWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 18),
                 _SettingsCard(
-                  icon: Icons.palette_rounded,
-                  title: l10n.themeTitle,
-                  body: l10n.themeBody,
-                  badge: isPremium ? l10n.premiumBadge : l10n.oneFreeBadge,
-                  child: const WallThemeSummary(),
-                ),
-                _SettingsCard(
-                  icon: Icons.event_repeat_rounded,
-                  title: l10n.onThisDayTitle,
-                  body: l10n.onThisDaySettingsBody,
-                  badge: isPremium ? null : l10n.premiumBadge,
+                  icon: Icons.delete_forever_rounded,
+                  title: l10n.clearAllDataTitle,
+                  body: l10n.clearAllDataBody,
+                  danger: true,
                   actions: [
                     _SettingsAction(
-                      label: l10n.onThisDayReminderAt(
-                        onThisDay.time.format(context),
+                      label: l10n.clearData,
+                      icon: Icons.delete_outline_rounded,
+                      danger: true,
+                      onTap: () => _clearAllData(context, ref),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Feedback, privacy policy and terms, music credits and the app version.
+class AboutHelpPage extends StatelessWidget {
+  const AboutHelpPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Scaffold(
+      body: WallBackground(
+        child: SafeArea(
+          child: TopBarPage(
+            title: l10n.aboutHelpTitle,
+            body: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+              children: [
+                _SettingsCard(
+                  icon: Icons.feedback_rounded,
+                  title: l10n.betaFeedbackTitle,
+                  body: l10n.betaFeedbackBody,
+                  badge: l10n.closedBetaBadge,
+                  actions: [
+                    _SettingsAction(
+                      label: l10n.sendFeedback,
+                      icon: Icons.mail_outline_rounded,
+                      onTap: () => _showBetaFeedback(context),
+                    ),
+                  ],
+                ),
+                _SettingsCard(
+                  icon: Icons.lock_rounded,
+                  title: l10n.privacyTitle,
+                  body: l10n.privacyBody,
+                  actions: [
+                    _SettingsAction(
+                      label: l10n.viewPrivacyPolicy,
+                      icon: Icons.policy_rounded,
+                      onTap: () => _openExternalUrl(
+                        context,
+                        Uri.parse('https://gkcoding.dev/lifethreads/privacy'),
+                        eventName: 'privacy_policy_opened',
                       ),
-                      icon: Icons.schedule_rounded,
-                      onTap: remindersOn
-                          ? () => _pickOnThisDayTime(context, ref, onThisDay)
-                          : null,
                     ),
-                  ],
-                  // One control for screen readers ("Daily reminder, switch"),
-                  // and the whole row toggles like a list tile.
-                  child: Semantics(
-                    container: true,
-                    child: MergeSemantics(
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () =>
-                            _setOnThisDayReminders(context, ref, !remindersOn),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                l10n.onThisDayReminderSwitch,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ),
-                            Switch.adaptive(
-                              value: remindersOn,
-                              onChanged: (value) =>
-                                  _setOnThisDayReminders(context, ref, value),
-                            ),
-                          ],
-                        ),
+                    _SettingsAction(
+                      label: l10n.viewTerms,
+                      icon: Icons.gavel_rounded,
+                      onTap: () => _openExternalUrl(
+                        context,
+                        Uri.parse('https://gkcoding.dev/lifethreads/terms'),
+                        eventName: 'terms_opened',
                       ),
                     ),
-                  ),
-                ),
-                _SettingsCard(
-                  icon: Icons.movie_filter_rounded,
-                  title: l10n.yearThreadTitle,
-                  body: l10n.yearThreadSettingsBody,
-                  badge: isPremium ? null : l10n.premiumBadge,
-                  actions: [
-                    _SettingsAction(
-                      label: l10n.yearThreadOpen,
-                      icon: Icons.movie_filter_rounded,
-                      onTap: () => context.push(RouteNames.yearThread),
-                    ),
                   ],
-                ),
-                _SettingsCard(
-                  key: const ValueKey('settings-family-walls'),
-                  icon: Icons.diversity_1_rounded,
-                  title: l10n.familyWallsTitle,
-                  body: l10n.familyWallsSettingsBody,
-                  actions: [
-                    _SettingsAction(
-                      label: l10n.familyWallsOpen,
-                      icon: Icons.family_restroom_rounded,
-                      onTap: () => context.push(RouteNames.familyWalls),
-                    ),
-                  ],
-                ),
-                _SettingsCard(
-                  icon: Icons.workspace_premium_rounded,
-                  title: l10n.premiumTitle,
-                  body: entitlement?.isPremium == true
-                      ? l10n.premiumActiveBody
-                      : l10n.premiumLockedBody,
-                  badge: entitlement?.isPremium == true
-                      ? l10n.activeBadge
-                      : l10n.unlockBadge,
-                  actions: [
-                    _SettingsAction(
-                      label: l10n.openPremium,
-                      icon: Icons.workspace_premium_rounded,
-                      onTap: () => context.push(RouteNames.upgrade),
-                    ),
-                  ],
-                ),
-                _SettingsCard(
-                  icon: Icons.info_rounded,
-                  title: l10n.appVersionTitle,
-                  body: '',
-                  child: FutureBuilder<PackageInfo>(
-                    future: PackageInfo.fromPlatform(),
-                    builder: (context, snapshot) {
-                      final info = snapshot.data;
-                      return Text(
-                        info == null
-                            ? 'LifeThreads'
-                            : '${info.version}+${info.buildNumber}',
-                        style: TextStyle(
-                          color: AppColors.gold,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      );
-                    },
-                  ),
                 ),
                 _SettingsCard(
                   icon: Icons.music_note_rounded,
@@ -292,18 +293,25 @@ class SettingsPage extends ConsumerWidget {
                   ),
                 ),
                 _SettingsCard(
-                  icon: Icons.delete_forever_rounded,
-                  title: l10n.clearAllDataTitle,
-                  body: l10n.clearAllDataBody,
-                  danger: true,
-                  actions: [
-                    _SettingsAction(
-                      label: l10n.clearData,
-                      icon: Icons.delete_outline_rounded,
-                      danger: true,
-                      onTap: () => _clearAllData(context, ref),
-                    ),
-                  ],
+                  icon: Icons.info_rounded,
+                  title: l10n.appVersionTitle,
+                  body: '',
+                  child: FutureBuilder<PackageInfo>(
+                    future: PackageInfo.fromPlatform(),
+                    builder: (context, snapshot) {
+                      final info = snapshot.data;
+                      return Text(
+                        info == null
+                            ? 'LifeThreads'
+                            : '${info.version}+${info.buildNumber}',
+                        style: TextStyle(
+                          color: AppColors.gold,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
@@ -312,261 +320,559 @@ class SettingsPage extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Future<void> _selectLanguage(
-    BuildContext context,
-    WidgetRef ref,
-    Locale? locale,
-  ) async {
-    if (locale == null) {
-      await ref.read(localeControllerProvider.notifier).useSystemLanguage();
-    } else {
-      await ref.read(localeControllerProvider.notifier).selectLocale(locale);
-    }
-    if (!context.mounted) return;
-    // The page still shows the old language here: word the confirmation in
-    // the language just chosen.
-    final l10n = lookupAppLocalizations(_effectiveLocale(locale));
-    final label = _languageLabel(l10n, locale);
-    ScaffoldMessenger.of(
-      context,
-    ).showToast(l10n.languageSelected(label), kind: ToastKind.success);
-  }
-
-  /// [locale], or the phone's language when it is "System" (English when
-  /// LifeThreads does not support the phone's language).
-  Locale _effectiveLocale(Locale? locale) {
-    if (locale != null) return locale;
-    final phone = WidgetsBinding.instance.platformDispatcher.locale;
-    final supported = AppLocalizations.supportedLocales.any(
-      (l) => l.languageCode == phone.languageCode,
-    );
-    return supported ? Locale(phone.languageCode) : const Locale('en');
-  }
-
-  String _languageLabel(AppLocalizations l10n, Locale? locale) {
-    return switch (locale?.languageCode) {
-      null => l10n.systemLanguage,
-      'de' => l10n.germanLanguage,
-      'ar' => l10n.arabicLanguage,
-      _ => l10n.englishLanguage,
-    };
-  }
-
-  Future<void> _openExternalUrl(
-    BuildContext context,
-    Uri uri, {
-    required String eventName,
-  }) async {
-    AppLogger.event(eventName);
-    try {
-      final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
-      if (!context.mounted || opened) return;
-    } catch (_) {
-      // Fall through to clipboard fallback.
-    }
-    await Clipboard.setData(ClipboardData(text: uri.toString()));
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showToast(uri.toString());
-  }
-
-  Future<void> _exportBackup(
-    BuildContext context,
-    WidgetRef ref,
-    MemoryState state,
-  ) async {
-    final l10n = context.l10n;
-    final password = await showArchivePasswordDialog(
-      context,
-      purpose: ArchivePasswordPurpose.export,
-    );
-    if (!context.mounted || password == null) return;
-
-    try {
-      final result = await ref
-          .read(backupServiceProvider)
-          .exportBackup(state, password: password);
-      if (!context.mounted) return;
-      await shareExportedArchive(
-        context,
-        result,
-        onSaved: ref.read(backupReminderProvider.notifier).markSaved,
-      );
-    } catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showToast(l10n.exportFailed('$error'), kind: ToastKind.error);
-    }
-  }
-
-  Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
-    final l10n = context.l10n;
-    final password = await showArchivePasswordDialog(
-      context,
-      purpose: ArchivePasswordPurpose.import,
-    );
-    if (!context.mounted || password == null) return;
-
-    try {
-      final backup = await ref
-          .read(backupServiceProvider)
-          .pickAndPrepareImport(password: password);
-      if (!context.mounted || backup == null) return;
-      final result = await ref
-          .read(memoryRepositoryProvider.notifier)
-          .importBackup(backup);
-      if (!context.mounted) return;
-      await showArchiveImportSummary(context, result);
-    } on BackupValidationException catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showToast(l10n.importRejected(error.message), kind: ToastKind.error);
-    } catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showToast(l10n.importFailed('$error'), kind: ToastKind.error);
-    }
-  }
-
-  Future<void> _importCapsule(BuildContext context, WidgetRef ref) async {
-    final l10n = context.l10n;
-    final password = await showMemoryCapsulePasswordDialog(
-      context,
-      purpose: MemoryCapsulePasswordPurpose.import,
-    );
-    if (!context.mounted || password == null) return;
-
-    MemoryCapsuleImportDraft? draft;
-    try {
-      draft = await ref
-          .read(memoryCapsuleServiceProvider)
-          .pickAndPrepareImport(password: password);
-      if (!context.mounted || draft == null) return;
-
-      final confirmed = await showMemoryCapsuleImportPreview(context, draft);
-      if (!context.mounted) return;
-      if (!confirmed) {
-        await ref.read(memoryCapsuleServiceProvider).discardImport(draft);
-        return;
-      }
-
-      final result = await ref
-          .read(memoryRepositoryProvider.notifier)
-          .importBackup(draft.backup);
-      if (!context.mounted) return;
-      await showArchiveImportSummary(context, result);
-    } on BackupValidationException catch (error) {
-      if (draft != null) {
-        await ref.read(memoryCapsuleServiceProvider).discardImport(draft);
-      }
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showToast(l10n.capsuleRejected(error.message), kind: ToastKind.error);
-    } catch (error) {
-      if (draft != null) {
-        await ref.read(memoryCapsuleServiceProvider).discardImport(draft);
-      }
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showToast(l10n.capsuleImportFailed('$error'), kind: ToastKind.error);
-    }
-  }
-
-  Future<void> _clearAllData(BuildContext context, WidgetRef ref) async {
-    final l10n = context.l10n;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(l10n.clearAllDataQuestion),
-        content: Text(l10n.clearAllDataQuestionBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel),
+/// Edits the name in a sheet.
+Future<void> _editName(
+  BuildContext context,
+  WidgetRef ref,
+  String displayName,
+) {
+  final l10n = context.l10n;
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (sheetContext) => Padding(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        0,
+        20,
+        20 + MediaQuery.viewInsetsOf(sheetContext).bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            l10n.settingsNameTitle,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.clearAll),
+          const SizedBox(height: 6),
+          Text(
+            l10n.settingsNameBody,
+            style: TextStyle(color: AppColors.muted, height: 1.4),
+          ),
+          const SizedBox(height: 14),
+          _DisplayNameEditor(
+            initialName: displayName,
+            onSave: (name) async {
+              await ref
+                  .read(userDisplayNameProvider.notifier)
+                  .setDisplayName(name);
+              if (!sheetContext.mounted) return;
+              Navigator.of(sheetContext).pop();
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(
+                context,
+              ).showToast(l10n.settingsNameSaved, kind: ToastKind.success);
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+/// Picks the language in a sheet.
+Future<void> _chooseLanguage(
+  BuildContext context,
+  WidgetRef ref,
+  Locale? selectedLocale,
+) async {
+  final chosen = await showModalBottomSheet<({Locale? locale})>(
+    context: context,
+    showDragHandle: true,
+    builder: (sheetContext) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              sheetContext.l10n.languageTitle,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+            ),
+            const SizedBox(height: 14),
+            _LanguageSelector(
+              selectedLocale: selectedLocale,
+              onSelect: (locale) =>
+                  Navigator.of(sheetContext).pop((locale: locale)),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+  if (chosen == null || !context.mounted) return;
+  await _selectLanguage(context, ref, chosen.locale);
+}
+
+/// Status and a way in, at the top of Settings.
+class _PremiumBanner extends StatelessWidget {
+  const _PremiumBanner({required this.isPremium, required this.onTap});
+
+  final bool isPremium;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(24),
+      side: BorderSide(color: AppColors.gold.withValues(alpha: 0.45)),
+    );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: Material(
+        color: AppColors.gold.withValues(alpha: 0.12),
+        shape: shape,
+        child: InkWell(
+          key: const ValueKey('settings-premium'),
+          customBorder: shape,
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.workspace_premium_rounded,
+                  color: AppColors.gold,
+                  size: 30,
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.premiumTitle,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        isPremium ? l10n.premiumActiveBody : l10n.premiumLockedBody,
+                        style: TextStyle(
+                          color: AppColors.muted,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.gold.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    isPremium ? l10n.activeBadge : l10n.unlockBadge,
+                    style: TextStyle(
+                      color: AppColors.gold,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A titled group of rows on one panel.
+class _SettingsGroup extends StatelessWidget {
+  const _SettingsGroup({required this.title, required this.children});
+
+  final String title;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsetsDirectional.only(start: 6, bottom: 8),
+            child: Semantics(
+              header: true,
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: AppColors.gold,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.panelWarm.withValues(alpha: 0.88),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.line),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (var i = 0; i < children.length; i++) ...[
+                    if (i > 0)
+                      Divider(height: 1, indent: 56, color: AppColors.line),
+                    children[i],
+                  ],
+                ],
+              ),
+            ),
           ),
         ],
       ),
     );
-    if (!context.mounted || confirmed != true) return;
-    try {
-      await ref.read(memoryRepositoryProvider.notifier).clearAllData();
-    } catch (_) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showToast(l10n.somethingWentWrong, kind: ToastKind.error);
+  }
+}
+
+/// One row: icon, title, a short grey line, and a chevron or [trailing].
+class _SettingsRow extends StatelessWidget {
+  const _SettingsRow({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.onTap,
+    this.value,
+    this.trailing,
+    this.mergeSemantics = false,
+  });
+
+  final IconData icon;
+  final String title;
+  final String? value;
+  final VoidCallback? onTap;
+  final Widget? trailing;
+
+  /// Reads the row and its [trailing] control as one (a switch row).
+  final bool mergeSemantics;
+
+  @override
+  Widget build(BuildContext context) {
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    final row = InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.gold, size: 24),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  if (value != null && value!.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      value!,
+                      style: TextStyle(
+                        color: AppColors.muted,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            trailing ??
+                Icon(
+                  rtl
+                      ? Icons.chevron_left_rounded
+                      : Icons.chevron_right_rounded,
+                  color: AppColors.muted,
+                ),
+          ],
+        ),
+      ),
+    );
+    if (!mergeSemantics) return row;
+    return Semantics(container: true, child: MergeSemantics(child: row));
+  }
+}
+
+Future<void> _selectLanguage(
+  BuildContext context,
+  WidgetRef ref,
+  Locale? locale,
+) async {
+  if (locale == null) {
+    await ref.read(localeControllerProvider.notifier).useSystemLanguage();
+  } else {
+    await ref.read(localeControllerProvider.notifier).selectLocale(locale);
+  }
+  if (!context.mounted) return;
+  // The page still shows the old language here: word the confirmation in
+  // the language just chosen.
+  final l10n = lookupAppLocalizations(_effectiveLocale(locale));
+  final label = _languageLabel(l10n, locale);
+  ScaffoldMessenger.of(
+    context,
+  ).showToast(l10n.languageSelected(label), kind: ToastKind.success);
+}
+
+/// [locale], or the phone's language when it is "System" (English when
+/// LifeThreads does not support the phone's language).
+Locale _effectiveLocale(Locale? locale) {
+  if (locale != null) return locale;
+  final phone = WidgetsBinding.instance.platformDispatcher.locale;
+  final supported = AppLocalizations.supportedLocales.any(
+    (l) => l.languageCode == phone.languageCode,
+  );
+  return supported ? Locale(phone.languageCode) : const Locale('en');
+}
+
+String _languageLabel(AppLocalizations l10n, Locale? locale) {
+  return switch (locale?.languageCode) {
+    null => l10n.systemLanguage,
+    'de' => l10n.germanLanguage,
+    'ar' => l10n.arabicLanguage,
+    _ => l10n.englishLanguage,
+  };
+}
+
+Future<void> _openExternalUrl(
+  BuildContext context,
+  Uri uri, {
+  required String eventName,
+}) async {
+  AppLogger.event(eventName);
+  try {
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!context.mounted || opened) return;
+  } catch (_) {
+    // Fall through to clipboard fallback.
+  }
+  await Clipboard.setData(ClipboardData(text: uri.toString()));
+  if (!context.mounted) return;
+  ScaffoldMessenger.of(context).showToast(uri.toString());
+}
+
+Future<void> _exportBackup(
+  BuildContext context,
+  WidgetRef ref,
+  MemoryState state,
+) async {
+  final l10n = context.l10n;
+  final password = await showArchivePasswordDialog(
+    context,
+    purpose: ArchivePasswordPurpose.export,
+  );
+  if (!context.mounted || password == null) return;
+
+  try {
+    final result = await ref
+        .read(backupServiceProvider)
+        .exportBackup(state, password: password);
+    if (!context.mounted) return;
+    await shareExportedArchive(
+      context,
+      result,
+      onSaved: ref.read(backupReminderProvider.notifier).markSaved,
+    );
+  } catch (error) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showToast(l10n.exportFailed('$error'), kind: ToastKind.error);
+  }
+}
+
+Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
+  final l10n = context.l10n;
+  final password = await showArchivePasswordDialog(
+    context,
+    purpose: ArchivePasswordPurpose.import,
+  );
+  if (!context.mounted || password == null) return;
+
+  try {
+    final backup = await ref
+        .read(backupServiceProvider)
+        .pickAndPrepareImport(password: password);
+    if (!context.mounted || backup == null) return;
+    final result = await ref
+        .read(memoryRepositoryProvider.notifier)
+        .importBackup(backup);
+    if (!context.mounted) return;
+    await showArchiveImportSummary(context, result);
+  } on BackupValidationException catch (error) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showToast(l10n.importRejected(error.message), kind: ToastKind.error);
+  } catch (error) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showToast(l10n.importFailed('$error'), kind: ToastKind.error);
+  }
+}
+
+Future<void> _importCapsule(BuildContext context, WidgetRef ref) async {
+  final l10n = context.l10n;
+  final password = await showMemoryCapsulePasswordDialog(
+    context,
+    purpose: MemoryCapsulePasswordPurpose.import,
+  );
+  if (!context.mounted || password == null) return;
+
+  MemoryCapsuleImportDraft? draft;
+  try {
+    draft = await ref
+        .read(memoryCapsuleServiceProvider)
+        .pickAndPrepareImport(password: password);
+    if (!context.mounted || draft == null) return;
+
+    final confirmed = await showMemoryCapsuleImportPreview(context, draft);
+    if (!context.mounted) return;
+    if (!confirmed) {
+      await ref.read(memoryCapsuleServiceProvider).discardImport(draft);
       return;
+    }
+
+    final result = await ref
+        .read(memoryRepositoryProvider.notifier)
+        .importBackup(draft.backup);
+    if (!context.mounted) return;
+    await showArchiveImportSummary(context, result);
+  } on BackupValidationException catch (error) {
+    if (draft != null) {
+      await ref.read(memoryCapsuleServiceProvider).discardImport(draft);
     }
     if (!context.mounted) return;
     ScaffoldMessenger.of(
       context,
-    ).showToast(l10n.allLocalDataCleared, kind: ToastKind.success);
-  }
-
-  Future<void> _showBetaFeedback(BuildContext context) async {
-    AppLogger.event('beta_feedback_opened');
-    await showDialog<void>(
-      context: context,
-      builder: (_) => const _BetaFeedbackDialog(),
-    );
-  }
-
-  Future<void> _setOnThisDayReminders(
-    BuildContext context,
-    WidgetRef ref,
-    bool enabled,
-  ) async {
-    final settings = ref.read(onThisDaySettingsProvider.notifier);
-    if (!enabled) {
-      await settings.setRemindersEnabled(false);
-      return;
-    }
-    if (!await requirePremium(context, PremiumFeature.onThisDay)) return;
-
-    // Permission is asked here, when the user turns reminders on.
-    bool granted;
-    try {
-      granted = await ref
-          .read(onThisDayNotificationsProvider)
-          .requestPermission();
-    } catch (error, stackTrace) {
-      AppLogger.recordCrash(error, stackTrace);
-      granted = false;
+    ).showToast(l10n.capsuleRejected(error.message), kind: ToastKind.error);
+  } catch (error) {
+    if (draft != null) {
+      await ref.read(memoryCapsuleServiceProvider).discardImport(draft);
     }
     if (!context.mounted) return;
-    if (!granted) {
-      ScaffoldMessenger.of(context).showToast(
-        context.l10n.onThisDayNotificationsDenied,
-        kind: ToastKind.error,
-      );
-      return;
-    }
-    AppLogger.event('on_this_day_reminders_on');
-    await settings.setRemindersEnabled(true);
+    ScaffoldMessenger.of(
+      context,
+    ).showToast(l10n.capsuleImportFailed('$error'), kind: ToastKind.error);
   }
+}
 
-  Future<void> _pickOnThisDayTime(
-    BuildContext context,
-    WidgetRef ref,
-    OnThisDaySettings current,
-  ) async {
-    final time = await showTimePicker(
-      context: context,
-      initialTime: current.time,
-    );
-    if (time == null) return;
-    await ref.read(onThisDaySettingsProvider.notifier).setTime(time);
+Future<void> _clearAllData(BuildContext context, WidgetRef ref) async {
+  final l10n = context.l10n;
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: Text(l10n.clearAllDataQuestion),
+      content: Text(l10n.clearAllDataQuestionBody),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text(l10n.clearAll),
+        ),
+      ],
+    ),
+  );
+  if (!context.mounted || confirmed != true) return;
+  try {
+    await ref.read(memoryRepositoryProvider.notifier).clearAllData();
+  } catch (_) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showToast(l10n.somethingWentWrong, kind: ToastKind.error);
+    return;
   }
+  if (!context.mounted) return;
+  ScaffoldMessenger.of(
+    context,
+  ).showToast(l10n.allLocalDataCleared, kind: ToastKind.success);
+}
+
+Future<void> _showBetaFeedback(BuildContext context) async {
+  AppLogger.event('beta_feedback_opened');
+  await showDialog<void>(
+    context: context,
+    builder: (_) => const _BetaFeedbackDialog(),
+  );
+}
+
+Future<void> _setOnThisDayReminders(
+  BuildContext context,
+  WidgetRef ref,
+  bool enabled,
+) async {
+  final settings = ref.read(onThisDaySettingsProvider.notifier);
+  if (!enabled) {
+    await settings.setRemindersEnabled(false);
+    return;
+  }
+  if (!await requirePremium(context, PremiumFeature.onThisDay)) return;
+
+  // Permission is asked here, when the user turns reminders on.
+  bool granted;
+  try {
+    granted = await ref
+        .read(onThisDayNotificationsProvider)
+        .requestPermission();
+  } catch (error, stackTrace) {
+    AppLogger.recordCrash(error, stackTrace);
+    granted = false;
+  }
+  if (!context.mounted) return;
+  if (!granted) {
+    ScaffoldMessenger.of(context).showToast(
+      context.l10n.onThisDayNotificationsDenied,
+      kind: ToastKind.error,
+    );
+    return;
+  }
+  AppLogger.event('on_this_day_reminders_on');
+  await settings.setRemindersEnabled(true);
+}
+
+Future<void> _pickOnThisDayTime(
+  BuildContext context,
+  WidgetRef ref,
+  OnThisDaySettings current,
+) async {
+  final time = await showTimePicker(
+    context: context,
+    initialTime: current.time,
+  );
+  if (time == null) return;
+  await ref.read(onThisDaySettingsProvider.notifier).setTime(time);
 }
 
 class _BetaFeedbackDialog extends StatefulWidget {
@@ -953,7 +1259,6 @@ class _DisplayNameEditorState extends State<_DisplayNameEditor> {
 
 class _SettingsCard extends StatelessWidget {
   const _SettingsCard({
-    super.key,
     required this.icon,
     required this.title,
     required this.body,

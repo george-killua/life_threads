@@ -2223,6 +2223,48 @@ abstract class AppLocalizations {
   /// **'Place from the photo: {place}'**
   String photoPlaceDetected(String place);
 
+  /// No description provided for @settingsGroupYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get settingsGroupYou;
+
+  /// No description provided for @settingsGroupReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get settingsGroupReminders;
+
+  /// No description provided for @settingsGroupMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get settingsGroupMore;
+
+  /// No description provided for @backupDataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup & data'**
+  String get backupDataTitle;
+
+  /// No description provided for @backupDataSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Back up, restore, move to a new phone'**
+  String get backupDataSubtitle;
+
+  /// No description provided for @aboutHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About & help'**
+  String get aboutHelpTitle;
+
+  /// No description provided for @aboutHelpSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback, privacy, music, version'**
+  String get aboutHelpSubtitle;
+
   /// No description provided for @savedPhotosTitle.
   ///
   /// In en, this message translates to:

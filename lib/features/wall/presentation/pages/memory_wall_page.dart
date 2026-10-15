@@ -397,6 +397,12 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                           _MoreAction.story => _pushRoute(
                             RouteNames.createStory,
                           ),
+                          _MoreAction.yearThread => _pushRoute(
+                            RouteNames.yearThread,
+                          ),
+                          _MoreAction.familyWalls => _pushRoute(
+                            RouteNames.familyWalls,
+                          ),
                           _MoreAction.display => _displayWall(context, state),
                           _MoreAction.help => showLifeThreadsTutorialSheet(
                             context,
@@ -1934,7 +1940,7 @@ class _EmptyModePanel extends StatelessWidget {
   }
 }
 
-enum _MoreAction { story, display, help, settings }
+enum _MoreAction { story, yearThread, familyWalls, display, help, settings }
 
 /// One row at the top of the wall: which wall, how it is shown, and a
 /// menu for everything else. It never grows over the cards.
@@ -2143,6 +2149,16 @@ class _WallMoreButton extends StatelessWidget {
         ),
         itemBuilder: (_) => [
           item(_MoreAction.story, Icons.auto_stories_rounded, l10n.createStory),
+          item(
+            _MoreAction.yearThread,
+            Icons.movie_filter_rounded,
+            l10n.yearThreadTitle,
+          ),
+          item(
+            _MoreAction.familyWalls,
+            Icons.diversity_1_rounded,
+            l10n.familyWallsTitle,
+          ),
           item(
             _MoreAction.display,
             Icons.qr_code_scanner_rounded,

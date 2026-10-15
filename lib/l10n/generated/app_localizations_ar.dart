@@ -1190,6 +1190,28 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get settingsGroupYou => 'أنت';
+
+  @override
+  String get settingsGroupReminders => 'التذكيرات';
+
+  @override
+  String get settingsGroupMore => 'المزيد';
+
+  @override
+  String get backupDataTitle => 'النسخ الاحتياطي والبيانات';
+
+  @override
+  String get backupDataSubtitle =>
+      'نسخ احتياطي، استعادة، الانتقال إلى هاتف جديد';
+
+  @override
+  String get aboutHelpTitle => 'حول التطبيق والمساعدة';
+
+  @override
+  String get aboutHelpSubtitle => 'الملاحظات، الخصوصية، الموسيقى، الإصدار';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

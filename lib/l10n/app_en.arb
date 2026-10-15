@@ -439,6 +439,13 @@
       }
     }
   },
+  "settingsGroupYou": "You",
+  "settingsGroupReminders": "Reminders",
+  "settingsGroupMore": "More",
+  "backupDataTitle": "Backup & data",
+  "backupDataSubtitle": "Back up, restore, move to a new phone",
+  "aboutHelpTitle": "About & help",
+  "aboutHelpSubtitle": "Feedback, privacy, music, version",
   "savedPhotosTitle": "{count, plural, =1{1 saved photo} other{{count} saved photos}}",
   "peopleEyebrow": "People",
   "partOfMemory": "Part of this memory",

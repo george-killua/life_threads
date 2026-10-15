@@ -187,7 +187,8 @@ void main() {
         tester,
         overrides(isPremium: true, notifications: notifications),
       );
-      expect(find.text('At 9:00 AM'), findsOneWidget);
+      // The time row shows once reminders are on.
+      expect(find.text('At 9:00 AM'), findsNothing);
 
       await tester.tap(reminderSwitch());
       await settle(tester);
@@ -195,6 +196,7 @@ void main() {
       expect(notifications.permissionRequests, 1);
       final settings = container.read(onThisDaySettingsProvider).value!;
       expect(settings.remindersEnabled, isTrue);
+      expect(find.text('At 9:00 AM'), findsOneWidget);
     });
 
     testWidgets('a denied permission leaves reminders off', (tester) async {

@@ -6,12 +6,11 @@ tags: [protocol, yr]
 ---
 - runFlow: ../subflows/three_memories.yaml
 - runFlow: ../subflows/unlock_premium.yaml
-- runFlow: ../subflows/open_settings.yaml
+# Thread of the Year is in the wall's More menu.
 - runFlow:
-    file: ../subflows/scroll_to.yaml
+    file: ../subflows/more.yaml
     env:
-      TARGET: "Make the film"
-- tapOn: "Make the film"
+      ITEM: "Thread of the Year"
 - extendedWaitUntil:
     visible: "Thread of the Year"
     timeout: 10000
