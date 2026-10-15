@@ -20,6 +20,7 @@ import '../../domain/memory_feeling.dart';
 import '../../domain/memory_type.dart';
 import '../memory_l10n.dart';
 import '../widgets/memory_people_editor.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 class AddMemoryPage extends ConsumerStatefulWidget {
   const AddMemoryPage({super.key, this.initialPhotos = const []});
@@ -504,9 +505,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
         : null;
 
     if (message == null) return true;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showToast(message);
     return false;
   }
 
@@ -577,9 +576,9 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     setState(() => _isSaving = false);
     // addMemory reports failures through the provider state, not by throwing.
     if (ref.read(memoryRepositoryProvider).hasError) {
-      ScaffoldMessenger.of(this.context).showSnackBar(
-        SnackBar(content: Text(this.context.l10n.memorySaveFailed)),
-      );
+      ScaffoldMessenger.of(
+        this.context,
+      ).showToast(this.context.l10n.memorySaveFailed, kind: ToastKind.error);
       return;
     }
     if (context.mounted) _backToWall(context);

@@ -7,6 +7,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../onboarding_preferences.dart';
 import '../widgets/onboarding_demo_wall_preview.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
@@ -246,7 +247,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       setState(() => _isContinuing = false);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(context.l10n.somethingWentWrong)));
+      ).showToast(context.l10n.somethingWentWrong, kind: ToastKind.error);
       return;
     }
     ref.invalidate(userDisplayNameProvider);

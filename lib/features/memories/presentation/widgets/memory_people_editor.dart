@@ -9,6 +9,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/widgets/dispose_on_unmount.dart';
 import '../../data/memory_repository.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 class MemoryPeopleEditor extends StatelessWidget {
   const MemoryPeopleEditor({
@@ -226,10 +227,9 @@ class MemoryPeopleEditor extends StatelessWidget {
                         relationship = l10n.contactRelationship;
                       }
                       if (name.isEmpty || relationship.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.nameRelationshipRequired),
-                          ),
+                        ScaffoldMessenger.of(context).showToast(
+                          l10n.nameRelationshipRequired,
+                          kind: ToastKind.error,
                         );
                         return;
                       }
@@ -310,7 +310,7 @@ class MemoryPeopleEditor extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text(l10n.contactAccessDenied)));
+          ).showToast(l10n.contactAccessDenied, kind: ToastKind.error);
         }
         return null;
       }
@@ -332,7 +332,7 @@ class MemoryPeopleEditor extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(l10n.couldNotOpenContacts)));
+        ).showToast(l10n.couldNotOpenContacts, kind: ToastKind.error);
       }
       return null;
     }

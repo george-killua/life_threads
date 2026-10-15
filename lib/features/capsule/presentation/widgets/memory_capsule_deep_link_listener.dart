@@ -17,6 +17,7 @@ import '../../../../features/capsule/domain/memory_capsule_models.dart';
 import '../../../../features/capsule/presentation/pages/capsule_cinema_page.dart';
 import '../../../../features/capsule/presentation/widgets/memory_capsule_dialogs.dart';
 import '../../../../features/memories/data/memory_repository.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 class MemoryCapsuleDeepLinkListener extends ConsumerStatefulWidget {
   const MemoryCapsuleDeepLinkListener({super.key, required this.child});
@@ -178,9 +179,9 @@ class _MemoryCapsuleDeepLinkListenerState
 
   void _showMessage(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.maybeOf(_uiContext)?.showSnackBar(
-      SnackBar(duration: const Duration(seconds: 7), content: Text(message)),
-    );
+    ScaffoldMessenger.maybeOf(
+      _uiContext,
+    )?.showToast(message, kind: ToastKind.error);
   }
 
   @override

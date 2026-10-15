@@ -9,6 +9,7 @@ import '../../../../core/logging/app_logger.dart';
 import '../../domain/family_models.dart';
 import '../family_flows.dart';
 import '../family_providers.dart';
+import '../../../../core/widgets/app_toast.dart';
 import 'family_ui.dart';
 
 /// Creates an invite link for [family] and offers it through the share
@@ -101,7 +102,11 @@ class FamilyInviteSheet extends ConsumerWidget {
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: link.toString()));
                 if (context.mounted) {
-                  showFamilyMessage(context, l10n.familyInviteCopied);
+                  showFamilyMessage(
+                    context,
+                    l10n.familyInviteCopied,
+                    kind: ToastKind.success,
+                  );
                 }
               },
               icon: const Icon(Icons.copy_rounded),
@@ -128,7 +133,11 @@ class FamilyInviteSheet extends ConsumerWidget {
       );
     } catch (_) {
       if (context.mounted) {
-        showFamilyMessage(context, l10n.familyInviteShareFailed);
+        showFamilyMessage(
+          context,
+          l10n.familyInviteShareFailed,
+          kind: ToastKind.error,
+        );
       }
     }
   }

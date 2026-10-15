@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../domain/backup_models.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 Future<void> shareExportedArchive(
   BuildContext context,
@@ -31,17 +32,12 @@ Future<void> shareExportedArchive(
       ShareResultStatus.dismissed => l10n.archiveNotSaved,
       ShareResultStatus.unavailable => l10n.archiveSharingUnavailable,
     };
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(duration: const Duration(seconds: 5), content: Text(label)),
-    );
+    ScaffoldMessenger.of(context).showToast(label);
   } catch (error) {
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 7),
-        content: Text(l10n.archiveShareFailed('$error')),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showToast(l10n.archiveShareFailed('$error'), kind: ToastKind.error);
   }
 }
 

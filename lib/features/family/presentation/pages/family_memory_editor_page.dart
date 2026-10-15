@@ -20,6 +20,7 @@ import '../family_flows.dart';
 import '../family_providers.dart';
 import '../widgets/family_photo.dart';
 import '../widgets/family_ui.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 /// Adds a memory to a family wall, or edits one of the author's own
 /// ([memoryId] set). Photos are encrypted and uploaded by the service.
@@ -363,7 +364,11 @@ class _FamilyMemoryEditorPageState
         AppLogger.event('family_memory_updated');
       }
       if (!mounted) return;
-      showFamilyMessage(context, l10n.familyMemorySaved);
+      showFamilyMessage(
+        context,
+        l10n.familyMemorySaved,
+        kind: ToastKind.success,
+      );
       context.pop();
     } on FamilyException catch (error) {
       if (!mounted) return;
@@ -418,7 +423,11 @@ class _FamilyMemoryEditorPageState
       await service.updateMemory(latest, draft);
       AppLogger.event('family_memory_conflict_resolved');
       if (!mounted) return;
-      showFamilyMessage(context, l10n.familyMemorySaved);
+      showFamilyMessage(
+        context,
+        l10n.familyMemorySaved,
+        kind: ToastKind.success,
+      );
       context.pop();
     } catch (error) {
       if (mounted) showFamilyError(context, error);

@@ -11,6 +11,7 @@ import '../family_flows.dart';
 import '../family_providers.dart';
 import '../widgets/family_invite_sheet.dart';
 import '../widgets/family_ui.dart';
+import '../../../../core/widgets/app_toast.dart';
 import 'family_report_page.dart';
 
 /// One family wall's settings: name, storage, my name, invites, members
@@ -192,7 +193,13 @@ class FamilySettingsPage extends ConsumerWidget {
     try {
       await service.setMyDisplayName(familyId, name);
       ref.invalidate(familyMembersProvider(familyId));
-      if (context.mounted) showFamilyMessage(context, l10n.familyMyNameSaved);
+      if (context.mounted) {
+        showFamilyMessage(
+          context,
+          l10n.familyMyNameSaved,
+          kind: ToastKind.success,
+        );
+      }
     } catch (error) {
       if (context.mounted) showFamilyError(context, error);
     }

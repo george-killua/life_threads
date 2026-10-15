@@ -24,6 +24,7 @@ import '../widgets/year_thread_player.dart';
 import '../widgets/year_thread_visuals.dart';
 import '../year_thread_film.dart';
 import '../year_thread_image_page.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 /// Thread of the Year: pick a year, adjust the memories, watch the film
 /// (free) and export it as a video or a "My year" image (Premium).
@@ -600,7 +601,7 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(l10n.yearThreadExportFailed)));
+        ).showToast(l10n.yearThreadExportFailed, kind: ToastKind.error);
       }
     } finally {
       navigator.pop();
@@ -657,14 +658,16 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
                     try {
                       await exporter.saveToGallery(file);
                       if (sheet.mounted) sheet.pop();
-                      messenger.showSnackBar(
-                        SnackBar(content: Text(l10n.yearThreadSaved)),
+                      messenger.showToast(
+                        l10n.yearThreadSaved,
+                        kind: ToastKind.success,
                       );
                     } catch (_) {
                       AppLogger.event('year_thread_save_failed');
                       if (sheet.mounted) sheet.pop();
-                      messenger.showSnackBar(
-                        SnackBar(content: Text(l10n.yearThreadExportFailed)),
+                      messenger.showToast(
+                        l10n.yearThreadExportFailed,
+                        kind: ToastKind.error,
                       );
                     }
                   },

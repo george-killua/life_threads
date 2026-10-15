@@ -29,6 +29,7 @@ import '../../../premium/presentation/premium_gate.dart';
 import '../../../stories/data/music_catalog.dart';
 import '../../../wall/presentation/widgets/wall_background.dart';
 import '../../../wall/presentation/widgets/wall_theme_picker.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -87,8 +88,9 @@ class SettingsPage extends ConsumerWidget {
                         .read(userDisplayNameProvider.notifier)
                         .setDisplayName(name);
                     if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.settingsNameSaved)),
+                    ScaffoldMessenger.of(context).showToast(
+                      l10n.settingsNameSaved,
+                      kind: ToastKind.success,
                     );
                   },
                 ),
@@ -346,7 +348,7 @@ class SettingsPage extends ConsumerWidget {
     final label = _languageLabel(l10n, locale);
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text(l10n.languageSelected(label))));
+    ).showToast(l10n.languageSelected(label), kind: ToastKind.success);
   }
 
   /// [locale], or the phone's language when it is "System" (English when
@@ -383,9 +385,7 @@ class SettingsPage extends ConsumerWidget {
     }
     await Clipboard.setData(ClipboardData(text: uri.toString()));
     if (!context.mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(uri.toString())));
+    ScaffoldMessenger.of(context).showToast(uri.toString());
   }
 
   Future<void> _exportBackup(
@@ -414,7 +414,7 @@ class SettingsPage extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(l10n.exportFailed('$error'))));
+      ).showToast(l10n.exportFailed('$error'), kind: ToastKind.error);
     }
   }
 
@@ -438,14 +438,14 @@ class SettingsPage extends ConsumerWidget {
       await showArchiveImportSummary(context, result);
     } on BackupValidationException catch (error) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.importRejected(error.message))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showToast(l10n.importRejected(error.message), kind: ToastKind.error);
     } catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(l10n.importFailed('$error'))));
+      ).showToast(l10n.importFailed('$error'), kind: ToastKind.error);
     }
   }
 
@@ -481,17 +481,17 @@ class SettingsPage extends ConsumerWidget {
         await ref.read(memoryCapsuleServiceProvider).discardImport(draft);
       }
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.capsuleRejected(error.message))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showToast(l10n.capsuleRejected(error.message), kind: ToastKind.error);
     } catch (error) {
       if (draft != null) {
         await ref.read(memoryCapsuleServiceProvider).discardImport(draft);
       }
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.capsuleImportFailed('$error'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showToast(l10n.capsuleImportFailed('$error'), kind: ToastKind.error);
     }
   }
 
@@ -522,13 +522,13 @@ class SettingsPage extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(l10n.somethingWentWrong)));
+      ).showToast(l10n.somethingWentWrong, kind: ToastKind.error);
       return;
     }
     if (!context.mounted) return;
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text(l10n.allLocalDataCleared)));
+    ).showToast(l10n.allLocalDataCleared, kind: ToastKind.success);
   }
 
   Future<void> _showBetaFeedback(BuildContext context) async {
@@ -563,8 +563,9 @@ class SettingsPage extends ConsumerWidget {
     }
     if (!context.mounted) return;
     if (!granted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.onThisDayNotificationsDenied)),
+      ScaffoldMessenger.of(context).showToast(
+        context.l10n.onThisDayNotificationsDenied,
+        kind: ToastKind.error,
       );
       return;
     }
@@ -674,9 +675,7 @@ class _BetaFeedbackDialogState extends State<_BetaFeedbackDialog> {
     final l10n = context.l10n;
     final feedback = _feedbackController.text.trim();
     if (feedback.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.feedbackEmpty)));
+      ScaffoldMessenger.of(context).showToast(l10n.feedbackEmpty);
       return;
     }
 
@@ -720,7 +719,7 @@ class _BetaFeedbackDialogState extends State<_BetaFeedbackDialog> {
     await Clipboard.setData(ClipboardData(text: body));
     if (!mounted) return;
     setState(() => _sending = false);
-    messenger.showSnackBar(SnackBar(content: Text(l10n.feedbackCopied)));
+    messenger.showToast(l10n.feedbackCopied, kind: ToastKind.success);
   }
 }
 
@@ -1066,7 +1065,12 @@ class _SettingsCard extends StatelessWidget {
           if (child != null) ...[const SizedBox(height: 12), child!],
           if (actions.isNotEmpty) ...[
             const SizedBox(height: 16),
-            Wrap(spacing: 10, runSpacing: 10, children: actions),
+            // Full width inside the card's padding, one under the other.
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: 10,
+              children: actions,
+            ),
           ],
         ],
       ),

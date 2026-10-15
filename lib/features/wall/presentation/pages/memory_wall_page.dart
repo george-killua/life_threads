@@ -49,6 +49,7 @@ import '../widgets/wall_filter.dart';
 import '../widgets/wall_nail.dart';
 import '../widgets/wall_pan_surface.dart';
 import '../widgets/wall_text_note.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 class MemoryWallPage extends ConsumerStatefulWidget {
   const MemoryWallPage({super.key});
@@ -938,9 +939,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
         if (!context.mounted) return;
 
         if (!permission.hasAccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(context.l10n.photoAccessNeeded)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showToast(context.l10n.photoAccessNeeded, kind: ToastKind.error);
           await service.openSettings();
           return;
         }
@@ -1046,9 +1047,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       );
     } catch (error) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.exportFailed('$error'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showToast(context.l10n.exportFailed('$error'), kind: ToastKind.error);
     }
   }
 
@@ -1056,9 +1057,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     final l10n = context.l10n;
 
     if (state.events.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.addMemoryBeforeDisplay)));
+      ScaffoldMessenger.of(context).showToast(l10n.addMemoryBeforeDisplay);
       return;
     }
 
@@ -1069,7 +1068,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     if (!service.isDisplayScanLink(scanUri)) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(l10n.notLifeThreadsDisplayQr)));
+      ).showToast(l10n.notLifeThreadsDisplayQr, kind: ToastKind.error);
       return;
     }
 
@@ -1116,10 +1115,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       final expires = result.expiresAt == null
           ? l10n.soon
           : '${result.expiresAt!.hour.toString().padLeft(2, '0')}:${result.expiresAt!.minute.toString().padLeft(2, '0')}';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.wallDisplayLive(result.memoryCount, expires)),
-        ),
+      ScaffoldMessenger.of(context).showToast(
+        l10n.wallDisplayLive(result.memoryCount, expires),
+        kind: ToastKind.success,
       );
     } on WallDisplayException catch (error) {
       if (context.mounted && progressVisible) {
@@ -1129,7 +1127,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(error.message)));
+      ).showToast(error.message, kind: ToastKind.error);
     } finally {
       if (context.mounted && progressVisible) {
         Navigator.of(context, rootNavigator: true).pop();

@@ -14,6 +14,7 @@ import '../../data/premium_entitlement_controller.dart';
 import '../../domain/premium_entitlement.dart';
 import '../../domain/premium_feature.dart';
 import '../../domain/premium_purchase_state.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 class UpgradePage extends ConsumerWidget {
   const UpgradePage({super.key, this.feature});
@@ -77,9 +78,9 @@ class UpgradePage extends ConsumerWidget {
   Future<void> _unlockMockPremium(BuildContext context, WidgetRef ref) async {
     await ref.read(premiumEntitlementProvider.notifier).setMockUnlock(true);
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.developmentUnlockEnabled)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showToast(context.l10n.developmentUnlockEnabled, kind: ToastKind.success);
     _leave(context);
   }
 

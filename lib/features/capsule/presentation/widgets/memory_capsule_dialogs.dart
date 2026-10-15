@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/widgets/dispose_on_unmount.dart';
 import '../../domain/memory_capsule_models.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 enum MemoryCapsulePasswordPurpose { export, import }
 
@@ -157,20 +158,14 @@ Future<void> shareMemoryCapsule(
       ShareResultStatus.dismissed => l10n.capsuleSavedLater,
       ShareResultStatus.unavailable => l10n.capsuleSharingUnavailable,
     };
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 5),
-        content: Text(l10n.savedToPath(label, result.path)),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showToast(l10n.savedToPath(label, result.path), kind: ToastKind.success);
   } catch (error) {
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 7),
-        content: Text(l10n.capsuleShareFailed('$error')),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showToast(l10n.capsuleShareFailed('$error'), kind: ToastKind.error);
   }
 }
 

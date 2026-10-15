@@ -93,6 +93,24 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       ),
+      // Toasts use showToast (core/widgets/app_toast.dart); this keeps any
+      // plain SnackBar in the same style.
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: panel,
+        contentTextStyle: TextStyle(
+          color: AppColors.text,
+          fontWeight: FontWeight.w700,
+        ),
+        actionTextColor: highlight,
+        showCloseIcon: true,
+        closeIconColor: AppColors.muted,
+        insetPadding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: accent.withValues(alpha: 0.38)),
+        ),
+      ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: panel,
         surfaceTintColor: Colors.transparent,

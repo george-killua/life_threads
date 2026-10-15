@@ -17,6 +17,7 @@ import '../../premium/domain/premium_feature.dart';
 import '../../premium/presentation/premium_gate.dart';
 import '../data/family_service.dart';
 import '../domain/family_models.dart';
+import '../../../core/widgets/app_toast.dart';
 import 'family_providers.dart';
 import 'pages/family_sign_in_page.dart';
 import 'pages/family_terms_page.dart';
@@ -79,12 +80,14 @@ String familyErrorMessage(AppLocalizations l10n, Object error) {
   };
 }
 
-void showFamilyMessage(BuildContext context, String message) {
+void showFamilyMessage(
+  BuildContext context,
+  String message, {
+  ToastKind kind = ToastKind.info,
+}) {
   ScaffoldMessenger.maybeOf(context)
     ?..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(duration: const Duration(seconds: 5), content: Text(message)),
-    );
+    ..showToast(message, kind: kind);
 }
 
 void showFamilyError(BuildContext context, Object error) {
@@ -92,7 +95,11 @@ void showFamilyError(BuildContext context, Object error) {
   AppLogger.event(
     'family_error_${error is FamilyException ? error.code : 'unknown'}',
   );
-  showFamilyMessage(context, familyErrorMessage(context.l10n, error));
+  showFamilyMessage(
+    context,
+    familyErrorMessage(context.l10n, error),
+    kind: ToastKind.error,
+  );
 }
 
 /// "1.2 GB" style sizes for the storage bar.
@@ -139,7 +146,11 @@ FamilyService? familyServiceFor(BuildContext context) {
   final container = ProviderScope.containerOf(context, listen: false);
   final service = container.read(familyServiceOrNullProvider);
   if (service == null) {
-    showFamilyMessage(context, context.l10n.familyUnavailable);
+    showFamilyMessage(
+      context,
+      context.l10n.familyUnavailable,
+      kind: ToastKind.error,
+    );
   }
   return service;
 }
@@ -265,7 +276,11 @@ Future<void> createFamilyFlow(BuildContext context) async {
       );
       if (!context.mounted) return;
       if (!account.hasActiveSubscription) {
-        showFamilyMessage(context, l10n.familyErrorSubscriptionRequired);
+        showFamilyMessage(
+          context,
+          l10n.familyErrorSubscriptionRequired,
+          kind: ToastKind.error,
+        );
         return;
       }
     }
@@ -399,7 +414,11 @@ Future<void> joinFamilyFlow(BuildContext context, Uri link) async {
   if (service == null) return;
   final l10n = context.l10n;
   if (!service.isInviteLink(link)) {
-    showFamilyMessage(context, l10n.familyErrorInviteInvalid);
+    showFamilyMessage(
+      context,
+      l10n.familyErrorInviteInvalid,
+      kind: ToastKind.error,
+    );
     return;
   }
   final account = await ensureFamilyAccount(context);
@@ -429,7 +448,11 @@ Future<void> joinFamilyFlow(BuildContext context, Uri link) async {
     await container.read(familyWallsActiveProvider.notifier).setActive(true);
     AppLogger.event('family_joined');
     if (!context.mounted) return;
-    showFamilyMessage(context, l10n.familyJoined(family.name));
+    showFamilyMessage(
+      context,
+      l10n.familyJoined(family.name),
+      kind: ToastKind.success,
+    );
     unawaited(context.push(RouteNames.familyWallFor(family.id)));
   } catch (error) {
     if (context.mounted) showFamilyError(context, error);
@@ -505,7 +528,11 @@ Future<void> pasteInviteFlow(BuildContext context) async {
   if (text == null || !context.mounted) return;
   final link = Uri.tryParse(text.trim());
   if (link == null || !link.hasScheme) {
-    showFamilyMessage(context, context.l10n.familyErrorInviteInvalid);
+    showFamilyMessage(
+      context,
+      context.l10n.familyErrorInviteInvalid,
+      kind: ToastKind.error,
+    );
     return;
   }
   await joinFamilyFlow(context, link);

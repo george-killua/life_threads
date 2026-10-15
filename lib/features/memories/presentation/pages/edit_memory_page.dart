@@ -20,6 +20,7 @@ import '../../domain/memory_person.dart';
 import '../../domain/memory_type.dart';
 import '../memory_l10n.dart';
 import '../widgets/memory_people_editor.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 class EditMemoryPage extends ConsumerStatefulWidget {
   const EditMemoryPage({super.key, required this.memoryId});
@@ -501,8 +502,9 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
       if (!mounted) return;
       setState(() => _isSaving = false);
       final messenger = ScaffoldMessenger.of(this.context);
-      messenger.showSnackBar(
-        SnackBar(content: Text(this.context.l10n.memorySaveFailed)),
+      messenger.showToast(
+        this.context.l10n.memorySaveFailed,
+        kind: ToastKind.error,
       );
       return;
     }

@@ -24,6 +24,7 @@ import '../widgets/music_trimmer.dart';
 import '../widgets/story_export_progress_dialog.dart';
 import '../widgets/story_memory_strip.dart';
 import '../widgets/story_search_field.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 /// Create Story: pick 1–6 memories, choose a template, edit the caption,
 /// optionally make it a film with music, then share or save. The preview
@@ -441,9 +442,9 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
     final l10n = context.l10n;
     try {
       await ref.read(storyExporterProvider).saveToGallery(file);
-      messenger.showSnackBar(SnackBar(content: Text(l10n.storySaved)));
+      messenger.showToast(l10n.storySaved, kind: ToastKind.success);
     } on StoryGalleryAccessDenied {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.storySaveDenied)));
+      messenger.showToast(l10n.storySaveDenied, kind: ToastKind.error);
     } catch (error) {
       _showError(error);
     }
@@ -511,11 +512,9 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
 
   void _showError(Object error) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 7),
-        content: Text(context.l10n.storyExportFailed('$error')),
-      ),
+    ScaffoldMessenger.of(context).showToast(
+      context.l10n.storyExportFailed('$error'),
+      kind: ToastKind.error,
     );
   }
 }
@@ -733,14 +732,8 @@ class _StoryMemoryPickerState extends State<_StoryMemoryPicker> {
                           if (order < 0 && selection.isFull) {
                             ScaffoldMessenger.of(context)
                               ..hideCurrentSnackBar()
-                              ..showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    l10n.storyPickLimit(
-                                      StorySelection.maxMemories,
-                                    ),
-                                  ),
-                                ),
+                              ..showToast(
+                                l10n.storyPickLimit(StorySelection.maxMemories),
                               );
                             return;
                           }

@@ -23,6 +23,7 @@ import '../../domain/memory_photo.dart';
 import '../../domain/memory_person.dart';
 import '../memory_l10n.dart';
 import '../../../wall/domain/wall_item.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 class MemoryDetailPage extends ConsumerWidget {
   const MemoryDetailPage({super.key, required this.memoryId});
@@ -172,16 +173,13 @@ class MemoryDetailPage extends ConsumerWidget {
         ShareResultStatus.dismissed => context.l10n.shareLinkCreated,
         ShareResultStatus.unavailable => context.l10n.shareLinkUnavailable,
       };
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          duration: const Duration(seconds: 9),
-          content: Text(context.l10n.shareLinkExpiresDelete(label)),
-          action: SnackBarAction(
-            label: context.l10n.delete,
-            onPressed: () {
-              unawaited(_deleteSharedCapsule(context, ref, cloudShare));
-            },
-          ),
+      ScaffoldMessenger.of(context).showToast(
+        context.l10n.shareLinkExpiresDelete(label),
+        action: ToastAction(
+          label: context.l10n.delete,
+          onPressed: () {
+            unawaited(_deleteSharedCapsule(context, ref, cloudShare));
+          },
         ),
       );
     } on BackupValidationException catch (error) {
@@ -190,8 +188,9 @@ class MemoryDetailPage extends ConsumerWidget {
         progressVisible = false;
       }
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.capsuleRejected(error.message))),
+      ScaffoldMessenger.of(context).showToast(
+        context.l10n.capsuleRejected(error.message),
+        kind: ToastKind.error,
       );
     } on MemoryCapsuleCloudShareException catch (error) {
       if (context.mounted && progressVisible) {
@@ -199,8 +198,9 @@ class MemoryDetailPage extends ConsumerWidget {
         progressVisible = false;
       }
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.cloudShareFailed(error.message))),
+      ScaffoldMessenger.of(context).showToast(
+        context.l10n.cloudShareFailed(error.message),
+        kind: ToastKind.error,
       );
     } catch (error) {
       if (context.mounted && progressVisible) {
@@ -208,8 +208,9 @@ class MemoryDetailPage extends ConsumerWidget {
         progressVisible = false;
       }
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.cloudShareFailed('$error'))),
+      ScaffoldMessenger.of(context).showToast(
+        context.l10n.cloudShareFailed('$error'),
+        kind: ToastKind.error,
       );
     }
   }
@@ -234,13 +235,15 @@ class MemoryDetailPage extends ConsumerWidget {
           .read(memoryCapsuleCloudShareServiceProvider)
           .revokeShare(cloudShare);
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.sharedMemoryLinkDeleted)),
+      ScaffoldMessenger.of(context).showToast(
+        context.l10n.sharedMemoryLinkDeleted,
+        kind: ToastKind.success,
       );
     } on MemoryCapsuleCloudShareException catch (error) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.deleteFailed(error.message))),
+      ScaffoldMessenger.of(context).showToast(
+        context.l10n.deleteFailed(error.message),
+        kind: ToastKind.error,
       );
     }
   }

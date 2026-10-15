@@ -8,6 +8,7 @@ import '../../../../core/localization/app_localizations_x.dart';
 import '../../../premium/data/premium_entitlement_controller.dart';
 import '../../data/wall_theme_controller.dart';
 import '../../domain/wall_theme.dart';
+import '../../../../core/widgets/app_toast.dart';
 import 'wall_theme_preview.dart';
 
 /// The theme choice in Settings: Auto, the year-round themes and the
@@ -90,7 +91,7 @@ class WallThemePicker extends ConsumerWidget {
     if (!context.mounted) return;
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text(context.l10n.themeAutoSelected)));
+    ).showToast(context.l10n.themeAutoSelected, kind: ToastKind.success);
   }
 
   Future<void> _showPreview(
@@ -125,12 +126,9 @@ class WallThemePicker extends ConsumerWidget {
   ) async {
     await ref.read(wallThemeProvider.notifier).selectTheme(theme);
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          context.l10n.themeSelected(wallThemeLabel(context, theme)),
-        ),
-      ),
+    ScaffoldMessenger.of(context).showToast(
+      context.l10n.themeSelected(wallThemeLabel(context, theme)),
+      kind: ToastKind.success,
     );
   }
 }

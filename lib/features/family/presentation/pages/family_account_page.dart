@@ -8,6 +8,7 @@ import '../../../../core/logging/app_logger.dart';
 import '../family_flows.dart';
 import '../family_providers.dart';
 import '../widgets/family_ui.dart';
+import '../../../../core/widgets/app_toast.dart';
 
 /// The family wall account: who is signed in, sign out, delete account.
 class FamilyAccountPage extends ConsumerWidget {
@@ -132,7 +133,11 @@ class FamilyAccountPage extends ConsumerWidget {
       );
       AppLogger.event('family_account_deleted');
       if (!context.mounted) return;
-      showFamilyMessage(context, l10n.familyAccountDeleted);
+      showFamilyMessage(
+        context,
+        l10n.familyAccountDeleted,
+        kind: ToastKind.success,
+      );
       Navigator.of(context).maybePop();
     } catch (error) {
       if (context.mounted) showFamilyError(context, error);
