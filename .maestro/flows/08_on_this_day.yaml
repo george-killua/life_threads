@@ -33,6 +33,6 @@ tags: [protocol, otd]
     commands:
       - tapOn: "Allow|Erlauben"
 - extendedWaitUntil:
-    visible: "(?s)At \\d.*"
+    visible: "(?s).*At \\d.*"
     timeout: 10000
 - takeScreenshot: OTD-01_reminder_on

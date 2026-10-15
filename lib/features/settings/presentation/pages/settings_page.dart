@@ -546,7 +546,9 @@ class _SettingsGroup extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsetsDirectional.only(start: 6, bottom: 8),
+            // Its own node: not read as part of the first row.
             child: Semantics(
+              container: true,
               header: true,
               child: Text(
                 title,

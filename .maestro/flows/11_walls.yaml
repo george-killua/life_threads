@@ -1,0 +1,64 @@
+# WAL-09 Search, several walls (Premium) and hidden memories.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+name: WAL-09 Search, walls and hidden memories
+tags: [protocol, wal]
+---
+- runFlow: ../subflows/three_memories.yaml
+- runFlow: ../subflows/unlock_premium.yaml
+
+# Search by place.
+- tapOn: "Search memories"
+- inputText: "croatia"
+- extendedWaitUntil:
+    visible: "(?s)Summer in Split.*"
+    timeout: 10000
+- assertNotVisible: "(?s)Grandpa's garden.*"
+- takeScreenshot: WAL-09_search
+- tapOn: "Back"
+
+# A new wall, named.
+- runFlow:
+    file: ../subflows/more.yaml
+    env:
+      ITEM: "New wall"
+- extendedWaitUntil:
+    visible: "(?s)Wall name.*"
+    timeout: 10000
+- inputText: "Travel 2025"
+- tapOn: "Create"
+- extendedWaitUntil:
+    visible: "Start with one thing from today"
+    timeout: 10000
+- takeScreenshot: WAL-09_new_wall
+
+# Back to My wall, and move a memory to the new wall.
+- tapOn: "Switch wall"
+- tapOn: "(?s)My wall.*"
+- runFlow: ../subflows/find_card.yaml
+- longPressOn: "Summer in Split.*"
+- tapOn: "Move to wall…"
+- tapOn: "Travel 2025"
+- extendedWaitUntil:
+    notVisible: "Summer in Split.*"
+    timeout: 10000
+- tapOn: "Switch wall"
+- tapOn: "(?s)Travel 2025.*"
+- extendedWaitUntil:
+    visible: "Summer in Split.*"
+    timeout: 10000
+- takeScreenshot: WAL-09_moved
+
+# Hide it; View > Hidden memories shows it again.
+- longPressOn: "Summer in Split.*"
+- tapOn: "Hide"
+- extendedWaitUntil:
+    notVisible: "Summer in Split.*"
+    timeout: 10000
+- tapOn: "View"
+- tapOn: "(?s)Hidden memories.*"
+- tapOn:
+    point: 50%, 8%
+- extendedWaitUntil:
+    visible: "Summer in Split.*"
+    timeout: 10000
+- takeScreenshot: WAL-09_hidden_shown

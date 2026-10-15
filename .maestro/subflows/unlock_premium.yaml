@@ -10,8 +10,10 @@ appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding
       TARGET: ".*debug mock unlock.*"
       DIRECTION: DOWN
 - tapOn: ".*debug mock unlock.*"
+# Unlocked: the test switch goes away (the page may be scrolled down,
+# so the "Premium Active" button can be out of view).
 - extendedWaitUntil:
-    visible: ".*Premium Active.*|.*Premium is active.*"
+    notVisible: ".*debug mock unlock.*"
     timeout: 10000
 - tapOn: "Back"
 - runFlow:

@@ -21,6 +21,7 @@ PROTOCOL = [
     ("WAL-06", "Timeline and map"),
     ("WAL-07", "People and places"),
     ("WAL-08", "Free limit"),
+    ("WAL-09", "Search, walls and hidden memories"),
     ("PRM-01", "Premium page"),
     ("PRM-02", "Subscribe"),
     ("PRM-03", "Restore"),

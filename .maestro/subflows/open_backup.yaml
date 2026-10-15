@@ -2,6 +2,10 @@
 appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 ---
 - runFlow: open_settings.yaml
+- runFlow:
+    file: scroll_to.yaml
+    env:
+      TARGET: "(?s)Backup & data.*"
 - tapOn: "(?s)Backup & data.*"
 - extendedWaitUntil:
     visible: "Export Archive"

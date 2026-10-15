@@ -37,10 +37,18 @@ tags: [protocol, set, large]
 - runFlow: ../subflows/open_settings.yaml
 - assertVisible: "(?s)Your name\nLina"
 - takeScreenshot: SET-02L_settings
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "(?s)Backup & data.*"
 - tapOn: "(?s)Backup & data.*"
 - assertVisible: "Export Archive"
 - takeScreenshot: SET-02L_backup
 - tapOn: "Back"
+- runFlow:
+    file: ../subflows/scroll_to.yaml
+    env:
+      TARGET: "(?s)About & help.*"
 - tapOn: "(?s)About & help.*"
 - assertVisible: "Send Feedback"
 - takeScreenshot: SET-02L_about

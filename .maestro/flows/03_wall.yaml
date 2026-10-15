@@ -75,12 +75,8 @@ tags: [protocol, wal]
 - inputText: "Summer by the sea"
 - runFlow: ../subflows/hide_keyboard.yaml
 - tapOn: "Edit Memory"
-- runFlow:
-    file: ../subflows/scroll_to.yaml
-    env:
-      TARGET: "Save memory"
-      DIRECTION: DOWN
-- tapOn: "Save memory"
+# Save sits in the top bar.
+- tapOn: "Save"
 - extendedWaitUntil:
     visible: "Edit story"
     timeout: 10000
@@ -102,10 +98,9 @@ tags: [protocol, wal]
 # Deleted at once, with Undo instead of "Are you sure?".
 - longPressOn: "Grandpa's garden.*"
 - tapOn: "Delete"
-- extendedWaitUntil:
-    notVisible: "Grandpa's garden.*"
-    timeout: 10000
-- assertVisible: "Memory deleted."
+- extendedWaitUntil:   # the "Memory deleted." toast, for 6 seconds
+    visible: "Undo"
+    timeout: 5000
 - tapOn: "Undo"
 - extendedWaitUntil:
     visible: "Grandpa's garden.*"

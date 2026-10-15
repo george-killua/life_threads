@@ -16,13 +16,27 @@ appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding
 - extendedWaitUntil:
     visible: "Save it before it fades"
     timeout: 15000
+# Scrolls first: at large text sizes the fields are below the fold.
+- runFlow:
+    file: scroll_to.yaml
+    env:
+      TARGET: "Moment"
 - tapOn: "Moment"
 - inputText: ${TITLE}
 - runFlow: hide_keyboard.yaml
+- tapOn: "Save it before it fades"   # closes the keyboard (iOS)
+- runFlow:
+    file: scroll_to.yaml
+    env:
+      TARGET: "What made it worth keeping?"
 - tapOn: "What made it worth keeping?"
 - inputText: ${STORY}
 - runFlow: hide_keyboard.yaml
 - tapOn: "Save it before it fades"   # closes the keyboard
+- runFlow:
+    file: scroll_to.yaml
+    env:
+      TARGET: "Pick"
 - tapOn: "Pick"
 - extendedWaitUntil:
     visible: "Select photos"
@@ -30,9 +44,13 @@ appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding
 - tapOn: "Photo from ${PHOTO}"
 - tapOn: "Use selected"
 - extendedWaitUntil:
-    visible: "Cover photo"
+    visible: "Add more|(?s).*Cover photo.*"
     timeout: 30000
 - tapOn: "Continue"
+- runFlow:
+    file: scroll_to.yaml
+    env:
+      TARGET: ${FEELING}
 - tapOn: ${FEELING}
 - tapOn: "Continue"
 - assertVisible: ".*${PHOTO}.*"

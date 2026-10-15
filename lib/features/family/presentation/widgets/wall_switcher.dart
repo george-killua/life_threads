@@ -270,42 +270,66 @@ Future<String?> _askWallName(
   required String title,
   String initial = '',
 }) {
-  final l10n = context.l10n;
-  final controller = TextEditingController(text: initial);
   return showDialog<String>(
     context: context,
-    builder: (dialogContext) {
-      void submit() {
-        final name = controller.text.trim();
-        if (name.isNotEmpty) Navigator.of(dialogContext).pop(name);
-      }
+    builder: (_) => _WallNameDialog(title: title, initial: initial),
+  );
+}
 
-      return AlertDialog(
-        title: Text(title),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          textCapitalization: TextCapitalization.sentences,
-          maxLength: 40,
-          onSubmitted: (_) => submit(),
-          decoration: InputDecoration(
-            labelText: l10n.wallNameLabel,
-            hintText: l10n.newWallHint,
-          ),
+/// Owns its text controller, so it is disposed only once the dialog has
+/// fully gone (not during its closing animation, which crashed).
+class _WallNameDialog extends StatefulWidget {
+  const _WallNameDialog({required this.title, required this.initial});
+
+  final String title;
+  final String initial;
+
+  @override
+  State<_WallNameDialog> createState() => _WallNameDialogState();
+}
+
+class _WallNameDialogState extends State<_WallNameDialog> {
+  late final _controller = TextEditingController(text: widget.initial);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final name = _controller.text.trim();
+    if (name.isNotEmpty) Navigator.of(context).pop(name);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return AlertDialog(
+      title: Text(widget.title),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        textCapitalization: TextCapitalization.sentences,
+        maxLength: 40,
+        onSubmitted: (_) => _submit(),
+        decoration: InputDecoration(
+          labelText: l10n.wallNameLabel,
+          hintText: l10n.newWallHint,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: submit,
-            child: Text(initial.isEmpty ? l10n.createWall : l10n.save),
-          ),
-        ],
-      );
-    },
-  ).whenComplete(controller.dispose);
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: _submit,
+          child: Text(widget.initial.isEmpty ? l10n.createWall : l10n.save),
+        ),
+      ],
+    );
+  }
 }
 
 class _ManageWalls extends _WallChoice {
