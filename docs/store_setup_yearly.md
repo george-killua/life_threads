@@ -65,7 +65,10 @@ The monthly subscription still has its older four English benefits only
 ## 3. Server (VPS) – family walls must accept the yearly plan
 
 The API only accepts the products listed in its environment. Today both
-lists contain only the monthly product. On the VPS:
+lists contain only the monthly product. Log in with `ssh gkcoding-vps` (the
+host alias in `~/.ssh/config` picks the `gkcoding_vps_deploy` key; plain
+`deploy@217.160.247.224` fails with "Permission denied (publickey)"). On the
+VPS:
 
 ```bash
 sudo sed -i 's/^LIFETHREADS_APPSTORE_PRODUCT_IDS=.*/LIFETHREADS_APPSTORE_PRODUCT_IDS=lifethreads_premium_monthly,lifethreads_premium_yearly/' /opt/gkcoding/api/.env
@@ -84,7 +87,7 @@ The Premium, privacy and terms pages (website repo commit `ababd26`) are
 ready. Upload only the LifeThreads pages (not the whole site):
 
 ```bash
-rsync -az ~/Desktop/development/Projects/gk_coding_website/web/lifethreads/ deploy@217.160.247.224:/var/www/subdomains/root/lifethreads/
+rsync -az ~/Desktop/development/Projects/gk_coding_website/web/lifethreads/ gkcoding-vps:/var/www/subdomains/root/lifethreads/
 ```
 
 Then check: <https://gkcoding.dev/lifethreads/premium/> shows €34.99 /
