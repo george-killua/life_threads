@@ -2535,6 +2535,12 @@ abstract class AppLocalizations {
   /// **'More'**
   String get moreActionsTooltip;
 
+  /// No description provided for @addToWallTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to your wall'**
+  String get addToWallTitle;
+
   /// No description provided for @expandableMemory.
   ///
   /// In en, this message translates to:

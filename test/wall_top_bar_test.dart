@@ -53,7 +53,8 @@ void main() {
 
     await tester.tap(find.text('Kategorie'));
     await settle(tester);
-    await tester.tapAt(const Offset(20, 20));
+    // Close the sheet (as the system back gesture does).
+    await tester.binding.handlePopRoute();
     await settle(tester);
     expect(find.text('Nach Datum'), findsNothing);
     expect(find.byKey(const ValueKey('wall-view-custom-dot')), findsOneWidget);

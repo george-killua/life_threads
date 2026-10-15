@@ -1357,6 +1357,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreActionsTooltip => 'More';
 
   @override
+  String get addToWallTitle => 'Add to your wall';
+
+  @override
   String get expandableMemory => 'Memory';
 
   @override

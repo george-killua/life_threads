@@ -2227,9 +2227,8 @@ class _WallViewSheetState extends State<_WallViewSheet> {
             ),
             if (_mode == _WallViewMode.wall) ...[
               _SheetSectionLabel(l10n.wallArrange),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
+              _ChoiceGrid(
+                columns: 2,
                 children: [
                   for (final layout in WallLayoutMode.values)
                     _SheetChoice(
@@ -2245,9 +2244,8 @@ class _WallViewSheetState extends State<_WallViewSheet> {
               ),
             ],
             _SheetSectionLabel(l10n.wallShowOnly),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+            _ChoiceGrid(
+              columns: 4,
               children: [
                 for (final filter in WallFilter.values)
                   _SheetChoice(
@@ -2327,18 +2325,120 @@ class _SheetChoice extends StatelessWidget {
   final VoidCallback onSelected;
   final IconData? icon;
 
+  static const labelStyle = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w900,
+  );
+  static const iconSize = 18.0;
+  static const horizontalPadding = 12.0;
+
+  /// The width this choice needs to show its label on one line.
+  double neededWidth(BuildContext context) {
+    final painter = TextPainter(
+      text: TextSpan(text: label, style: labelStyle),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+      maxLines: 1,
+    )..layout();
+    final iconWidth = icon == null
+        ? 0.0
+        : MediaQuery.textScalerOf(context).scale(iconSize) + 6;
+    return painter.width + iconWidth + 2 * horizontalPadding + 2;
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final foreground = selected ? scheme.onPrimary : AppColors.muted;
-    return ChoiceChip(
+    final shape = StadiumBorder(
+      side: BorderSide(color: selected ? Colors.transparent : scheme.outline),
+    );
+    return Semantics(
+      button: true,
       selected: selected,
-      onSelected: (_) => onSelected(),
-      showCheckmark: false,
-      selectedColor: scheme.primary,
-      avatar: icon == null ? null : Icon(icon, size: 18, color: foreground),
-      label: Text(label),
-      labelStyle: TextStyle(color: foreground, fontWeight: FontWeight.w900),
+      inMutuallyExclusiveGroup: true,
+      excludeSemantics: true,
+      label: label,
+      child: Material(
+        color: selected
+            ? scheme.primary
+            : AppColors.panelWarm.withValues(alpha: 0.6),
+        shape: shape,
+        child: InkWell(
+          customBorder: shape,
+          onTap: onSelected,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+              vertical: 12,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (icon != null) ...[
+                  Icon(icon, size: iconSize, color: foreground),
+                  const SizedBox(width: 6),
+                ],
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: labelStyle.copyWith(color: foreground),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Equal-width choices across the sheet, [columns] per row; two per row (or
+/// one) when a label would not fit, e.g. in German, Arabic or large text.
+class _ChoiceGrid extends StatelessWidget {
+  const _ChoiceGrid({required this.columns, required this.children});
+
+  final int columns;
+  final List<_SheetChoice> children;
+
+  static const _gap = 8.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final needed = children
+            .map((choice) => choice.neededWidth(context))
+            .fold(0.0, math.max);
+        var perRow = columns;
+        while (perRow > 1 &&
+            (constraints.maxWidth - (perRow - 1) * _gap) / perRow < needed) {
+          perRow = perRow > 2 ? 2 : 1;
+        }
+        return Column(
+          children: [
+            for (var start = 0; start < children.length; start += perRow)
+              Padding(
+                padding: EdgeInsets.only(top: start == 0 ? 0 : _gap),
+                child: Row(
+                  children: [
+                    for (var i = start; i < start + perRow; i++) ...[
+                      if (i > start) const SizedBox(width: _gap),
+                      Expanded(
+                        child: i < children.length
+                            ? children[i]
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
@@ -3107,10 +3207,16 @@ class _CameraCaptureFab extends StatelessWidget {
           ),
         ],
       ),
+      // The secondary action beside the gold "+": dark with a gold icon.
       child: FloatingActionButton(
         heroTag: 'wall-camera-capture',
         tooltip: context.l10n.takePhotosFabTooltip,
         onPressed: onPressed,
+        backgroundColor: AppColors.panelWarm,
+        foregroundColor: AppColors.gold,
+        shape: CircleBorder(
+          side: BorderSide(color: AppColors.gold.withValues(alpha: 0.4)),
+        ),
         child: const Icon(Icons.photo_camera_rounded),
       ),
     );

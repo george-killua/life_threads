@@ -1373,6 +1373,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get moreActionsTooltip => 'Mehr';
 
   @override
+  String get addToWallTitle => 'Zu deiner Wand hinzufügen';
+
+  @override
   String get expandableMemory => 'Erinnerung';
 
   @override

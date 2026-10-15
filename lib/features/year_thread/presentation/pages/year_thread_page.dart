@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/top_bar_page.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/logging/app_logger.dart';
@@ -85,54 +86,34 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
     return Scaffold(
       body: WallBackground(
         child: SafeArea(
-          child: memoryState.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, _) => Center(child: Text(error.toString())),
-            data: (state) {
-              final years = YearThread.availableYears(state);
-              final year = _resolveYear(years);
-              return ListView(
-                padding: const EdgeInsets.fromLTRB(20, 18, 20, 32),
-                children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.of(context).maybePop(),
-                        tooltip: MaterialLocalizations.of(
-                          context,
-                        ).backButtonTooltip,
-                        icon: const Icon(Icons.arrow_back_rounded),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
+          child: TopBarPage(
+            title: l10n.yearThreadTitle,
+            body: memoryState.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) => Center(child: Text(error.toString())),
+              data: (state) {
+                final years = YearThread.availableYears(state);
+                final year = _resolveYear(years);
+                return ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                  children: [
+                    if (year == null)
+                      _Panel(
                         child: Text(
-                          l10n.yearThreadTitle,
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.8,
+                          l10n.yearThreadNoYears,
+                          style: TextStyle(
+                            color: AppColors.muted,
+                            height: 1.45,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  if (year == null)
-                    _Panel(
-                      child: Text(
-                        l10n.yearThreadNoYears,
-                        style: TextStyle(
-                          color: AppColors.muted,
-                          height: 1.45,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    )
-                  else
-                    ..._editor(context, years, YearThread.year(state, year)),
-                ],
-              );
-            },
+                      )
+                    else
+                      ..._editor(context, years, YearThread.year(state, year)),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),

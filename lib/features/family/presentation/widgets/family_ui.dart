@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/top_bar_page.dart';
 import '../../../wall/presentation/widgets/wall_background.dart';
 
-/// The page frame of the family screens: the wall background, a back
-/// button, a title and a scrolling body, like Settings.
+/// The page frame of the family screens: the wall background, a fixed top
+/// bar with back button and title, and a scrolling body, like Settings.
 class FamilyPageScaffold extends StatelessWidget {
   const FamilyPageScaffold({
     super.key,
@@ -27,40 +28,16 @@ class FamilyPageScaffold extends StatelessWidget {
           // Ink of list tiles and buttons draws on the wall, not under it.
           child: Material(
             type: MaterialType.transparency,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        tooltip: MaterialLocalizations.of(
-                          context,
-                        ).backButtonTooltip,
-                        onPressed:
-                            onBack ?? () => Navigator.of(context).maybePop(),
-                        icon: const BackButtonIcon(),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.8,
-                          ),
-                        ),
-                      ),
-                      ...actions,
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ...children,
-                ],
+            child: TopBarPage(
+              title: title,
+              actions: actions,
+              onBack: onBack,
+              body: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: children,
+                ),
               ),
             ),
           ),
@@ -70,7 +47,6 @@ class FamilyPageScaffold extends StatelessWidget {
   }
 }
 
-/// A rounded panel like the Settings cards.
 class FamilyPanel extends StatelessWidget {
   const FamilyPanel({
     super.key,

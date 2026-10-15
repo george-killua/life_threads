@@ -1,5 +1,5 @@
-// The wall's bottom row on a small phone: the Add button shows only its icon
-// so the memory card beside it keeps a readable width.
+// The wall's bottom row: a round "+" beside the camera, so the memory card
+// keeps a readable width, and the "Add to your wall" sheet it opens.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -47,72 +47,52 @@ double cardWidth(WidgetTester tester, {required bool rtl}) {
 }
 
 void main() {
-  testWidgets(
-    'German at 375 pt: Add is icon-only and the card stays readable',
-    (tester) async {
-      await pumpWall(tester, const Locale('de'), const Size(375, 667));
-      final l10n = lookupAppLocalizations(const Locale('de'));
-
-      expect(find.text(l10n.add), findsNothing);
-      expect(find.byTooltip(l10n.add), findsOneWidget);
-      expect(tester.getSize(find.byKey(addButton)).width, 56);
-      expect(cardWidth(tester, rtl: false), greaterThanOrEqualTo(180));
-      expect(find.text(l10n.rememberThis), findsOneWidget);
-
-      // The open menu floats above the row instead of squeezing the card.
-      await tester.tap(find.byKey(addButton));
-      await tester.pump(const Duration(milliseconds: 300));
-      expect(find.text(l10n.expandableMemory), findsOneWidget);
-      expect(find.byTooltip(l10n.close), findsOneWidget);
-      expect(cardWidth(tester, rtl: false), greaterThanOrEqualTo(180));
-      final menu = tester.getRect(
-        find.ancestor(
-          of: find.text(l10n.expandableNail),
-          matching: find.byType(InkWell),
-        ),
-      );
-      final add = tester.getRect(find.byKey(addButton));
-      expect(menu.right, add.right);
-      expect(menu.bottom, lessThan(add.top));
-      expect(menu.left, greaterThanOrEqualTo(20));
-      expect(menu.height, lessThan(100));
-
-      await tester.tap(find.byKey(addButton));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-      expect(find.text(l10n.expandableMemory), findsNothing);
-    },
-  );
-
-  testWidgets('Arabic at 375 pt: icon-only Add sits at the left edge', (
+  testWidgets('German at 375 pt: a round + and the card stays readable', (
     tester,
   ) async {
-    await pumpWall(tester, const Locale('ar'), const Size(375, 667));
-    final l10n = lookupAppLocalizations(const Locale('ar'));
+    await pumpWall(tester, const Locale('de'), const Size(375, 667));
+    final l10n = lookupAppLocalizations(const Locale('de'));
 
     expect(find.text(l10n.add), findsNothing);
     expect(find.byTooltip(l10n.add), findsOneWidget);
-    expect(tester.getRect(find.byKey(addButton)).left, 20);
-    expect(cardWidth(tester, rtl: true), greaterThanOrEqualTo(180));
+    expect(tester.getSize(find.byKey(addButton)), const Size.square(64));
+    expect(cardWidth(tester, rtl: false), greaterThanOrEqualTo(180));
+    expect(find.text(l10n.rememberThis), findsOneWidget);
 
+    // The sheet: a title and four full-width rows of the same width.
     await tester.tap(find.byKey(addButton));
-    await tester.pump(const Duration(milliseconds: 300));
-    final menu = tester.getRect(
-      find.ancestor(
-        of: find.text(l10n.expandableNail),
-        matching: find.byType(InkWell),
-      ),
-    );
-    expect(menu.left, 20);
-    expect(menu.right, lessThanOrEqualTo(355));
-    expect(cardWidth(tester, rtl: true), greaterThanOrEqualTo(180));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text(l10n.addToWallTitle), findsOneWidget);
+    final rows =
+        [
+          l10n.expandableMemory,
+          l10n.expandableQuickPhoto,
+          l10n.expandableTextNote,
+          l10n.expandableNail,
+        ].map(
+          (label) => tester.getRect(
+            find.ancestor(of: find.text(label), matching: find.byType(InkWell)),
+          ),
+        );
+    for (final row in rows) {
+      expect(row.left, 20);
+      expect(row.right, 355);
+    }
+
+    // Closed by tapping outside it.
+    await tester.tapAt(const Offset(20, 20));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text(l10n.addToWallTitle), findsNothing);
   });
 
-  testWidgets('wider screens keep the labelled Add button', (tester) async {
-    await pumpWall(tester, const Locale('en'), const Size(800, 1000));
-    expect(
-      find.descendant(of: find.byKey(addButton), matching: find.text('Add')),
-      findsOneWidget,
-    );
+  testWidgets('Arabic at 375 pt: the + sits at the left edge', (tester) async {
+    await pumpWall(tester, const Locale('ar'), const Size(375, 667));
+    final l10n = lookupAppLocalizations(const Locale('ar'));
+
+    expect(find.byTooltip(l10n.add), findsOneWidget);
+    expect(tester.getRect(find.byKey(addButton)).left, 20);
+    expect(cardWidth(tester, rtl: true), greaterThanOrEqualTo(180));
   });
 }

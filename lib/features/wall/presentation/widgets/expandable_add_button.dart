@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
 
-class ExpandableAddButton extends StatefulWidget {
+/// The wall's main action: a round "+" that opens the "Add to your wall"
+/// sheet (memory, quick photo, text note, nail).
+class ExpandableAddButton extends StatelessWidget {
   const ExpandableAddButton({
     super.key,
     required this.onAddEvent,
@@ -17,72 +19,77 @@ class ExpandableAddButton extends StatefulWidget {
   final VoidCallback onAddText;
   final VoidCallback onAddNail;
 
-  /// Screens narrower than this get the icon-only button.
-  static const double compactBelowWidth = 400;
-
-  @override
-  State<ExpandableAddButton> createState() => _ExpandableAddButtonState();
-}
-
-class _ExpandableAddButtonState extends State<ExpandableAddButton> {
-  // The menu opens in its own popup route above the button, so it doesn't
-  // take width from the memory card beside the button. An OverlayPortal or a
-  // LayerLink here made iOS report every accessibility frame on the wall at
-  // a third of its size (VoiceOver, UI tests); a route doesn't.
-  final _buttonKey = GlobalKey();
+  /// The "+" is a little larger than the camera button beside it.
+  static const double size = 64;
 
   @override
   Widget build(BuildContext context) {
-    return KeyedSubtree(
-      key: _buttonKey,
-      child: _AddButton(
-        open: false,
-        turns: const AlwaysStoppedAnimation(0),
-        heroTag: 'wall-add-menu',
-        buttonKey: const ValueKey('wall-add-button'),
-        onPressed: _open,
+    final l10n = context.l10n;
+    final scheme = Theme.of(context).colorScheme;
+    return Tooltip(
+      message: l10n.add,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: scheme.primary.withValues(alpha: 0.28),
+              blurRadius: 28,
+              offset: const Offset(0, 12),
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.36),
+              blurRadius: 24,
+              offset: const Offset(0, 14),
+            ),
+          ],
+        ),
+        child: FilledButton(
+          key: const ValueKey('wall-add-button'),
+          style: FilledButton.styleFrom(
+            shape: const CircleBorder(),
+            fixedSize: const Size.square(size),
+            minimumSize: const Size.square(size),
+            padding: EdgeInsets.zero,
+          ),
+          onPressed: () => _open(context),
+          child: const Icon(Icons.add_rounded, size: 32),
+        ),
       ),
     );
   }
 
-  Future<void> _open() async {
-    final navigator = Navigator.of(context);
-    final button = _buttonKey.currentContext?.findRenderObject() as RenderBox?;
-    final overlay = navigator.overlay?.context.findRenderObject() as RenderBox?;
-    if (button == null || overlay == null) return;
-    final anchor =
-        button.localToGlobal(Offset.zero, ancestor: overlay) & button.size;
+  Future<void> _open(BuildContext context) async {
     final l10n = context.l10n;
-    final action = await navigator.push(
-      _AddMenuRoute(
-        anchor: anchor,
-        barrierLabel: MaterialLocalizations.of(
-          context,
-        ).modalBarrierDismissLabel,
+    final action = await showModalBottomSheet<VoidCallback>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) => _AddSheet(
         items: [
           (
             icon: Icons.auto_stories_rounded,
             label: l10n.expandableMemory,
             subtitle: l10n.expandableMemorySubtitle,
-            action: widget.onAddEvent,
+            action: onAddEvent,
           ),
           (
             icon: Icons.add_photo_alternate_rounded,
             label: l10n.expandableQuickPhoto,
             subtitle: l10n.expandableQuickPhotoSubtitle,
-            action: widget.onAddQuickPhoto,
+            action: onAddQuickPhoto,
           ),
           (
             icon: Icons.sticky_note_2_rounded,
             label: l10n.expandableTextNote,
             subtitle: l10n.expandableTextNoteSubtitle,
-            action: widget.onAddText,
+            action: onAddText,
           ),
           (
             icon: Icons.push_pin_rounded,
             label: l10n.expandableNail,
             subtitle: l10n.expandableNailSubtitle,
-            action: widget.onAddNail,
+            action: onAddNail,
           ),
         ],
       ),
@@ -91,162 +98,56 @@ class _ExpandableAddButtonState extends State<ExpandableAddButton> {
   }
 }
 
-typedef _AddMenuItem = ({
+typedef _AddItem = ({
   IconData icon,
   String label,
   String subtitle,
   VoidCallback action,
 });
 
-/// The add button; the menu route draws a copy of it over it, turned into
-/// "Close".
-class _AddButton extends StatelessWidget {
-  const _AddButton({
-    required this.open,
-    required this.turns,
-    required this.onPressed,
-    this.heroTag,
-    this.buttonKey,
-  });
+/// "Add to your wall": one full-width row per thing to add. Pops with the
+/// chosen action.
+class _AddSheet extends StatelessWidget {
+  const _AddSheet({required this.items});
 
-  final bool open;
-  final Animation<double> turns;
-  final VoidCallback onPressed;
-  final Object? heroTag;
-  final Key? buttonKey;
+  final List<_AddItem> items;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final compact =
-        MediaQuery.sizeOf(context).width <
-        ExpandableAddButton.compactBelowWidth;
-    final icon = RotationTransition(
-      turns: turns,
-      child: const Icon(Icons.add_rounded),
-    );
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(
-              context,
-            ).colorScheme.primary.withValues(alpha: 0.28),
-            blurRadius: 28,
-            offset: const Offset(0, 12),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.36),
-            blurRadius: 24,
-            offset: const Offset(0, 14),
-          ),
-        ],
-      ),
-      // On a small phone the label ("Hinzufügen") would squeeze the
-      // memory card beside it, so the button shows only the icon.
-      child: compact
-          ? FloatingActionButton(
-              key: buttonKey,
-              heroTag: heroTag,
-              tooltip: open ? l10n.close : l10n.add,
-              onPressed: onPressed,
-              child: icon,
-            )
-          : FloatingActionButton.extended(
-              key: buttonKey,
-              heroTag: heroTag,
-              onPressed: onPressed,
-              icon: icon,
-              label: Text(open ? l10n.close : l10n.add),
-            ),
-    );
-  }
-}
-
-/// The open menu: its bottom end corner sits 10 pt above the button's top
-/// end corner, with a Close button where the add button is. Pops with the
-/// chosen action, or null.
-class _AddMenuRoute extends PopupRoute<VoidCallback> {
-  _AddMenuRoute({
-    required this.anchor,
-    required this.items,
-    required this.barrierLabel,
-  });
-
-  final Rect anchor;
-  final List<_AddMenuItem> items;
-
-  @override
-  final String barrierLabel;
-
-  @override
-  Color? get barrierColor => Colors.transparent;
-
-  @override
-  bool get barrierDismissible => true;
-
-  @override
-  Duration get transitionDuration => const Duration(milliseconds: 190);
-
-  @override
-  Widget buildPage(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-  ) {
-    final size = MediaQuery.sizeOf(context);
-    final rtl = Directionality.of(context) == TextDirection.rtl;
-    final curved = CurvedAnimation(
-      parent: animation,
-      curve: Curves.easeOutCubic,
-      reverseCurve: Curves.easeInCubic,
-    );
-    return Stack(
-      children: [
-        Positioned(
-          left: rtl ? anchor.left : null,
-          right: rtl ? null : size.width - anchor.right,
-          bottom: size.height - anchor.top + 10,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: size.width - 40),
-            child: FadeTransition(
-              opacity: curved,
-              child: ScaleTransition(
-                scale: Tween(begin: 0.96, end: 1.0).animate(curved),
-                alignment: rtl ? Alignment.bottomLeft : Alignment.bottomRight,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    for (final item in items)
-                      _ActionChipButton(
-                        icon: item.icon,
-                        label: item.label,
-                        subtitle: item.subtitle,
-                        onTap: () => Navigator.of(context).pop(item.action),
-                      ),
-                  ],
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Semantics(
+              header: true,
+              child: Text(
+                context.l10n.addToWallTitle,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
             ),
-          ),
+            const SizedBox(height: 14),
+            for (final item in items)
+              _AddRow(
+                icon: item.icon,
+                label: item.label,
+                subtitle: item.subtitle,
+                onTap: () => Navigator.of(context).pop(item.action),
+              ),
+          ],
         ),
-        Positioned.fromRect(
-          rect: anchor,
-          child: _AddButton(
-            open: true,
-            turns: Tween(begin: 0.0, end: 0.125).animate(curved),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
 
-class _ActionChipButton extends StatelessWidget {
-  const _ActionChipButton({
+class _AddRow extends StatelessWidget {
+  const _AddRow({
     required this.icon,
     required this.label,
     required this.subtitle,
@@ -260,65 +161,61 @@ class _ActionChipButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20),
+      side: BorderSide(color: AppColors.gold.withValues(alpha: 0.18)),
+    );
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(24),
+        color: AppColors.panelWarm,
+        shape: shape,
         child: InkWell(
+          customBorder: shape,
           onTap: onTap,
-          borderRadius: BorderRadius.circular(24),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.panelWarm.withValues(alpha: 0.95),
-                  AppColors.wallDeep.withValues(alpha: 0.94),
-                ],
-              ),
-              border: Border.all(color: AppColors.gold.withValues(alpha: 0.22)),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.32),
-                  blurRadius: 22,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, color: AppColors.amber, size: 18),
-                const SizedBox(width: 9),
-                Flexible(
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.gold.withValues(alpha: 0.14),
+                  ),
+                  child: Icon(icon, color: AppColors.amber, size: 22),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: AppColors.text,
+                          fontSize: 16,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: AppColors.muted,
-                          fontSize: 11,
+                          fontSize: 13,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
                   ),
+                ),
+                Icon(
+                  Directionality.of(context) == TextDirection.rtl
+                      ? Icons.chevron_left_rounded
+                      : Icons.chevron_right_rounded,
+                  color: AppColors.muted,
                 ),
               ],
             ),

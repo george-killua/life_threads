@@ -59,13 +59,80 @@ class MemoryDetailPage extends ConsumerWidget {
               : null;
           final galleryPhotos = _galleryPreviewPhotos(photos);
 
-          return CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: _CinematicHero(
-                  event: event,
-                  previewPhotos: heroPhotos,
-                  onThisDayYears: onThisDayYears,
+          return _ScrolledPast(
+            offset: 320,
+            builder: (context, pastPhoto) => Stack(
+              children: [
+                CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: _CinematicHero(
+                        event: event,
+                        previewPhotos: heroPhotos,
+                        onThisDayYears: onThisDayYears,
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 18, 20, 32),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _ChapterActions(
+                              onEdit: () =>
+                                  context.push('/memories/$memoryId/edit'),
+                              onConnect: () => context.push(
+                                '/memories/$memoryId/connections',
+                              ),
+                              onCreateStory: () => context.push(
+                                RouteNames.createStory,
+                                extra: memoryId,
+                              ),
+                              onShareCapsule: () => _shareCloudCapsule(
+                                context,
+                                ref,
+                                state,
+                                memoryId,
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            _MetadataGrid(event: event),
+                            const SizedBox(height: 22),
+                            _StorySection(event: event),
+                            if (people.isNotEmpty) ...[
+                              const SizedBox(height: 22),
+                              _PeopleSection(people: people),
+                            ],
+                            if (attachedNotes.isNotEmpty) ...[
+                              const SizedBox(height: 22),
+                              _ConnectedNotesSection(notes: attachedNotes),
+                            ],
+                            if (photos.isNotEmpty) ...[
+                              const SizedBox(height: 22),
+                              _GallerySection(
+                                photos: photos,
+                                previewPhotos: galleryPhotos,
+                              ),
+                            ],
+                            if (event.hasGeoPoint) ...[
+                              const SizedBox(height: 22),
+                              _MapSection(event: event),
+                            ],
+                            const SizedBox(height: 22),
+                            _ConnectedThreadPath(
+                              memoryId: memoryId,
+                              events: connectedEvents,
+                              state: state,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // Fixed above the content, so they stay while it scrolls.
+                _DetailTopButtons(
+                  solid: pastPhoto,
                   onBack: () => _backToWall(context),
                   onEdit: () => context.push('/memories/$memoryId/edit'),
                   onConnect: () =>
@@ -73,58 +140,8 @@ class MemoryDetailPage extends ConsumerWidget {
                   onShareCapsule: () =>
                       _shareCloudCapsule(context, ref, state, memoryId),
                 ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 32),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _ChapterActions(
-                        onEdit: () => context.push('/memories/$memoryId/edit'),
-                        onConnect: () =>
-                            context.push('/memories/$memoryId/connections'),
-                        onCreateStory: () => context.push(
-                          RouteNames.createStory,
-                          extra: memoryId,
-                        ),
-                        onShareCapsule: () =>
-                            _shareCloudCapsule(context, ref, state, memoryId),
-                      ),
-                      const SizedBox(height: 18),
-                      _MetadataGrid(event: event),
-                      const SizedBox(height: 22),
-                      _StorySection(event: event),
-                      if (people.isNotEmpty) ...[
-                        const SizedBox(height: 22),
-                        _PeopleSection(people: people),
-                      ],
-                      if (attachedNotes.isNotEmpty) ...[
-                        const SizedBox(height: 22),
-                        _ConnectedNotesSection(notes: attachedNotes),
-                      ],
-                      if (photos.isNotEmpty) ...[
-                        const SizedBox(height: 22),
-                        _GallerySection(
-                          photos: photos,
-                          previewPhotos: galleryPhotos,
-                        ),
-                      ],
-                      if (event.hasGeoPoint) ...[
-                        const SizedBox(height: 22),
-                        _MapSection(event: event),
-                      ],
-                      const SizedBox(height: 22),
-                      _ConnectedThreadPath(
-                        memoryId: memoryId,
-                        events: connectedEvents,
-                        state: state,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
@@ -274,20 +291,12 @@ class _CinematicHero extends StatelessWidget {
   const _CinematicHero({
     required this.event,
     required this.previewPhotos,
-    required this.onBack,
-    required this.onEdit,
-    required this.onConnect,
-    required this.onShareCapsule,
     this.onThisDayYears,
   });
 
   final MemoryEvent event;
   final List<_PreviewPhoto> previewPhotos;
   final int? onThisDayYears;
-  final VoidCallback onBack;
-  final VoidCallback onEdit;
-  final VoidCallback onConnect;
-  final VoidCallback onShareCapsule;
 
   @override
   Widget build(BuildContext context) {
@@ -352,41 +361,6 @@ class _CinematicHero extends StatelessWidget {
                 colors: [
                   event.feeling.color.withValues(alpha: 0.32),
                   Colors.transparent,
-                ],
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _GlassIconButton(
-                    icon: Icons.arrow_back_rounded,
-                    tooltip: MaterialLocalizations.of(
-                      context,
-                    ).backButtonTooltip,
-                    onTap: onBack,
-                  ),
-                  const Spacer(),
-                  _GlassIconButton(
-                    icon: Icons.inventory_2_rounded,
-                    tooltip: context.l10n.shareMemoryCapsule,
-                    onTap: onShareCapsule,
-                  ),
-                  const SizedBox(width: 8),
-                  _GlassIconButton(
-                    icon: Icons.edit_rounded,
-                    tooltip: context.l10n.editMemoryTooltip,
-                    onTap: onEdit,
-                  ),
-                  const SizedBox(width: 8),
-                  _GlassIconButton(
-                    icon: Icons.hub_rounded,
-                    tooltip: context.l10n.connectMemoryTooltip,
-                    onTap: onConnect,
-                  ),
                 ],
               ),
             ),
@@ -1512,4 +1486,102 @@ String _eventContextLabel(BuildContext context, MemoryEvent event) {
 String _formatDate(BuildContext context, DateTime date) {
   final locale = Localizations.localeOf(context).toLanguageTag();
   return DateFormat.yMMMd(locale).format(date);
+}
+
+/// Back, capsule, edit and connect: fixed over the memory while it scrolls.
+/// Tells [builder] whether the scroll view below it has scrolled more than
+/// [offset], e.g. past the memory's photo.
+class _ScrolledPast extends StatefulWidget {
+  const _ScrolledPast({required this.offset, required this.builder});
+
+  final double offset;
+  final Widget Function(BuildContext context, bool past) builder;
+
+  @override
+  State<_ScrolledPast> createState() => _ScrolledPastState();
+}
+
+class _ScrolledPastState extends State<_ScrolledPast> {
+  var _past = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (notification.depth != 0) return false;
+        final past = notification.metrics.pixels > widget.offset;
+        if (past != _past) setState(() => _past = past);
+        return false;
+      },
+      child: widget.builder(context, _past),
+    );
+  }
+}
+
+class _DetailTopButtons extends StatelessWidget {
+  const _DetailTopButtons({
+    required this.solid,
+    required this.onBack,
+    required this.onEdit,
+    required this.onConnect,
+    required this.onShareCapsule,
+  });
+
+  final VoidCallback onBack;
+  final VoidCallback onEdit;
+  final VoidCallback onConnect;
+  final VoidCallback onShareCapsule;
+
+  /// Past the photo the bar gets a background, so text scrolling beneath
+  /// it (and under the status bar) stays out of the way.
+  final bool solid;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      decoration: BoxDecoration(
+        color: solid ? AppColors.wallInk : Colors.transparent,
+        border: Border(
+          bottom: BorderSide(
+            color: solid ? AppColors.line : Colors.transparent,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _GlassIconButton(
+                icon: Icons.arrow_back_rounded,
+                tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                onTap: onBack,
+              ),
+              const Spacer(),
+              _GlassIconButton(
+                icon: Icons.inventory_2_rounded,
+                tooltip: context.l10n.shareMemoryCapsule,
+                onTap: onShareCapsule,
+              ),
+              const SizedBox(width: 8),
+              _GlassIconButton(
+                icon: Icons.edit_rounded,
+                tooltip: context.l10n.editMemoryTooltip,
+                onTap: onEdit,
+              ),
+              const SizedBox(width: 8),
+              _GlassIconButton(
+                icon: Icons.hub_rounded,
+                tooltip: context.l10n.connectMemoryTooltip,
+                onTap: onConnect,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -1349,6 +1349,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get moreActionsTooltip => 'المزيد';
 
   @override
+  String get addToWallTitle => 'أضِف إلى جدارك';
+
+  @override
   String get expandableMemory => 'ذكرى';
 
   @override

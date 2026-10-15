@@ -129,7 +129,7 @@ void main() {
       // A service that fails to start must not break the screen.
       await pumpFamilyScreens(tester, null);
       expect(find.text('Not available yet'), findsOneWidget);
-      await tapAndSettle(tester, find.byType(BackButtonIcon));
+      await tapAndSettle(tester, find.byTooltip('Back'));
       expect(tester.takeException(), isNull);
     });
   });
@@ -203,7 +203,7 @@ void main() {
       );
       await tapAndSettle(tester, key('family-add-memory'));
       expect(find.byType(FamilyTermsPage), findsOneWidget);
-      await tapAndSettle(tester, find.byType(BackButtonIcon).last);
+      await tapAndSettle(tester, find.byTooltip('Back').last);
       expect(find.byType(FamilyWallPage), findsOneWidget);
       expect(service.calls.where((c) => c.startsWith('acceptTerms')), isEmpty);
     });

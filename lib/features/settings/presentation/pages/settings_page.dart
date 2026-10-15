@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/widgets/top_bar_page.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
@@ -51,280 +52,261 @@ class SettingsPage extends ConsumerWidget {
     return Scaffold(
       body: WallBackground(
         child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 18, 20, 32),
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    tooltip: MaterialLocalizations.of(
-                      context,
-                    ).backButtonTooltip,
-                    icon: const Icon(Icons.arrow_back_rounded),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      l10n.settingsTitle,
-                      style: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.8,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              _SettingsCard(
-                icon: Icons.person_rounded,
-                title: l10n.settingsNameTitle,
-                body: l10n.settingsNameBody,
-                child: _DisplayNameEditor(
-                  initialName: displayName,
-                  onSave: (name) async {
-                    await ref
-                        .read(userDisplayNameProvider.notifier)
-                        .setDisplayName(name);
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showToast(
-                      l10n.settingsNameSaved,
-                      kind: ToastKind.success,
-                    );
-                  },
-                ),
-              ),
-              _SettingsCard(
-                icon: Icons.language_rounded,
-                title: l10n.languageTitle,
-                body: l10n.languageBody,
-                child: _LanguageSelector(
-                  selectedLocale: selectedLocale,
-                  onSelect: (locale) => _selectLanguage(context, ref, locale),
-                ),
-              ),
-              _SettingsCard(
-                icon: Icons.lock_rounded,
-                title: l10n.privacyTitle,
-                body: l10n.privacyBody,
-                actions: [
-                  _SettingsAction(
-                    label: l10n.viewPrivacyPolicy,
-                    icon: Icons.policy_rounded,
-                    onTap: () => _openExternalUrl(
-                      context,
-                      Uri.parse('https://gkcoding.dev/lifethreads/privacy'),
-                      eventName: 'privacy_policy_opened',
-                    ),
-                  ),
-                  _SettingsAction(
-                    label: l10n.viewTerms,
-                    icon: Icons.gavel_rounded,
-                    onTap: () => _openExternalUrl(
-                      context,
-                      Uri.parse('https://gkcoding.dev/lifethreads/terms'),
-                      eventName: 'terms_opened',
-                    ),
-                  ),
-                ],
-              ),
-              _SettingsCard(
-                icon: Icons.feedback_rounded,
-                title: l10n.betaFeedbackTitle,
-                body: l10n.betaFeedbackBody,
-                badge: l10n.closedBetaBadge,
-                actions: [
-                  _SettingsAction(
-                    label: l10n.sendFeedback,
-                    icon: Icons.mail_outline_rounded,
-                    onTap: () => _showBetaFeedback(context),
-                  ),
-                ],
-              ),
-              _SettingsCard(
-                icon: Icons.enhanced_encryption_rounded,
-                title: l10n.backupArchiveTitle,
-                body: l10n.backupArchiveBody,
-                actions: [
-                  _SettingsAction(
-                    label: l10n.exportArchive,
-                    icon: Icons.ios_share_rounded,
-                    onTap: memoryState.asData == null
-                        ? null
-                        : () => _exportBackup(context, ref, memoryState.value!),
-                  ),
-                  _SettingsAction(
-                    label: l10n.importArchive,
-                    icon: Icons.restore_rounded,
-                    onTap: () => _importBackup(context, ref),
-                  ),
-                  _SettingsAction(
-                    label: l10n.importCapsule,
-                    icon: Icons.inventory_2_rounded,
-                    onTap: () => _importCapsule(context, ref),
-                  ),
-                  _SettingsAction(
-                    label: l10n.moveDevices,
-                    icon: Icons.devices_rounded,
-                    onTap: () => context.push(RouteNames.archiveTransfer),
-                  ),
-                ],
-              ),
-              _SettingsCard(
-                icon: Icons.palette_rounded,
-                title: l10n.themeTitle,
-                body: l10n.themeBody,
-                badge: isPremium ? l10n.premiumBadge : l10n.oneFreeBadge,
-                child: const WallThemeSummary(),
-              ),
-              _SettingsCard(
-                icon: Icons.event_repeat_rounded,
-                title: l10n.onThisDayTitle,
-                body: l10n.onThisDaySettingsBody,
-                badge: isPremium ? null : l10n.premiumBadge,
-                actions: [
-                  _SettingsAction(
-                    label: l10n.onThisDayReminderAt(
-                      onThisDay.time.format(context),
-                    ),
-                    icon: Icons.schedule_rounded,
-                    onTap: remindersOn
-                        ? () => _pickOnThisDayTime(context, ref, onThisDay)
-                        : null,
-                  ),
-                ],
-                // One control for screen readers ("Daily reminder, switch"),
-                // and the whole row toggles like a list tile.
-                child: Semantics(
-                  container: true,
-                  child: MergeSemantics(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () =>
-                          _setOnThisDayReminders(context, ref, !remindersOn),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              l10n.onThisDayReminderSwitch,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                          Switch.adaptive(
-                            value: remindersOn,
-                            onChanged: (value) =>
-                                _setOnThisDayReminders(context, ref, value),
-                          ),
-                        ],
-                      ),
-                    ),
+          child: TopBarPage(
+            title: l10n.settingsTitle,
+            body: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+              children: [
+                _SettingsCard(
+                  icon: Icons.person_rounded,
+                  title: l10n.settingsNameTitle,
+                  body: l10n.settingsNameBody,
+                  child: _DisplayNameEditor(
+                    initialName: displayName,
+                    onSave: (name) async {
+                      await ref
+                          .read(userDisplayNameProvider.notifier)
+                          .setDisplayName(name);
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showToast(
+                        l10n.settingsNameSaved,
+                        kind: ToastKind.success,
+                      );
+                    },
                   ),
                 ),
-              ),
-              _SettingsCard(
-                icon: Icons.movie_filter_rounded,
-                title: l10n.yearThreadTitle,
-                body: l10n.yearThreadSettingsBody,
-                badge: isPremium ? null : l10n.premiumBadge,
-                actions: [
-                  _SettingsAction(
-                    label: l10n.yearThreadOpen,
-                    icon: Icons.movie_filter_rounded,
-                    onTap: () => context.push(RouteNames.yearThread),
+                _SettingsCard(
+                  icon: Icons.language_rounded,
+                  title: l10n.languageTitle,
+                  body: l10n.languageBody,
+                  child: _LanguageSelector(
+                    selectedLocale: selectedLocale,
+                    onSelect: (locale) => _selectLanguage(context, ref, locale),
                   ),
-                ],
-              ),
-              _SettingsCard(
-                key: const ValueKey('settings-family-walls'),
-                icon: Icons.diversity_1_rounded,
-                title: l10n.familyWallsTitle,
-                body: l10n.familyWallsSettingsBody,
-                actions: [
-                  _SettingsAction(
-                    label: l10n.familyWallsOpen,
-                    icon: Icons.family_restroom_rounded,
-                    onTap: () => context.push(RouteNames.familyWalls),
-                  ),
-                ],
-              ),
-              _SettingsCard(
-                icon: Icons.workspace_premium_rounded,
-                title: l10n.premiumTitle,
-                body: entitlement?.isPremium == true
-                    ? l10n.premiumActiveBody
-                    : l10n.premiumLockedBody,
-                badge: entitlement?.isPremium == true
-                    ? l10n.activeBadge
-                    : l10n.unlockBadge,
-                actions: [
-                  _SettingsAction(
-                    label: l10n.openPremium,
-                    icon: Icons.workspace_premium_rounded,
-                    onTap: () => context.push(RouteNames.upgrade),
-                  ),
-                ],
-              ),
-              _SettingsCard(
-                icon: Icons.info_rounded,
-                title: l10n.appVersionTitle,
-                body: '',
-                child: FutureBuilder<PackageInfo>(
-                  future: PackageInfo.fromPlatform(),
-                  builder: (context, snapshot) {
-                    final info = snapshot.data;
-                    return Text(
-                      info == null
-                          ? 'LifeThreads'
-                          : '${info.version}+${info.buildNumber}',
-                      style: TextStyle(
-                        color: AppColors.gold,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    );
-                  },
                 ),
-              ),
-              _SettingsCard(
-                icon: Icons.music_note_rounded,
-                title: l10n.musicCreditsTitle,
-                body: l10n.musicCreditsBody,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (final track in bundledMusicTracks)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Text(
-                          l10n.musicCreditLine(
-                            track.title,
-                            track.artist,
-                            track.license,
-                          ),
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
+                _SettingsCard(
+                  icon: Icons.lock_rounded,
+                  title: l10n.privacyTitle,
+                  body: l10n.privacyBody,
+                  actions: [
+                    _SettingsAction(
+                      label: l10n.viewPrivacyPolicy,
+                      icon: Icons.policy_rounded,
+                      onTap: () => _openExternalUrl(
+                        context,
+                        Uri.parse('https://gkcoding.dev/lifethreads/privacy'),
+                        eventName: 'privacy_policy_opened',
                       ),
+                    ),
+                    _SettingsAction(
+                      label: l10n.viewTerms,
+                      icon: Icons.gavel_rounded,
+                      onTap: () => _openExternalUrl(
+                        context,
+                        Uri.parse('https://gkcoding.dev/lifethreads/terms'),
+                        eventName: 'terms_opened',
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              _SettingsCard(
-                icon: Icons.delete_forever_rounded,
-                title: l10n.clearAllDataTitle,
-                body: l10n.clearAllDataBody,
-                danger: true,
-                actions: [
-                  _SettingsAction(
-                    label: l10n.clearData,
-                    icon: Icons.delete_outline_rounded,
-                    danger: true,
-                    onTap: () => _clearAllData(context, ref),
+                _SettingsCard(
+                  icon: Icons.feedback_rounded,
+                  title: l10n.betaFeedbackTitle,
+                  body: l10n.betaFeedbackBody,
+                  badge: l10n.closedBetaBadge,
+                  actions: [
+                    _SettingsAction(
+                      label: l10n.sendFeedback,
+                      icon: Icons.mail_outline_rounded,
+                      onTap: () => _showBetaFeedback(context),
+                    ),
+                  ],
+                ),
+                _SettingsCard(
+                  icon: Icons.enhanced_encryption_rounded,
+                  title: l10n.backupArchiveTitle,
+                  body: l10n.backupArchiveBody,
+                  actions: [
+                    _SettingsAction(
+                      label: l10n.exportArchive,
+                      icon: Icons.ios_share_rounded,
+                      onTap: memoryState.asData == null
+                          ? null
+                          : () =>
+                                _exportBackup(context, ref, memoryState.value!),
+                    ),
+                    _SettingsAction(
+                      label: l10n.importArchive,
+                      icon: Icons.restore_rounded,
+                      onTap: () => _importBackup(context, ref),
+                    ),
+                    _SettingsAction(
+                      label: l10n.importCapsule,
+                      icon: Icons.inventory_2_rounded,
+                      onTap: () => _importCapsule(context, ref),
+                    ),
+                    _SettingsAction(
+                      label: l10n.moveDevices,
+                      icon: Icons.devices_rounded,
+                      onTap: () => context.push(RouteNames.archiveTransfer),
+                    ),
+                  ],
+                ),
+                _SettingsCard(
+                  icon: Icons.palette_rounded,
+                  title: l10n.themeTitle,
+                  body: l10n.themeBody,
+                  badge: isPremium ? l10n.premiumBadge : l10n.oneFreeBadge,
+                  child: const WallThemeSummary(),
+                ),
+                _SettingsCard(
+                  icon: Icons.event_repeat_rounded,
+                  title: l10n.onThisDayTitle,
+                  body: l10n.onThisDaySettingsBody,
+                  badge: isPremium ? null : l10n.premiumBadge,
+                  actions: [
+                    _SettingsAction(
+                      label: l10n.onThisDayReminderAt(
+                        onThisDay.time.format(context),
+                      ),
+                      icon: Icons.schedule_rounded,
+                      onTap: remindersOn
+                          ? () => _pickOnThisDayTime(context, ref, onThisDay)
+                          : null,
+                    ),
+                  ],
+                  // One control for screen readers ("Daily reminder, switch"),
+                  // and the whole row toggles like a list tile.
+                  child: Semantics(
+                    container: true,
+                    child: MergeSemantics(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () =>
+                            _setOnThisDayReminders(context, ref, !remindersOn),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                l10n.onThisDayReminderSwitch,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            Switch.adaptive(
+                              value: remindersOn,
+                              onChanged: (value) =>
+                                  _setOnThisDayReminders(context, ref, value),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                _SettingsCard(
+                  icon: Icons.movie_filter_rounded,
+                  title: l10n.yearThreadTitle,
+                  body: l10n.yearThreadSettingsBody,
+                  badge: isPremium ? null : l10n.premiumBadge,
+                  actions: [
+                    _SettingsAction(
+                      label: l10n.yearThreadOpen,
+                      icon: Icons.movie_filter_rounded,
+                      onTap: () => context.push(RouteNames.yearThread),
+                    ),
+                  ],
+                ),
+                _SettingsCard(
+                  key: const ValueKey('settings-family-walls'),
+                  icon: Icons.diversity_1_rounded,
+                  title: l10n.familyWallsTitle,
+                  body: l10n.familyWallsSettingsBody,
+                  actions: [
+                    _SettingsAction(
+                      label: l10n.familyWallsOpen,
+                      icon: Icons.family_restroom_rounded,
+                      onTap: () => context.push(RouteNames.familyWalls),
+                    ),
+                  ],
+                ),
+                _SettingsCard(
+                  icon: Icons.workspace_premium_rounded,
+                  title: l10n.premiumTitle,
+                  body: entitlement?.isPremium == true
+                      ? l10n.premiumActiveBody
+                      : l10n.premiumLockedBody,
+                  badge: entitlement?.isPremium == true
+                      ? l10n.activeBadge
+                      : l10n.unlockBadge,
+                  actions: [
+                    _SettingsAction(
+                      label: l10n.openPremium,
+                      icon: Icons.workspace_premium_rounded,
+                      onTap: () => context.push(RouteNames.upgrade),
+                    ),
+                  ],
+                ),
+                _SettingsCard(
+                  icon: Icons.info_rounded,
+                  title: l10n.appVersionTitle,
+                  body: '',
+                  child: FutureBuilder<PackageInfo>(
+                    future: PackageInfo.fromPlatform(),
+                    builder: (context, snapshot) {
+                      final info = snapshot.data;
+                      return Text(
+                        info == null
+                            ? 'LifeThreads'
+                            : '${info.version}+${info.buildNumber}',
+                        style: TextStyle(
+                          color: AppColors.gold,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                _SettingsCard(
+                  icon: Icons.music_note_rounded,
+                  title: l10n.musicCreditsTitle,
+                  body: l10n.musicCreditsBody,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (final track in bundledMusicTracks)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            l10n.musicCreditLine(
+                              track.title,
+                              track.artist,
+                              track.license,
+                            ),
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                _SettingsCard(
+                  icon: Icons.delete_forever_rounded,
+                  title: l10n.clearAllDataTitle,
+                  body: l10n.clearAllDataBody,
+                  danger: true,
+                  actions: [
+                    _SettingsAction(
+                      label: l10n.clearData,
+                      icon: Icons.delete_outline_rounded,
+                      danger: true,
+                      onTap: () => _clearAllData(context, ref),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

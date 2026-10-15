@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/widgets/top_bar_page.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
@@ -38,39 +39,45 @@ class UpgradePage extends ConsumerWidget {
     return Scaffold(
       body: WallBackground(
         child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 18, 20, 34),
-            children: [
-              _UpgradeTopBar(onBack: () => _leave(context)),
-              const SizedBox(height: 18),
-              if (feature != null && !isPremium) ...[
-                _FeatureNotice(feature: feature!),
-                const SizedBox(height: 14),
+          child: TopBarPage(
+            title: context.l10n.premiumPageTitle,
+            onBack: () => _leave(context),
+            body: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 34),
+              children: [
+                if (feature != null && !isPremium) ...[
+                  _FeatureNotice(feature: feature!),
+                  const SizedBox(height: 14),
+                ],
+                _SubscriptionHero(
+                  isPremium: isPremium,
+                  memoryCount: memoryCount,
+                ),
+                const SizedBox(height: 16),
+                const _BenefitGrid(),
+                const SizedBox(height: 16),
+                _SubscriptionOfferCard(
+                  isPremium: isPremium,
+                  purchaseState: purchaseState,
+                  onPurchase: () => ref
+                      .read(premiumBillingProvider.notifier)
+                      .buySubscription(),
+                  onRestore: () => ref
+                      .read(premiumBillingProvider.notifier)
+                      .restorePurchases(),
+                  onRetry: () =>
+                      ref.read(premiumBillingProvider.notifier).loadProduct(),
+                  onMockUnlock: showDebugUnlock
+                      ? () => _unlockMockPremium(context, ref)
+                      : null,
+                  onContinue: () => _leave(context),
+                ),
+                const SizedBox(height: 4),
+                const _LegalLinks(),
+                const SizedBox(height: 10),
+                const _BillingReadyNotice(),
               ],
-              _SubscriptionHero(isPremium: isPremium, memoryCount: memoryCount),
-              const SizedBox(height: 16),
-              const _BenefitGrid(),
-              const SizedBox(height: 16),
-              _SubscriptionOfferCard(
-                isPremium: isPremium,
-                purchaseState: purchaseState,
-                onPurchase: () =>
-                    ref.read(premiumBillingProvider.notifier).buySubscription(),
-                onRestore: () => ref
-                    .read(premiumBillingProvider.notifier)
-                    .restorePurchases(),
-                onRetry: () =>
-                    ref.read(premiumBillingProvider.notifier).loadProduct(),
-                onMockUnlock: showDebugUnlock
-                    ? () => _unlockMockPremium(context, ref)
-                    : null,
-                onContinue: () => _leave(context),
-              ),
-              const SizedBox(height: 4),
-              const _LegalLinks(),
-              const SizedBox(height: 10),
-              const _BillingReadyNotice(),
-            ],
+            ),
           ),
         ),
       ),
@@ -92,36 +99,6 @@ class UpgradePage extends ConsumerWidget {
     } else {
       context.go(RouteNames.wall);
     }
-  }
-}
-
-class _UpgradeTopBar extends StatelessWidget {
-  const _UpgradeTopBar({required this.onBack});
-
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        IconButton(
-          onPressed: onBack,
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-          icon: const Icon(Icons.arrow_back_rounded),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            context.l10n.premiumPageTitle,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.8,
-            ),
-          ),
-        ),
-      ],
-    );
   }
 }
 
