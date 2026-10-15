@@ -70,90 +70,94 @@ class _MemoryCardState extends State<MemoryCard> {
     final bob = widget.isDragging ? -7.0 : math.sin(phase * 0.7) * 2.4;
     final scale = widget.isDragging ? 1.055 : 1.0;
 
-    return Positioned(
-      left: widget.event.wallPosition.dx,
-      top: widget.event.wallPosition.dy,
-      child: AnimatedScale(
-        scale: scale,
-        duration: const Duration(milliseconds: 120),
-        curve: Curves.easeOutCubic,
-        child: Transform.translate(
-          offset: Offset(0, bob),
-          child: Transform.rotate(
-            angle: widget.event.rotation + sway,
-            alignment: Alignment.topCenter,
-            child: Column(
-              children: [
-                if (widget.hasConnection)
-                  _HangingThread(isDragging: widget.isDragging)
-                else
-                  const SizedBox(height: 34),
-                SizedBox(
-                  width: 190,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      WallDragListener(
-                        onDragStart: widget.onDragStart,
-                        onDragUpdate: widget.onDragUpdate,
-                        onDragEnd: widget.onDragEnd,
-                        onPointerDown: () {
-                          _suppressTap = false;
-                          widget.onPointerDown();
-                        },
-                        onPointerUp: widget.onPointerUp,
-                        onDraggingChanged: (dragging) {
-                          if (dragging) _suppressTap = true;
-                        },
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () {
-                            if (_suppressTap) return;
-                            widget.onTap();
+    // Cards are small objects on the wall (they zoom with it); larger text would split words.
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.3,
+      child: Positioned(
+        left: widget.event.wallPosition.dx,
+        top: widget.event.wallPosition.dy,
+        child: AnimatedScale(
+          scale: scale,
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOutCubic,
+          child: Transform.translate(
+            offset: Offset(0, bob),
+            child: Transform.rotate(
+              angle: widget.event.rotation + sway,
+              alignment: Alignment.topCenter,
+              child: Column(
+                children: [
+                  if (widget.hasConnection)
+                    _HangingThread(isDragging: widget.isDragging)
+                  else
+                    const SizedBox(height: 34),
+                  SizedBox(
+                    width: 190,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        WallDragListener(
+                          onDragStart: widget.onDragStart,
+                          onDragUpdate: widget.onDragUpdate,
+                          onDragEnd: widget.onDragEnd,
+                          onPointerDown: () {
+                            _suppressTap = false;
+                            widget.onPointerDown();
                           },
-                          onLongPress: () {
-                            if (_suppressTap) return;
-                            widget.onLongPress();
+                          onPointerUp: widget.onPointerUp,
+                          onDraggingChanged: (dragging) {
+                            if (dragging) _suppressTap = true;
                           },
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              _PhotoPaper(
-                                event: widget.event,
-                                isDragging: widget.isDragging,
-                                footnote: widget.footnote,
-                              ),
-                              _Tape(isDragging: widget.isDragging),
-                              if (widget.hasConnection)
-                                _Pin(isDragging: widget.isDragging),
-                            ],
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () {
+                              if (_suppressTap) return;
+                              widget.onTap();
+                            },
+                            onLongPress: () {
+                              if (_suppressTap) return;
+                              widget.onLongPress();
+                            },
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                _PhotoPaper(
+                                  event: widget.event,
+                                  isDragging: widget.isDragging,
+                                  footnote: widget.footnote,
+                                ),
+                                _Tape(isDragging: widget.isDragging),
+                                if (widget.hasConnection)
+                                  _Pin(isDragging: widget.isDragging),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      if (widget.showActions)
-                        Positioned(
-                          top: 10,
-                          right: 10,
-                          child: Row(
-                            children: [
-                              _CardActionButton(
-                                icon: Icons.edit_rounded,
-                                onTap: widget.onEdit,
-                                tooltip: context.l10n.editMemoryTooltip,
-                              ),
-                              const SizedBox(width: 7),
-                              _CardActionButton(
-                                icon: Icons.hub_rounded,
-                                onTap: widget.onConnect,
-                                tooltip: context.l10n.connectMemoryTooltip,
-                              ),
-                            ],
+                        if (widget.showActions)
+                          Positioned(
+                            top: 10,
+                            right: 10,
+                            child: Row(
+                              children: [
+                                _CardActionButton(
+                                  icon: Icons.edit_rounded,
+                                  onTap: widget.onEdit,
+                                  tooltip: context.l10n.editMemoryTooltip,
+                                ),
+                                const SizedBox(width: 7),
+                                _CardActionButton(
+                                  icon: Icons.hub_rounded,
+                                  onTap: widget.onConnect,
+                                  tooltip: context.l10n.connectMemoryTooltip,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

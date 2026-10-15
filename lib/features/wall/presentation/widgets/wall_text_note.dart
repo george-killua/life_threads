@@ -47,143 +47,149 @@ class _WallTextNoteWidgetState extends State<WallTextNoteWidget> {
     final sway = widget.isDragging ? 0.0 : math.sin(phase) * 0.028;
     final bob = widget.isDragging ? -5.0 : math.cos(phase * 0.6) * 1.8;
 
-    return Positioned(
-      left: widget.item.wallPosition.dx,
-      top: widget.item.wallPosition.dy,
-      child: AnimatedScale(
-        scale: widget.isDragging ? 1.045 : 1,
-        duration: const Duration(milliseconds: 120),
-        curve: Curves.easeOutCubic,
-        child: Transform.translate(
-          offset: Offset(0, bob),
-          child: Transform.rotate(
-            angle: sway,
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-              width: 198,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  WallDragListener(
-                    onDragStart: widget.onDragStart,
-                    onDragUpdate: widget.onDragUpdate,
-                    onDragEnd: widget.onDragEnd,
-                    onPointerDown: () {
-                      _suppressTap = false;
-                      widget.onPointerDown();
-                    },
-                    onPointerUp: widget.onPointerUp,
-                    onDraggingChanged: (dragging) {
-                      if (dragging) _suppressTap = true;
-                    },
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onLongPress: () {
-                        if (_suppressTap) return;
-                        widget.onLongPress();
+    // Notes are small objects on the wall (they zoom with it).
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.3,
+      child: Positioned(
+        left: widget.item.wallPosition.dx,
+        top: widget.item.wallPosition.dy,
+        child: AnimatedScale(
+          scale: widget.isDragging ? 1.045 : 1,
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOutCubic,
+          child: Transform.translate(
+            offset: Offset(0, bob),
+            child: Transform.rotate(
+              angle: sway,
+              alignment: Alignment.topCenter,
+              child: SizedBox(
+                width: 198,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    WallDragListener(
+                      onDragStart: widget.onDragStart,
+                      onDragUpdate: widget.onDragUpdate,
+                      onDragEnd: widget.onDragEnd,
+                      onPointerDown: () {
+                        _suppressTap = false;
+                        widget.onPointerDown();
                       },
-                      onTap: () {
-                        if (_suppressTap) return;
-                        widget.onLongPress();
+                      onPointerUp: widget.onPointerUp,
+                      onDraggingChanged: (dragging) {
+                        if (dragging) _suppressTap = true;
                       },
-                      child: Container(
-                        width: 198,
-                        padding: const EdgeInsets.fromLTRB(17, 20, 17, 17),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              widget.item.color.withValues(alpha: 0.98),
-                              widget.item.color,
-                              AppColors.cardDark,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onLongPress: () {
+                          if (_suppressTap) return;
+                          widget.onLongPress();
+                        },
+                        onTap: () {
+                          if (_suppressTap) return;
+                          widget.onLongPress();
+                        },
+                        child: Container(
+                          width: 198,
+                          padding: const EdgeInsets.fromLTRB(17, 20, 17, 17),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                widget.item.color.withValues(alpha: 0.98),
+                                widget.item.color,
+                                AppColors.cardDark,
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.4),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(
+                                  alpha: widget.isDragging ? 0.52 : 0.38,
+                                ),
+                                blurRadius: widget.isDragging ? 38 : 27,
+                                offset: Offset(0, widget.isDragging ? 22 : 15),
+                              ),
+                              BoxShadow(
+                                color: widget.item.color.withValues(
+                                  alpha: 0.18,
+                                ),
+                                blurRadius: 22,
+                                offset: const Offset(0, 8),
+                              ),
                             ],
                           ),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.4),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(
-                                alpha: widget.isDragging ? 0.52 : 0.38,
-                              ),
-                              blurRadius: widget.isDragging ? 38 : 27,
-                              offset: Offset(0, widget.isDragging ? 22 : 15),
-                            ),
-                            BoxShadow(
-                              color: widget.item.color.withValues(alpha: 0.18),
-                              blurRadius: 22,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            CustomPaint(
-                              foregroundPainter: _NoteLinesPainter(),
-                              child: Text(
-                                widget.item.content,
-                                maxLines: 6,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: AppColors.paperInk,
-                                  fontSize: 15,
-                                  height: 1.35,
-                                  fontWeight: FontWeight.w900,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              CustomPaint(
+                                foregroundPainter: _NoteLinesPainter(),
+                                child: Text(
+                                  widget.item.content,
+                                  maxLines: 6,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: AppColors.paperInk,
+                                    fontSize: 15,
+                                    height: 1.35,
+                                    fontWeight: FontWeight.w900,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              top: -34,
-                              left: 63,
-                              child: Transform.rotate(
-                                angle: 0.06,
-                                child: Container(
-                                  width: 50,
-                                  height: 19,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.card.withValues(
-                                      alpha: 0.76,
-                                    ),
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.34,
+                              Positioned(
+                                top: -34,
+                                left: 63,
+                                child: Transform.rotate(
+                                  angle: 0.06,
+                                  child: Container(
+                                    width: 50,
+                                    height: 19,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.card.withValues(
+                                        alpha: 0.76,
+                                      ),
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.34,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              top: -47,
-                              left: 82,
-                              child: Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.gold,
+                              Positioned(
+                                top: -47,
+                                left: 82,
+                                child: Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.gold,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    right: -9,
-                    bottom: -9,
-                    child: _NoteActionButton(
-                      icon: Icons.edit_rounded,
-                      onTap: widget.onEdit,
-                      tooltip: context.l10n.editText,
+                    Positioned(
+                      right: -9,
+                      bottom: -9,
+                      child: _NoteActionButton(
+                        icon: Icons.edit_rounded,
+                        onTap: widget.onEdit,
+                        tooltip: context.l10n.editText,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

@@ -67,7 +67,11 @@ class _TopBarPageState extends State<TopBarPage> {
                 Expanded(
                   child: Semantics(
                     header: true,
+                    // Large but whole: a title never splits a word.
                     child: Text(
+                      textScaler: MediaQuery.textScalerOf(
+                        context,
+                      ).clamp(maxScaleFactor: 1.6),
                       widget.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,

@@ -728,90 +728,107 @@ class _CoverPicker extends StatelessWidget {
     final hasImage = path != null && (isAsset || File(path!).existsSync());
     final l10n = context.l10n;
 
-    return Container(
-      height: 230,
-      decoration: BoxDecoration(
-        color: AppColors.panel,
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: AppColors.line),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          if (hasImage && isAsset) Image.asset(path!, fit: BoxFit.cover),
-          if (hasImage && !isAsset)
-            Image.file(
-              File(path!),
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Center(
-                child: Icon(
-                  Icons.photo_camera_back_rounded,
-                  color: AppColors.gold,
-                  size: 48,
+    // The buttons go under the photo (not over it), so they keep their
+    // full labels at any text size.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          height: 230,
+          decoration: BoxDecoration(
+            color: AppColors.panel,
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: AppColors.line),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (hasImage && isAsset) Image.asset(path!, fit: BoxFit.cover),
+              if (hasImage && !isAsset)
+                Image.file(
+                  File(path!),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => Center(
+                    child: Icon(
+                      Icons.photo_camera_back_rounded,
+                      color: AppColors.gold,
+                      size: 48,
+                    ),
+                  ),
+                ),
+              if (!hasImage)
+                Center(
+                  child: Icon(
+                    Icons.photo_camera_back_rounded,
+                    color: AppColors.gold,
+                    size: 48,
+                  ),
+                ),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      AppColors.wallInk.withValues(alpha: 0.72),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          if (!hasImage)
-            Center(
-              child: Icon(
-                Icons.photo_camera_back_rounded,
-                color: AppColors.gold,
-                size: 48,
+              Positioned(
+                left: 16,
+                bottom: 18,
+                child: Text(
+                  hasImage ? l10n.coverPhoto : l10n.noPhotosFound,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
               ),
-            ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  AppColors.wallInk.withValues(alpha: 0.72),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            left: 16,
-            bottom: 18,
-            child: Text(
-              hasImage ? l10n.coverPhoto : l10n.noPhotosFound,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
-            ),
-          ),
-          Positioned(
-            right: 12,
-            bottom: 12,
-            child: Wrap(
-              spacing: 8,
-              children: [
-                if (onClear != null)
-                  IconButton.filledTonal(
+              if (onClear != null)
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: IconButton.filledTonal(
+                    tooltip: l10n.removePhoto,
                     onPressed: isPicking ? null : onClear,
                     icon: const Icon(Icons.close_rounded),
                   ),
-                FilledButton.icon(
-                  onPressed: isPicking ? null : onCapture,
-                  icon: const Icon(Icons.photo_camera_rounded),
-                  label: Text(l10n.takePhoto),
                 ),
-                FilledButton.icon(
-                  onPressed: isPicking ? null : onPick,
-                  icon: isPicking
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.image_rounded),
-                  label: Text(hasImage ? l10n.replacePhoto : l10n.choosePhoto),
-                ),
-              ],
-            ),
+            ],
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 12),
+        EqualWidthButtons(
+          buttons: [
+            (
+              label: l10n.takePhoto,
+              button: FilledButton.icon(
+                onPressed: isPicking ? null : onCapture,
+                icon: const Icon(Icons.photo_camera_rounded),
+                label: Text(l10n.takePhoto),
+              ),
+            ),
+            (
+              label: hasImage ? l10n.replacePhoto : l10n.choosePhoto,
+              button: FilledButton.icon(
+                onPressed: isPicking ? null : onPick,
+                icon: isPicking
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.image_rounded),
+                label: Text(hasImage ? l10n.replacePhoto : l10n.choosePhoto),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

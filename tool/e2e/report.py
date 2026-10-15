@@ -110,6 +110,12 @@ def flutter_results(path):
 
 def platform(out, name):
     merged = maestro_results(os.path.join(out, "maestro-junit.xml"), out, name)
+    # The large-text run (iOS) counts for its protocol IDs too.
+    for pid, value in maestro_results(
+        os.path.join(out, "maestro-large-junit.xml"), out, name
+    ).items():
+        if merged.get(pid) != "FAIL":
+            merged[pid] = value
     for pid, value in flutter_results(os.path.join(out, name, "flutter.log")).items():
         if merged.get(pid) != "FAIL":
             merged[pid] = value

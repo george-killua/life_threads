@@ -1,0 +1,59 @@
+# SET-02 Large text: run by tool/e2e/run_e2e.sh with the simulator at the
+# largest text size (Accessibility, XXXL). Adds a memory and opens every
+# main screen; the screenshots show nothing is cut off or split.
+appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
+name: SET-02 Large text
+tags: [protocol, set, large]
+---
+- runFlow: ../subflows/fresh_wall.yaml
+- runFlow:
+    file: ../subflows/add_memory.yaml
+    env:
+      TITLE: "Summer in Split"
+      STORY: "Barefoot until the sun went down."
+      PHOTO: ${PHOTO_YEAR_AGO}
+      FEELING: "Warm.*"
+- assertVisible: "View"
+- assertVisible: "More"
+- takeScreenshot: SET-02L_wall
+
+- tapOn: "Add"
+- assertVisible: "Add to your wall"
+- takeScreenshot: SET-02L_add_sheet
+- swipe:
+    start: 50%, 30%
+    end: 50%, 98%
+- runFlow:
+    file: ../subflows/view.yaml
+    env:
+      OPTION: "Timeline"
+- assertVisible: ".*Summer in Split.*"
+- takeScreenshot: SET-02L_timeline
+- runFlow:
+    file: ../subflows/view.yaml
+    env:
+      OPTION: "Wall"
+
+- runFlow: ../subflows/open_settings.yaml
+- assertVisible: "(?s)Your name\nLina"
+- takeScreenshot: SET-02L_settings
+- tapOn: "(?s)Backup & data.*"
+- assertVisible: "Export Archive"
+- takeScreenshot: SET-02L_backup
+- tapOn: "Back"
+- tapOn: "(?s)About & help.*"
+- assertVisible: "Send Feedback"
+- takeScreenshot: SET-02L_about
+- tapOn: "Back"
+- runFlow: ../subflows/leave_settings.yaml
+
+- runFlow: ../subflows/find_card.yaml
+- tapOn: "Summer in Split.*"
+- extendedWaitUntil:
+    visible: "Edit memory"
+    timeout: 10000
+- takeScreenshot: SET-02L_memory
+- tapOn: "Edit memory"
+- assertVisible: "Take photo"
+- assertVisible: "Replace photo"
+- takeScreenshot: SET-02L_edit

@@ -2051,23 +2051,27 @@ class _WallTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Flexible(
-          child: Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: wallSwitcher ?? const _WallWordmark(),
+    // A one-row bar: larger text would cut the labels off.
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.35,
+      child: Row(
+        children: [
+          Flexible(
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: wallSwitcher ?? const _WallWordmark(),
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        _WallViewButton(
-          selectedMode: selectedMode,
-          hasCustomView: hasCustomView,
-          onTap: onOpenView,
-        ),
-        const SizedBox(width: 8),
-        _WallMoreButton(onSelected: onMoreAction),
-      ],
+          const SizedBox(width: 8),
+          _WallViewButton(
+            selectedMode: selectedMode,
+            hasCustomView: hasCustomView,
+            onTap: onOpenView,
+          ),
+          const SizedBox(width: 8),
+          _WallMoreButton(onSelected: onMoreAction),
+        ],
+      ),
     );
   }
 }
@@ -2590,77 +2594,81 @@ class _MemoryRitualCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final memory = event;
     final years = yearsAgo;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.wallInk.withValues(alpha: 0.78),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.gold.withValues(alpha: 0.14)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.28),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(13),
-        // With a large text size there is little room: the text keeps it
-        // and the icon goes.
-        child: LayoutBuilder(
-          builder: (context, constraints) => Row(
-            children: [
-              if (constraints.maxWidth >= 96) ...[
-                Icon(
-                  memory == null
-                      ? Icons.edit_note_rounded
-                      : years != null
-                      ? Icons.event_repeat_rounded
-                      : Icons.history_edu_rounded,
-                  color: AppColors.gold,
-                  size: 22,
-                ),
-                const SizedBox(width: 10),
-              ],
-              Expanded(
-                child: InkWell(
-                  onTap: memory == null ? onSave : () => onOpen(memory),
-                  borderRadius: BorderRadius.circular(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        memory == null
-                            ? context.l10n.saveToday
-                            : years != null
-                            ? context.l10n.onThisDayYearsAgoToday(years)
-                            : context.l10n.rememberThis,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: AppColors.gold,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900,
+    // Room for one short line each at large text sizes.
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.5,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.wallInk.withValues(alpha: 0.78),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: AppColors.gold.withValues(alpha: 0.14)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.28),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(13),
+          // With a large text size there is little room: the text keeps it
+          // and the icon goes.
+          child: LayoutBuilder(
+            builder: (context, constraints) => Row(
+              children: [
+                if (constraints.maxWidth >= 96) ...[
+                  Icon(
+                    memory == null
+                        ? Icons.edit_note_rounded
+                        : years != null
+                        ? Icons.event_repeat_rounded
+                        : Icons.history_edu_rounded,
+                    color: AppColors.gold,
+                    size: 22,
+                  ),
+                  const SizedBox(width: 10),
+                ],
+                Expanded(
+                  child: InkWell(
+                    onTap: memory == null ? onSave : () => onOpen(memory),
+                    borderRadius: BorderRadius.circular(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          memory == null
+                              ? context.l10n.saveToday
+                              : years != null
+                              ? context.l10n.onThisDayYearsAgoToday(years)
+                              : context.l10n.rememberThis,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: AppColors.gold,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        memory == null
-                            ? context.l10n.whatHappenedToday
-                            : memory.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w900,
-                          height: 1.2,
+                        const SizedBox(height: 2),
+                        Text(
+                          memory == null
+                              ? context.l10n.whatHappenedToday
+                              : memory.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            height: 1.2,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

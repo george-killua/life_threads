@@ -398,58 +398,84 @@ class _CinematicHero extends StatelessWidget {
               ),
             ),
           ),
+          // Kept below the fixed buttons: at large text sizes the block
+          // shrinks to fit instead of sliding under them.
           Positioned(
             left: 20,
             right: 20,
+            top: MediaQuery.paddingOf(context).top + 68,
             bottom: 24,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (onThisDayYears != null) ...[
-                  _OnThisDayHeader(yearsAgo: onThisDayYears!),
-                  const SizedBox(height: 10),
-                ],
-                _FeelingBadge(event: event),
-                const SizedBox(height: 14),
-                Text(
-                  event.title,
-                  style: const TextStyle(
-                    fontSize: 43,
-                    height: 0.98,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -1.4,
+            child: LayoutBuilder(
+              builder: (context, constraints) => Align(
+                alignment: AlignmentDirectional.bottomStart,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.bottomStart,
+                  child: SizedBox(
+                    width: constraints.maxWidth,
+                    child: _heroText(context),
                   ),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(
-                      event.hasGeoPoint
-                          ? Icons.place_rounded
-                          : Icons.calendar_month_rounded,
-                      color: AppColors.amber,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 7),
-                    Expanded(
-                      child: Text(
-                        _heroSubtitle(context, event),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: AppColors.muted,
-                          fontWeight: FontWeight.w800,
-                          height: 1.25,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _heroText(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (onThisDayYears != null) ...[
+          _OnThisDayHeader(yearsAgo: onThisDayYears!),
+          const SizedBox(height: 10),
+        ],
+        _FeelingBadge(event: event),
+        const SizedBox(height: 14),
+        Text(
+          event.title,
+          // Already display size; more would push the rest away.
+          textScaler: MediaQuery.textScalerOf(
+            context,
+          ).clamp(maxScaleFactor: 1.3),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 43,
+            height: 0.98,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -1.4,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Icon(
+              event.hasGeoPoint
+                  ? Icons.place_rounded
+                  : Icons.calendar_month_rounded,
+              color: AppColors.amber,
+              size: 20,
+            ),
+            const SizedBox(width: 7),
+            Expanded(
+              child: Text(
+                _heroSubtitle(context, event),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: AppColors.muted,
+                  fontWeight: FontWeight.w800,
+                  height: 1.25,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

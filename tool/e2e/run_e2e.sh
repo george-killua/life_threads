@@ -221,6 +221,17 @@ maestro test --device "$device_list" --shard-all "${#devices[@]}" "$target" \
   --test-output-dir "$OUT/maestro" >"$OUT/maestro.log" 2>&1
 echo $? >"$OUT/maestro.exit"
 
+# 2b. iOS at the largest text size (SET-02): every main screen once more.
+if [[ -z "$FLOW" && -f "$OUT/.ios_device" ]]; then
+  ios_udid="$(cat "$OUT/.ios_device")"
+  log "Large text flow on iOS"
+  xcrun simctl ui "$ios_udid" content_size accessibility-extra-extra-extra-large
+  maestro test --device "$ios_udid" .maestro/large \
+    "${maestro_env[@]}" --format junit --output "$OUT/maestro-large-junit.xml" \
+    --test-output-dir "$OUT/maestro-large" >"$OUT/maestro-large.log" 2>&1
+  xcrun simctl ui "$ios_udid" content_size large
+fi
+
 # 3. Flutter integration tests, both devices at the same time.
 if [[ -z "$FLOW" ]]; then
   pids=()
