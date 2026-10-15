@@ -78,8 +78,12 @@ class AppRouter {
       ),
       GoRoute(
         path: RouteNames.editMemory,
-        builder: (context, state) =>
-            EditMemoryPage(memoryId: state.pathParameters['id']!),
+        builder: (context, state) => EditMemoryPage(
+          memoryId: state.pathParameters['id']!,
+          section: EditMemorySection.values
+              .where((s) => s.name == state.uri.queryParameters['section'])
+              .firstOrNull,
+        ),
       ),
       GoRoute(
         path: RouteNames.manageConnections,

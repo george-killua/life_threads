@@ -499,4 +499,54 @@ void main() {
       contains(en.demoRelationGrandpa),
     );
   });
+
+  test('a removed memory comes back whole with Undo', () async {
+    SharedPreferences.setMockInitialValues({});
+    final photosDir = Directory('${docs.path}/memory_photos')..createSync();
+    final file = File('${photosDir.path}/p.jpg')..writeAsBytesSync([1, 2, 3]);
+    final container = _container();
+    addTearDown(container.dispose);
+    await container.read(memoryRepositoryProvider.future);
+    final repo = container.read(memoryRepositoryProvider.notifier);
+    await repo.addMemory(_draft('Other', photos: const []));
+    final otherId = container
+        .read(memoryRepositoryProvider)
+        .value!
+        .events
+        .single
+        .id;
+    await repo.addMemory(
+      NewMemoryDraft(
+        title: 'With photo',
+        description: '',
+        category: MemoryCategory.personal,
+        memoryType: MemoryType.moment,
+        feeling: MemoryFeeling.warm,
+        occurredAt: DateTime(2025, 1, 1),
+        locationLabel: '',
+        photos: [_photo(file.path)],
+        coverPhotoPath: file.path,
+        connectedEventId: otherId,
+        people: const [MemoryPersonDraft(name: 'Kate', relationship: 'Sister')],
+      ),
+    );
+    MemoryState current() => container.read(memoryRepositoryProvider).value!;
+    final id = current().events.firstWhere((e) => e.title == 'With photo').id;
+
+    final removed = await repo.removeMemory(id);
+    expect(current().findEvent(id), isNull);
+    expect(current().connections, isEmpty);
+    // Still on disk while it can be undone.
+    expect(file.existsSync(), isTrue);
+
+    await repo.restore(removed);
+    expect(current().findEvent(id)?.title, 'With photo');
+    expect(current().photosForEvent(id), hasLength(1));
+    expect(current().peopleForEvent(id).single.name, 'Kate');
+    expect(current().connections, hasLength(1));
+
+    // Not undone: the photo file goes once the undo window has passed.
+    await repo.forget(await repo.removeMemory(id));
+    expect(file.existsSync(), isFalse);
+  });
 }

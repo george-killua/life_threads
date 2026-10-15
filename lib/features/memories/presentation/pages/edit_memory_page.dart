@@ -22,11 +22,23 @@ import '../../domain/memory_type.dart';
 import '../memory_l10n.dart';
 import '../widgets/memory_people_editor.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../../core/widgets/equal_width_buttons.dart';
+
+/// A part of the edit screen, to open it scrolled to that part (the pencil
+/// on a card of the memory screen).
+enum EditMemorySection { story, details, time, people, gallery }
 
 class EditMemoryPage extends ConsumerStatefulWidget {
-  const EditMemoryPage({super.key, required this.memoryId});
+  const EditMemoryPage({super.key, required this.memoryId, this.section});
 
   final String memoryId;
+  final EditMemorySection? section;
+
+  /// The edit screen's route, opened at [section].
+  static String location(String memoryId, [EditMemorySection? section]) =>
+      section == null
+      ? '/memories/$memoryId/edit'
+      : '/memories/$memoryId/edit?section=${section.name}';
 
   @override
   ConsumerState<EditMemoryPage> createState() => _EditMemoryPageState();
@@ -34,6 +46,10 @@ class EditMemoryPage extends ConsumerStatefulWidget {
 
 class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
   final _formKey = GlobalKey<FormState>();
+  final _sectionKeys = {
+    for (final section in EditMemorySection.values) section: GlobalKey(),
+  };
+  var _scrolledToSection = false;
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final List<_EditablePhoto> _photos = [];
@@ -82,214 +98,262 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
             state.peopleForEvent(widget.memoryId),
           );
 
+          _scrollToSectionOnce();
           return Form(
             key: _formKey,
-            child: ListView(
+            // Not a lazy list: every section is built, so a card's pencil can
+            // scroll straight to its section.
+            child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
-              children: [
-                _CoverPicker(
-                  path: _coverPhotoPath,
-                  isPicking: _isPicking,
-                  onPick: () => _pickPhotos(setFirstAsCover: true),
-                  onCapture: () => _capturePhoto(setAsCover: true),
-                  onClear: _coverPhotoPath == null
-                      ? null
-                      : () => setState(() => _coverPhotoPath = null),
-                ),
-                const SizedBox(height: 22),
-                _EditPanel(
-                  title: l10n.storyPanel,
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        controller: _titleController,
-                        decoration: InputDecoration(
-                          labelText: l10n.memoryTitleLabel,
-                        ),
-                        validator: (value) =>
-                            value == null || value.trim().isEmpty
-                            ? l10n.addTitleValidation
-                            : null,
-                      ),
-                      const SizedBox(height: 14),
-                      TextFormField(
-                        controller: _descriptionController,
-                        minLines: 4,
-                        maxLines: 7,
-                        decoration: InputDecoration(
-                          labelText: l10n.storyDescriptionLabel,
-                        ),
-                        validator: (value) =>
-                            value == null || value.trim().isEmpty
-                            ? l10n.addStoryValidation
-                            : null,
-                      ),
-                    ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _CoverPicker(
+                    path: _coverPhotoPath,
+                    isPicking: _isPicking,
+                    onPick: () => _pickPhotos(setFirstAsCover: true),
+                    onCapture: () => _capturePhoto(setAsCover: true),
+                    onClear: _coverPhotoPath == null
+                        ? null
+                        : () => setState(() => _coverPhotoPath = null),
                   ),
-                ),
-                const SizedBox(height: 16),
-                _EditPanel(
-                  title: l10n.shapeFeelingTitle,
-                  child: Column(
-                    children: [
-                      DropdownButtonFormField<MemoryType>(
-                        initialValue: _memoryType,
-                        decoration: InputDecoration(
-                          labelText: l10n.memoryTypeLabel,
-                        ),
-                        items: MemoryType.values
-                            .map(
-                              (type) => DropdownMenuItem(
-                                value: type,
-                                child: Text(type.localizedLabel(l10n)),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (value) => setState(
-                          () => _memoryType = value ?? MemoryType.moment,
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      DropdownButtonFormField<MemoryFeeling>(
-                        initialValue: _feeling,
-                        decoration: InputDecoration(
-                          labelText: l10n.feelingLabel,
-                        ),
-                        items: MemoryFeeling.values
-                            .map(
-                              (feeling) => DropdownMenuItem(
-                                value: feeling,
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      feeling.icon,
-                                      color: feeling.color,
-                                      size: 18,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(feeling.localizedLabel(l10n)),
-                                  ],
-                                ),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (value) =>
-                            setState(() => _feeling = value ?? _feeling),
-                      ),
-                      const SizedBox(height: 14),
-                      DropdownButtonFormField<MemoryCategory>(
-                        initialValue: _category,
-                        decoration: InputDecoration(
-                          labelText: l10n.categoryLabel,
-                        ),
-                        items: MemoryCategory.values
-                            .map(
-                              (category) => DropdownMenuItem(
-                                value: category,
-                                child: Text(category.localizedLabel(l10n)),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (value) => setState(
-                          () => _category = value ?? MemoryCategory.personal,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _EditPanel(
-                  title: l10n.timePhotoGpsTitle,
-                  child: Column(
-                    children: [
-                      Material(
-                        type: MaterialType.transparency,
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: Icon(
-                            Icons.event_rounded,
-                            color: AppColors.gold,
+                  const SizedBox(height: 22),
+                  _EditPanel(
+                    key: _sectionKeys[EditMemorySection.story],
+                    title: l10n.storyPanel,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _titleController,
+                          decoration: InputDecoration(
+                            labelText: l10n.memoryTitleLabel,
                           ),
-                          title: Text(
-                            DateFormat.yMMMd(
-                              Localizations.localeOf(context).toLanguageTag(),
-                            ).format(_occurredAt ?? event.occurredAt),
-                          ),
-                          subtitle: Text(l10n.memoryDateLabel),
-                          trailing: const Icon(Icons.edit_calendar_rounded),
-                          onTap: () => _pickDate(event.occurredAt),
+                          validator: (value) =>
+                              value == null || value.trim().isEmpty
+                              ? l10n.addTitleValidation
+                              : null,
                         ),
-                      ),
-                      const SizedBox(height: 14),
-                      _PhotoGpsStatus(
-                        latitude: _latitude,
-                        longitude: _longitude,
-                      ),
-                    ],
+                        const SizedBox(height: 14),
+                        TextFormField(
+                          controller: _descriptionController,
+                          minLines: 4,
+                          maxLines: 7,
+                          decoration: InputDecoration(
+                            labelText: l10n.storyDescriptionLabel,
+                          ),
+                          validator: (value) =>
+                              value == null || value.trim().isEmpty
+                              ? l10n.addStoryValidation
+                              : null,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                _EditPanel(
-                  title: l10n.peopleTitle,
-                  child: MemoryPeopleEditor(
-                    people: _people,
-                    suggestedPeople: state.people.map(_personToDraft).toList(),
-                    onChanged: (people) => setState(() => _people = people),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _EditPanel(
-                  title: l10n.galleryTitle,
-                  trailing: Wrap(
-                    spacing: 8,
-                    children: [
-                      TextButton.icon(
-                        onPressed: _isPicking ? null : _capturePhoto,
-                        icon: const Icon(Icons.photo_camera_rounded),
-                        label: Text(l10n.takePhoto),
-                      ),
-                      TextButton.icon(
-                        onPressed: _isPicking ? null : _pickPhotos,
-                        icon: _isPicking
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+                  const SizedBox(height: 16),
+                  _EditPanel(
+                    key: _sectionKeys[EditMemorySection.details],
+                    title: l10n.shapeFeelingTitle,
+                    child: Column(
+                      children: [
+                        DropdownButtonFormField<MemoryType>(
+                          initialValue: _memoryType,
+                          decoration: InputDecoration(
+                            labelText: l10n.memoryTypeLabel,
+                          ),
+                          items: MemoryType.values
+                              .map(
+                                (type) => DropdownMenuItem(
+                                  value: type,
+                                  child: Text(type.localizedLabel(l10n)),
                                 ),
                               )
-                            : const Icon(Icons.add_photo_alternate_rounded),
-                        label: Text(l10n.addPhotos),
-                      ),
-                    ],
+                              .toList(),
+                          onChanged: (value) => setState(
+                            () => _memoryType = value ?? MemoryType.moment,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        DropdownButtonFormField<MemoryFeeling>(
+                          initialValue: _feeling,
+                          decoration: InputDecoration(
+                            labelText: l10n.feelingLabel,
+                          ),
+                          items: MemoryFeeling.values
+                              .map(
+                                (feeling) => DropdownMenuItem(
+                                  value: feeling,
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        feeling.icon,
+                                        color: feeling.color,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(feeling.localizedLabel(l10n)),
+                                    ],
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) =>
+                              setState(() => _feeling = value ?? _feeling),
+                        ),
+                        const SizedBox(height: 14),
+                        DropdownButtonFormField<MemoryCategory>(
+                          initialValue: _category,
+                          decoration: InputDecoration(
+                            labelText: l10n.categoryLabel,
+                          ),
+                          items: MemoryCategory.values
+                              .map(
+                                (category) => DropdownMenuItem(
+                                  value: category,
+                                  child: Text(category.localizedLabel(l10n)),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) => setState(
+                            () => _category = value ?? MemoryCategory.personal,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: _GalleryEditor(
-                    photos: _photos,
-                    coverPhotoPath: _coverPhotoPath,
-                    onSetCover: (photo) =>
-                        setState(() => _coverPhotoPath = photo.localPath),
-                    onReplace: _replacePhoto,
-                    onRemove: _removePhoto,
+                  const SizedBox(height: 16),
+                  _EditPanel(
+                    key: _sectionKeys[EditMemorySection.time],
+                    title: l10n.timePhotoGpsTitle,
+                    child: Column(
+                      children: [
+                        Material(
+                          type: MaterialType.transparency,
+                          child: ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: Icon(
+                              Icons.event_rounded,
+                              color: AppColors.gold,
+                            ),
+                            title: Text(
+                              DateFormat.yMMMd(
+                                Localizations.localeOf(context).toLanguageTag(),
+                              ).format(_occurredAt ?? event.occurredAt),
+                            ),
+                            subtitle: Text(l10n.memoryDateLabel),
+                            trailing: const Icon(Icons.edit_calendar_rounded),
+                            onTap: () => _pickDate(event.occurredAt),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        _PhotoGpsStatus(
+                          latitude: _latitude,
+                          longitude: _longitude,
+                          placeName:
+                              _locationFromPhotos ||
+                                  _locationLabel.trim().isEmpty ||
+                                  isCoordinateLabel(_locationLabel)
+                              ? null
+                              : _locationLabel.trim(),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 22),
-                FilledButton.icon(
-                  onPressed: _isSaving ? null : () => _save(context),
-                  icon: _isSaving
-                      ? const SizedBox(
-                          width: 17,
-                          height: 17,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.save_rounded),
-                  label: Text(l10n.saveMemory),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  _EditPanel(
+                    key: _sectionKeys[EditMemorySection.people],
+                    title: l10n.peopleTitle,
+                    child: MemoryPeopleEditor(
+                      people: _people,
+                      suggestedPeople: state.people
+                          .map(_personToDraft)
+                          .toList(),
+                      onChanged: (people) => setState(() => _people = people),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _EditPanel(
+                    key: _sectionKeys[EditMemorySection.gallery],
+                    title: l10n.galleryTitle,
+                    trailing: EqualWidthButtons(
+                      labelStyle: const TextStyle(fontWeight: FontWeight.w800),
+                      chrome: 64,
+                      buttons: [
+                        (
+                          label: l10n.takePhoto,
+                          button: OutlinedButton.icon(
+                            onPressed: _isPicking ? null : _capturePhoto,
+                            icon: const Icon(Icons.photo_camera_rounded),
+                            label: Text(l10n.takePhoto),
+                          ),
+                        ),
+                        (
+                          label: l10n.addPhotos,
+                          button: OutlinedButton.icon(
+                            onPressed: _isPicking ? null : _pickPhotos,
+                            icon: _isPicking
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.add_photo_alternate_rounded),
+                            label: Text(l10n.addPhotos),
+                          ),
+                        ),
+                      ],
+                    ),
+                    child: _GalleryEditor(
+                      photos: _photos,
+                      placeName:
+                          _locationLabel.trim().isEmpty ||
+                              isCoordinateLabel(_locationLabel)
+                          ? null
+                          : _locationLabel.trim(),
+                      coverPhotoPath: _coverPhotoPath,
+                      onSetCover: (photo) =>
+                          setState(() => _coverPhotoPath = photo.localPath),
+                      onReplace: _replacePhoto,
+                      onRemove: _removePhoto,
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  FilledButton.icon(
+                    onPressed: _isSaving ? null : () => _save(context),
+                    icon: _isSaving
+                        ? const SizedBox(
+                            width: 17,
+                            height: 17,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.save_rounded),
+                    label: Text(l10n.saveMemory),
+                  ),
+                ],
+              ),
             ),
           );
         },
       ),
     );
+  }
+
+  /// Opened from a card's pencil: show that section at the top, once.
+  void _scrollToSectionOnce() {
+    final section = widget.section;
+    if (section == null || _scrolledToSection) return;
+    _scrolledToSection = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final target = _sectionKeys[section]?.currentContext;
+      if (target == null || !target.mounted) return;
+      Scrollable.ensureVisible(
+        target,
+        alignment: 0.02,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
+      );
+    });
   }
 
   void _init(
@@ -525,7 +589,12 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
 
     if (!mounted) return;
     setState(() => _isSaving = false);
-    if (context.mounted) _backToPrevious(context);
+    if (!context.mounted) return;
+    // Shown on the screen it returns to, so it is clear the edit worked.
+    ScaffoldMessenger.of(
+      context,
+    ).showToast(context.l10n.memoryChangesSaved, kind: ToastKind.success);
+    _backToPrevious(context);
   }
 }
 
@@ -588,10 +657,17 @@ class _EditablePhoto {
 }
 
 class _PhotoGpsStatus extends StatelessWidget {
-  const _PhotoGpsStatus({required this.latitude, required this.longitude});
+  const _PhotoGpsStatus({
+    required this.latitude,
+    required this.longitude,
+    this.placeName,
+  });
 
   final double? latitude;
   final double? longitude;
+
+  /// The place's name, shown instead of the coordinates when known.
+  final String? placeName;
 
   @override
   Widget build(BuildContext context) {
@@ -614,10 +690,12 @@ class _PhotoGpsStatus extends StatelessWidget {
           Expanded(
             child: Text(
               hasGps
-                  ? l10n.photoGpsDetected(
-                      latitude!.toStringAsFixed(5),
-                      longitude!.toStringAsFixed(5),
-                    )
+                  ? placeName != null
+                        ? l10n.photoPlaceDetected(placeName!)
+                        : l10n.photoGpsDetected(
+                            latitude!.toStringAsFixed(5),
+                            longitude!.toStringAsFixed(5),
+                          )
                   : l10n.photoGpsMissing,
               style: TextStyle(color: AppColors.muted, height: 1.35),
             ),
@@ -738,7 +816,12 @@ class _CoverPicker extends StatelessWidget {
 }
 
 class _EditPanel extends StatelessWidget {
-  const _EditPanel({required this.title, required this.child, this.trailing});
+  const _EditPanel({
+    super.key,
+    required this.title,
+    required this.child,
+    this.trailing,
+  });
 
   final String title;
   final Widget child;
@@ -756,20 +839,16 @@ class _EditPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-              ?trailing,
-            ],
+          // The title has the full width (never squeezed next to buttons,
+          // which would split it); the panel's buttons go below it.
+          Semantics(
+            header: true,
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            ),
           ),
+          if (trailing != null) ...[const SizedBox(height: 12), trailing!],
           const SizedBox(height: 14),
           child,
         ],
@@ -781,6 +860,7 @@ class _EditPanel extends StatelessWidget {
 class _GalleryEditor extends StatelessWidget {
   const _GalleryEditor({
     required this.photos,
+    required this.placeName,
     required this.coverPhotoPath,
     required this.onSetCover,
     required this.onReplace,
@@ -788,6 +868,9 @@ class _GalleryEditor extends StatelessWidget {
   });
 
   final List<_EditablePhoto> photos;
+
+  /// The memory's place, shown on photos taken there (null if unnamed).
+  final String? placeName;
   final String? coverPhotoPath;
   final ValueChanged<_EditablePhoto> onSetCover;
   final ValueChanged<_EditablePhoto> onReplace;
@@ -809,6 +892,7 @@ class _GalleryEditor extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 12),
             child: _GalleryPhotoTile(
               photo: photo,
+              placeName: placeName,
               isCover: photo.localPath == coverPhotoPath,
               onSetCover: () => onSetCover(photo),
               onReplace: () => onReplace(photo),
@@ -823,6 +907,7 @@ class _GalleryEditor extends StatelessWidget {
 class _GalleryPhotoTile extends StatelessWidget {
   const _GalleryPhotoTile({
     required this.photo,
+    required this.placeName,
     required this.isCover,
     required this.onSetCover,
     required this.onReplace,
@@ -830,6 +915,7 @@ class _GalleryPhotoTile extends StatelessWidget {
   });
 
   final _EditablePhoto photo;
+  final String? placeName;
   final bool isCover;
   final VoidCallback onSetCover;
   final VoidCallback onReplace;
@@ -883,14 +969,17 @@ class _GalleryPhotoTile extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w900),
                 ),
                 const SizedBox(height: 4),
+                // When and where, not pixel sizes or coordinates.
                 Text(
-                  '${photo.width} x ${photo.height} • ${_shortDate(context, photo.capturedAt)}',
+                  _shortDate(context, photo.capturedAt),
                   style: TextStyle(color: AppColors.muted, fontSize: 12),
                 ),
-                if (photo.hasLocation) ...[
+                if (photo.hasLocation && placeName != null) ...[
                   const SizedBox(height: 3),
                   Text(
-                    '${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}',
+                    placeName!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: AppColors.muted, fontSize: 12),
                   ),
                 ],

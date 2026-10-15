@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -22,6 +24,7 @@ import '../../domain/memory_event.dart';
 import '../../domain/memory_photo.dart';
 import '../../domain/memory_person.dart';
 import '../memory_l10n.dart';
+import 'edit_memory_page.dart';
 import '../../../wall/domain/wall_item.dart';
 import '../../../../core/widgets/app_toast.dart';
 
@@ -96,12 +99,33 @@ class MemoryDetailPage extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 18),
-                            _MetadataGrid(event: event),
+                            _MetadataGrid(
+                              event: event,
+                              onEdit: (section) => context.push(
+                                EditMemoryPage.location(memoryId, section),
+                              ),
+                            ),
                             const SizedBox(height: 22),
-                            _StorySection(event: event),
+                            _StorySection(
+                              event: event,
+                              onEdit: () => context.push(
+                                EditMemoryPage.location(
+                                  memoryId,
+                                  EditMemorySection.story,
+                                ),
+                              ),
+                            ),
                             if (people.isNotEmpty) ...[
                               const SizedBox(height: 22),
-                              _PeopleSection(people: people),
+                              _PeopleSection(
+                                people: people,
+                                onEdit: () => context.push(
+                                  EditMemoryPage.location(
+                                    memoryId,
+                                    EditMemorySection.people,
+                                  ),
+                                ),
+                              ),
                             ],
                             if (attachedNotes.isNotEmpty) ...[
                               const SizedBox(height: 22),
@@ -112,6 +136,12 @@ class MemoryDetailPage extends ConsumerWidget {
                               _GallerySection(
                                 photos: photos,
                                 previewPhotos: galleryPhotos,
+                                onEdit: () => context.push(
+                                  EditMemoryPage.location(
+                                    memoryId,
+                                    EditMemorySection.gallery,
+                                  ),
+                                ),
                               ),
                             ],
                             if (event.hasGeoPoint) ...[
@@ -123,6 +153,9 @@ class MemoryDetailPage extends ConsumerWidget {
                               memoryId: memoryId,
                               events: connectedEvents,
                               state: state,
+                              onEdit: () => context.push(
+                                '/memories/$memoryId/connections',
+                              ),
                             ),
                           ],
                         ),
@@ -627,9 +660,12 @@ class _ChapterActions extends StatelessWidget {
 }
 
 class _MetadataGrid extends StatelessWidget {
-  const _MetadataGrid({required this.event});
+  const _MetadataGrid({required this.event, required this.onEdit});
 
   final MemoryEvent event;
+
+  /// Each tile opens the part of the edit screen where it is changed.
+  final ValueChanged<EditMemorySection> onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -649,24 +685,28 @@ class _MetadataGrid extends StatelessWidget {
           label: l10n.metaType,
           value: event.memoryType.localizedLabel(l10n),
           color: AppColors.gold,
+          onTap: () => onEdit(EditMemorySection.details),
         ),
         _MetaCard(
           icon: event.feeling.icon,
           label: l10n.metaFeeling,
           value: event.feeling.localizedLabel(l10n),
           color: event.feeling.color,
+          onTap: () => onEdit(EditMemorySection.details),
         ),
         _MetaCard(
           icon: Icons.category_rounded,
           label: l10n.metaCategory,
           value: event.category.localizedLabel(l10n),
           color: AppColors.sage,
+          onTap: () => onEdit(EditMemorySection.details),
         ),
         _MetaCard(
           icon: Icons.calendar_month_rounded,
           label: l10n.metaDate,
           value: _formatDate(context, event.occurredAt),
           color: AppColors.blue,
+          onTap: () => onEdit(EditMemorySection.time),
         ),
       ],
     );
@@ -679,15 +719,36 @@ class _MetaCard extends StatelessWidget {
     required this.label,
     required this.value,
     required this.color,
+    required this.onTap,
   });
 
   final IconData icon;
   final String label;
   final String value;
   final Color color;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(23),
+    );
+    return Semantics(
+      button: true,
+      hint: context.l10n.editSectionTooltip(label),
+      child: Material(
+        type: MaterialType.transparency,
+        shape: shape,
+        child: InkWell(
+          customBorder: shape,
+          onTap: onTap,
+          child: _metaContent(),
+        ),
+      ),
+    );
+  }
+
+  Widget _metaContent() {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -729,13 +790,15 @@ class _MetaCard extends StatelessWidget {
 }
 
 class _StorySection extends StatelessWidget {
-  const _StorySection({required this.event});
+  const _StorySection({required this.event, required this.onEdit});
 
   final MemoryEvent event;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
     return _ChapterPanel(
+      onEdit: onEdit,
       eyebrow: context.l10n.storyEyebrow,
       title: context.l10n.whyMemoryMatters,
       child: Text(
@@ -752,81 +815,96 @@ class _StorySection extends StatelessWidget {
 }
 
 class _GallerySection extends StatelessWidget {
-  const _GallerySection({required this.photos, required this.previewPhotos});
+  const _GallerySection({
+    required this.photos,
+    required this.previewPhotos,
+    required this.onEdit,
+  });
 
   final List<MemoryPhoto> photos;
   final List<_PreviewPhoto> previewPhotos;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
     return _ChapterPanel(
+      onEdit: onEdit,
       eyebrow: context.l10n.galleryEyebrow,
       title: context.l10n.savedPhotosTitle(photos.length),
-      child: SizedBox(
-        height: 176,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: photos.length,
-          separatorBuilder: (_, _) => const SizedBox(width: 13),
-          itemBuilder: (context, index) {
-            final photo = photos[index];
-            final heroTag = 'memory-photo-${photo.id}';
-            final fileExists = File(photo.localPath).existsSync();
-            return GestureDetector(
-              onTap: () => _openPhotoPreview(
-                context,
-                photos: previewPhotos,
-                initialIndex: index,
-              ),
-              child: Container(
-                width: 138,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.32),
-                      blurRadius: 22,
-                      offset: const Offset(0, 12),
+      // One photo fills the card; several scroll side by side.
+      child: photos.length == 1
+          ? _SinglePhoto(photo: photos.single, previewPhotos: previewPhotos)
+          : SizedBox(
+              height: 176,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: photos.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 13),
+                itemBuilder: (context, index) {
+                  final photo = photos[index];
+                  final heroTag = 'memory-photo-${photo.id}';
+                  final fileExists = File(photo.localPath).existsSync();
+                  return GestureDetector(
+                    onTap: () => _openPhotoPreview(
+                      context,
+                      photos: previewPhotos,
+                      initialIndex: index,
                     ),
-                  ],
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: fileExists
-                    ? Hero(
-                        tag: heroTag,
-                        child: Image.file(
-                          File(photo.localPath),
-                          fit: BoxFit.cover,
-                          filterQuality: FilterQuality.medium,
-                          errorBuilder: (_, _, _) => ColoredBox(
-                            color: AppColors.wallDeep,
-                            child: Center(
-                              child: Icon(Icons.photo_camera_back_rounded),
-                            ),
+                    child: Container(
+                      width: 138,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.32),
+                            blurRadius: 22,
+                            offset: const Offset(0, 12),
                           ),
-                        ),
-                      )
-                    : ColoredBox(
-                        color: AppColors.wallDeep,
-                        child: Center(child: Icon(Icons.broken_image_rounded)),
+                        ],
                       ),
+                      clipBehavior: Clip.antiAlias,
+                      child: fileExists
+                          ? Hero(
+                              tag: heroTag,
+                              child: Image.file(
+                                File(photo.localPath),
+                                fit: BoxFit.cover,
+                                filterQuality: FilterQuality.medium,
+                                errorBuilder: (_, _, _) => ColoredBox(
+                                  color: AppColors.wallDeep,
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.photo_camera_back_rounded,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : ColoredBox(
+                              color: AppColors.wallDeep,
+                              child: Center(
+                                child: Icon(Icons.broken_image_rounded),
+                              ),
+                            ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-      ),
+            ),
     );
   }
 }
 
 class _PeopleSection extends StatelessWidget {
-  const _PeopleSection({required this.people});
+  const _PeopleSection({required this.people, required this.onEdit});
 
   final List<MemoryPerson> people;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
     return _ChapterPanel(
+      onEdit: onEdit,
       eyebrow: context.l10n.peopleEyebrow,
       title: context.l10n.partOfMemory,
       child: Wrap(
@@ -987,7 +1065,74 @@ class _MapSection extends StatelessWidget {
     return _ChapterPanel(
       eyebrow: context.l10n.placeEyebrow,
       title: event.locationDisplayLabel,
-      child: MemoryMapPreview(event: event),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          MemoryMapPreview(event: event),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: () => _openInMaps(event),
+            icon: const Icon(Icons.map_rounded),
+            label: Text(context.l10n.openInMaps),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Opens the phone's maps app at the memory's place.
+Future<void> _openInMaps(MemoryEvent event) async {
+  final lat = event.latitude!;
+  final lng = event.longitude!;
+  final name = event.locationDisplayLabel;
+  final uri = defaultTargetPlatform == TargetPlatform.iOS
+      ? Uri.https('maps.apple.com', '/', {'ll': '$lat,$lng', 'q': name})
+      : Uri.parse('geo:$lat,$lng?q=$lat,$lng(${Uri.encodeComponent(name)})');
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
+}
+
+/// A memory's only photo, across the whole card in its own proportions.
+class _SinglePhoto extends StatelessWidget {
+  const _SinglePhoto({required this.photo, required this.previewPhotos});
+
+  final MemoryPhoto photo;
+  final List<_PreviewPhoto> previewPhotos;
+
+  @override
+  Widget build(BuildContext context) {
+    final ratio = photo.width > 0 && photo.height > 0
+        ? (photo.width / photo.height).clamp(0.75, 1.6)
+        : 4 / 3;
+    final exists = File(photo.localPath).existsSync();
+    return GestureDetector(
+      onTap: () =>
+          _openPhotoPreview(context, photos: previewPhotos, initialIndex: 0),
+      child: AspectRatio(
+        aspectRatio: ratio,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: exists
+              ? Hero(
+                  tag: 'memory-photo-${photo.id}',
+                  child: Image.file(
+                    File(photo.localPath),
+                    fit: BoxFit.cover,
+                    filterQuality: FilterQuality.medium,
+                    errorBuilder: (_, _, _) => ColoredBox(
+                      color: AppColors.wallDeep,
+                      child: const Center(
+                        child: Icon(Icons.photo_camera_back_rounded),
+                      ),
+                    ),
+                  ),
+                )
+              : ColoredBox(
+                  color: AppColors.wallDeep,
+                  child: const Center(child: Icon(Icons.broken_image_rounded)),
+                ),
+        ),
+      ),
     );
   }
 }
@@ -997,15 +1142,18 @@ class _ConnectedThreadPath extends StatelessWidget {
     required this.memoryId,
     required this.events,
     required this.state,
+    required this.onEdit,
   });
 
   final String memoryId;
   final List<MemoryEvent> events;
   final MemoryState state;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
     return _ChapterPanel(
+      onEdit: onEdit,
       eyebrow: context.l10n.threadsEyebrow,
       title: context.l10n.connectedMemories,
       child: events.isEmpty
@@ -1139,11 +1287,15 @@ class _ChapterPanel extends StatelessWidget {
     required this.eyebrow,
     required this.title,
     required this.child,
+    this.onEdit,
   });
 
   final String eyebrow;
   final String title;
   final Widget child;
+
+  /// Shows a pencil in the card's top corner that edits this part.
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -1183,14 +1335,31 @@ class _ChapterPanel extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              eyebrow.toUpperCase(),
-              style: TextStyle(
-                color: AppColors.gold,
-                fontSize: 11,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.3,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    eyebrow.toUpperCase(),
+                    style: TextStyle(
+                      color: AppColors.gold,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.3,
+                    ),
+                  ),
+                ),
+                if (onEdit != null)
+                  IconButton(
+                    onPressed: onEdit,
+                    tooltip: context.l10n.editSectionTooltip(eyebrow),
+                    visualDensity: VisualDensity.compact,
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppColors.gold.withValues(alpha: 0.12),
+                      foregroundColor: AppColors.gold,
+                    ),
+                    icon: const Icon(Icons.edit_rounded, size: 18),
+                  ),
+              ],
             ),
             const SizedBox(height: 6),
             Text(

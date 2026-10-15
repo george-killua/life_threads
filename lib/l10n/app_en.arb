@@ -417,7 +417,29 @@
   "storyEyebrow": "Story",
   "whyMemoryMatters": "Why this memory matters",
   "galleryEyebrow": "Gallery",
-  "savedPhotosTitle": "{count} saved photo(s)",
+  "editSectionTooltip": "Edit {section}",
+  "openInMaps": "Open in Maps",
+  "@editSectionTooltip": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryChangesSaved": "Changes saved.",
+  "memoryDeletedToast": "Memory deleted.",
+  "noteDeletedToast": "Note deleted.",
+  "nailDeletedToast": "Nail removed.",
+  "undo": "Undo",
+  "photoPlaceDetected": "Place from the photo: {place}",
+  "@photoPlaceDetected": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "savedPhotosTitle": "{count, plural, =1{1 saved photo} other{{count} saved photos}}",
   "peopleEyebrow": "People",
   "partOfMemory": "Part of this memory",
   "notesEyebrow": "Notes",

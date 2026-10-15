@@ -99,9 +99,18 @@ tags: [protocol, wal]
 - extendedWaitUntil:
     visible: "Summer by the sea.*"
     timeout: 10000
+# Deleted at once, with Undo instead of "Are you sure?".
 - longPressOn: "Grandpa's garden.*"
 - tapOn: "Delete"
-- assertVisible: "Delete memory?"
+- extendedWaitUntil:
+    notVisible: "Grandpa's garden.*"
+    timeout: 10000
+- assertVisible: "Memory deleted."
+- tapOn: "Undo"
+- extendedWaitUntil:
+    visible: "Grandpa's garden.*"
+    timeout: 10000
+- longPressOn: "Grandpa's garden.*"
 - tapOn: "Delete"
 - extendedWaitUntil:
     notVisible: "Grandpa's garden.*"

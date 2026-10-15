@@ -45,7 +45,6 @@ tags: [protocol, bak]
       - runFlow: ../subflows/leave_settings.yaml
       - longPressOn: "Summer in Split.*"
       - tapOn: "Delete"
-      - tapOn: "Delete"
       - extendedWaitUntil:
           notVisible: "Summer in Split.*"
           timeout: 10000

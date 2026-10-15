@@ -27,9 +27,7 @@ void main() {
     return captured;
   }
 
-  testWidgets('shows the message and closes with the X button', (
-    tester,
-  ) async {
+  testWidgets('shows the message and closes with the X button', (tester) async {
     final context = await pumpHost(tester);
 
     context.showToast('Saved.', kind: ToastKind.success);

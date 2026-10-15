@@ -1167,8 +1167,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get galleryEyebrow => 'Gallery';
 
   @override
+  String editSectionTooltip(String section) {
+    return 'Edit $section';
+  }
+
+  @override
+  String get openInMaps => 'Open in Maps';
+
+  @override
+  String get memoryChangesSaved => 'Changes saved.';
+
+  @override
+  String get memoryDeletedToast => 'Memory deleted.';
+
+  @override
+  String get noteDeletedToast => 'Note deleted.';
+
+  @override
+  String get nailDeletedToast => 'Nail removed.';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String photoPlaceDetected(String place) {
+    return 'Place from the photo: $place';
+  }
+
+  @override
   String savedPhotosTitle(int count) {
-    return '$count saved photo(s)';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saved photos',
+      one: '1 saved photo',
+    );
+    return '$_temp0';
   }
 
   @override

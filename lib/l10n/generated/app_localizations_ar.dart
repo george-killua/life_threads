@@ -1162,8 +1162,45 @@ class AppLocalizationsAr extends AppLocalizations {
   String get galleryEyebrow => 'المعرض';
 
   @override
+  String editSectionTooltip(String section) {
+    return 'تعديل $section';
+  }
+
+  @override
+  String get openInMaps => 'افتح في الخرائط';
+
+  @override
+  String get memoryChangesSaved => 'تم حفظ التغييرات.';
+
+  @override
+  String get memoryDeletedToast => 'تم حذف الذكرى.';
+
+  @override
+  String get noteDeletedToast => 'تم حذف الملاحظة.';
+
+  @override
+  String get nailDeletedToast => 'تمت إزالة المسمار.';
+
+  @override
+  String get undo => 'تراجع';
+
+  @override
+  String photoPlaceDetected(String place) {
+    return 'المكان من الصورة: $place';
+  }
+
+  @override
   String savedPhotosTitle(int count) {
-    return '$count صورة محفوظة';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صورة محفوظة',
+      many: '$count صورة محفوظة',
+      few: '$count صور محفوظة',
+      two: 'صورتان محفوظتان',
+      one: 'صورة محفوظة واحدة',
+    );
+    return '$_temp0';
   }
 
   @override

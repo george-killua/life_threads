@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Table;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -202,6 +202,28 @@ class MemoryPersonDraft {
   final String relationship;
   final String? phone;
   final String? email;
+}
+
+/// A memory, note or nail taken off the wall, kept for "Undo" until the
+/// undo window has passed.
+class RemovedFromWall {
+  const RemovedFromWall._({
+    this.events = const [],
+    this.photos = const [],
+    this.people = const [],
+    this.connections = const [],
+    this.wallItems = const [],
+    this.files = const {},
+  });
+
+  final List<db.MemoryEvent> events;
+  final List<db.MemoryPhoto> photos;
+  final List<db.MemoryPeopleData> people;
+  final List<db.MemoryConnection> connections;
+  final List<db.WallItem> wallItems;
+
+  /// The photo files to delete once it can no longer be undone.
+  final Set<String> files;
 }
 
 class MemoryRepository extends AsyncNotifier<MemoryState> {
@@ -512,17 +534,39 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     state = await AsyncValue.guard(_loadState);
   }
 
-  Future<void> deleteMemory(String id) async {
-    final removedFiles = <String>{};
+  Future<void> deleteMemory(String id) async => forget(await removeMemory(id));
+
+  /// Takes a memory off the wall: its photos, people and threads too. Its
+  /// photo files stay until [forget], so [restore] can still undo it.
+  Future<RemovedFromWall> removeMemory(String id) async {
+    late RemovedFromWall removed;
     await _database.transaction(() async {
-      removedFiles.addAll(await _storedPhotoPathsFor([id]));
+      final connections = _database.memoryConnections;
+      removed = RemovedFromWall._(
+        events: await (_database.select(
+          _database.memoryEvents,
+        )..where((row) => row.id.equals(id))).get(),
+        photos: await (_database.select(
+          _database.memoryPhotos,
+        )..where((row) => row.eventId.equals(id))).get(),
+        people: await (_database.select(
+          _database.memoryPeople,
+        )..where((row) => row.eventId.equals(id))).get(),
+        connections:
+            await (_database.select(connections)..where(
+                  (row) =>
+                      row.fromEventId.equals(id) | row.toEventId.equals(id),
+                ))
+                .get(),
+        files: await _storedPhotoPathsFor([id]),
+      );
       await (_database.delete(
         _database.memoryPhotos,
       )..where((row) => row.eventId.equals(id))).go();
       await (_database.delete(
         _database.memoryPeople,
       )..where((row) => row.eventId.equals(id))).go();
-      await (_database.delete(_database.memoryConnections)..where(
+      await (_database.delete(connections)..where(
             (row) => row.fromEventId.equals(id) | row.toEventId.equals(id),
           ))
           .go();
@@ -530,9 +574,75 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
         _database.memoryEvents,
       )..where((row) => row.id.equals(id))).go();
     });
-    await _deleteUnreferencedPhotoFiles(removedFiles);
+    state = await AsyncValue.guard(_loadState);
+    return removed;
+  }
+
+  /// Takes a note or nail off the wall, with its threads; [restore] undoes.
+  Future<RemovedFromWall> removeWallItem(String id) async {
+    late RemovedFromWall removed;
+    await _database.transaction(() async {
+      final connections = _database.memoryConnections;
+      removed = RemovedFromWall._(
+        wallItems: await (_database.select(
+          _database.wallItems,
+        )..where((row) => row.id.equals(id))).get(),
+        connections:
+            await (_database.select(connections)..where(
+                  (row) =>
+                      row.fromEventId.equals(id) | row.toEventId.equals(id),
+                ))
+                .get(),
+      );
+      await (_database.delete(connections)..where(
+            (row) => row.fromEventId.equals(id) | row.toEventId.equals(id),
+          ))
+          .go();
+      await (_database.delete(
+        _database.wallItems,
+      )..where((row) => row.id.equals(id))).go();
+    });
+    state = await AsyncValue.guard(_loadState);
+    return removed;
+  }
+
+  /// Puts back what [removeMemory] or [removeWallItem] took off the wall.
+  Future<void> restore(RemovedFromWall removed) async {
+    await _database.transaction(() async {
+      Future<void> put<T extends Table, D>(
+        TableInfo<T, D> table,
+        List<Insertable<D>> rows,
+      ) async {
+        for (final row in rows) {
+          await _database
+              .into(table)
+              .insert(row, mode: InsertMode.insertOrReplace);
+        }
+      }
+
+      await put(_database.memoryEvents, removed.events);
+      await put(_database.wallItems, removed.wallItems);
+      await put(_database.memoryPhotos, removed.photos);
+      await put(_database.memoryPeople, removed.people);
+      // A thread only comes back if both of its ends are on the wall.
+      final eventIds = (await _database.select(_database.memoryEvents).get())
+          .map((row) => row.id)
+          .toSet();
+      final itemIds = (await _database.select(_database.wallItems).get())
+          .map((row) => row.id)
+          .toSet();
+      bool onWall(String id) => eventIds.contains(id) || itemIds.contains(id);
+      await put(_database.memoryConnections, [
+        for (final c in removed.connections)
+          if (onWall(c.fromEventId) && onWall(c.toEventId)) c,
+      ]);
+    });
     state = await AsyncValue.guard(_loadState);
   }
+
+  /// The undo window has passed: deletes the removed photos' files.
+  Future<void> forget(RemovedFromWall removed) =>
+      _deleteUnreferencedPhotoFiles(removed.files);
 
   /// Stored (DB-form) paths of the photo files and covers owned by [eventIds].
   Future<Set<String>> _storedPhotoPathsFor(
@@ -832,18 +942,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     state = await AsyncValue.guard(_loadState);
   }
 
-  Future<void> deleteWallItem(String id) async {
-    await _database.transaction(() async {
-      await (_database.delete(_database.memoryConnections)..where(
-            (row) => row.fromEventId.equals(id) | row.toEventId.equals(id),
-          ))
-          .go();
-      await (_database.delete(
-        _database.wallItems,
-      )..where((row) => row.id.equals(id))).go();
-    });
-    state = await AsyncValue.guard(_loadState);
-  }
+  Future<void> deleteWallItem(String id) async => removeWallItem(id);
 
   Future<void> moveMemory(String id, Offset position) async {
     // `value` keeps the previous data while another write is loading, so a

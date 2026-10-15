@@ -1291,26 +1291,40 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       case _MemoryAction.story:
         await _pushRoute(RouteNames.createStory, extra: memoryId);
       case _MemoryAction.delete:
-        final confirmed = await showDialog<bool>(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text(context.l10n.deleteMemoryQuestion),
-            content: Text(context.l10n.deleteMemoryBody),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text(context.l10n.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: Text(context.l10n.delete),
-              ),
-            ],
-          ),
+        await _removeWithUndo(
+          context,
+          repository,
+          () => repository.removeMemory(memoryId),
+          context.l10n.memoryDeletedToast,
         );
-        if (!context.mounted || !_isCurrentRoute(context)) return;
-        if (confirmed == true) await repository.deleteMemory(memoryId);
     }
+  }
+
+  /// Removes at once and offers "Undo" for a few seconds, instead of asking
+  /// "Are you sure?" first. Photo files are deleted once it can't be undone.
+  Future<void> _removeWithUndo(
+    BuildContext context,
+    MemoryRepository repository,
+    Future<RemovedFromWall> Function() remove,
+    String message,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final undoLabel = context.l10n.undo;
+    final removed = await remove();
+    var undone = false;
+    final toast = messenger.showToast(
+      message,
+      duration: const Duration(seconds: 6),
+      action: ToastAction(
+        label: undoLabel,
+        onPressed: () {
+          undone = true;
+          repository.restore(removed);
+        },
+      ),
+    );
+    await toast.closed;
+    if (!undone) await repository.forget(removed);
   }
 
   Future<void> _showTextMenu(
@@ -1354,7 +1368,12 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       case _TextAction.edit:
         await _editTextNote(context, repository, sourceItem);
       case _TextAction.delete:
-        await repository.deleteWallItem(sourceItem.id);
+        await _removeWithUndo(
+          context,
+          repository,
+          () => repository.removeWallItem(sourceItem.id),
+          context.l10n.noteDeletedToast,
+        );
     }
   }
 
@@ -1418,7 +1437,12 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       case _NailAction.connect:
         await _showNailConnections(context, state, nail);
       case _NailAction.delete:
-        await repository.deleteWallItem(nail.id);
+        await _removeWithUndo(
+          context,
+          repository,
+          () => repository.removeWallItem(nail.id),
+          context.l10n.nailDeletedToast,
+        );
     }
   }
 

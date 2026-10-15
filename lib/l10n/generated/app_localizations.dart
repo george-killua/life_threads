@@ -2175,10 +2175,58 @@ abstract class AppLocalizations {
   /// **'Gallery'**
   String get galleryEyebrow;
 
+  /// No description provided for @editSectionTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {section}'**
+  String editSectionTooltip(String section);
+
+  /// No description provided for @openInMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Maps'**
+  String get openInMaps;
+
+  /// No description provided for @memoryChangesSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes saved.'**
+  String get memoryChangesSaved;
+
+  /// No description provided for @memoryDeletedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory deleted.'**
+  String get memoryDeletedToast;
+
+  /// No description provided for @noteDeletedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Note deleted.'**
+  String get noteDeletedToast;
+
+  /// No description provided for @nailDeletedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Nail removed.'**
+  String get nailDeletedToast;
+
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// No description provided for @photoPlaceDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'Place from the photo: {place}'**
+  String photoPlaceDetected(String place);
+
   /// No description provided for @savedPhotosTitle.
   ///
   /// In en, this message translates to:
-  /// **'{count} saved photo(s)'**
+  /// **'{count, plural, =1{1 saved photo} other{{count} saved photos}}'**
   String savedPhotosTitle(int count);
 
   /// No description provided for @peopleEyebrow.
