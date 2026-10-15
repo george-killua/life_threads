@@ -8,6 +8,7 @@ class RouteNames {
   static const backupData = '/settings/backup';
   static const aboutHelp = '/settings/about';
   static const upgrade = '/upgrade';
+  static const search = '/search';
   static const archiveTransfer = '/archive/transfer';
   static const addMemory = '/memories/new';
   static const memoryDetail = '/memories/:id';

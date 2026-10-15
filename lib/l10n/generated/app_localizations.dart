@@ -2337,6 +2337,42 @@ abstract class AppLocalizations {
   /// **'{years, plural, =1{A memory from 1 year ago is waiting.} other{A memory from {years} years ago is waiting.}}'**
   String onThisDayNotificationPrivate(int years);
 
+  /// No description provided for @searchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get searchTitle;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Title, place, person or year'**
+  String get searchHint;
+
+  /// No description provided for @searchClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get searchClear;
+
+  /// No description provided for @searchNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No memory matches that.'**
+  String get searchNoResults;
+
+  /// No description provided for @searchResultCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 memory} other{{count} memories}}'**
+  String searchResultCount(int count);
+
+  /// No description provided for @searchTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Search memories'**
+  String get searchTooltip;
+
   /// No description provided for @savedPhotosTitle.
   ///
   /// In en, this message translates to:

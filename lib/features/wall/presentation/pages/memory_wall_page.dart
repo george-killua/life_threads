@@ -393,6 +393,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                             ? const WallSwitcherButton()
                             : null,
                         onOpenView: () => _showViewSheet(context),
+                        onSearch: () => _pushRoute(RouteNames.search),
                         onMoreAction: (action) => switch (action) {
                           _MoreAction.story => _pushRoute(
                             RouteNames.createStory,
@@ -2037,6 +2038,7 @@ class _WallTopBar extends StatelessWidget {
     required this.selectedMode,
     required this.hasCustomView,
     required this.onOpenView,
+    required this.onSearch,
     required this.onMoreAction,
     this.wallSwitcher,
   });
@@ -2044,6 +2046,7 @@ class _WallTopBar extends StatelessWidget {
   final _WallViewMode selectedMode;
   final bool hasCustomView;
   final VoidCallback onOpenView;
+  final VoidCallback onSearch;
   final ValueChanged<_MoreAction> onMoreAction;
 
   /// "My wall" / family walls, once family walls are in use.
@@ -2062,6 +2065,8 @@ class _WallTopBar extends StatelessWidget {
               child: wallSwitcher ?? const _WallWordmark(),
             ),
           ),
+          const SizedBox(width: 8),
+          _WallSearchButton(onTap: onSearch),
           const SizedBox(width: 8),
           _WallViewButton(
             selectedMode: selectedMode,
@@ -2090,6 +2095,32 @@ BoxDecoration _barDecoration(BuildContext context) {
       ),
     ],
   );
+}
+
+class _WallSearchButton extends StatelessWidget {
+  const _WallSearchButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: _barDecoration(context),
+      child: IconButton(
+        key: const ValueKey('wall-search-button'),
+        tooltip: context.l10n.searchTooltip,
+        onPressed: onTap,
+        icon: Icon(Icons.search_rounded, color: AppColors.card),
+        iconSize: 22,
+        padding: EdgeInsets.zero,
+        style: IconButton.styleFrom(
+          fixedSize: const Size(40, 40),
+          minimumSize: const Size(40, 40),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+      ),
+    );
+  }
 }
 
 class _WallWordmark extends StatelessWidget {

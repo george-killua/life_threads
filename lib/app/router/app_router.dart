@@ -8,6 +8,7 @@ import '../../features/family/presentation/family_routes.dart';
 import '../../features/media/data/picked_memory_photo.dart';
 import '../../features/memories/presentation/pages/add_memory_page.dart';
 import '../../features/memories/presentation/pages/edit_memory_page.dart';
+import '../../features/search/presentation/memory_search_page.dart';
 import '../../features/memories/presentation/pages/manage_connections_page.dart';
 import '../../features/memories/presentation/pages/memory_detail_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_gate.dart';
@@ -48,6 +49,10 @@ class AppRouter {
       GoRoute(
         path: RouteNames.themes,
         builder: (context, state) => const ThemesPage(),
+      ),
+      GoRoute(
+        path: RouteNames.search,
+        builder: (context, state) => const MemorySearchPage(),
       ),
       GoRoute(
         path: RouteNames.backupData,

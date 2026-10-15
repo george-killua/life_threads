@@ -1276,6 +1276,32 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get searchTitle => 'Suche';
+
+  @override
+  String get searchHint => 'Titel, Ort, Person oder Jahr';
+
+  @override
+  String get searchClear => 'Suche löschen';
+
+  @override
+  String get searchNoResults => 'Keine Erinnerung passt dazu.';
+
+  @override
+  String searchResultCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Erinnerungen',
+      one: '1 Erinnerung',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchTooltip => 'Erinnerungen suchen';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

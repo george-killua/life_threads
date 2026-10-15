@@ -465,6 +465,19 @@
       }
     }
   },
+  "searchTitle": "Search",
+  "searchHint": "Title, place, person or year",
+  "searchClear": "Clear search",
+  "searchNoResults": "No memory matches that.",
+  "searchResultCount": "{count, plural, =1{1 memory} other{{count} memories}}",
+  "searchTooltip": "Search memories",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "savedPhotosTitle": "{count, plural, =1{1 saved photo} other{{count} saved photos}}",
   "peopleEyebrow": "People",
   "partOfMemory": "Part of this memory",

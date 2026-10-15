@@ -1259,6 +1259,34 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get searchTitle => 'البحث';
+
+  @override
+  String get searchHint => 'العنوان أو المكان أو الشخص أو السنة';
+
+  @override
+  String get searchClear => 'مسح البحث';
+
+  @override
+  String get searchNoResults => 'لا توجد ذكرى مطابقة.';
+
+  @override
+  String searchResultCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ذكرى',
+      few: '$count ذكريات',
+      two: 'ذكريان',
+      one: 'ذكرى واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchTooltip => 'البحث في الذكريات';
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
