@@ -12,6 +12,7 @@ import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/localization/locale_controller.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../../l10n/generated/app_localizations.dart';
+import '../../../app_lock/app_lock.dart';
 import '../../../backup/data/backup_reminder.dart';
 import '../../../backup/data/backup_service.dart';
 import '../../../backup/domain/backup_models.dart';
@@ -50,6 +51,7 @@ class SettingsPage extends ConsumerWidget {
         const OnThisDaySettings();
     // Reminders only run with Premium; after it ends the switch shows off.
     final remindersOn = onThisDay.remindersEnabled && isPremium;
+    final appLock = ref.watch(appLockProvider);
 
     return Scaffold(
       body: WallBackground(
@@ -88,9 +90,27 @@ class SettingsPage extends ConsumerWidget {
                   ],
                 ),
                 _SettingsGroup(
+                  title: l10n.settingsGroupPrivacy,
+                  children: [
+                    _SettingsRow(
+                      key: const ValueKey('settings-app-lock'),
+                      icon: Icons.lock_rounded,
+                      title: l10n.appLockTitle,
+                      value: l10n.appLockSubtitle,
+                      mergeSemantics: true,
+                      onTap: () => _setAppLock(context, ref, !appLock.enabled),
+                      trailing: Switch.adaptive(
+                        value: appLock.enabled,
+                        onChanged: (value) => _setAppLock(context, ref, value),
+                      ),
+                    ),
+                  ],
+                ),
+                _SettingsGroup(
                   title: l10n.settingsGroupReminders,
                   children: [
                     _SettingsRow(
+                      key: const ValueKey('settings-on-this-day'),
                       icon: Icons.event_repeat_rounded,
                       title: l10n.onThisDayTitle,
                       value: isPremium
@@ -319,6 +339,22 @@ class AboutHelpPage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Turns the app lock on (after Face ID or the passcode) or off.
+Future<void> _setAppLock(
+  BuildContext context,
+  WidgetRef ref,
+  bool enabled,
+) async {
+  final l10n = context.l10n;
+  final messenger = ScaffoldMessenger.of(context);
+  final done = await ref
+      .read(appLockProvider.notifier)
+      .setEnabled(enabled, reason: l10n.appLockReason);
+  if (!done && enabled) {
+    messenger.showToast(l10n.appLockUnavailable, kind: ToastKind.error);
   }
 }
 

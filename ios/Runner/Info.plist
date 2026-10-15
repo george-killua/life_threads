@@ -39,6 +39,8 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>LifeThreads uses Face ID to unlock your private memory wall when you turn on the app lock.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>LifeThreads can import selected contact details into a private memory person entry.</string>
 	<key>NSCameraUsageDescription</key>

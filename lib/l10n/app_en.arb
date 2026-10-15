@@ -450,6 +450,21 @@
   "discardChangesBody": "What you changed here will be lost.",
   "discardChanges": "Discard",
   "keepEditing": "Keep editing",
+  "settingsGroupPrivacy": "Privacy",
+  "appLockTitle": "App lock",
+  "appLockSubtitle": "Face ID or passcode to open LifeThreads",
+  "appLockReason": "Unlock your memories",
+  "appLockLockedTitle": "LifeThreads is locked",
+  "appLockUnlock": "Unlock",
+  "appLockUnavailable": "Set up Face ID or a passcode on this phone first.",
+  "onThisDayNotificationPrivate": "{years, plural, =1{A memory from 1 year ago is waiting.} other{A memory from {years} years ago is waiting.}}",
+  "@onThisDayNotificationPrivate": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
   "savedPhotosTitle": "{count, plural, =1{1 saved photo} other{{count} saved photos}}",
   "peopleEyebrow": "People",
   "partOfMemory": "Part of this memory",

@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../app_lock/app_lock.dart';
 import '../../../core/localization/locale_controller.dart';
 import '../../../core/logging/app_logger.dart';
 import '../../../l10n/generated/app_localizations.dart';
@@ -21,17 +22,23 @@ final onThisDaySchedulerProvider = NotifierProvider<OnThisDayScheduler, void>(
 
 /// The notifications for [reminders]: one per day, opening the first
 /// memory and naming how many more there are.
+///
+/// With [private] (the app lock is on) the text names no memory, so nothing
+/// personal shows on the lock screen.
 List<OnThisDayNotification> onThisDayNotificationsFor(
   List<OnThisDayReminder> reminders,
-  AppLocalizations l10n,
-) {
+  AppLocalizations l10n, {
+  bool private = false,
+}) {
   return [
     for (final (index, reminder) in reminders.indexed)
       OnThisDayNotification(
         id: LocalOnThisDayNotifications.firstId + index,
         at: reminder.at,
         title: l10n.onThisDayTitle,
-        body: reminder.matches.length == 1
+        body: private
+            ? l10n.onThisDayNotificationPrivate(reminder.matches.first.yearsAgo)
+            : reminder.matches.length == 1
             ? l10n.onThisDayNotificationBody(
                 reminder.matches.first.yearsAgo,
                 reminder.matches.first.memory.title,
@@ -77,14 +84,22 @@ class OnThisDayScheduler extends Notifier<void> {
 
     final events = ref.watch(memoryRepositoryProvider).asData?.value.events;
     final selectedLocale = ref.watch(localeControllerProvider);
-    // Wait for both, so start-up schedules once.
-    if (events == null || selectedLocale.isLoading) return;
+    final lock = ref.watch(appLockProvider);
+    // Wait for all three, so start-up schedules once.
+    if (events == null || selectedLocale.isLoading || !lock.ready) return;
     final l10n = _localizations(selectedLocale.value);
     final now = ref.read(onThisDayClockProvider)();
     _mayHaveScheduled = true;
     _enqueue(
       generation,
-      () => _schedule(notifications, events, settings.minuteOfDay, now, l10n),
+      () => _schedule(
+        notifications,
+        events,
+        settings.minuteOfDay,
+        now,
+        l10n,
+        private: lock.enabled,
+      ),
     );
   }
 
@@ -93,8 +108,9 @@ class OnThisDayScheduler extends Notifier<void> {
     List<MemoryEvent> events,
     int minuteOfDay,
     DateTime now,
-    AppLocalizations l10n,
-  ) async {
+    AppLocalizations l10n, {
+    required bool private,
+  }) async {
     final location = await notifications.localLocation();
     final reminders = OnThisDay.upcoming(
       now: tz.TZDateTime.from(now, location),
@@ -102,7 +118,7 @@ class OnThisDayScheduler extends Notifier<void> {
       minuteOfDay: minuteOfDay,
     );
     await notifications.replaceScheduled(
-      onThisDayNotificationsFor(reminders, l10n),
+      onThisDayNotificationsFor(reminders, l10n, private: private),
       channelName: l10n.onThisDayTitle,
       channelDescription: l10n.onThisDayChannelDescription,
     );

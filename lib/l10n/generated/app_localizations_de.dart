@@ -1243,6 +1243,39 @@ class AppLocalizationsDe extends AppLocalizations {
   String get keepEditing => 'Weiter bearbeiten';
 
   @override
+  String get settingsGroupPrivacy => 'Privatsphäre';
+
+  @override
+  String get appLockTitle => 'App-Sperre';
+
+  @override
+  String get appLockSubtitle => 'Face ID oder Code zum Öffnen von LifeThreads';
+
+  @override
+  String get appLockReason => 'Entsperre deine Erinnerungen';
+
+  @override
+  String get appLockLockedTitle => 'LifeThreads ist gesperrt';
+
+  @override
+  String get appLockUnlock => 'Entsperren';
+
+  @override
+  String get appLockUnavailable =>
+      'Richte zuerst Face ID oder einen Code auf diesem Handy ein.';
+
+  @override
+  String onThisDayNotificationPrivate(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: 'Eine Erinnerung von vor $years Jahren wartet.',
+      one: 'Eine Erinnerung von vor 1 Jahr wartet.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

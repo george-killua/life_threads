@@ -159,7 +159,10 @@ void main() {
       );
     }
 
-    Finder reminderSwitch() => find.byType(Switch);
+    Finder reminderSwitch() => find.descendant(
+      of: find.byKey(const ValueKey('settings-on-this-day')),
+      matching: find.byType(Switch),
+    );
 
     testWidgets('free users are sent to Premium; no permission is asked', (
       tester,

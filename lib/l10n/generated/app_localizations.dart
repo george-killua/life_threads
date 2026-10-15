@@ -2289,6 +2289,54 @@ abstract class AppLocalizations {
   /// **'Keep editing'**
   String get keepEditing;
 
+  /// No description provided for @settingsGroupPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get settingsGroupPrivacy;
+
+  /// No description provided for @appLockTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App lock'**
+  String get appLockTitle;
+
+  /// No description provided for @appLockSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Face ID or passcode to open LifeThreads'**
+  String get appLockSubtitle;
+
+  /// No description provided for @appLockReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock your memories'**
+  String get appLockReason;
+
+  /// No description provided for @appLockLockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'LifeThreads is locked'**
+  String get appLockLockedTitle;
+
+  /// No description provided for @appLockUnlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get appLockUnlock;
+
+  /// No description provided for @appLockUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up Face ID or a passcode on this phone first.'**
+  String get appLockUnavailable;
+
+  /// No description provided for @onThisDayNotificationPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'{years, plural, =1{A memory from 1 year ago is waiting.} other{A memory from {years} years ago is waiting.}}'**
+  String onThisDayNotificationPrivate(int years);
+
   /// No description provided for @savedPhotosTitle.
   ///
   /// In en, this message translates to:

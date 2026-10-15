@@ -1224,6 +1224,41 @@ class AppLocalizationsAr extends AppLocalizations {
   String get keepEditing => 'متابعة التعديل';
 
   @override
+  String get settingsGroupPrivacy => 'الخصوصية';
+
+  @override
+  String get appLockTitle => 'قفل التطبيق';
+
+  @override
+  String get appLockSubtitle => 'Face ID أو رمز الدخول لفتح LifeThreads';
+
+  @override
+  String get appLockReason => 'افتح ذكرياتك';
+
+  @override
+  String get appLockLockedTitle => 'LifeThreads مقفل';
+
+  @override
+  String get appLockUnlock => 'فتح القفل';
+
+  @override
+  String get appLockUnavailable =>
+      'اضبط Face ID أو رمز دخول على هذا الهاتف أولاً.';
+
+  @override
+  String onThisDayNotificationPrivate(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: 'ذكرى من قبل $years سنة بانتظارك.',
+      few: 'ذكرى من قبل $years سنوات بانتظارك.',
+      two: 'ذكرى من قبل سنتين بانتظارك.',
+      one: 'ذكرى من قبل سنة واحدة بانتظارك.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

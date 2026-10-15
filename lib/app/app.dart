@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/localization/locale_controller.dart';
+import '../features/app_lock/app_lock_gate.dart';
 import '../features/capsule/presentation/widgets/memory_capsule_deep_link_listener.dart';
 import '../features/family/presentation/widgets/family_invite_link_listener.dart';
 import '../features/memories/data/memory_repository.dart';
@@ -65,9 +66,11 @@ class LifeThreadsApp extends ConsumerWidget {
           // on iOS; multi-line fields have no Done key to close it otherwise.
           behavior: HitTestBehavior.translucent,
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          child: MemoryCapsuleDeepLinkListener(
-            child: FamilyInviteLinkListener(
-              child: child ?? const SizedBox.shrink(),
+          child: AppLockGate(
+            child: MemoryCapsuleDeepLinkListener(
+              child: FamilyInviteLinkListener(
+                child: child ?? const SizedBox.shrink(),
+              ),
             ),
           ),
         ),

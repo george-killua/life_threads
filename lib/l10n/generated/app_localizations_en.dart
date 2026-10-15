@@ -1228,6 +1228,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get keepEditing => 'Keep editing';
 
   @override
+  String get settingsGroupPrivacy => 'Privacy';
+
+  @override
+  String get appLockTitle => 'App lock';
+
+  @override
+  String get appLockSubtitle => 'Face ID or passcode to open LifeThreads';
+
+  @override
+  String get appLockReason => 'Unlock your memories';
+
+  @override
+  String get appLockLockedTitle => 'LifeThreads is locked';
+
+  @override
+  String get appLockUnlock => 'Unlock';
+
+  @override
+  String get appLockUnavailable =>
+      'Set up Face ID or a passcode on this phone first.';
+
+  @override
+  String onThisDayNotificationPrivate(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: 'A memory from $years years ago is waiting.',
+      one: 'A memory from 1 year ago is waiting.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String savedPhotosTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
