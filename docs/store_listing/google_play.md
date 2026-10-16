@@ -17,8 +17,11 @@ description 4000, release notes 500).
 | Default language | English (United States) – en-US; translations: de-DE, ar |
 
 Play Console: **Grow users → Store presence → Store listings → Default store listing**, and
-**Manage translations** for de-DE and ar. Store listing changes go live after **Publishing
-overview → Send changes for review** (managed publishing is on).
+**Manage translations** for de-DE and ar. Managed publishing is off: changes go to Google's
+review as soon as they are saved and are published once approved.
+
+Texts and screenshots can also be sent with the API (backs up the current listing first):
+`python3 tool/play/play.py listing listing.json store_listing_assets/store_screenshots`.
 
 ## English (en-US)
 
@@ -239,7 +242,8 @@ LifeThreads متاح بالعربية والإنجليزية والألماني�
 | 10" tablet screenshots | | `store_listing_assets/store_screenshots/play-tablet-10/<lang>/` |
 
 Screenshots are rendered from the real app screens by `tool/store_screenshots/run.sh` (not in git;
-run it to regenerate). Upload all five per language in order: wall, memory, story, timeline, add.
+run it to regenerate). Upload all eight per language in this order (search results show the first three): wall, stories with music,
+family wall, Thread of the Year, memory, story, timeline (privacy), add.
 
 ## Subscription (Monetise with Play → Products → Subscriptions)
 

@@ -9,16 +9,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:life_threads/app/router/app_router.dart';
+import 'package:life_threads/app/router/route_names.dart';
 import 'package:life_threads/app/theme/app_theme.dart';
+import 'package:life_threads/features/family/data/family_service.dart';
 import 'package:life_threads/features/media/data/picked_memory_photo.dart';
 import 'package:life_threads/features/memories/data/memory_repository.dart';
 import 'package:life_threads/features/on_this_day/data/on_this_day_providers.dart';
 import 'package:life_threads/features/premium/data/premium_entitlement_controller.dart';
 import 'package:life_threads/features/premium/domain/premium_entitlement.dart';
+import 'package:life_threads/features/stories/data/music_catalog.dart';
+import 'package:life_threads/features/stories/data/music_preview.dart';
 import 'package:life_threads/features/year_thread/data/year_thread_providers.dart';
 import 'package:life_threads/l10n/generated/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../test/support/fake_family_service.dart';
+import '../../test/support/fake_music_preview.dart';
 import 'fixtures.dart';
 import 'fonts.dart';
 import 'store_frame.dart';
@@ -61,8 +67,60 @@ typedef _Scene = ({
   Future<void> Function(WidgetTester tester, AppLocalizations l10n) open,
 });
 
+// Listing order: the first three are what search results show.
 final List<_Scene> _scenes = [
   (name: 'wall', caption: 'wall', open: (tester, l10n) => _go(tester, '/wall')),
+  (
+    name: 'stories',
+    caption: 'stories',
+    open: (tester, l10n) async {
+      AppRouter.router.go(RouteNames.createStory, extra: 'store-beach-sunset');
+      await _settle(tester, rounds: 8);
+      // A film with a song, as the caption says.
+      final video = find.byKey(const ValueKey('story-video-switch'));
+      await tester.ensureVisible(video);
+      await _settle(tester, rounds: 2);
+      await tester.tap(video);
+      await _settle(tester);
+      // The page scrolls down; the template row above scrolls sideways.
+      final page = find
+          .byWidgetPredicate(
+            (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+          )
+          .first;
+      // Built only once scrolled into view: look for one song by name.
+      final song = find.textContaining(bundledMusicTracks.first.title);
+      await tester.scrollUntilVisible(song, 300, scrollable: page);
+      await tester.tap(song);
+      await _settle(tester);
+      // Back to the top: the story preview is what the screenshot shows.
+      await tester.drag(page, const Offset(0, 3000));
+      await _settle(tester);
+    },
+  ),
+  (
+    name: 'family',
+    caption: 'family',
+    open: (tester, l10n) async {
+      await _go(tester, RouteNames.familyWallFor(_familyId));
+      await _settle(tester, rounds: 8);
+    },
+  ),
+  (
+    name: 'year',
+    caption: 'year',
+    open: (tester, l10n) async {
+      await _go(tester, RouteNames.yearThreadFor(2025));
+      await _settle(tester, rounds: 8);
+      // With a song, as the caption says.
+      await tester.tap(find.text(l10n.yearThreadNoMusic).first);
+      await _settle(tester);
+      await tester.tap(
+        find.textContaining(bundledMusicTracks.first.title).last,
+      );
+      await _settle(tester);
+    },
+  ),
   (
     name: 'memory',
     caption: 'detail',
@@ -120,6 +178,50 @@ final List<_Scene> _scenes = [
 ];
 
 late String _lang;
+
+const _familyId = 'store-family-wall';
+
+/// A family wall with six of the demo moments, posted by three members.
+FakeFamilyService _storeFamily(String lang) {
+  final names = switch (lang) {
+    'de' => ('Unsere Familie', 'Ich', 'Mama', 'Lina'),
+    'ar' => ('عائلتنا', 'أنا', 'ماما', 'لينا'),
+    _ => ('Our family', 'Me', 'Mom', 'Lina'),
+  };
+  final service = FakeFamilyService(account: FakeFamilyService.account());
+  service.addFamily(
+    id: _familyId,
+    name: names.$1,
+    ownerId: 'me',
+    members: {'me': names.$2, 'mom': names.$3, 'lina': names.$4},
+  );
+  final events = storeMemoryState(lang).events.take(6).toList();
+  const authors = ['me', 'mom', 'lina'];
+  for (final (i, event) in events.indexed) {
+    final cover = event.coverPhotoPath;
+    final photoId = 'photo-$i';
+    if (cover != null) {
+      service.setPhotoFile(
+        photoId,
+        File('$_momentsDir/${cover.split('/').last}').absolute,
+      );
+    }
+    service.seedMemory(
+      _familyId,
+      id: 'family-memory-$i',
+      authorId: authors[i % 3],
+      title: event.title,
+      description: event.description,
+      photoIds: cover == null ? const [] : [photoId],
+      // Two columns: the whole wall fits a phone screen.
+      wallX: 150.0 + (i % 2) * 210,
+      wallY: 180.0 + (i ~/ 2) * 250,
+      feeling: event.feeling,
+      category: event.category,
+    );
+  }
+  return service;
+}
 
 Future<void> _go(WidgetTester tester, String location) async {
   AppRouter.router.go(location);
@@ -230,6 +332,12 @@ ThemeData _storeTheme(ThemeData theme) {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: buttonFont(theme.elevatedButtonTheme.style),
     ),
+    chipTheme: theme.chipTheme.copyWith(
+      labelStyle:
+          withFont(theme.chipTheme.labelStyle) ??
+          const TextStyle(fontFamily: 'Avenir', fontFamilyFallback: fallback),
+      secondaryLabelStyle: withFont(theme.chipTheme.secondaryLabelStyle),
+    ),
   );
 }
 
@@ -325,6 +433,13 @@ void main() {
                               ),
                               premiumEntitlementProvider.overrideWith(
                                 _PremiumController.new,
+                              ),
+                              familyServiceProvider.overrideWithValue(
+                                _storeFamily(lang),
+                              ),
+                              // Choosing a song must not play it.
+                              musicPreviewProvider.overrideWithValue(
+                                FakeMusicPreview(),
                               ),
                               // Same wall card and memory hero on any run
                               // date (no On this day memory).

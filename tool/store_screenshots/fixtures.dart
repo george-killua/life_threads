@@ -50,18 +50,69 @@ const storeCaptions = {
   'wall': {
     'en': (
       'Your memory wall',
-      'Your most beautiful moments, on one wall',
+      'Your life, pinned to one wall',
       'Photos, places and stories, connected by the threads of your life.',
     ),
     'de': (
       'Deine Erinnerungswand',
-      'Deine schönsten Momente an einer Wand',
+      'Dein Leben an einer Wand',
       'Fotos, Orte und Geschichten – verbunden durch die Fäden deines Lebens.',
     ),
     'ar': (
       'جدار ذكرياتك',
-      'أجمل لحظاتك على جدار واحد',
+      'حياتك على جدار واحد',
       'صور وأماكن وقصص تربطها خيوط حياتك.',
+    ),
+  },
+  'stories': {
+    'en': (
+      'Stories with music',
+      'Turn memories into stories',
+      'Story images and short films with music, ready to share.',
+    ),
+    'de': (
+      'Storys mit Musik',
+      'Mach Erinnerungen zu Storys',
+      'Story-Bilder und kurze Filme mit Musik, bereit zum Teilen.',
+    ),
+    'ar': (
+      'قصص مع موسيقى',
+      'حوّل ذكرياتك إلى قصص',
+      'صور قصص وأفلام قصيرة مع موسيقى، جاهزة للمشاركة.',
+    ),
+  },
+  'family': {
+    'en': (
+      'Family walls',
+      'One wall for the whole family',
+      'End-to-end encrypted. Family members join free.',
+    ),
+    'de': (
+      'Familienwände',
+      'Eine Wand für die ganze Familie',
+      'Ende-zu-Ende-verschlüsselt. Familienmitglieder treten kostenlos bei.',
+    ),
+    'ar': (
+      'جدران العائلة',
+      'جدار واحد للعائلة كلها',
+      'مشفّر من طرف إلى طرف. ينضم أفراد العائلة مجاناً.',
+    ),
+  },
+  'year': {
+    'en': (
+      'Thread of the Year',
+      'Your year as a short film',
+      'The moments that mattered, in order, with music.',
+    ),
+    'de': (
+      'Faden des Jahres',
+      'Dein Jahr als kurzer Film',
+      'Die Momente, die gezählt haben, der Reihe nach, mit Musik.',
+    ),
+    'ar': (
+      'خيط السنة',
+      'سنتك كفيلم قصير',
+      'اللحظات التي صنعت الفرق، بالترتيب، مع موسيقى.',
     ),
   },
   'detail': {
@@ -96,19 +147,19 @@ const storeCaptions = {
   },
   'timeline': {
     'en': (
-      'Timeline',
+      'Private by design',
       'Your life, year by year',
-      'Switch from the wall to a timeline whenever you like.',
+      'Stays on your phone: no account, no ads, no tracking.',
     ),
     'de': (
-      'Zeitleiste',
+      'Privat von Anfang an',
       'Dein Leben, Jahr für Jahr',
-      'Wechsle jederzeit von der Wand zur Zeitleiste.',
+      'Bleibt auf deinem Handy: kein Konto, keine Werbung, kein Tracking.',
     ),
     'ar': (
-      'الخط الزمني',
+      'الخصوصية أولاً',
       'حياتك سنةً بعد سنة',
-      'انتقل من الجدار إلى الخط الزمني متى شئت.',
+      'تبقى على هاتفك: لا حساب، لا إعلانات، لا تتبّع.',
     ),
   },
   'add': {

@@ -83,10 +83,10 @@ Premium is a monthly or yearly subscription; a year costs about as much as seven
 LifeThreads is available in English, German and Arabic.
 ```
 
-**Keywords** (97/100 bytes)
+**Keywords** (95/100 bytes)
 
 ```text
-scrapbook,timeline,story,travel,album,baby,keepsake,anniversary,private,vacation,milestone,widget
+scrapbook,timeline,story,travel,album,baby,keepsake,anniversary,gratitude,book,milestone,widget
 ```
 
 **What's New in this version** (375/4000)
@@ -164,10 +164,10 @@ Premium gibt es als Monats- oder Jahresabo; ein Jahr kostet etwa so viel wie sie
 LifeThreads gibt es auf Deutsch, Englisch und Arabisch.
 ```
 
-**Keywords** (93/100 bytes)
+**Keywords** (98/100 bytes)
 
 ```text
-fotoalbum,zeitleiste,story,reise,momente,privat,journal,baby,jahrestag,urlaub,andenken,widget
+fotoalbum,zeitleiste,story,reise,momente,dankbarkeit,journal,baby,jahrestag,urlaub,andenken,widget
 ```
 
 **What's New in this version** (407/4000)
@@ -273,8 +273,8 @@ LifeThreads متاح بالعربية والإنجليزية والألماني�
 | iPhone 6.1" / 6.3" | 1206 × 2622 | `store_listing_assets/store_screenshots/ios-6.3/<lang>/` |
 | iPad 13" | 2064 × 2752 | `store_listing_assets/store_screenshots/ios-ipad-13/<lang>/` |
 
-Rendered from the real app by `tool/store_screenshots/run.sh` (not in git). Upload all five per
-language in order: wall, memory, story, timeline, add.
+Rendered from the real app by `tool/store_screenshots/run.sh` (not in git). Upload all eight per language in this order (search results show the first three): wall, stories with music,
+family wall, Thread of the Year, memory, story, timeline (privacy), add.
 
 ## Product page header (Kopfzeile)
 

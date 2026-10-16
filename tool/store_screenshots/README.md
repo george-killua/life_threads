@@ -5,7 +5,7 @@ frame with a caption, in English, German and Arabic. No phone or simulator is ne
 `flutter test` that pumps the app with a fake memory repository and saves PNGs.
 
 ```bash
-tool/store_screenshots/run.sh                                   # 6 sizes × 3 languages × 5 scenes
+tool/store_screenshots/run.sh                                   # 7 sizes × 3 languages × 8 scenes
 STORE_SIZES=ios-6.9 STORE_LANGS=en STORE_SCENES=wall tool/store_screenshots/run.sh
 ```
 
@@ -18,10 +18,14 @@ Output: `store_listing_assets/store_screenshots/<size>/<lang>/NN-scene.png` (git
 | `play-tablet-10` | 1600×2560 | Google Play 10″ tablet |
 | `ios-6.9` | 1320×2868 | App Store iPhone 6.9″ |
 | `ios-6.5` | 1242×2688 | App Store iPhone 6.5″ |
+| `ios-6.3` | 1206×2622 | App Store iPhone 6.1″/6.3″ |
 | `ios-ipad-13` | 2064×2752 | App Store iPad 13″ |
 
-Scenes, in listing order: `wall`, `memory` (a memory's hero), `story` (story, people and threads),
-`timeline`, `add` (saving a moment with three photos).
+Scenes, in listing order (search results show the first three): `wall`, `stories` (a story film
+with a song), `family` (a family wall of six moments by three members, from the fake family
+service in `test/support/`), `year` (Thread of the Year 2025 with a song), `memory` (a memory's
+hero), `story` (story, people and threads), `timeline` (captioned as privacy), `add` (saving a
+moment with three photos). Picking a song uses a silent `FakeMusicPreview`.
 
 ## How it works
 

@@ -3,10 +3,19 @@
     export GOOGLE_PLAY_JSON_KEY_PATH=/path/to/service-account.json
     python3 tool/play/play.py tracks
     python3 tool/play/play.py upload build/app/outputs/bundle/release/app-release.aab alpha completed "Release notes"
+    python3 tool/play/play.py listing listing.json store_listing_assets/store_screenshots
+
+`listing` sets the store texts (JSON: {"en-US": {"title", "shortDescription",
+"fullDescription"}, ...}) and replaces the phone and tablet screenshots, after
+saving the current listing to listing-backup.json. The commit sends the
+changes to Google's review; they go live once approved (this app has no
+managed publishing, so the API cannot hold them back).
 
 Tracks: internal, alpha (closed testing), beta (open testing), production.
 Status: completed (rolls out to the track's testers) or draft.
 """
+import glob
+import json
 import os
 import sys
 from google.oauth2 import service_account
@@ -40,3 +49,36 @@ elif sys.argv[1] == 'upload':
         body={'track': track, 'releases': [release]}).execute()
     res = edits.commit(packageName=PKG, editId=eid).execute()
     print('committed edit', res.get('id'), 'track', track, 'status', status)
+elif sys.argv[1] == 'listing':
+    texts = json.load(open(sys.argv[2]))
+    shots = sys.argv[3]
+    # Play's language codes -> the screenshot folders' languages.
+    folder = {'en-US': 'en', 'de-DE': 'de', 'ar': 'ar'}
+    slots = {'phoneScreenshots': 'play-phone',
+             'sevenInchScreenshots': 'play-tablet-7',
+             'tenInchScreenshots': 'play-tablet-10'}
+    backup = {}
+    for lang in texts:
+        try:
+            backup[lang] = edits.listings().get(
+                packageName=PKG, editId=eid, language=lang).execute()
+        except Exception as error:  # a language without a listing yet
+            backup[lang] = {'error': str(error)}
+    json.dump(backup, open('listing-backup.json', 'w'), ensure_ascii=False, indent=2)
+    print('saved the current listing to listing-backup.json')
+    for lang, body in texts.items():
+        edits.listings().update(packageName=PKG, editId=eid, language=lang,
+            body={'language': lang, **body}).execute()
+        print('texts', lang)
+        for slot, size in slots.items():
+            files = sorted(glob.glob(os.path.join(shots, size, folder[lang], '*.png')))
+            if not files:
+                continue
+            edits.images().deleteall(packageName=PKG, editId=eid,
+                language=lang, imageType=slot).execute()
+            for path in files[:8]:  # Play takes at most 8 per slot
+                edits.images().upload(packageName=PKG, editId=eid, language=lang,
+                    imageType=slot, media_body=MediaFileUpload(path, mimetype='image/png')).execute()
+            print('  ', slot, len(files[:8]))
+    res = edits.commit(packageName=PKG, editId=eid).execute()
+    print('committed edit', res.get('id'), '(sent to Google for review)')
