@@ -17,7 +17,23 @@
 6. Grant it app access with release permissions.
 7. Download the service-account JSON file.
 
-## Local Upload
+## Upload with the Play API script (current way)
+
+```bash
+cd ~/Developer/life_threads
+flutter build appbundle --release
+export GOOGLE_PLAY_JSON_KEY_PATH="$HOME/Developer/life-threads-developer-account.json"
+python3 tool/play/play.py tracks
+python3 tool/play/play.py upload build/app/outputs/bundle/release/app-release.aab alpha completed "What's new"
+```
+
+The key file stays outside the repo. No MapTiler key is needed: the map
+uses OpenFreeMap unless `--dart-define=MAPTILER_KEY=…` is passed.
+
+Uploads so far: 1.0.0 (17) and 1.0.0 (21) to `alpha` (closed testing),
+both `completed`.
+
+## Local Upload (old fastlane way; fastlane is not set up)
 
 ```bash
 cd ~/Developer/life_threads

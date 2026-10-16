@@ -1,4 +1,8 @@
-# MapTiler key rotation (required before public release)
+# MapTiler key rotation
+
+> Not needed any more: the app uses OpenFreeMap (free, no key) by default.
+> MapTiler is only used when a key is passed with `--dart-define`. If you
+> still have the old key, revoke it in MapTiler Cloud.
 
 A previous MapTiler key was shared in chat. Rotate it before production traffic.
 

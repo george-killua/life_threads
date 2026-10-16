@@ -4,6 +4,8 @@ What changed in each TestFlight / Play build. Newest first.
 
 ## 1.0.0 (21) – 16 October 2026
 
+Uploaded to TestFlight and to Google Play closed testing (alpha).
+
 **New**
 - **Home screen widget** (iPhone and Android, free): a memory from your wall
   with its photo – one from this day in an earlier year when there is one,
