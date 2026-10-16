@@ -76,8 +76,12 @@ tags: [protocol, wal]
 - tapOn: "Edit Memory"
 # Save sits in the top bar.
 - tapOn: "Save"
+# Back on the memory (its top bar pencil).
 - extendedWaitUntil:
-    visible: "Edit story"
+    visible: "Edit Memory"
+    timeout: 10000
+- extendedWaitUntil:
+    notVisible: "Save"
     timeout: 10000
 - runFlow:
     file: ../subflows/scroll_to.yaml
