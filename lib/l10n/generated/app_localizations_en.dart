@@ -3641,4 +3641,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importAction => 'Import';
+
+  @override
+  String get familyRemovingMember => 'Removing and securing the wall…';
 }

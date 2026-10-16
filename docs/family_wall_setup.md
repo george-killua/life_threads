@@ -123,6 +123,7 @@ The server needs the Play service account and the App Store Server API key (runb
 | --- | --- | --- |
 | Session token (`lts_…`) | Keychain / Keystore (`flutter_secure_storage`) | sign out, 401, delete account |
 | Family keys (one key ring per family) | Keychain / Keystore | leaving / losing a family, delete account |
+| Device key (X25519, receives rotated family keys) | Keychain / Keystore | delete account |
 | Decrypted memory records, cursors, members, families list | `Application Support/family_wall/*.json` | sign out, delete account, leaving a family |
 | Decrypted photos (JPEG) | `Application Support/family_wall/families/<id>/photos/` | same, and photo tombstones |
 
@@ -151,14 +152,48 @@ n bytes     ciphertext
   family, kind (`memory`, `photo`, `profile`) and id, so the server cannot swap blobs. The family
   name is encrypted before the family id exists, so it uses `lifethreads-family/v1//family-name/`.
 - Key id = first 9 bytes of `SHA-256("lifethreads-family-key-id:" + key)`, base64url (12
-  characters). Derived, so every member computes the same id; it lets a future key rotation keep
-  old keys for reading.
+  characters). Derived, so every member computes the same id; a key rotation keeps old keys
+  for reading.
 - Memory records are JSON (title, description, category, feeling, occurredAt, location, photo
   ids, cover, wall position); id, author, version and timestamps come from the server item.
 - Photos are resized to at most 2048 px, re-encoded as JPEG quality 85 (EXIF and GPS dropped),
   then encrypted, off the UI isolate.
 - Names (`encryptedName`) and member profiles (`encryptedProfile`, JSON `{displayName}`) are
   base64url envelopes.
+
+## Key rotation
+
+When the member list shrinks (a member is removed, leaves or deletes their account) the server
+sets `rotationRequired` on the family. The **owner's** app then switches the family to a new key
+that the removed member never receives. Old items stay under the old key (the removed member
+saw them already, and only authors may rewrite items); everything posted afterwards uses the
+new one.
+
+- **Device keys.** Each device has an X25519 key pair (`FamilyDeviceKey`). Per family it
+  registers the public key with `PUT /families/:id/members/me/devices/:deviceId
+  {publicKey, proof}`; `proof` is the public key encrypted under the family key (kind `device`,
+  id `<accountId>/<deviceId>`), so only someone holding the family key can add a device.
+- **Rotation** (`POST /families/:id/keys`, owner only): a new key; the family name encrypted
+  under it; the older keys as a *key chain* (kind `key-chain`, under the new key); the new key
+  sealed for every device whose proof opens (`FamilyKeySealer`: X25519 with an ephemeral key,
+  HKDF-SHA256, AES-256-GCM, associated data
+  `lifethreads-family-seal/v1/<familyId>/<keyId>/<accountId>/<deviceId>`). Devices whose proof
+  doesn't open are listed as `rejected` and removed. Compare-and-set on `epoch`
+  (`409 key_epoch_conflict`); every registered device must be covered (`409 seals_incomplete`).
+  The server revokes open invites (they carry the old key) and bumps `membersVersion`.
+- **Pick-up.** A device whose ring lacks the family's `keyId` fetches
+  `GET /families/:id/keys/current/:deviceId` (`{keyId, epoch, encryptedChain, sealed}`), opens its
+  copy, makes it current, adds the chain's keys and re-saves its profile under the new key.
+  No copy for this device (not registered at the rotation): `404 key_seal_missing` (with the
+  chain), shown as `family_key_missing`; a fresh invite link fixes it and the chain gives the
+  older keys.
+- **Enforcement.** Once a family has a `keyId`, uploads with another `X-Key-Id` get
+  `409 key_outdated`; the app picks up the key and retries once. Walls created before rotation
+  existed have no `keyId` until their first rotation.
+- **When.** Right after `removeMember` (the settings page shows "Removing and securing the
+  wall…"), at the start of each sync, and when `membersVersion` changes. Offline at removal: the
+  next sync on the owner's phone does it. Items under a key the device doesn't have are kept,
+  not dropped: the sync picks up the key and reads the page again.
 
 ## Sync
 

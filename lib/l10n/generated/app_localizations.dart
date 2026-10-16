@@ -6182,6 +6182,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Import'**
   String get importAction;
+
+  /// No description provided for @familyRemovingMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Removing and securing the wall…'**
+  String get familyRemovingMember;
 }
 
 class _AppLocalizationsDelegate

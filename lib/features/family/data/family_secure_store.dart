@@ -65,8 +65,27 @@ class FamilySecrets {
 
   static const _sessionKey = 'lifethreads.family.session';
   static const _familyKeyPrefix = 'lifethreads.family.key.';
+  static const _deviceKey = 'lifethreads.family.device';
 
   final Map<String, FamilyKeyRing> _rings = {};
+  Future<FamilyDeviceKey>? _device;
+
+  /// This device's key pair for receiving rotated family keys, created on
+  /// first use. Kept on sign-out (like the family keys), removed with them.
+  Future<FamilyDeviceKey> deviceKey() => _device ??= () async {
+    final raw = await storage.read(_deviceKey);
+    if (raw != null) {
+      try {
+        final existing = await FamilyDeviceKey.fromJson(jsonDecode(raw));
+        if (existing != null) return existing;
+      } on FormatException {
+        // Unreadable: replaced below.
+      }
+    }
+    final created = await FamilyDeviceKey.generate();
+    await storage.write(_deviceKey, jsonEncode(created.toJson()));
+    return created;
+  }();
   String? _session;
   bool _sessionLoaded = false;
 
@@ -127,6 +146,25 @@ class FamilySecrets {
     return ring;
   }
 
+  /// Adds older keys (from a key chain) without changing the current one.
+  Future<FamilyKeyRing?> addOlderKeys(
+    String familyId,
+    Map<String, FamilyKey> keys,
+  ) async {
+    final existing = await keyRing(familyId);
+    if (existing == null || keys.isEmpty) return existing;
+    final ring = FamilyKeyRing(
+      currentKeyId: existing.currentKeyId,
+      keys: {...keys, ...existing.keys},
+    );
+    await storage.write(
+      '$_familyKeyPrefix$familyId',
+      jsonEncode(ring.toJson()),
+    );
+    _rings[familyId] = ring;
+    return ring;
+  }
+
   Future<void> deleteKey(String familyId) async {
     _rings.remove(familyId);
     await storage.delete('$_familyKeyPrefix$familyId');
@@ -136,11 +174,14 @@ class FamilySecrets {
   Future<void> deleteAll() async {
     final all = await storage.readAll();
     for (final key in all.keys) {
-      if (key == _sessionKey || key.startsWith(_familyKeyPrefix)) {
+      if (key == _sessionKey ||
+          key == _deviceKey ||
+          key.startsWith(_familyKeyPrefix)) {
         await storage.delete(key);
       }
     }
     _rings.clear();
+    _device = null;
     _session = null;
     _sessionLoaded = true;
   }

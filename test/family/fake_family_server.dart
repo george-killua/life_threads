@@ -34,6 +34,12 @@ class FakeFamilyServer implements FamilyHttp {
   /// Answers the next `/changes` call with 409 `cursor_reset`.
   bool resetNextChanges = false;
 
+  /// Rotation requests received (accepted or not).
+  int rotations = 0;
+
+  /// False: behaves like the server before key rotation (no key routes).
+  bool supportsKeys = true;
+
   /// Drops the response of the next PUT after storing it (lost answer).
   bool loseNextPutResponse = false;
 
@@ -112,6 +118,7 @@ class FakeFamilyServer implements FamilyHttp {
           if (f.ownerId == me) {
             families.remove(f.id);
           } else if (f.members.remove(me) != null) {
+            f.memberGone(me);
             f.membersVersion++;
           }
         }
@@ -173,7 +180,8 @@ class FakeFamilyServer implements FamilyHttp {
             id: _id('fam'),
             ownerId: me,
             encryptedName: _json(r)['encryptedName'] as String,
-          );
+          )..keyId = _json(r)['keyId'] as String?;
+          if (family.keyId != null) family.keyEpoch = 1;
           family.members[me] = FakeMember('owner');
           families[family.id] = family;
           return _ok({'family': family.toJson(me)}, status: 201);
@@ -217,6 +225,7 @@ class FakeFamilyServer implements FamilyHttp {
       if (m == 'POST' && s.length == 3 && s[2] == 'leave') {
         if (isOwner) throw _Fail(409, 'owner_cannot_leave');
         family.members.remove(me);
+        family.memberGone(me);
         family.membersVersion++;
         return _ok({});
       }
@@ -229,6 +238,7 @@ class FakeFamilyServer implements FamilyHttp {
         if (family.members.remove(s[3]) == null) {
           throw _Fail(404, 'member_not_found');
         }
+        family.memberGone(s[3]);
         family.membersVersion++;
         if (r.uri.queryParameters['deleteContent'] == 'true') {
           for (final item in family.items.values) {
@@ -236,6 +246,97 @@ class FakeFamilyServer implements FamilyHttp {
           }
         }
         return _ok({});
+      }
+      // Keys (rotation) ------------------------------------------------------
+      if (!supportsKeys &&
+          (s.contains('devices') || (s.length > 2 && s[2] == 'keys'))) {
+        throw _Fail(404, 'not_found');
+      }
+      if (m == 'PUT' &&
+          s.length == 6 &&
+          _is(s.sublist(2, 5), ['members', 'me', 'devices'])) {
+        final body = _json(r);
+        family.devices['$me/${s[5]}'] = (
+          publicKey: body['publicKey'] as String,
+          proof: body['proof'] as String,
+        );
+        return _ok({});
+      }
+      if (m == 'GET' && s.length == 3 && s[2] == 'devices') {
+        return _ok({
+          'devices': [
+            for (final e in family.devices.entries)
+              {
+                'accountId': e.key.split('/').first,
+                'deviceId': e.key.split('/').last,
+                'publicKey': e.value.publicKey,
+                'proof': e.value.proof,
+              },
+          ],
+        });
+      }
+      if (m == 'GET' &&
+          s.length == 5 &&
+          _is(s.sublist(2, 4), ['keys', 'current'])) {
+        final keyId = family.keyId;
+        if (keyId == null) throw _Fail(404, 'key_not_found');
+        final sealed = family.seals['$keyId/$me/${s[4]}'];
+        final chain = family.chains[keyId];
+        if (sealed == null) {
+          throw _Fail(404, 'key_seal_missing', {
+            'keyId': keyId,
+            'epoch': family.keyEpoch,
+            'encryptedChain': chain,
+          });
+        }
+        return _ok({
+          'keyId': keyId,
+          'epoch': family.keyEpoch,
+          'encryptedChain': chain,
+          'sealed': sealed,
+        });
+      }
+      if (m == 'POST' && s.length == 3 && s[2] == 'keys') {
+        if (!isOwner) throw _Fail(403, 'owner_only');
+        final body = _json(r);
+        rotations++;
+        if (body['epoch'] != family.keyEpoch + 1) {
+          throw _Fail(409, 'key_epoch_conflict', {
+            'currentEpoch': family.keyEpoch,
+          });
+        }
+        for (final d in (body['rejected'] as List? ?? const [])) {
+          family.devices.remove('${d['accountId']}/${d['deviceId']}');
+        }
+        final seals = {
+          for (final x in body['seals'] as List)
+            '${x['accountId']}/${x['deviceId']}': x['sealed'] as String,
+        };
+        final missing = [
+          for (final k in family.devices.keys)
+            if (!seals.containsKey(k))
+              {'accountId': k.split('/').first, 'deviceId': k.split('/').last},
+        ];
+        if (missing.isNotEmpty) {
+          throw _Fail(409, 'seals_incomplete', {'missing': missing});
+        }
+        final keyId = body['keyId'] as String;
+        family
+          ..seals.clear()
+          ..keyId = keyId
+          ..keyEpoch = family.keyEpoch + 1
+          ..rotationRequired = false
+          ..encryptedName = body['encryptedName'] as String
+          ..membersVersion += 1;
+        family.chains[keyId] = body['encryptedChain'] as String;
+        for (final e in seals.entries) {
+          family.seals['$keyId/${e.key}'] = e.value;
+        }
+        invites.updateAll(
+          (_, v) =>
+              v.familyId == family.id ? (familyId: v.familyId, used: true) : v,
+        );
+        return _ok({'family': family.toJson(me)});
       }
       if (m == 'POST' && s.length == 3 && s[2] == 'invites') {
         final token = 'lti_${_id('').padRight(32, 'y')}';
@@ -291,6 +392,9 @@ class FakeFamilyServer implements FamilyHttp {
           }
           if (current != null && current.authorId != me) {
             throw _Fail(403, 'not_author');
+          }
+          if (family.keyId != null && r.headers['x-key-id'] != family.keyId) {
+            throw _Fail(409, 'key_outdated', {'keyId': family.keyId});
           }
           if ((current?.version ?? 0) != base) {
             throw _Fail(412, 'version_conflict', {
@@ -417,6 +521,22 @@ class FakeFamily {
   final Map<String, FakeMember> members = {};
   final Map<String, FakeItem> items = {};
 
+  // Key rotation: what members' apps encrypted, never keys in the clear.
+  String? keyId;
+  int keyEpoch = 0;
+  bool rotationRequired = false;
+  final Map<String, ({String publicKey, String proof})> devices = {};
+  final Map<String, String> chains = {};
+  final Map<String, String> seals = {};
+
+  /// A member left or was removed: their devices get no future keys and the
+  /// owner's app rotates.
+  void memberGone(String accountId) {
+    devices.removeWhere((k, _) => k.startsWith('$accountId/'));
+    seals.removeWhere((k, _) => k.split('/')[1] == accountId);
+    rotationRequired = true;
+  }
+
   void tombstone(FakeItem item) {
     item
       ..deleted = true
@@ -432,6 +552,9 @@ class FakeFamily {
     'role': members[me]?.role ?? 'member',
     'cursor': '$seq',
     'membersVersion': membersVersion,
+    'keyId': keyId,
+    'keyEpoch': keyEpoch,
+    'rotationRequired': rotationRequired,
     'memberCount': members.length,
     'usage': {
       'usedBytes': items.values.fold<int>(0, (sum, i) => sum + i.bytes.length),

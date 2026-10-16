@@ -365,11 +365,17 @@ class _MemberTile extends ConsumerWidget {
               confirmLabel: l10n.familyRemoveMember,
             ),
           );
-          if (deleteContent == null) return;
-          await service.removeMember(
-            family.id,
-            member.accountId,
-            deleteContent: deleteContent,
+          if (deleteContent == null || !context.mounted) return;
+          // Removing also switches the wall to a new key the removed
+          // member never gets, which takes a moment.
+          await runWithFamilyProgress(
+            context,
+            l10n.familyRemovingMember,
+            () => service.removeMember(
+              family.id,
+              member.accountId,
+              deleteContent: deleteContent,
+            ),
           );
           AppLogger.event('family_member_removed');
       }

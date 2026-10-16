@@ -3696,4 +3696,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get importAction => 'استيراد';
+
+  @override
+  String get familyRemovingMember => 'جارٍ الإزالة وتأمين الجدار…';
 }

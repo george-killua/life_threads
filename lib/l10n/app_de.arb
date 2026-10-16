@@ -1073,5 +1073,6 @@
   "photoNumber": "Foto {number}",
   "familyDisplayNameNotSaved": "Dein Name auf dieser Wand konnte nicht gespeichert werden. Du kannst ihn in den Einstellungen der Wand festlegen.",
   "importBackupCount": "{count, plural, =1{Es enthält 1 Erinnerung.} other{Es enthält {count} Erinnerungen.}} Erinnerungen, die schon auf deinen Wänden sind, bleiben und werden nicht doppelt hinzugefügt.",
-  "importAction": "Importieren"
+  "importAction": "Importieren",
+  "familyRemovingMember": "Wird entfernt, die Wand wird gesichert…"
 }

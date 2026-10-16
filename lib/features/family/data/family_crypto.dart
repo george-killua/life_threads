@@ -240,4 +240,220 @@ abstract final class FamilyCipherKinds {
   static const photo = 'photo';
   static const familyName = 'family-name';
   static const profile = 'profile';
+
+  /// A device's public key, encrypted under the family key as proof that
+  /// whoever registered it holds that key.
+  static const device = 'device';
+
+  /// The older keys, encrypted under a new key after a rotation.
+  static const keyChain = 'key-chain';
+}
+
+/// This device's X25519 key pair. Family keys are sealed to its public key
+/// when a family switches keys, so they never travel in readable form.
+class FamilyDeviceKey {
+  FamilyDeviceKey._(this.id, this._seed, this.publicKey);
+
+  /// A random device id (sent to the server) and a new key pair.
+  static Future<FamilyDeviceKey> generate([Random? random]) async {
+    final source = random ?? Random.secure();
+    final seed = List<int>.generate(32, (_) => source.nextInt(256));
+    final id = base64Url
+        .encode(List<int>.generate(12, (_) => source.nextInt(256)))
+        .replaceAll('=', '');
+    return _fromSeed(id, seed);
+  }
+
+  static Future<FamilyDeviceKey> _fromSeed(String id, List<int> seed) async {
+    final pair = await X25519().newKeyPairFromSeed(seed);
+    final public = await pair.extractPublicKey();
+    return FamilyDeviceKey._(
+      id,
+      Uint8List.fromList(seed),
+      Uint8List.fromList(public.bytes),
+    );
+  }
+
+  final String id;
+  final Uint8List _seed;
+  final Uint8List publicKey;
+
+  String get encodedPublicKey => base64Url.encode(publicKey);
+
+  Future<SimpleKeyPair> keyPair() => X25519().newKeyPairFromSeed(_seed);
+
+  Map<String, Object?> toJson() => {'id': id, 'seed': base64Url.encode(_seed)};
+
+  static Future<FamilyDeviceKey?> fromJson(Object? json) async {
+    if (json is! Map) return null;
+    final id = json['id'];
+    final seed = json['seed'];
+    if (id is! String || seed is! String) return null;
+    try {
+      final bytes = base64Url.decode(base64Url.normalize(seed));
+      if (bytes.length != 32) return null;
+      return await _fromSeed(id, bytes);
+    } on FormatException {
+      return null;
+    }
+  }
+}
+
+/// Seals a family key to one device's public key: X25519 with a fresh
+/// ephemeral key, HKDF-SHA256, AES-256-GCM. Output (base64url):
+/// ephemeral public key (32) | nonce (12) | sealed key (32) | tag (16).
+/// The associated data binds the copy to its family, key, account and
+/// device, so the server can't hand one device's copy to another.
+class FamilyKeySealer {
+  const FamilyKeySealer();
+
+  static List<int> _context(
+    String familyId,
+    String keyId,
+    String accountId,
+    String deviceId,
+  ) => utf8.encode(
+    'lifethreads-family-seal/v1/$familyId/$keyId/$accountId/$deviceId',
+  );
+
+  Future<String> seal(
+    FamilyKey key, {
+    required List<int> recipientPublicKey,
+    required String familyId,
+    required String keyId,
+    required String accountId,
+    required String deviceId,
+  }) async {
+    final ephemeral = await X25519().newKeyPair();
+    final ephemeralPublic = (await ephemeral.extractPublicKey()).bytes;
+    final secret = await _secret(
+      ephemeral,
+      recipientPublicKey,
+      ephemeralPublic,
+      recipientPublicKey,
+    );
+    final context = _context(familyId, keyId, accountId, deviceId);
+    final box = await AesGcm.with256bits().encrypt(
+      key.bytes,
+      secretKey: secret,
+      nonce: AesGcm.with256bits().newNonce(),
+      aad: context,
+    );
+    return base64Url.encode([
+      ...ephemeralPublic,
+      ...box.nonce,
+      ...box.cipherText,
+      ...box.mac.bytes,
+    ]);
+  }
+
+  Future<FamilyKey> unseal(
+    String sealed, {
+    required FamilyDeviceKey device,
+    required String familyId,
+    required String keyId,
+    required String accountId,
+  }) async {
+    final List<int> bytes;
+    try {
+      bytes = base64Url.decode(base64Url.normalize(sealed));
+    } on FormatException {
+      throw const FamilyDecryptionException('Sealed key is not base64.');
+    }
+    const head = 32 + FamilyCipher.nonceLength;
+    if (bytes.length != head + FamilyKey.keyLength + FamilyCipher.macLength) {
+      throw const FamilyDecryptionException('Sealed key has the wrong size.');
+    }
+    final ephemeralPublic = bytes.sublist(0, 32);
+    final secret = await _secret(
+      await device.keyPair(),
+      ephemeralPublic,
+      ephemeralPublic,
+      device.publicKey,
+    );
+    try {
+      final clear = await AesGcm.with256bits().decrypt(
+        SecretBox(
+          bytes.sublist(head, bytes.length - FamilyCipher.macLength),
+          nonce: bytes.sublist(32, head),
+          mac: Mac(bytes.sublist(bytes.length - FamilyCipher.macLength)),
+        ),
+        secretKey: secret,
+        aad: _context(familyId, keyId, accountId, device.id),
+      );
+      final key = FamilyKey(clear);
+      if (await key.keyId() != keyId) {
+        throw const FamilyDecryptionException('Sealed key has another id.');
+      }
+      return key;
+    } on SecretBoxAuthenticationError {
+      throw const FamilyDecryptionException('Sealed key failed to open.');
+    }
+  }
+
+  Future<SecretKey> _secret(
+    SimpleKeyPair own,
+    List<int> otherPublic,
+    List<int> ephemeralPublic,
+    List<int> recipientPublic,
+  ) async {
+    final shared = await X25519().sharedSecretKey(
+      keyPair: own,
+      remotePublicKey: SimplePublicKey(otherPublic, type: KeyPairType.x25519),
+    );
+    return Hkdf(hmac: Hmac.sha256(), outputLength: 32).deriveKey(
+      secretKey: shared,
+      nonce: [...ephemeralPublic, ...recipientPublic],
+      info: utf8.encode('lifethreads-family-seal/v1'),
+    );
+  }
+}
+
+/// The keys a family used before its current one, encrypted under the
+/// current key so a member who joins later (or a device that missed a
+/// rotation) can still read older items.
+abstract final class FamilyKeyChain {
+  static Future<String> encrypt(
+    FamilyKeyRing older, {
+    required FamilyKeyRing current,
+    required String familyId,
+  }) => const FamilyCipher().encryptString(
+    jsonEncode({for (final e in older.keys.entries) e.key: e.value.encode()}),
+    ring: current,
+    familyId: familyId,
+    kind: FamilyCipherKinds.keyChain,
+    id: current.currentKeyId,
+  );
+
+  /// The older keys by id; throws [FamilyDecryptionException].
+  static Future<Map<String, FamilyKey>> decrypt(
+    String chain, {
+    required FamilyKeyRing current,
+    required String familyId,
+  }) async {
+    final json = jsonDecode(
+      await const FamilyCipher().decryptString(
+        chain,
+        ring: current,
+        familyId: familyId,
+        kind: FamilyCipherKinds.keyChain,
+        id: current.currentKeyId,
+      ),
+    );
+    if (json is! Map) {
+      throw const FamilyDecryptionException('Key chain is malformed.');
+    }
+    final keys = <String, FamilyKey>{};
+    for (final entry in json.entries) {
+      final key = entry.value is String
+          ? FamilyKey.tryParse(entry.value as String)
+          : null;
+      if (entry.key is String &&
+          key != null &&
+          await key.keyId() == entry.key) {
+        keys[entry.key as String] = key;
+      }
+    }
+    return keys;
+  }
 }

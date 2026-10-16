@@ -322,6 +322,9 @@ class FamilyLocalCache {
                   : 0,
               usedBytes: f['usedBytes'] is int ? f['usedBytes'] as int : 0,
               quotaBytes: f['quotaBytes'] is int ? f['quotaBytes'] as int : 0,
+              keyId: f['keyId'] is String ? f['keyId'] as String : null,
+              keyEpoch: f['keyEpoch'] is int ? f['keyEpoch'] as int : 0,
+              rotationRequired: f['rotationRequired'] == true,
             ),
           );
         }
@@ -342,6 +345,9 @@ class FamilyLocalCache {
           'memberCount': f.memberCount,
           'usedBytes': f.usedBytes,
           'quotaBytes': f.quotaBytes,
+          'keyId': f.keyId,
+          'keyEpoch': f.keyEpoch,
+          'rotationRequired': f.rotationRequired,
         },
     ]);
   }
@@ -413,7 +419,11 @@ class FamilyLocalCache {
     _states.remove(familyId);
     await _writes;
     final dir = Directory(await _familyDir(familyId));
-    if (await dir.exists()) await dir.delete(recursive: true);
+    try {
+      await dir.delete(recursive: true);
+    } on PathNotFoundException {
+      // Already gone.
+    }
   }
 
   /// Forgets everything (sign out, account deletion).
@@ -425,6 +435,10 @@ class FamilyLocalCache {
     _blocked = null;
     await _writes;
     final dir = await root;
-    if (await dir.exists()) await dir.delete(recursive: true);
+    try {
+      await dir.delete(recursive: true);
+    } on PathNotFoundException {
+      // Already gone (cleared twice at once, e.g. sign-out and a 401).
+    }
   }
 }

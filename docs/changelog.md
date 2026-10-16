@@ -88,6 +88,10 @@ What changed in each TestFlight / Play build. Newest first.
 - Once after the update, photo copies older versions left behind are
   deleted (kept: anything a memory or the draft uses, and the last day's).
 - Importing a backup asks first and says how many memories it has.
+- Family walls: removing a member (or a member leaving) switches the wall to
+  a new key that only the remaining members' devices receive, so nothing
+  posted afterwards can be read with the old key. Needs the updated server
+  (works with the current one, without rotation, until it is deployed).
 
 ## 1.0.0 (22) – 16 October 2026
 

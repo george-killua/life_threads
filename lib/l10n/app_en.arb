@@ -1729,5 +1729,6 @@
       }
     }
   },
-  "importAction": "Import"
+  "importAction": "Import",
+  "familyRemovingMember": "Removing and securing the wall…"
 }

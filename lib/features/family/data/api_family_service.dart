@@ -331,6 +331,9 @@ class ApiFamilyService implements FamilyService {
       quotaBytes: usage is Map && usage['quotaBytes'] is int
           ? usage['quotaBytes'] as int
           : 0,
+      keyId: json['keyId'] is String ? json['keyId'] as String : null,
+      keyEpoch: json['keyEpoch'] is int ? json['keyEpoch'] as int : 0,
+      rotationRequired: json['rotationRequired'] == true,
     );
   }
 
@@ -359,6 +362,320 @@ class ApiFamilyService implements FamilyService {
         id: '',
       );
 
+  // Keys --------------------------------------------------------------------
+  //
+  // When the member list shrinks the server sets `rotationRequired`; the
+  // owner's app then switches the family to a new key, sealed for every
+  // registered device of the remaining members (see docs/family_wall_setup.md).
+
+  /// Families whose device registration this run already sent, by key id.
+  final Set<String> _registeredDevices = {};
+
+  /// Makes sure this device is registered, holds the family's current key and
+  /// (for the owner) that a pending rotation is done. Returns the ring to use.
+  Future<FamilyKeyRing> _keysCurrent(String familyId, {Family? family}) async {
+    var ring = await _ring(familyId);
+    family ??= (await cache.families())
+        .where((f) => f.id == familyId)
+        .firstOrNull;
+    if (family == null) return ring;
+    final keyId = family.keyId;
+    if (keyId != null && !ring.keys.containsKey(keyId)) {
+      ring = await _pickUpKey(familyId) ?? ring;
+    }
+    // Best effort: a server without key rotation (or offline) must not stop
+    // posting; the next sync registers the device.
+    await _registerDeviceQuietly(familyId, ring);
+    if (family.rotationRequired && family.role == FamilyRole.owner) {
+      ring = await _rotateKey(familyId, family, ring) ?? ring;
+    }
+    return ring;
+  }
+
+  /// [_keysCurrent] where a failure (offline) must not stop the caller.
+  Future<FamilyKeyRing?> _keysCurrentQuietly(
+    String familyId, {
+    Family? family,
+  }) async {
+    try {
+      return await _keysCurrent(familyId, family: family);
+    } on FamilyException catch (error) {
+      debugPrint('Family keys for $familyId not updated: ${error.code}');
+      return null;
+    }
+  }
+
+  /// Runs [write] with the current key; when the server says the family moved
+  /// to a newer key, picks it up and tries once more.
+  Future<T> _withCurrentKey<T>(
+    String familyId,
+    Future<T> Function(FamilyKeyRing ring) write,
+  ) async {
+    final ring = await _keysCurrent(familyId);
+    try {
+      return await write(ring);
+    } on FamilyException catch (error) {
+      if (error.code != FamilyErrorCodes.keyOutdated) rethrow;
+      await members(familyId);
+      final fresh = await _keysCurrent(familyId);
+      if (fresh.currentKeyId == ring.currentKeyId) {
+        throw const FamilyException(FamilyErrorCodes.familyKeyMissing);
+      }
+      return write(fresh);
+    }
+  }
+
+  /// Publishes this device's public key for [familyId], with a proof made
+  /// with the family key so nobody without it can add a device.
+  Future<void> _registerDevice(String familyId, FamilyKeyRing ring) async {
+    final marker = '$familyId/${ring.currentKeyId}';
+    if (_registeredDevices.contains(marker)) return;
+    final device = await secrets.deviceKey();
+    final accountId = await _currentAccountId();
+    if (accountId == null) return;
+    final proof = await cipher.encryptString(
+      device.encodedPublicKey,
+      ring: ring,
+      familyId: familyId,
+      kind: FamilyCipherKinds.device,
+      id: '$accountId/${device.id}',
+    );
+    await api.sendJson(
+      'PUT',
+      '/families/$familyId/members/me/devices/${device.id}',
+      json: {'publicKey': device.encodedPublicKey, 'proof': proof},
+      idempotent: true,
+    );
+    _registeredDevices.add(marker);
+  }
+
+  Future<void> _registerDeviceQuietly(
+    String familyId,
+    FamilyKeyRing ring,
+  ) async {
+    try {
+      await _registerDevice(familyId, ring);
+    } on FamilyException catch (error) {
+      debugPrint('Family device not registered yet: ${error.code}');
+    }
+  }
+
+  /// The older keys of a family, encrypted under its current key; null when
+  /// it never rotated.
+  Future<Object?> _chainFor(String familyId) async {
+    final device = await secrets.deviceKey();
+    try {
+      final json = await api.getJson(
+        '/families/$familyId/keys/current/${device.id}',
+      );
+      return json['encryptedChain'];
+    } on FamilyApiException catch (error) {
+      if (error.code == FamilyErrorCodes.keySealMissing) {
+        return error.details['encryptedChain'];
+      }
+      return null;
+    } on FamilyException {
+      return null;
+    }
+  }
+
+  /// Fetches this device's sealed copy of the family's current key and the
+  /// chain of older keys. Null when there is no copy for this device (it was
+  /// not registered at the rotation): an invite link brings the key then.
+  Future<FamilyKeyRing?> _pickUpKey(String familyId) async {
+    final device = await secrets.deviceKey();
+    final Map<String, Object?> json;
+    try {
+      json = await api.getJson('/families/$familyId/keys/current/${device.id}');
+    } on FamilyApiException catch (error) {
+      if (error.code == FamilyErrorCodes.keySealMissing ||
+          error.code == FamilyErrorCodes.keyNotFound) {
+        return null;
+      }
+      rethrow;
+    }
+    final keyId = json['keyId'];
+    final sealed = json['sealed'];
+    final accountId = await _currentAccountId();
+    if (keyId is! String || sealed is! String || accountId == null) {
+      throw const FamilyException(FamilyErrorCodes.invalidResponse);
+    }
+    final FamilyKey key;
+    try {
+      key = await const FamilyKeySealer().unseal(
+        sealed,
+        device: device,
+        familyId: familyId,
+        keyId: keyId,
+        accountId: accountId,
+      );
+    } on FamilyDecryptionException {
+      return null;
+    }
+    var ring = await secrets.addKey(familyId, key);
+    ring = await _addChain(familyId, ring, json['encryptedChain']);
+    // Our name on this wall, under the new key too.
+    unawaited(_refreshOwnProfile(familyId).then((_) {}, onError: (_) {}));
+    return ring;
+  }
+
+  /// Adds the older keys from a key chain encrypted under [ring]'s current key.
+  Future<FamilyKeyRing> _addChain(
+    String familyId,
+    FamilyKeyRing ring,
+    Object? chain,
+  ) async {
+    if (chain is! String) return ring;
+    try {
+      final older = await FamilyKeyChain.decrypt(
+        chain,
+        current: ring,
+        familyId: familyId,
+      );
+      return await secrets.addOlderKeys(familyId, older) ?? ring;
+    } on FamilyDecryptionException {
+      return ring;
+    } on FormatException {
+      return ring;
+    }
+  }
+
+  Future<void> _refreshOwnProfile(String familyId) async {
+    final accountId = await _currentAccountId();
+    final me = (await members(
+      familyId,
+    )).where((m) => m.accountId == accountId).firstOrNull;
+    if (me != null && me.displayName.isNotEmpty) {
+      await setMyDisplayName(familyId, me.displayName);
+    }
+  }
+
+  /// The owner's part: a new key for the remaining members' devices. Devices
+  /// whose proof doesn't open with the family key are rejected, not sealed.
+  Future<FamilyKeyRing?> _rotateKey(
+    String familyId,
+    Family family,
+    FamilyKeyRing ring, {
+    bool retried = false,
+  }) async {
+    // The name is re-encrypted under the new key; without it there is
+    // nothing to put there.
+    if (family.name.isEmpty) return null;
+    final accountId = await _currentAccountId();
+    if (accountId == null) return null;
+    final devices = await api.getJson('/families/$familyId/devices');
+    final list = devices['devices'];
+    if (list is! List) {
+      throw const FamilyException(FamilyErrorCodes.invalidResponse);
+    }
+    final key = FamilyKey.generate();
+    final keyId = await key.keyId();
+    final next = FamilyKeyRing(
+      currentKeyId: keyId,
+      keys: {...ring.keys, keyId: key},
+    );
+    final seals = <Map<String, Object?>>[];
+    final rejected = <Map<String, Object?>>[];
+    for (final entry in list) {
+      if (entry is! Map) continue;
+      final account = entry['accountId'];
+      final deviceId = entry['deviceId'];
+      final publicKey = entry['publicKey'];
+      final proof = entry['proof'];
+      if (account is! String || deviceId is! String) continue;
+      final verified =
+          publicKey is String &&
+          proof is String &&
+          await _proofMatches(
+            familyId,
+            ring,
+            account,
+            deviceId,
+            publicKey,
+            proof,
+          );
+      if (!verified) {
+        rejected.add({'accountId': account, 'deviceId': deviceId});
+        continue;
+      }
+      seals.add({
+        'accountId': account,
+        'deviceId': deviceId,
+        'sealed': await const FamilyKeySealer().seal(
+          key,
+          recipientPublicKey: base64Url.decode(base64Url.normalize(publicKey)),
+          familyId: familyId,
+          keyId: keyId,
+          accountId: account,
+          deviceId: deviceId,
+        ),
+      });
+    }
+    final Map<String, Object?> json;
+    try {
+      json = await api.sendJson(
+        'POST',
+        '/families/$familyId/keys',
+        json: {
+          'keyId': keyId,
+          'epoch': family.keyEpoch + 1,
+          'encryptedName': await _encryptName(family.name, next),
+          'encryptedChain': await FamilyKeyChain.encrypt(
+            ring,
+            current: next,
+            familyId: familyId,
+          ),
+          'seals': seals,
+          'rejected': rejected,
+        },
+      );
+    } on FamilyApiException catch (error) {
+      if (error.code == FamilyErrorCodes.keyEpochConflict) {
+        // Another of the owner's devices rotated first.
+        return _pickUpKey(familyId);
+      }
+      if (error.code == FamilyErrorCodes.sealsIncomplete && !retried) {
+        // A device registered meanwhile: seal for it too.
+        return _rotateKey(familyId, family, ring, retried: true);
+      }
+      rethrow;
+    }
+    final stored = await secrets.addKey(familyId, key);
+    _registeredDevices.removeWhere((m) => m.startsWith('$familyId/'));
+    final familyJson = json['family'];
+    if (familyJson is Map) {
+      await _upsertFamily(
+        await _parseFamily(familyJson.cast<String, Object?>()),
+      );
+    }
+    await _registerDevice(familyId, stored);
+    return stored;
+  }
+
+  Future<bool> _proofMatches(
+    String familyId,
+    FamilyKeyRing ring,
+    String accountId,
+    String deviceId,
+    String publicKey,
+    String proof,
+  ) async {
+    try {
+      final opened = await cipher.decryptString(
+        proof,
+        ring: ring,
+        familyId: familyId,
+        kind: FamilyCipherKinds.device,
+        id: '$accountId/$deviceId',
+      );
+      return opened == publicKey;
+    } on FamilyDecryptionException {
+      return false;
+    } on FormatException {
+      return false;
+    }
+  }
+
   Future<FamilyKeyRing> _ring(String familyId) async {
     final ring = await secrets.keyRing(familyId);
     if (ring == null) {
@@ -378,15 +695,19 @@ class ApiFamilyService implements FamilyService {
     final json = await api.sendJson(
       'POST',
       '/families',
-      json: {'encryptedName': await _encryptName(name, ring)},
+      json: {
+        'encryptedName': await _encryptName(name, ring),
+        'keyId': ring.currentKeyId,
+      },
     );
     final familyJson = json['family'];
     if (familyJson is! Map || familyJson['id'] is! String) {
       throw const FamilyException(FamilyErrorCodes.invalidResponse);
     }
-    await secrets.addKey(familyJson['id'] as String, key);
+    final stored = await secrets.addKey(familyJson['id'] as String, key);
     final family = await _parseFamily(familyJson.cast<String, Object?>());
     await _upsertFamily(family);
+    await _registerDeviceQuietly(family.id, stored);
     return family;
   }
 
@@ -552,7 +873,14 @@ class ApiFamilyService implements FamilyService {
       '/families/$familyId/members/$accountId',
       query: deleteContent ? const {'deleteContent': 'true'} : null,
     );
-    unawaited(members(familyId).then((_) {}, onError: (_) {}));
+    // Switch to a new key right away, so nothing posted from now on can be
+    // read with the one the removed member had. Offline: the next sync does.
+    try {
+      await members(familyId);
+      await _keysCurrentQuietly(familyId);
+    } on FamilyException {
+      // Retried on the next sync (the server keeps rotationRequired).
+    }
     if (deleteContent) _syncQuietly(familyId);
   }
 
@@ -560,7 +888,8 @@ class ApiFamilyService implements FamilyService {
 
   @override
   Future<Uri> createInvite(String familyId) async {
-    final ring = await _ring(familyId);
+    // A pending rotation first: the link must carry the key in use.
+    final ring = await _keysCurrentQuietly(familyId) ?? await _ring(familyId);
     final json = await api.sendJson(
       'POST',
       '/families/$familyId/invites',
@@ -606,22 +935,33 @@ class ApiFamilyService implements FamilyService {
       throw const FamilyException(FamilyErrorCodes.inviteInvalid);
     }
     // The key must open the family's name, or the link was altered.
-    final ring = await FamilyKeyRing.single(invite.key);
+    final inviteRing = await FamilyKeyRing.single(invite.key);
     final encryptedName = familyJson['encryptedName'];
     try {
       if (encryptedName is! String) throw const FamilyDecryptionException('');
-      await _decryptName(encryptedName, ring);
+      await _decryptName(encryptedName, inviteRing);
     } on FamilyDecryptionException {
       throw const FamilyException(FamilyErrorCodes.inviteKeyInvalid);
     }
     final existing = await secrets.keyRing(invite.familyId);
-    await secrets.addKey(
+    final inviteKeyId = await invite.key.keyId();
+    // The link's key becomes current when it is the family's current one
+    // (a device that missed a rotation catches up this way).
+    var ring = await secrets.addKey(
       invite.familyId,
       invite.key,
-      makeCurrent: existing == null,
+      makeCurrent: existing == null || familyJson['keyId'] == inviteKeyId,
     );
+    if (ring.currentKeyId == inviteKeyId) {
+      ring = await _addChain(
+        invite.familyId,
+        ring,
+        await _chainFor(invite.familyId),
+      );
+    }
     final family = await _parseFamily(familyJson);
     await _upsertFamily(family);
+    await _registerDeviceQuietly(invite.familyId, ring);
     _syncQuietly(invite.familyId);
     return family;
   }
@@ -708,6 +1048,7 @@ class ApiFamilyService implements FamilyService {
     final status = _statusValue(familyId);
     status.set(FamilySyncStatus.syncing);
     try {
+      await _keysCurrentQuietly(familyId);
       await _pullChanges(familyId);
       status.set(FamilySyncStatus.idle);
     } on FamilyException catch (error) {
@@ -746,7 +1087,8 @@ class ApiFamilyService implements FamilyService {
   Future<void> _pullChanges(String familyId) async {
     final generation = _generation;
     final forgotten = _forgotten[familyId] ?? 0;
-    final ring = await _ring(familyId);
+    var ring = await _ring(familyId);
+    var pickedUpKey = false;
     var state = await cache.state(familyId);
     var cursor = state.cursor;
     var fullResync = cursor == '0';
@@ -808,10 +1150,30 @@ class ApiFamilyService implements FamilyService {
       }
 
       final fetchList = toFetch.values.toList();
-      final fetched = await _pool(
-        fetchList,
-        (change) => _fetchMemory(familyId, change, ring),
-      );
+      final List<FamilyMemory?> fetched;
+      try {
+        fetched = await _pool(
+          fetchList,
+          (change) => _fetchMemory(familyId, change, ring),
+        );
+      } on _MissingFamilyKey catch (missing) {
+        // Written with a key this device doesn't have yet (a rotation it
+        // missed): fetch it and read this page again. Nothing is dropped.
+        if (!pickedUpKey) {
+          pickedUpKey = true;
+          await members(familyId);
+          final fresh = await _keysCurrentQuietly(familyId);
+          if (fresh != null && fresh.keys.containsKey(missing.keyId)) {
+            ring = fresh;
+            continue;
+          }
+        }
+        throw const FamilyException(
+          FamilyErrorCodes.familyKeyMissing,
+          'This device does not have the current key for this family wall. '
+          'Open a new invite link from a family member.',
+        );
+      }
       final upserts = <FamilyMemory>[];
       for (var i = 0; i < fetchList.length; i++) {
         final memory = fetched[i];
@@ -865,6 +1227,8 @@ class ApiFamilyService implements FamilyService {
     if (membersChanged) {
       try {
         await members(familyId);
+        // A rotation (or one now due) comes with a member-list change.
+        await _keysCurrentQuietly(familyId);
       } on FamilyException {
         // The member list refreshes on the next sync.
       }
@@ -909,6 +1273,10 @@ class ApiFamilyService implements FamilyService {
         updatedAt: change.updatedAt,
       );
     } on FamilyDecryptionException catch (error) {
+      final keyId = FamilyCipher.keyIdOf(response.body);
+      if (keyId != null && !ring.keys.containsKey(keyId)) {
+        throw _MissingFamilyKey(keyId);
+      }
       debugPrint('Family memory ${change.id} could not be decrypted: $error');
       return null;
     } on FormatException {
@@ -961,11 +1329,14 @@ class ApiFamilyService implements FamilyService {
   }
 
   @override
-  Future<FamilyMemory> addMemory(
+  Future<FamilyMemory> addMemory(String familyId, FamilyMemoryDraft draft) =>
+      _withCurrentKey(familyId, (ring) => _addMemory(familyId, draft, ring));
+
+  Future<FamilyMemory> _addMemory(
     String familyId,
     FamilyMemoryDraft draft,
+    FamilyKeyRing ring,
   ) async {
-    final ring = await _ring(familyId);
     final index = (await cache.memories(familyId)).length;
     final id = _newId();
     final newPhotoIds = await _uploadPhotos(
@@ -1002,9 +1373,17 @@ class ApiFamilyService implements FamilyService {
   Future<FamilyMemory> updateMemory(
     FamilyMemory memory,
     FamilyMemoryDraft draft,
+  ) => _withCurrentKey(
+    memory.familyId,
+    (ring) => _updateMemory(memory, draft, ring),
+  );
+
+  Future<FamilyMemory> _updateMemory(
+    FamilyMemory memory,
+    FamilyMemoryDraft draft,
+    FamilyKeyRing ring,
   ) async {
     final familyId = memory.familyId;
-    final ring = await _ring(familyId);
     final kept = draft.keptPhotoIds.where(memory.photoIds.contains).toList();
     final newPhotoIds = await _uploadPhotos(
       familyId,
@@ -1047,26 +1426,22 @@ class ApiFamilyService implements FamilyService {
   }
 
   @override
-  Future<void> moveMemory(
-    FamilyMemory memory,
-    double wallX,
-    double wallY,
-  ) async {
-    final ring = await _ring(memory.familyId);
-    final record = {
-      ...FamilyMemoryRecord.fromMemory(memory),
-      'wallX': wallX,
-      'wallY': wallY,
-    };
-    await _putMemory(
-      memory.familyId,
-      memory.id,
-      record,
-      ring,
-      baseVersion: memory.version,
-      createdAt: memory.createdAt,
-    );
-  }
+  Future<void> moveMemory(FamilyMemory memory, double wallX, double wallY) =>
+      _withCurrentKey(memory.familyId, (ring) {
+        final record = {
+          ...FamilyMemoryRecord.fromMemory(memory),
+          'wallX': wallX,
+          'wallY': wallY,
+        };
+        return _putMemory(
+          memory.familyId,
+          memory.id,
+          record,
+          ring,
+          baseVersion: memory.version,
+          createdAt: memory.createdAt,
+        );
+      });
 
   @override
   Future<void> deleteMemory(FamilyMemory memory) async {
@@ -1409,4 +1784,11 @@ class _Value<T> {
       };
     });
   }
+}
+
+/// A memory encrypted with a key this device doesn't hold yet.
+class _MissingFamilyKey implements Exception {
+  const _MissingFamilyKey(this.keyId);
+
+  final String keyId;
 }

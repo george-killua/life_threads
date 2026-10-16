@@ -32,9 +32,22 @@ class Family {
     required this.memberCount,
     required this.usedBytes,
     required this.quotaBytes,
+    this.keyId,
+    this.keyEpoch = 0,
+    this.rotationRequired = false,
   });
 
   final String id;
+
+  /// The family's current key (its id; the key itself never leaves the
+  /// members' devices). Null for walls made before key rotation existed.
+  final String? keyId;
+
+  /// How many times the key changed.
+  final int keyEpoch;
+
+  /// The member list shrank: the owner's app switches to a new key.
+  final bool rotationRequired;
 
   /// Decrypted on the device; the server only has ciphertext.
   final String name;

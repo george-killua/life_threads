@@ -236,4 +236,63 @@ void main() {
         : false,
     timeout: const Timeout(Duration(minutes: 2)),
   );
+
+  test(
+    'removing a member rotates the key; the others keep reading',
+    () async {
+      await launcher.command('purchase it-play-token-rotation');
+      final owner = device('rot-owner', purchase: 'it-play-token-rotation');
+      final account = await owner.signInWithApple();
+      await owner.acceptTerms(account.requiredTermsVersion);
+      await owner.linkSubscription();
+      final family = await owner.createFamily('Rotation family');
+
+      Future<ApiFamilyService> join(String name) async {
+        final member = device(name);
+        final a = await member.signInWithGoogle();
+        await member.acceptTerms(a.requiredTermsVersion);
+        await member.acceptInvite(await owner.createInvite(family.id));
+        return member;
+      }
+
+      final stay = await join('rot-stay');
+      final gone = await join('rot-gone');
+      final goneId = (await gone.watchAccount().first)!.id;
+      FamilyMemoryDraft draft(String title) => FamilyMemoryDraft(
+        title: title,
+        description: '',
+        category: MemoryCategory.family,
+        feeling: MemoryFeeling.warm,
+        occurredAt: DateTime.utc(2025, 1, 1),
+        locationLabel: '',
+        newPhotoPaths: const [],
+      );
+      await owner.addMemory(family.id, draft('Before removal'));
+      final oldKey = (await owner.secrets.keyRing(family.id))!.currentKeyId;
+
+      await owner.removeMember(family.id, goneId);
+      final newKey = (await owner.secrets.keyRing(family.id))!.currentKeyId;
+      expect(newKey, isNot(oldKey));
+
+      await owner.addMemory(family.id, draft('After removal'));
+      await stay.sync(family.id);
+      final titles = [
+        for (final m in await stay.watchMemories(family.id).first) m.title,
+      ]..sort();
+      expect(titles, ['After removal', 'Before removal']);
+      expect((await stay.secrets.keyRing(family.id))!.currentKeyId, newKey);
+      expect((await stay.refreshFamilies()).single.name, 'Rotation family');
+
+      // A late joiner reads both, through the key chain.
+      final late = await join('rot-late');
+      await late.sync(family.id);
+      expect(await late.watchMemories(family.id).first, hasLength(2));
+
+      await owner.deleteAccount();
+    },
+    skip: _serverDir == null
+        ? 'Set LIFETHREADS_FAMILY_SERVER_DIR to the server backend directory.'
+        : false,
+    timeout: const Timeout(Duration(minutes: 2)),
+  );
 }

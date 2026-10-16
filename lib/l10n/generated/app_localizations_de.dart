@@ -3675,4 +3675,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get importAction => 'Importieren';
+
+  @override
+  String get familyRemovingMember => 'Wird entfernt, die Wand wird gesichert…';
 }

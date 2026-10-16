@@ -115,6 +115,13 @@ abstract final class FamilyErrorCodes {
   static const nameTooLong = 'name_too_long';
   static const photoUnreadable = 'photo_unreadable';
   static const memoryNotFound = 'memory_not_found';
+
+  // Key rotation (server codes).
+  static const keyOutdated = 'key_outdated';
+  static const keyNotFound = 'key_not_found';
+  static const keySealMissing = 'key_seal_missing';
+  static const keyEpochConflict = 'key_epoch_conflict';
+  static const sealsIncomplete = 'seals_incomplete';
 }
 
 /// A failed API call with the server's JSON error body.
