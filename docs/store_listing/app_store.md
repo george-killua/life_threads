@@ -7,7 +7,7 @@ text 170, description 4000, keywords 100, What's New 4000).
 | | |
 |---|---|
 | Bundle ID | `dev.gkcoding.lifeThreads` (Apple ID 6821782747, team 443GVR9G8M) |
-| Version | 1.0.0 (15), from `pubspec.yaml`; the App Store version must also be named 1.0.0 |
+| Version | 1.0.0 (23), from `pubspec.yaml`; the App Store version must also be named 1.0.0 |
 | Name | LifeThreads: Memory Journal (the name on the home screen stays "LifeThreads") |
 | Primary / secondary category | Lifestyle / Photo & Video |
 | Copyright | 2026 GK Coding |
@@ -30,77 +30,75 @@ screenshots). Add the German and Arabic localizations from the language menu at 
 LifeThreads: Memory Journal
 ```
 
-**Subtitle** (30/30)
+**Subtitle** (29/30)
 
 ```text
-Photo diary for family & trips
+Photo diary & family memories
 ```
 
-**Promotional text** (149/170)
+**Promotional text** (152/170)
 
 ```text
-Turn your memories into stories with music, relive your year as a film, and share a private wall with your family. Your own wall stays on your phone.
+New: your memories on the home screen. Pin photos to a wall, connect them with threads, relive your year as a film and share a private wall with family.
 ```
 
-**Description** (1803/4000)
+**Description** (2029/4000)
 
 ```text
-LifeThreads is a private memory journal and photo diary for the moments you never want to lose.
+Your life, pinned to one wall.
 
-Pin your memories to a wall: the photos, the place, who was there and how it felt. Connect them with threads – your first home, the day your child was born, the summer by the sea – and watch your life become one story.
+LifeThreads turns your photos into a wall of memories you can take in at a glance, and ties them together with threads: your first home, the day your child was born, the summer by the sea. Private by design, no account needed.
 
-YOUR MEMORY WALL
-• Add memories with photos, a story, date, place, people and a feeling
-• Hang them on a warm, living wall and connect them with threads
-• Say why two moments belong together
-• Switch between wall, timeline and map
-• Open any memory as its own chapter
-
-STORIES WITH MUSIC (PREMIUM)
-• Turn memories into story images and short films for Instagram, WhatsApp, Snapchat and more
-• Pick a song and choose exactly which part plays
-• Reorder, add or remove memories before you share
-
-THREAD OF THE YEAR (PREMIUM)
-• Your year as a short film: the moments that mattered, in order, with music
-
-ON THIS DAY (PREMIUM)
-• A gentle reminder when a memory from an earlier year comes back
-
-FAMILY WALLS (PREMIUM)
-• A shared wall for your family where everyone adds their moments
-• End-to-end encrypted: we cannot see your family's memories
-• Join by private invite link; report and block are built in
+YOUR WALL OF MEMORIES – FREE
+• Add a memory in seconds: photos, a few words, the date, the place, who was there and how it felt
+• Pin it to a warm, living wall and tie it to other moments with a thread, and say why they belong together
+• See your life as a wall, a timeline or a map
+• Your month in memories: a look back when a month ends
+• Memories on your home screen with the LifeThreads widget
+• Interrupted while writing? Your memory waits as a draft
+• Show your wall on a TV or computer screen
 
 PRIVATE BY DESIGN
-• Your own wall needs no account and stays on your phone
-• No ads, no public feed, no tracking
-• Back up everything – photos included – into one file, free, and keep it wherever you like
-• Share a single memory as an encrypted capsule by private link, only when you choose
+• Your wall stays on your phone: no account, no ads, no tracking, no public feed
+• Lock LifeThreads with Face ID or your passcode, and hide memories only you should see
+• Back up everything, photos included, into one file for free and keep it wherever you like
+• Share a single memory by private, encrypted link, only when you choose
 
-FREE AND PREMIUM
-LifeThreads is free with up to 30 memories, full backups, the wall, timeline and map. Premium is a monthly subscription that adds unlimited memories, stories with music, Thread of the Year, On this day and family walls.
+PREMIUM
+• Unlimited memories (free: 30)
+• Stories with music: turn memories into story images and short films for Instagram, WhatsApp and more; pick the song and the part that plays
+• Thread of the Year: your year as a short film, with music
+• On this day: a gentle reminder when a memory from an earlier year comes back
+• More walls: one for each child, a trip or a project
+• Premium wall themes
+
+FAMILY WALLS (PREMIUM)
+• One shared wall where everyone adds their moments
+• End-to-end encrypted, so we can't read your family's memories (a memory only reaches us if a member reports it)
+• Only the person who creates the wall needs Premium: family members join free with a private invite link
+• Report and block are built in
+
+Premium is a monthly or yearly subscription; a year costs about as much as seven months. Cancel any time in your App Store settings.
 
 LifeThreads is available in English, German and Arabic.
 ```
 
-**Keywords** (98/100 bytes)
+**Keywords** (97/100 bytes)
 
 ```text
-scrapbook,timeline,story,travel,moments,album,gratitude,baby,keepsake,anniversary,private,vacation
+scrapbook,timeline,story,travel,album,baby,keepsake,anniversary,private,vacation,milestone,widget
 ```
 
-**What's New in this version** (422/4000)
+**What's New in this version** (375/4000)
 
 ```text
 LifeThreads 1.0 is here.
 
-• A living memory wall: photos, story, place, people and feelings, connected by threads
-• Wall, timeline and map views
-• Create Story: images and short films with music for Instagram, WhatsApp and more
-• Thread of the Year: your year as a short film
-• On this day: memories that come back
-• Family walls: a shared, end-to-end encrypted wall for your family
+• A living wall of memories, connected by threads, as a wall, timeline or map
+• New: your memories on the home screen with the widget
+• New: your month in memories, and drafts for unfinished memories
+• Stories and short films with music, and your year as a film
+• Family walls: shared and end-to-end encrypted
 • Free backup of everything in one file
 ```
 
@@ -113,77 +111,75 @@ LifeThreads 1.0 is here.
 LifeThreads: Erinnerungen
 ```
 
-**Subtitle** (25/30)
+**Subtitle** (29/30)
 
 ```text
-Foto-Tagebuch für Familie
+Foto-Tagebuch & Familienalbum
 ```
 
-**Promotional text** (156/170)
+**Promotional text** (161/170)
 
 ```text
-Mach aus Erinnerungen Storys mit Musik, erlebe dein Jahr als Film und teile eine private Wand mit deiner Familie. Deine eigene Wand bleibt auf deinem Handy.
+Neu: deine Erinnerungen auf dem Home-Bildschirm. Fotos an eine Wand pinnen, mit Fäden verbinden, dein Jahr als Film erleben und eine Wand mit der Familie teilen.
 ```
 
-**Description** (2056/4000)
+**Description** (2267/4000)
 
 ```text
-LifeThreads ist dein privates Foto-Tagebuch und Erinnerungsalbum für die Momente, die du nie verlieren willst.
+Dein Leben an einer Wand.
 
-Pinne deine Erinnerungen an eine Wand: die Fotos, den Ort, wer dabei war und wie es sich angefühlt hat. Verbinde sie mit Fäden – das erste Zuhause, der Tag, an dem dein Kind geboren wurde, der Sommer am Meer – und sieh, wie dein Leben zu einer Geschichte wird.
+LifeThreads macht aus deinen Fotos eine Wand voller Erinnerungen, die du auf einen Blick siehst, und verbindet sie mit Fäden: das erste Zuhause, der Tag, an dem dein Kind geboren wurde, der Sommer am Meer. Privat von Anfang an, ohne Konto.
 
-DEINE ERINNERUNGSWAND
-• Erinnerungen mit Fotos, Geschichte, Datum, Ort, Menschen und Gefühl festhalten
-• An eine warme, lebendige Wand hängen und mit Fäden verbinden
-• Festhalten, warum zwei Momente zusammengehören
-• Zwischen Wand, Zeitleiste und Karte wechseln
-• Jede Erinnerung als eigenes Kapitel öffnen
-
-STORYS MIT MUSIK (PREMIUM)
-• Erinnerungen als Story-Bilder und kurze Filme für Instagram, WhatsApp, Snapchat und mehr
-• Einen Song wählen und genau bestimmen, welcher Teil läuft
-• Erinnerungen vor dem Teilen sortieren, hinzufügen oder entfernen
-
-FADEN DES JAHRES (PREMIUM)
-• Dein Jahr als kurzer Film: die Momente, die gezählt haben, der Reihe nach, mit Musik
-
-AN DIESEM TAG (PREMIUM)
-• Eine sanfte Erinnerung, wenn ein Moment aus einem früheren Jahr zurückkommt
-
-FAMILIENWÄNDE (PREMIUM)
-• Eine gemeinsame Wand für deine Familie, an der alle ihre Momente hinzufügen
-• Ende-zu-Ende-verschlüsselt: Wir können die Erinnerungen deiner Familie nicht sehen
-• Beitritt per privatem Einladungslink; Melden und Blockieren sind eingebaut
+DEINE ERINNERUNGSWAND – GRATIS
+• Eine Erinnerung in Sekunden festhalten: Fotos, ein paar Worte, Datum, Ort, wer dabei war und wie es sich angefühlt hat
+• An eine warme, lebendige Wand pinnen, mit anderen Momenten durch einen Faden verbinden und sagen, warum sie zusammengehören
+• Dein Leben als Wand, Zeitleiste oder Karte sehen
+• Dein Monat in Erinnerungen: ein Rückblick am Monatsende
+• Erinnerungen auf dem Home-Bildschirm mit dem LifeThreads-Widget
+• Beim Schreiben unterbrochen? Deine Erinnerung wartet als Entwurf
+• Deine Wand auf einem Fernseher oder Computer zeigen
 
 PRIVAT VON ANFANG AN
-• Deine eigene Wand braucht kein Konto und bleibt auf deinem Handy
-• Keine Werbung, kein öffentlicher Feed, kein Tracking
-• Alles sichern – auch die Fotos – in einer Datei, kostenlos, und aufbewahren, wo du willst
-• Eine einzelne Erinnerung als verschlüsselte Kapsel per privatem Link teilen, nur wenn du willst
+• Deine Wand bleibt auf deinem Handy: kein Konto, keine Werbung, kein Tracking, kein öffentlicher Feed
+• LifeThreads mit Face ID oder Code sperren und Erinnerungen verbergen, die nur du sehen sollst
+• Alles sichern, auch die Fotos, in einer Datei, kostenlos, und aufbewahren, wo du willst
+• Eine einzelne Erinnerung per privatem, verschlüsseltem Link teilen, nur wenn du willst
 
-GRATIS UND PREMIUM
-LifeThreads ist kostenlos mit bis zu 30 Erinnerungen, vollständigen Backups, Wand, Zeitleiste und Karte. Premium ist ein Monatsabo mit unbegrenzten Erinnerungen, Storys mit Musik, dem Faden des Jahres, An diesem Tag und Familienwänden.
+PREMIUM
+• Unbegrenzte Erinnerungen (gratis: 30)
+• Storys mit Musik: Erinnerungen als Story-Bilder und kurze Filme für Instagram, WhatsApp und mehr; Song und Ausschnitt wählst du selbst
+• Faden des Jahres: dein Jahr als kurzer Film mit Musik
+• An diesem Tag: eine sanfte Erinnerung, wenn ein Moment aus einem früheren Jahr zurückkommt
+• Weitere Wände: eine für jedes Kind, eine Reise oder ein Projekt
+• Premium-Designs für deine Wand
+
+FAMILIENWÄNDE (PREMIUM)
+• Eine gemeinsame Wand, an der alle ihre Momente hinzufügen
+• Ende-zu-Ende-verschlüsselt, wir können die Erinnerungen deiner Familie nicht lesen (eine Erinnerung erreicht uns nur, wenn ein Mitglied sie meldet)
+• Nur wer die Wand erstellt, braucht Premium: Familienmitglieder treten kostenlos per privatem Einladungslink bei
+• Melden und Blockieren sind eingebaut
+
+Premium gibt es als Monats- oder Jahresabo; ein Jahr kostet etwa so viel wie sieben Monate. Jederzeit in den Einstellungen des App Store kündbar.
 
 LifeThreads gibt es auf Deutsch, Englisch und Arabisch.
 ```
 
-**Keywords** (98/100 bytes)
+**Keywords** (93/100 bytes)
 
 ```text
-fotoalbum,zeitleiste,story,reise,momente,privat,journal,baby,dankbarkeit,jahrestag,urlaub,andenken
+fotoalbum,zeitleiste,story,reise,momente,privat,journal,baby,jahrestag,urlaub,andenken,widget
 ```
 
-**What's New in this version** (463/4000)
+**What's New in this version** (407/4000)
 
 ```text
 LifeThreads 1.0 ist da.
 
-• Eine lebendige Erinnerungswand: Fotos, Geschichte, Ort, Menschen und Gefühle, mit Fäden verbunden
-• Wand, Zeitleiste und Karte
-• Story erstellen: Bilder und kurze Filme mit Musik für Instagram, WhatsApp und mehr
-• Faden des Jahres: dein Jahr als kurzer Film
-• An diesem Tag: Erinnerungen, die zurückkommen
-• Familienwände: eine gemeinsame, Ende-zu-Ende-verschlüsselte Wand für deine Familie
+• Eine lebendige Erinnerungswand, mit Fäden verbunden, als Wand, Zeitleiste oder Karte
+• Neu: deine Erinnerungen als Widget auf dem Home-Bildschirm
+• Neu: dein Monat in Erinnerungen und Entwürfe für angefangene Erinnerungen
+• Storys und kurze Filme mit Musik, dein Jahr als Film
+• Familienwände: gemeinsam und Ende-zu-Ende-verschlüsselt
 • Kostenloses Backup von allem in einer Datei
 ```
 
@@ -202,71 +198,69 @@ LifeThreads: دفتر ذكريات
 يوميات بالصور للعائلة والسفر
 ```
 
-**Promotional text** (108/170)
+**Promotional text** (116/170)
 
 ```text
-حوّل ذكرياتك إلى قصص مع الموسيقى، وعِش سنتك كفيلم، وشارك جداراً خاصاً مع عائلتك. جدارك الخاص يبقى على هاتفك.
+جديد: ذكرياتك على الشاشة الرئيسية. علّق صورك على جدار، واربطها بخيوط، وعِش سنتك كفيلم، وشارك جداراً خاصاً مع عائلتك.
 ```
 
-**Description** (1495/4000)
+**Description** (1642/4000)
 
 ```text
-LifeThreads دفتر ذكريات ويوميات بالصور، خاص بك، للّحظات التي لا تريد أن تفقدها أبداً.
+حياتك على جدار واحد.
 
-علّق ذكرياتك على جدار: الصور، والمكان، ومن كان معك، وكيف كان الشعور. اربطها بخيوط – بيتك الأول، يوم وُلد طفلك، صيف على البحر – وشاهد حياتك تصبح قصة واحدة.
+يحوّل LifeThreads صورك إلى جدار من الذكريات تراه بنظرة واحدة، ويربطها بخيوط: بيتك الأول، يوم وُلد طفلك، صيف على البحر. خاص بك منذ البداية، بلا حساب.
 
-جدار ذكرياتك
-• أضف ذكريات مع صور وقصة وتاريخ ومكان وأشخاص وشعور
-• علّقها على جدار دافئ وحيّ واربطها بخيوط
-• اكتب لماذا تنتمي لحظتان إلى بعضهما
-• تنقّل بين الجدار والخط الزمني والخريطة
-• افتح كل ذكرى كفصل خاص بها
-
-قصص مع موسيقى (PREMIUM)
-• حوّل ذكرياتك إلى صور قصص وأفلام قصيرة لإنستغرام وواتساب وسناب شات وغيرها
-• اختر أغنية وحدّد الجزء الذي يُعزف بالضبط
-• رتّب الذكريات أو أضف إليها أو احذف منها قبل المشاركة
-
-خيط السنة (PREMIUM)
-• سنتك كفيلم قصير: اللحظات التي صنعت الفرق، بالترتيب، مع موسيقى
-
-في مثل هذا اليوم (PREMIUM)
-• تذكير لطيف حين تعود إليك ذكرى من سنة سابقة
-
-جدران العائلة (PREMIUM)
-• جدار مشترك لعائلتك يضيف إليه الجميع لحظاتهم
-• مشفّر من طرف إلى طرف: لا يمكننا رؤية ذكريات عائلتك
-• الانضمام برابط دعوة خاص، مع خيارَي الإبلاغ والحظر
+جدار ذكرياتك – مجاناً
+• احفظ ذكرى في ثوانٍ: صور، بضع كلمات، التاريخ، المكان، من كان معك وكيف كان الشعور
+• علّقها على جدار دافئ وحيّ، واربطها بلحظات أخرى بخيط، واكتب لماذا تنتمي إليها
+• شاهد حياتك كجدار أو خط زمني أو خريطة
+• شهرك في ذكريات: نظرة إلى الوراء في نهاية كل شهر
+• ذكرياتك على الشاشة الرئيسية مع أداة LifeThreads
+• انقطعتَ أثناء الكتابة؟ ذكراك تنتظرك كمسودة
+• اعرض جدارك على تلفاز أو شاشة حاسوب
 
 الخصوصية أولاً
-• جدارك الخاص لا يحتاج إلى حساب ويبقى على هاتفك
-• لا إعلانات، لا صفحة عامة، لا تتبّع
-• احفظ نسخة احتياطية من كل شيء – مع الصور – في ملف واحد، مجاناً، واحتفظ بها أينما شئت
-• شارك ذكرى واحدة ككبسولة مشفّرة برابط خاص، فقط حين تختار ذلك
+• جدارك يبقى على هاتفك: لا حساب، لا إعلانات، لا تتبّع، لا صفحة عامة
+• اقفل LifeThreads ببصمة الوجه أو رمز الدخول، وأخفِ الذكريات التي لا يجب أن يراها غيرك
+• احفظ نسخة احتياطية من كل شيء، مع الصور، في ملف واحد مجاناً، واحتفظ بها أينما شئت
+• شارك ذكرى واحدة برابط خاص ومشفّر، فقط حين تختار ذلك
 
-مجاني وPremium
-LifeThreads مجاني حتى 30 ذكرى، مع نسخ احتياطية كاملة والجدار والخط الزمني والخريطة. Premium اشتراك شهري يضيف ذكريات بلا حدود، وقصصاً مع الموسيقى، وخيط السنة، وفي مثل هذا اليوم، وجدران العائلة.
+Premium
+• ذكريات بلا حدود (مجاناً: 30)
+• قصص مع موسيقى: حوّل ذكرياتك إلى صور قصص وأفلام قصيرة لإنستغرام وواتساب وغيرها، واختر الأغنية والجزء الذي يُعزف
+• خيط السنة: سنتك كفيلم قصير مع موسيقى
+• في مثل هذا اليوم: تذكير لطيف حين تعود إليك ذكرى من سنة سابقة
+• جدران إضافية: جدار لكل طفل أو رحلة أو مشروع
+• تصاميم Premium لجدارك
+
+جدران العائلة (Premium)
+• جدار مشترك يضيف إليه الجميع لحظاتهم
+• مشفّر من طرف إلى طرف، فلا يمكننا قراءة ذكريات عائلتك (لا تصلنا ذكرى إلا إذا أبلغ عنها أحد الأعضاء)
+• يحتاج Premium من يُنشئ الجدار فقط: ينضم أفراد العائلة مجاناً برابط دعوة خاص
+• الإبلاغ والحظر متاحان
+
+Premium اشتراك شهري أو سنوي؛ السنة تكلّف تقريباً ما تكلّفه سبعة أشهر. يمكنك الإلغاء في أي وقت من إعدادات App Store.
 
 LifeThreads متاح بالعربية والإنجليزية والألمانية.
 ```
 
-**Keywords** (79/100 bytes)
+**Keywords** (97/100 bytes)
 
 ```text
-ذكرى,ألبوم,عائلة,قصة,لحظات,مذكرات,رحلات,طفل
+ألبوم,قصة,لحظات,مذكرات,رحلات,طفل,ذكرى,أداة,خريطة,زواج
 ```
 
-**What's New in this version** (349/4000)
+**What's New in this version** (309/4000)
 
 ```text
 وصل LifeThreads 1.0.
 
-• جدار ذكريات حيّ: صور وقصة ومكان وأشخاص ومشاعر، تربطها خيوط
-• عرض الجدار والخط الزمني والخريطة
-• إنشاء قصة: صور وأفلام قصيرة مع موسيقى لإنستغرام وواتساب وغيرها
-• خيط السنة: سنتك كفيلم قصير
-• في مثل هذا اليوم: ذكريات تعود إليك
-• جدران العائلة: جدار مشترك ومشفّر من طرف إلى طرف لعائلتك
+• جدار ذكريات حيّ تربطه خيوط، كجدار أو خط زمني أو خريطة
+• جديد: ذكرياتك على الشاشة الرئيسية مع الأداة
+• جديد: شهرك في ذكريات، ومسودات للذكريات غير المكتملة
+• قصص وأفلام قصيرة مع موسيقى، وسنتك كفيلم
+• جدران العائلة: مشتركة ومشفّرة من طرف إلى طرف
 • نسخة احتياطية مجانية لكل شيء في ملف واحد
 ```
 
@@ -292,7 +286,10 @@ language in order: wall, memory, story, timeline, add.
 No text in the artwork (Apple overlays the icon and name at the bottom left, which stays dark),
 so the same images serve every language. Check the result with **Vorschau** in App Store Connect.
 
-## In-app purchase: LifeThreads Premium Monthly
+## In-app purchases: LifeThreads Premium (yearly and monthly)
+
+The yearly plan (`lifethreads_premium_yearly`, €34.99, Austria as the base, level 1 in the group)
+is set up as described in [store_setup_yearly.md](../store_setup_yearly.md). The monthly plan:
 
 | | |
 |---|---|
@@ -316,7 +313,7 @@ Sign-in required: **No** (leave the demo account empty). Notes:
 ```text
 LifeThreads is a private memory wall. No account is needed: on first launch choose "Preview demo wall" to see nine sample memories, or start an empty wall.
 
-Premium (monthly auto-renewing subscription "lifethreads_premium_monthly") unlocks unlimited memories (free: 30), Create Story (story images and videos with music), Thread of the Year, On this day and family walls. Open it from Settings or any Premium feature; the Premium page shows the price, the renewal terms and links to the Terms of Use and Privacy Policy, plus Restore.
+Premium (auto-renewing subscriptions "lifethreads_premium_yearly" and "lifethreads_premium_monthly", same benefits) unlocks unlimited memories (free: 30), more walls, Premium wall themes, Create Story (story images and videos with music), Thread of the Year, On this day and family walls. Open it from Settings or any Premium feature; the Premium page shows the price, the renewal terms and links to the Terms of Use and Privacy Policy, plus Restore.
 
 Family walls (Premium) are shared, end-to-end encrypted walls. They need Sign in with Apple; creating a wall needs an active subscription (verified with the App Store Server API). Members join by a one-time invite link. Every member can report a memory or a member and block members; reports are reviewed within 24 hours (info@gkcoding.dev). Account deletion: Family walls > Account > Delete account.
 
