@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -304,7 +305,8 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
       (purchase) =>
           PremiumProductIds.all.contains(purchase.productID) &&
           purchase.status != PurchaseStatus.error &&
-          purchase.status != PurchaseStatus.canceled,
+          purchase.status != PurchaseStatus.canceled &&
+          !_isRevokedOrExpired(purchase),
     );
     if (!hasOwnPurchase) _markRestoreDelivered(found: false);
     for (final purchase in purchases) {
@@ -325,6 +327,14 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
       case PurchaseStatus.pending:
         _markRestoreDelivered();
         _markPending();
+      case PurchaseStatus.purchased || PurchaseStatus.restored
+          when _isRevokedOrExpired(purchase):
+        // StoreKit 2 reports a refund (or a lapsed period) as a "purchased"
+        // update. Ask the store what is still active: that grants Premium
+        // for a current subscription and revokes it otherwise.
+        if (_restoreInFlight == null) {
+          unawaited(restorePurchases(silent: true));
+        }
       case PurchaseStatus.purchased:
         await _deliverPurchase(purchase, PremiumPurchaseStatus.purchased);
       case PurchaseStatus.restored:
@@ -346,6 +356,22 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
           message: PremiumPurchaseMessage.canceled,
         );
     }
+  }
+
+  /// An App Store transaction that was refunded or whose period is over,
+  /// read from its StoreKit 2 JSON (`revocationDate`, `expiresDate`, in ms).
+  /// Play purchases carry neither and count as active.
+  static bool _isRevokedOrExpired(PurchaseDetails purchase) {
+    final Object? json;
+    try {
+      json = jsonDecode(purchase.verificationData.localVerificationData);
+    } on FormatException {
+      return false;
+    }
+    if (json is! Map) return false;
+    if (json['revocationDate'] != null) return true;
+    final expires = json['expiresDate'];
+    return expires is num && expires < DateTime.now().millisecondsSinceEpoch;
   }
 
   void _markRestoreDelivered({bool found = true}) {

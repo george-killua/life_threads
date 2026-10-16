@@ -3678,4 +3678,22 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get familyDisplayNameNotSaved =>
       'تعذّر حفظ اسمك على هذا الجدار. يمكنك تعيينه من إعدادات الجدار.';
+
+  @override
+  String importBackupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'يحتوي على $count ذكرى.',
+      many: 'يحتوي على $count ذكرى.',
+      few: 'يحتوي على $count ذكريات.',
+      two: 'يحتوي على ذكريين.',
+      one: 'يحتوي على ذكرى واحدة.',
+      zero: 'لا يحتوي على ذكريات.',
+    );
+    return '$_temp0 الذكريات الموجودة على جدرانك تبقى ولا تُضاف مرتين.';
+  }
+
+  @override
+  String get importAction => 'استيراد';
 }

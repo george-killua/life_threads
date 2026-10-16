@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -295,7 +296,44 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     await _replaceLegacyDemoWall();
     await _syncDemoAssetCovers();
     await _localizeDemoRows(await _appLocale());
-    return _loadState();
+    final loaded = await _loadState();
+    unawaited(_sweepOrphanPhotosOnce());
+    return loaded;
+  }
+
+  static const _orphanPhotosSweptKey = 'orphan_photos_swept_v1';
+
+  /// Once: deletes photo copies earlier versions left behind (photos removed
+  /// before saving, re-imported backups, the family editor). Kept: whatever
+  /// a memory or the draft uses, and anything from the last day (a copy that
+  /// may still be on its way into a memory).
+  Future<void> _sweepOrphanPhotosOnce() async {
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      if (preferences.getBool(_orphanPhotosSweptKey) ?? false) return;
+      final photosDir = await AppStoragePaths.memoryPhotosDirectory();
+      if (await photosDir.exists()) {
+        final draft = await ref.read(memoryDraftStoreProvider).load();
+        final inDraft = {
+          for (final photo in draft?.photos ?? const [])
+            p.normalize(photo.localPath),
+        };
+        final recent = DateTime.now().subtract(const Duration(days: 1));
+        final candidates = <String>{};
+        await for (final entity in photosDir.list()) {
+          if (entity is! File) continue;
+          final path = p.normalize(entity.path);
+          if (inDraft.contains(path)) continue;
+          if ((await entity.lastModified()).isAfter(recent)) continue;
+          candidates.add(path);
+        }
+        // Deletes only those no memory uses.
+        await _deleteUnreferencedPhotoFiles(candidates);
+      }
+      await preferences.setBool(_orphanPhotosSweptKey, true);
+    } catch (_) {
+      // Best effort; tried again on the next launch.
+    }
   }
 
   /// The app's language: the one chosen in Settings, or the phone's.

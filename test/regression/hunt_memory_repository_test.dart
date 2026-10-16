@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:life_threads/core/database/database_provider.dart';
 import 'package:life_threads/features/backup/domain/backup_models.dart';
+import 'package:life_threads/features/media/data/picked_memory_photo.dart';
+import 'package:life_threads/features/memories/data/memory_draft_store.dart';
 import 'package:life_threads/features/memories/data/memory_repository.dart';
 import 'package:life_threads/features/memories/data/memory_seed_data.dart';
 import 'package:life_threads/features/memories/domain/memory_category.dart';
@@ -44,6 +46,71 @@ void main() {
   });
   tearDown(() async {
     if (await docs.exists()) await docs.delete(recursive: true);
+  });
+
+  test('photo copies left by older versions are deleted once', () async {
+    // Set up with the cleanup already done; it runs again further down.
+    SharedPreferences.setMockInitialValues({'orphan_photos_swept_v1': true});
+    final dir = Directory('${docs.path}/memory_photos')..createSync();
+    File photo(String name, {bool old = true}) {
+      final file = File('${dir.path}/$name')..writeAsBytesSync([1]);
+      if (old) {
+        file.setLastModifiedSync(
+          DateTime.now().subtract(const Duration(days: 3)),
+        );
+      }
+      return file;
+    }
+
+    final used = photo('used.jpg');
+    var c = _container();
+    await c.read(memoryRepositoryProvider.future);
+    await c
+        .read(memoryRepositoryProvider.notifier)
+        .addMemory(
+          NewMemoryDraft(
+            title: 'Kept',
+            description: '',
+            category: MemoryCategory.personal,
+            memoryType: MemoryType.moment,
+            feeling: MemoryFeeling.warm,
+            occurredAt: DateTime(2025, 1, 1),
+            locationLabel: '',
+            coverPhotoPath: used.path,
+          ),
+        );
+    c.dispose();
+
+    final orphan = photo('orphan.jpg');
+    final drafted = photo('draft.jpg');
+    final fresh = photo('fresh.jpg', old: false);
+    await MemoryDraftStore(documentsPath: () async => docs.path).save(
+      MemoryDraft(
+        savedAt: DateTime(2026),
+        title: 'Draft',
+        photos: [
+          PickedMemoryPhoto(
+            localPath: drafted.path,
+            capturedAt: DateTime(2026),
+            width: 1,
+            height: 1,
+            hasCapturedDate: false,
+            hasDimensions: true,
+          ),
+        ],
+      ),
+    );
+    // The first launch after the update.
+    (await SharedPreferences.getInstance()).remove('orphan_photos_swept_v1');
+    c = _container();
+    addTearDown(c.dispose);
+    await c.read(memoryRepositoryProvider.future);
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+
+    expect(orphan.existsSync(), isFalse);
+    expect(used.existsSync(), isTrue);
+    expect(drafted.existsSync(), isTrue);
+    expect(fresh.existsSync(), isTrue);
   });
 
   test('M1-01 moving a note keeps the list of personal walls', () async {

@@ -6170,6 +6170,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your name on this wall couldn\'t be saved. You can set it in the wall\'s settings.'**
   String get familyDisplayNameNotSaved;
+
+  /// No description provided for @importBackupCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{It has 1 memory.} other{It has {count} memories.}} Memories already on your walls are kept and not added twice.'**
+  String importBackupCount(int count);
+
+  /// No description provided for @importAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get importAction;
 }
 
 class _AppLocalizationsDelegate

@@ -3627,4 +3627,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get familyDisplayNameNotSaved =>
       'Your name on this wall couldn\'t be saved. You can set it in the wall\'s settings.';
+
+  @override
+  String importBackupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'It has $count memories.',
+      one: 'It has 1 memory.',
+    );
+    return '$_temp0 Memories already on your walls are kept and not added twice.';
+  }
+
+  @override
+  String get importAction => 'Import';
 }

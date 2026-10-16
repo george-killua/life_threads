@@ -1,6 +1,7 @@
 // Regression tests from the 2026-10-16 whole-codebase bug hunt:
 // an expired iOS (StoreKit 2) subscription must end Premium.
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -106,4 +107,42 @@ void main() {
       );
     },
   );
+
+  test('a refund reported while the app is open ends premium', () async {
+    // Active at launch.
+    store.onRestore = () => [
+      _transaction({'expiresDate': _inDays(30)}),
+    ];
+    container.read(premiumBillingProvider);
+    await _settle(400);
+    expect(container.read(premiumEntitlementProvider).value!.isPremium, isTrue);
+
+    // Refunded: StoreKit 2 sends a "purchased" update with a revocationDate,
+    // and the subscription is no longer a current entitlement.
+    store.onRestore = () => [];
+    store.controller.add([
+      _transaction({'expiresDate': _inDays(30), 'revocationDate': _inDays(0)}),
+    ]);
+    await _settle(800);
+    expect(
+      container.read(premiumEntitlementProvider).value!.isPremium,
+      isFalse,
+    );
+  });
 }
+
+int _inDays(int days) =>
+    DateTime.now().add(Duration(days: days)).millisecondsSinceEpoch;
+
+/// A StoreKit 2 transaction for the monthly plan with [json] fields.
+PurchaseDetails _transaction(Map<String, Object?> json) => PurchaseDetails(
+  purchaseID: 'tx',
+  productID: PremiumProductIds.monthlySubscription,
+  verificationData: PurchaseVerificationData(
+    localVerificationData: jsonEncode(json),
+    serverVerificationData: 'jws',
+    source: 'app_store',
+  ),
+  transactionDate: '0',
+  status: PurchaseStatus.purchased,
+);

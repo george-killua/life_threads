@@ -1037,6 +1037,38 @@ Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
         .read(backupServiceProvider)
         .pickAndPrepareImport(password: password);
     if (!context.mounted || backup == null) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.importBackupQuestion),
+        content: Text(
+          '${l10n.importBackupBody}\n\n'
+          '${l10n.importBackupCount(backup.events.length)}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            key: const ValueKey('import-backup-confirm'),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.importAction),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) {
+      // The archive's photos were unpacked already; nothing uses them.
+      for (final path in backup.photoPaths.values.toSet()) {
+        try {
+          final file = File(path);
+          if (await file.exists()) await file.delete();
+        } catch (_) {}
+      }
+      return;
+    }
+    if (!context.mounted) return;
     final result = await ref
         .read(memoryRepositoryProvider.notifier)
         .importBackup(backup);

@@ -83,6 +83,11 @@ What changed in each TestFlight / Play build. Newest first.
   title is translated.
 - iPhone widget: says to open the app before its first update instead of
   showing a sample memory.
+- A refund while the app is open ends Premium right away (not only at the
+  next launch).
+- Once after the update, photo copies older versions left behind are
+  deleted (kept: anything a memory or the draft uses, and the last day's).
+- Importing a backup asks first and says how many memories it has.
 
 ## 1.0.0 (22) – 16 October 2026
 

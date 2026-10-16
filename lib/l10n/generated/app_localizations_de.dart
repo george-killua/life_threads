@@ -3661,4 +3661,18 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get familyDisplayNameNotSaved =>
       'Dein Name auf dieser Wand konnte nicht gespeichert werden. Du kannst ihn in den Einstellungen der Wand festlegen.';
+
+  @override
+  String importBackupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Es enthält $count Erinnerungen.',
+      one: 'Es enthält 1 Erinnerung.',
+    );
+    return '$_temp0 Erinnerungen, die schon auf deinen Wänden sind, bleiben und werden nicht doppelt hinzugefügt.';
+  }
+
+  @override
+  String get importAction => 'Importieren';
 }
