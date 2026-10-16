@@ -3605,4 +3605,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String yearThreadAddMemoryTo(String year) {
     return 'أضف ذكرى إلى $year';
   }
+
+  @override
+  String get onboardingHangTitle => 'علّق ذكرياتك';
+
+  @override
+  String get onboardingHangText =>
+      'صورة، مكان، والأشخاص الذين كانوا هناك – جدارك يكبر مع حياتك.';
+
+  @override
+  String get onboardingConnectTitle => 'اربطها بالخيوط';
+
+  @override
+  String get onboardingConnectText =>
+      'قل لماذا ينتمي لحظتان لبعضهما. الخيوط تُظهر كيف تترابط قصتك.';
+
+  @override
+  String get onboardingComeBackTitle => 'ذكرياتك تعود إليك';
+
+  @override
+  String get onboardingComeBackText =>
+      'في مثل هذا اليوم، شهرك في نظرة، سنتك كفيلم – وأداة على شاشتك الرئيسية.';
+
+  @override
+  String get onboardingPrivateText =>
+      'دون حساب. كل شيء يبقى على هاتفك – مع Face ID إن أردت.';
+
+  @override
+  String get onboardingNameStaysHere =>
+      'للترحيب بك فقط – ويبقى على هذا الهاتف.';
 }

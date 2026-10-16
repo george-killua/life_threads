@@ -3554,4 +3554,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String yearThreadAddMemoryTo(String year) {
     return 'Add a memory to $year';
   }
+
+  @override
+  String get onboardingHangTitle => 'Hang your memories';
+
+  @override
+  String get onboardingHangText =>
+      'A photo, a place, the people who were there – your wall grows with your life.';
+
+  @override
+  String get onboardingConnectTitle => 'Connect them with threads';
+
+  @override
+  String get onboardingConnectText =>
+      'Say why two moments belong together. The threads show how your story fits.';
+
+  @override
+  String get onboardingComeBackTitle => 'Memories come back to you';
+
+  @override
+  String get onboardingComeBackText =>
+      'On this day, your month looked back, your year as a film – and a widget on your home screen.';
+
+  @override
+  String get onboardingPrivateText =>
+      'No account. Everything stays on your phone – with Face ID if you like.';
+
+  @override
+  String get onboardingNameStaysHere =>
+      'Only for greeting you – it stays on this phone.';
 }

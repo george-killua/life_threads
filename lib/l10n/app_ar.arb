@@ -1051,5 +1051,13 @@
   "homeWidgetPrivacyNote": "لا تظهر الذكريات المخفية على الأداة أبداً. ومع قفل التطبيق لا تعرض أي ذكرى.",
   "yearThreadAlmostThere": "اقتربت",
   "yearThreadMemoriesFrom": "ذكريات من",
-  "yearThreadAddMemoryTo": "أضف ذكرى إلى {year}"
+  "yearThreadAddMemoryTo": "أضف ذكرى إلى {year}",
+  "onboardingHangTitle": "علّق ذكرياتك",
+  "onboardingHangText": "صورة، مكان، والأشخاص الذين كانوا هناك – جدارك يكبر مع حياتك.",
+  "onboardingConnectTitle": "اربطها بالخيوط",
+  "onboardingConnectText": "قل لماذا ينتمي لحظتان لبعضهما. الخيوط تُظهر كيف تترابط قصتك.",
+  "onboardingComeBackTitle": "ذكرياتك تعود إليك",
+  "onboardingComeBackText": "في مثل هذا اليوم، شهرك في نظرة، سنتك كفيلم – وأداة على شاشتك الرئيسية.",
+  "onboardingPrivateText": "دون حساب. كل شيء يبقى على هاتفك – مع Face ID إن أردت.",
+  "onboardingNameStaysHere": "للترحيب بك فقط – ويبقى على هذا الهاتف."
 }

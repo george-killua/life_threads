@@ -3588,4 +3588,33 @@ class AppLocalizationsDe extends AppLocalizations {
   String yearThreadAddMemoryTo(String year) {
     return 'Erinnerung zu $year hinzufügen';
   }
+
+  @override
+  String get onboardingHangTitle => 'Erinnerungen aufhängen';
+
+  @override
+  String get onboardingHangText =>
+      'Ein Foto, ein Ort, die Menschen, die dabei waren – deine Wand wächst mit deinem Leben.';
+
+  @override
+  String get onboardingConnectTitle => 'Mit Fäden verbinden';
+
+  @override
+  String get onboardingConnectText =>
+      'Sag, warum zwei Momente zusammengehören. Die Fäden zeigen, wie deine Geschichte zusammenhängt.';
+
+  @override
+  String get onboardingComeBackTitle => 'Erinnerungen kommen zu dir zurück';
+
+  @override
+  String get onboardingComeBackText =>
+      'An diesem Tag, dein Monat im Rückblick, dein Jahr als Film – und ein Widget auf dem Home-Bildschirm.';
+
+  @override
+  String get onboardingPrivateText =>
+      'Kein Konto. Alles bleibt auf deinem Handy – mit Face ID, wenn du möchtest.';
+
+  @override
+  String get onboardingNameStaysHere =>
+      'Nur für die Begrüßung – er bleibt auf diesem Handy.';
 }

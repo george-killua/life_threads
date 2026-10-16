@@ -103,21 +103,28 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     ),
                     _HowItWorksStep(
                       title: l10n.howItWorks,
+                      // What the app does, what comes back, and that it
+                      // stays private.
                       cards: [
                         (
-                          Icons.auto_awesome_rounded,
-                          l10n.storyWallTitle,
-                          l10n.storyWallText,
+                          Icons.photo_library_rounded,
+                          l10n.onboardingHangTitle,
+                          l10n.onboardingHangText,
                         ),
                         (
                           Icons.hub_rounded,
-                          l10n.storyConnectTitle,
-                          l10n.storyConnectText,
+                          l10n.onboardingConnectTitle,
+                          l10n.onboardingConnectText,
+                        ),
+                        (
+                          Icons.event_repeat_rounded,
+                          l10n.onboardingComeBackTitle,
+                          l10n.onboardingComeBackText,
                         ),
                         (
                           Icons.lock_rounded,
                           l10n.storyPrivacyTitle,
-                          l10n.onboardingPrivacyShort,
+                          l10n.onboardingPrivateText,
                         ),
                       ],
                     ),
@@ -361,19 +368,48 @@ class _WelcomeStep extends StatelessWidget {
   }
 }
 
-class _HowItWorksStep extends StatelessWidget {
+/// The features, sliding in one after another (still with Reduce Motion).
+class _HowItWorksStep extends StatefulWidget {
   const _HowItWorksStep({required this.title, required this.cards});
 
   final String title;
   final List<(IconData, String, String)> cards;
 
   @override
+  State<_HowItWorksStep> createState() => _HowItWorksStepState();
+}
+
+class _HowItWorksStepState extends State<_HowItWorksStep>
+    with SingleTickerProviderStateMixin {
+  late final _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1100),
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.value = 1;
+    } else if (_controller.value == 0) {
+      _controller.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final count = widget.cards.length;
     return ListView(
       padding: const EdgeInsets.fromLTRB(22, 12, 22, 12),
       children: [
         Text(
-          title,
+          widget.title,
           style: const TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.w900,
@@ -381,8 +417,24 @@ class _HowItWorksStep extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 18),
-        for (final card in cards) ...[
-          _FeatureCard(icon: card.$1, title: card.$2, text: card.$3),
+        for (final (index, card) in widget.cards.indexed) ...[
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              final start = 0.5 * index / count;
+              final t = Curves.easeOutCubic.transform(
+                ((_controller.value - start) / 0.5).clamp(0.0, 1.0),
+              );
+              return Opacity(
+                opacity: t,
+                child: Transform.translate(
+                  offset: Offset(0, (1 - t) * 18),
+                  child: child,
+                ),
+              );
+            },
+            child: _FeatureCard(icon: card.$1, title: card.$2, text: card.$3),
+          ),
           const SizedBox(height: 12),
         ],
       ],
@@ -437,8 +489,6 @@ class _FeatureCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   text,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.muted,
                     height: 1.35,
@@ -510,6 +560,22 @@ class _NameStep extends StatelessWidget {
               borderSide: BorderSide(color: AppColors.gold, width: 1.4),
             ),
           ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Icon(Icons.lock_rounded, size: 16, color: AppColors.muted),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                context.l10n.onboardingNameStaysHere,
+                style: TextStyle(
+                  color: AppColors.muted,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
         ),
         if (preview != null) ...[
           const SizedBox(height: 18),

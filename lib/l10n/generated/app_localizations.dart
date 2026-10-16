@@ -6050,6 +6050,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add a memory to {year}'**
   String yearThreadAddMemoryTo(String year);
+
+  /// No description provided for @onboardingHangTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hang your memories'**
+  String get onboardingHangTitle;
+
+  /// No description provided for @onboardingHangText.
+  ///
+  /// In en, this message translates to:
+  /// **'A photo, a place, the people who were there – your wall grows with your life.'**
+  String get onboardingHangText;
+
+  /// No description provided for @onboardingConnectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect them with threads'**
+  String get onboardingConnectTitle;
+
+  /// No description provided for @onboardingConnectText.
+  ///
+  /// In en, this message translates to:
+  /// **'Say why two moments belong together. The threads show how your story fits.'**
+  String get onboardingConnectText;
+
+  /// No description provided for @onboardingComeBackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Memories come back to you'**
+  String get onboardingComeBackTitle;
+
+  /// No description provided for @onboardingComeBackText.
+  ///
+  /// In en, this message translates to:
+  /// **'On this day, your month looked back, your year as a film – and a widget on your home screen.'**
+  String get onboardingComeBackText;
+
+  /// No description provided for @onboardingPrivateText.
+  ///
+  /// In en, this message translates to:
+  /// **'No account. Everything stays on your phone – with Face ID if you like.'**
+  String get onboardingPrivateText;
+
+  /// No description provided for @onboardingNameStaysHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Only for greeting you – it stays on this phone.'**
+  String get onboardingNameStaysHere;
 }
 
 class _AppLocalizationsDelegate

@@ -1693,5 +1693,13 @@
         "type": "String"
       }
     }
-  }
+  },
+  "onboardingHangTitle": "Hang your memories",
+  "onboardingHangText": "A photo, a place, the people who were there – your wall grows with your life.",
+  "onboardingConnectTitle": "Connect them with threads",
+  "onboardingConnectText": "Say why two moments belong together. The threads show how your story fits.",
+  "onboardingComeBackTitle": "Memories come back to you",
+  "onboardingComeBackText": "On this day, your month looked back, your year as a film – and a widget on your home screen.",
+  "onboardingPrivateText": "No account. Everything stays on your phone – with Face ID if you like.",
+  "onboardingNameStaysHere": "Only for greeting you – it stays on this phone."
 }

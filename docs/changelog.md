@@ -2,6 +2,18 @@
 
 What changed in each TestFlight / Play build. Newest first.
 
+## Next build – 16 October 2026 (not uploaded yet)
+
+**Onboarding redesign**
+- The demo wall preview comes alive: six cards hang in two rows, appear
+  one after another, sway, and the threads draw themselves between their
+  pins.
+- "How it works" shows four features sliding in: Hang your memories,
+  Connect them with threads, Memories come back to you (On this day, month
+  look-back, Thread of the Year, widget) and Private by default.
+- The name step says the name stays on the phone.
+- No motion with Reduce Motion.
+
 ## 1.0.0 (22) – 16 October 2026
 
 Uploaded to TestFlight and to Google Play closed testing (alpha).
