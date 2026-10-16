@@ -135,7 +135,7 @@ footer { color: var(--muted); font-size: 13px; }
     <p class="lead" data-t="lead"></p>
     <dl class="meta">
       <div><dt data-t="mApp"></dt><dd class="ltr">LifeThreads – Memory Wall</dd></div>
-      <div><dt data-t="mBuild"></dt><dd class="ltr">1.0.0 (21)</dd></div>
+      <div><dt data-t="mBuild"></dt><dd class="ltr">1.0.0 (23)</dd></div>
       <div><dt data-t="mPlatforms"></dt><dd>iOS (TestFlight) · Android (Play)</dd></div>
       <div><dt data-t="mPeriod"></dt><dd data-t="period"></dd></div>
       <div><dt data-t="mContact"></dt><dd class="ltr">info@gkcoding.dev</dd></div>
@@ -217,7 +217,7 @@ var T = {
     reportLead: "When you are done, copy the report and send it by email or message to George. Failed and blocked tests come first.",
     copy: "Copy report", copied: "Copied.", copyFail: "Select the text below and copy it.",
     reset: "Clear all my answers", resetQ: "Clear every result and note in this browser?", resetYes: "Yes, clear", resetNo: "Keep",
-    footer: "LifeThreads by GK Coding · Test protocol for build 1.0.0 (21) · Your answers are saved only in this browser.",
+    footer: "LifeThreads by GK Coding · Test protocol for build 1.0.0 (23) · Your answers are saved only in this browser.",
     rTitle: "LIFETHREADS TEST REPORT", rIssues: "FAILED / BLOCKED", rAll: "ALL RESULTS", rNone: "none", rOpen: "not tested"
   },
   de: {
@@ -242,7 +242,7 @@ var T = {
     reportLead: "Wenn du fertig bist, kopiere den Bericht und schick ihn per E-Mail oder Nachricht an George. Fehler und blockierte Tests stehen oben.",
     copy: "Bericht kopieren", copied: "Kopiert.", copyFail: "Markiere den Text unten und kopiere ihn.",
     reset: "Alle meine Antworten löschen", resetQ: "Alle Ergebnisse und Notizen in diesem Browser löschen?", resetYes: "Ja, löschen", resetNo: "Behalten",
-    footer: "LifeThreads von GK Coding · Testprotokoll für Build 1.0.0 (21) · Deine Antworten werden nur in diesem Browser gespeichert.",
+    footer: "LifeThreads von GK Coding · Testprotokoll für Build 1.0.0 (23) · Deine Antworten werden nur in diesem Browser gespeichert.",
     rTitle: "LIFETHREADS TESTBERICHT", rIssues: "FEHLER / BLOCKIERT", rAll: "ALLE ERGEBNISSE", rNone: "keine", rOpen: "nicht getestet"
   }
 };
@@ -286,8 +286,8 @@ var AREAS = [
     en: ["Free limit", ["Without Premium, add memories until you reach 30 (only if you have time)."], "At 30 memories the app explains the free limit kindly and offers Premium. Nothing you saved is lost."],
     de: ["Gratis-Limit", ["Ohne Premium Erinnerungen anlegen, bis es 30 sind (nur wenn du Zeit hast)."], "Bei 30 Erinnerungen erklärt die App das Gratis-Limit freundlich und bietet Premium an. Nichts Gespeichertes geht verloren."] },
   { id: "WAL-09", p: 2,
-    en: ["Search, several walls, hidden memories", ["Tap the magnifier and search for a place, a person or a year.", "Premium: More › New wall, give it a name. Use Move memories here (or a memory's menu › Move to wall).", "Open a memory's menu and choose Hide. Then View › Hidden memories."], "Search finds memories as you type. Each wall shows only its own memories; the switcher at the top changes walls. A hidden memory leaves the wall and comes back only after Face ID or the passcode."],
-    de: ["Suche, mehrere Wände, ausgeblendete Erinnerungen", ["Auf die Lupe tippen und nach einem Ort, einer Person oder einem Jahr suchen.", "Premium: Mehr › Neue Wand, benennen. Erinnerungen hierher verschieben nutzen (oder im Menü einer Erinnerung › Auf Wand verschieben).", "Im Menü einer Erinnerung Ausblenden wählen. Dann Ansicht › Ausgeblendete Erinnerungen."], "Die Suche findet Erinnerungen beim Tippen. Jede Wand zeigt nur ihre eigenen Erinnerungen; oben wechselst du die Wand. Eine ausgeblendete Erinnerung verschwindet von der Wand und kommt nur nach Face ID oder Code zurück."] },
+    en: ["Search, several walls, hidden memories", ["Tap the magnifier and search for a place, a person or a year.", "Premium: More › New wall, give it a name. Use Move memories here (or a memory's menu › Move to wall).", "Open a memory's menu and choose Hide. Then View › Hidden memories."], "Search finds memories as you type. Each wall shows only its own memories; the switcher at the top changes walls. A hidden memory leaves the wall and comes back only after Face ID or the passcode, and only on that wall. A visible memory threaded to a hidden one doesn't show it among its threads, and sharing the visible memory doesn't include it."],
+    de: ["Suche, mehrere Wände, ausgeblendete Erinnerungen", ["Auf die Lupe tippen und nach einem Ort, einer Person oder einem Jahr suchen.", "Premium: Mehr › Neue Wand, benennen. Erinnerungen hierher verschieben nutzen (oder im Menü einer Erinnerung › Auf Wand verschieben).", "Im Menü einer Erinnerung Ausblenden wählen. Dann Ansicht › Ausgeblendete Erinnerungen."], "Die Suche findet Erinnerungen beim Tippen. Jede Wand zeigt nur ihre eigenen Erinnerungen; oben wechselst du die Wand. Eine ausgeblendete Erinnerung verschwindet von der Wand und kommt nur nach Face ID oder Code zurück, und nur auf dieser Wand. Eine sichtbare Erinnerung, die mit einer ausgeblendeten verbunden ist, zeigt sie nicht bei ihren Fäden, und beim Teilen der sichtbaren ist sie nicht dabei."] },
   { id: "WAL-10", p: 2,
     en: ["Edit pencils, Undo, Open in Maps", ["Open a memory and tap the pencil on a section (for example Gallery).", "Delete a memory, then tap Undo in the message at the bottom.", "On the Place card tap Open in Maps."], "The pencil opens the edit screen at that section. Undo brings the memory back. Maps opens at the memory's place."],
     de: ["Bearbeiten-Stifte, Rückgängig, In Karten öffnen", ["Eine Erinnerung öffnen und auf den Stift eines Abschnitts tippen (z. B. Galerie).", "Eine Erinnerung löschen, dann in der Meldung unten Rückgängig tippen.", "Auf der Ort-Karte In Karten öffnen tippen."], "Der Stift öffnet die Bearbeitung genau bei diesem Abschnitt. Rückgängig holt die Erinnerung zurück. Karten öffnet sich beim Ort der Erinnerung."] },
@@ -355,6 +355,12 @@ var AREAS = [
   { id: "FAM-04", p: 2,
     en: ["Report, block, remove", ["Report a test memory (choose a reason).", "Block a member, then unblock.", "As owner, remove a member; as member, leave a wall."], "Each action asks for confirmation and works. Removed members no longer see the wall."],
     de: ["Melden, blockieren, entfernen", ["Eine Test-Erinnerung melden (Grund wählen).", "Ein Mitglied blockieren, dann entsperren.", "Als Besitzer:in ein Mitglied entfernen; als Mitglied eine Wand verlassen."], "Jede Aktion fragt nach und funktioniert. Entfernte Mitglieder sehen die Wand nicht mehr."] },
+  { id: "FAM-06", p: 2,
+    en: ["Leave or delete a family wall", ["As a member, open a wall's settings and choose Leave; or, as owner, Delete the wall (use a test wall).", "On the family walls list that follows, tap the back arrow (or swipe back on iPhone)."], "The wall is gone from your list, and back takes you to your own wall. You are never stuck on a screen."],
+    de: ["Familienwand verlassen oder löschen", ["Als Mitglied in den Einstellungen einer Wand Verlassen wählen; oder als Besitzer:in die Wand löschen (eine Testwand nehmen).", "Auf der Liste der Familienwände danach auf den Zurück-Pfeil tippen (oder auf dem iPhone zurückwischen)."], "Die Wand ist aus deiner Liste verschwunden, und Zurück bringt dich zu deiner eigenen Wand. Du bleibst nie auf einem Bildschirm hängen."] },
+  { id: "FAM-07", p: 2,
+    en: ["Removing someone secures the wall (three accounts)", ["You need three people (or phones) on one test wall: the owner, A and B.", "Owner: Settings of the wall › remove B. Watch the message Removing and securing the wall.", "Owner: post a new memory. A: open the wall.", "Owner: invite someone new (C) with a fresh link; C joins."], "Removing shows the securing message and finishes without an error. A still sees all old memories and the new one, and can post. B no longer sees the wall. C sees the old memories too."],
+    de: ["Entfernen sichert die Wand (drei Konten)", ["Du brauchst drei Personen (oder Handys) auf einer Testwand: Besitzer:in, A und B.", "Besitzer:in: Einstellungen der Wand › B entfernen. Auf die Meldung Wird entfernt, die Wand wird gesichert achten.", "Besitzer:in: eine neue Erinnerung posten. A: die Wand öffnen.", "Besitzer:in: jemand Neues (C) mit frischem Link einladen; C tritt bei."], "Das Entfernen zeigt die Meldung zum Sichern und endet ohne Fehler. A sieht weiter alle alten Erinnerungen und die neue und kann posten. B sieht die Wand nicht mehr. C sieht auch die alten Erinnerungen."] },
   { id: "FAM-05", p: 3,
     en: ["Delete the account", ["Family walls, Account, Delete account (only at the end of your testing)."], "The account and the walls you own are deleted. Your private wall on the phone stays untouched."],
     de: ["Konto löschen", ["Familienwände, Konto, Konto löschen (erst am Ende deiner Tests)."], "Konto und deine eigenen Familienwände werden gelöscht. Deine private Wand auf dem Handy bleibt unberührt."] }
@@ -364,8 +370,8 @@ var AREAS = [
     en: ["Back up everything", ["Settings, Backup: create a backup with a password.", "Save the file (Files, Google Drive, email to yourself)."], "One .zip file with all memories and photos is created. The app warns you to keep the password safe."],
     de: ["Alles sichern", ["Einstellungen, Backup: ein Backup mit Passwort erstellen.", "Die Datei speichern (Dateien, Google Drive, E-Mail an dich)."], "Eine .zip-Datei mit allen Erinnerungen und Fotos entsteht. Die App weist darauf hin, das Passwort gut aufzubewahren."] },
   { id: "BAK-02", p: 1,
-    en: ["Restore a backup", ["Import the backup (on the same phone after reinstalling, or on another phone).", "Enter the password."], "All memories and photos come back. Memories already on the wall are kept and not duplicated."],
-    de: ["Backup wiederherstellen", ["Das Backup importieren (am selben Handy nach Neuinstallation oder auf einem anderen).", "Passwort eingeben."], "Alle Erinnerungen und Fotos sind wieder da. Vorhandene Erinnerungen bleiben und werden nicht doppelt angelegt."] },
+    en: ["Restore a backup", ["Import the backup (on the same phone after reinstalling, or on another phone).", "Enter the password.", "The app asks Import backup? and says how many memories it has. Try Cancel once, then import again and confirm."], "Cancel imports nothing. After confirming, all memories and photos come back, threads included. Memories already on the wall are kept and not duplicated."],
+    de: ["Backup wiederherstellen", ["Das Backup importieren (am selben Handy nach Neuinstallation oder auf einem anderen).", "Passwort eingeben.", "Die App fragt Backup importieren? und sagt, wie viele Erinnerungen es enthält. Einmal Abbrechen probieren, dann erneut importieren und bestätigen."], "Abbrechen importiert nichts. Nach dem Bestätigen sind alle Erinnerungen und Fotos wieder da, auch die Fäden. Vorhandene Erinnerungen bleiben und werden nicht doppelt angelegt."] },
   { id: "BAK-03", p: 2,
     en: ["Send one memory as a capsule", ["Open a memory and share it as a capsule, with or without a password.", "Open the link on another phone with LifeThreads and import it."], "The other person sees the memory with its photos and can add it to their wall."],
     de: ["Eine Erinnerung als Kapsel schicken", ["Eine Erinnerung öffnen und als Kapsel teilen, mit oder ohne Passwort.", "Den Link auf einem anderen Handy mit LifeThreads öffnen und importieren."], "Die andere Person sieht die Erinnerung mit Fotos und kann sie an ihre Wand hängen."] },
@@ -384,8 +390,11 @@ var AREAS = [
     en: ["Offline and restart", ["Turn on flight mode, use the app, add a memory.", "Close the app fully and open it again."], "Your own wall works offline. Everything is still there after the restart."],
     de: ["Offline und Neustart", ["Flugmodus an, App benutzen, eine Erinnerung anlegen.", "App ganz schließen und wieder öffnen."], "Deine eigene Wand funktioniert offline. Nach dem Neustart ist alles noch da."] },
   { id: "SET-05", p: 1,
-    en: ["App lock", ["Settings › Privacy › App lock: turn it on and confirm with Face ID, fingerprint or passcode.", "Close the app and open it again; also look at it in the app switcher."], "The app opens only after unlocking. In the app switcher your wall is blurred."],
-    de: ["App-Sperre", ["Einstellungen › Privatsphäre › App-Sperre: einschalten und mit Face ID, Fingerabdruck oder Code bestätigen.", "App schließen und wieder öffnen; auch im App-Umschalter ansehen."], "Die App öffnet sich erst nach dem Entsperren. Im App-Umschalter ist deine Wand verschwommen."] },
+    en: ["App lock", ["Settings › Privacy › App lock: turn it on and confirm with Face ID, fingerprint or passcode.", "Close the app and open it again; also look at it in the app switcher.", "Optional: turn on VoiceOver (iPhone) or TalkBack (Android) while the app is locked and swipe through the screen."], "The app opens only after unlocking. In the app switcher your wall is blurred. While locked, VoiceOver/TalkBack reads only the lock screen, never your memories."],
+    de: ["App-Sperre", ["Einstellungen › Privatsphäre › App-Sperre: einschalten und mit Face ID, Fingerabdruck oder Code bestätigen.", "App schließen und wieder öffnen; auch im App-Umschalter ansehen.", "Optional: Bei gesperrter App VoiceOver (iPhone) oder TalkBack (Android) einschalten und über den Bildschirm wischen."], "Die App öffnet sich erst nach dem Entsperren. Im App-Umschalter ist deine Wand verschwommen. Gesperrt liest VoiceOver/TalkBack nur den Sperrbildschirm vor, nie deine Erinnerungen."] },
+  { id: "SET-06", p: 3,
+    en: ["Dates after travelling", ["Note the date of two memories.", "Change the phone's time zone (iPhone: Settings › General › Date & Time, turn off Set Automatically, pick New York; Android: Settings › System › Date & time).", "Open LifeThreads again, then set the time zone back."], "Every memory keeps exactly the same date, also in the timeline and in Thread of the Year."],
+    de: ["Daten nach einer Reise", ["Das Datum von zwei Erinnerungen notieren.", "Die Zeitzone des Handys ändern (iPhone: Einstellungen › Allgemein › Datum & Uhrzeit, Automatisch einstellen aus, New York wählen; Android: Einstellungen › System › Datum & Uhrzeit).", "LifeThreads wieder öffnen, danach die Zeitzone zurückstellen."], "Jede Erinnerung behält genau dasselbe Datum, auch in der Zeitleiste und im Faden des Jahres."] },
   { id: "SET-04", p: 1,
     en: ["Your overall impression", ["Use the app for a few days as you normally would."], "Write in the notes: what you liked most, what confused you, what you missed, and whether you would pay for Premium."],
     de: ["Dein Gesamteindruck", ["Die App ein paar Tage ganz normal nutzen."], "Schreib in die Notizen: was dir am besten gefiel, was dich verwirrt hat, was dir fehlte und ob du für Premium zahlen würdest."] }
@@ -414,7 +423,7 @@ T.ar = {
   reportLead: "عندما تنتهي، انسخ التقرير وأرسله إلى جورج بالبريد أو برسالة. الاختبارات الفاشلة والمتعذّرة تظهر أولاً.",
   copy: "نسخ التقرير", copied: "تم النسخ.", copyFail: "حدّد النص في الأسفل وانسخه.",
   reset: "مسح كل إجاباتي", resetQ: "مسح كل النتائج والملاحظات من هذا المتصفح؟", resetYes: "نعم، امسح", resetNo: "إبقاء",
-  footer: "LifeThreads من GK Coding · بروتوكول اختبار للإصدار 1.0.0 (21) · تُحفظ إجاباتك في هذا المتصفح فقط.",
+  footer: "LifeThreads من GK Coding · بروتوكول اختبار للإصدار 1.0.0 (23) · تُحفظ إجاباتك في هذا المتصفح فقط.",
   rTitle: "تقرير اختبار LIFETHREADS", rIssues: "أخطاء / متعذّر", rAll: "كل النتائج", rNone: "لا شيء", rOpen: "لم يُختبر"
 };
 var AR_AREAS = { INS: "التثبيت والتشغيل الأول", WAL: "جدار ذكرياتك", PRM: "Premium", STO: "إنشاء قصة", YR: "خيط السنة", OTD: "في مثل هذا اليوم", FAM: "جدران العائلة", BAK: "النسخ الاحتياطي والمشاركة", SET: "الإعدادات والانطباع العام" };
@@ -445,20 +454,23 @@ var AR = {
   "FAM-02": ["الدعوة والانضمام (هاتفان)", ["على الجدار أنشئ رابط دعوة وأرسله لشخص ثانٍ.", "يفتح الشخص الثاني الرابط ويسجّل الدخول وينضم (الانضمام مجاني)."], "يرى الشخص الثاني جدار العائلة، ويرى كلاكما الآخر في قائمة الأعضاء."],
   "FAM-03": ["مشاركة الذكريات في العائلة", ["أضف ذكرى مع صورة إلى جدار العائلة.", "عدّلها، ثم تحقّق على الهاتف الآخر."], "تظهر الذكرى على الهاتف الآخر بعد وقت قصير مع الصورة والنص."],
   "FAM-04": ["الإبلاغ والحظر والإزالة", ["أبلغ عن ذكرى تجريبية (اختر سبباً).", "احظر عضواً ثم ألغِ الحظر.", "كمالك أزِل عضواً، وكعضو غادر جداراً."], "كل إجراء يطلب تأكيداً ويعمل. العضو المُزال لا يرى الجدار بعد ذلك."],
+  "FAM-06": ["مغادرة جدار عائلة أو حذفه", ["كعضو افتح إعدادات جدار واختر «مغادرة»؛ أو كمالك احذف الجدار (استخدم جداراً تجريبياً).", "في قائمة جدران العائلة التي تظهر بعدها اضغط سهم الرجوع (أو اسحب للرجوع على الآيفون)."], "يختفي الجدار من قائمتك، والرجوع يعيدك إلى جدارك الخاص. لا تعلق أبداً على شاشة."],
+  "FAM-07": ["الإزالة تؤمّن الجدار (ثلاثة حسابات)", ["تحتاج ثلاثة أشخاص (أو هواتف) على جدار تجريبي واحد: المالك وA وB.", "المالك: إعدادات الجدار › أزِل B. لاحظ رسالة «جارٍ الإزالة وتأمين الجدار».", "المالك: انشر ذكرى جديدة. A: افتح الجدار.", "المالك: ادعُ شخصاً جديداً (C) برابط جديد؛ ينضم C."], "تظهر رسالة التأمين وتنتهي الإزالة دون خطأ. يرى A كل الذكريات القديمة والجديدة ويستطيع النشر. لا يرى B الجدار بعد ذلك. ويرى C الذكريات القديمة أيضاً."],
   "FAM-05": ["حذف الحساب", ["جدران العائلة، الحساب، حذف الحساب (فقط في نهاية اختباراتك)."], "يُحذف الحساب وجدران العائلة التي تملكها. يبقى جدارك الخاص على الهاتف كما هو."],
   "BAK-01": ["نسخ احتياطي لكل شيء", ["الإعدادات، النسخ الاحتياطي: أنشئ نسخة احتياطية بكلمة مرور.", "احفظ الملف (الملفات، Google Drive، أو بريد إلى نفسك)."], "يُنشأ ملف .zip واحد فيه كل الذكريات والصور. ينبّهك التطبيق إلى حفظ كلمة المرور جيداً."],
-  "BAK-02": ["استعادة نسخة احتياطية", ["استورد النسخة الاحتياطية (على نفس الهاتف بعد إعادة التثبيت أو على هاتف آخر).", "أدخل كلمة المرور."], "تعود كل الذكريات والصور. الذكريات الموجودة تبقى ولا تتكرّر."],
+  "BAK-02": ["استعادة نسخة احتياطية", ["استورد النسخة الاحتياطية (على نفس الهاتف بعد إعادة التثبيت أو على هاتف آخر).", "أدخل كلمة المرور.", "يسأل التطبيق «استيراد نسخة احتياطية؟» ويذكر عدد الذكريات فيها. جرّب «إلغاء» مرة، ثم استورد مجدداً وأكّد."], "الإلغاء لا يستورد شيئاً. بعد التأكيد تعود كل الذكريات والصور مع الخيوط. الذكريات الموجودة تبقى ولا تتكرّر."],
   "BAK-03": ["إرسال ذكرى واحدة ككبسولة", ["افتح ذكرى وشاركها ككبسولة، بكلمة مرور أو بدونها.", "افتح الرابط على هاتف آخر فيه LifeThreads واستوردها."], "يرى الشخص الآخر الذكرى مع صورها ويستطيع إضافتها إلى جداره."],
   "BAK-04": ["عرض الجدار على شاشة كبيرة", ["على متصفح حاسوب أو تلفاز افتح lifethreads.gkcoding.dev/display.", "في التطبيق اضغط «عرض الجدار» (QR) وامسح الرمز."], "يظهر جدارك للقراءة فقط في المتصفح وينتهي تلقائياً بعد فترة."],
   "SET-01": ["المظاهر والاسم", ["الإعدادات: غيّر اسمك.", "جرّب مظاهر الجدار (غرفة ذكريات دافئة وغيرها)."], "تعرض التحية الاسم الجديد. كل مظهر واضح القراءة، ومظاهر Premium مميّزة."],
   "SET-02": ["اللغة وحجم الخط", ["غيّر لغة الهاتف إلى العربية (أو الألمانية/الإنجليزية) وافتح التطبيق.", "اختر خطاً أكبر من إعدادات الهاتف."], "يتبع التطبيق اللغة، والعربية من اليمين إلى اليسار دون تداخل في النص. يبقى الخط الكبير مقروءاً."],
   "SET-03": ["دون إنترنت وإعادة التشغيل", ["فعّل وضع الطيران، استخدم التطبيق وأضف ذكرى.", "أغلق التطبيق تماماً وافتحه من جديد."], "جدارك الخاص يعمل دون إنترنت، وكل شيء باقٍ بعد إعادة التشغيل."],
-  "WAL-09": ["البحث وعدة جدران والذكريات المخفية", ["اضغط العدسة وابحث عن مكان أو شخص أو سنة.", "Premium: المزيد › جدار جديد وسمِّه. استخدم «انقل ذكريات إلى هنا» (أو قائمة الذكرى › نقل إلى جدار).", "من قائمة ذكرى اختر «إخفاء». ثم العرض › الذكريات المخفية."], "يجد البحث الذكريات أثناء الكتابة. كل جدار يعرض ذكرياته فقط، وتبدّل الجدار من الأعلى. الذكرى المخفية تختفي من الجدار ولا تعود إلا بعد Face ID أو رمز القفل."],
+  "WAL-09": ["البحث وعدة جدران والذكريات المخفية", ["اضغط العدسة وابحث عن مكان أو شخص أو سنة.", "Premium: المزيد › جدار جديد وسمِّه. استخدم «انقل ذكريات إلى هنا» (أو قائمة الذكرى › نقل إلى جدار).", "من قائمة ذكرى اختر «إخفاء». ثم العرض › الذكريات المخفية."], "يجد البحث الذكريات أثناء الكتابة. كل جدار يعرض ذكرياته فقط، وتبدّل الجدار من الأعلى. الذكرى المخفية تختفي من الجدار ولا تعود إلا بعد Face ID أو رمز القفل، وعلى هذا الجدار فقط. الذكرى الظاهرة المرتبطة بذكرى مخفية لا تعرضها بين خيوطها، ولا تُضاف إليها عند مشاركة الذكرى الظاهرة."],
   "WAL-10": ["أقلام التعديل والتراجع والفتح في الخرائط", ["افتح ذكرى واضغط القلم على قسم (مثلاً المعرض).", "احذف ذكرى ثم اضغط «تراجع» في الرسالة بالأسفل.", "في بطاقة المكان اضغط «فتح في الخرائط»."], "يفتح القلم شاشة التعديل عند هذا القسم. يعيد «تراجع» الذكرى. تُفتح الخرائط عند مكان الذكرى."],
   "WAL-11": ["الذكرى غير المكتملة تبقى مسودة", ["اضغط + › ذكرى، اكتب عنواناً واختر صورة.", "اخرج بسهم الرجوع دون حفظ (أو أغلق التطبيق تماماً).", "اضغط + › ذكرى مرة أخرى."], "عند الخروج تظهر «حُفظت كمسودة». في المرة التالية يسأل التطبيق «هل تتابع من حيث توقفت؟»: «متابعة المسودة» تعيد العنوان والصورة، و«ابدأ من جديد» يبدأ فارغاً."],
   "WAL-12": ["نظرة على شهر", ["افتح المزيد › نظرة على شهر.", "استخدم الأسهم للانتقال إلى أشهر أخرى.", "في الأسبوع الأول من الشهر: انظر إلى البطاقة على الجدار للشهر السابق."], "ترى مثلاً «ذكريات سبتمبر» مع ذكرياته والأشخاص والأماكن فيها و«إنشاء قصة». الشهر الفارغ يقول ذلك في وسط الشاشة مع «أضف ذكرى»."],
   "WAL-13": ["أداة الشاشة الرئيسية", ["آيفون: اضغط مطوّلاً على أيقونة LifeThreads واختر حجم الأداة (أو تعديل › إضافة أداة › LifeThreads). أندرويد: اضغط مطوّلاً على الشاشة الرئيسية › الأدوات › LifeThreads.", "اضغط على الأداة.", "الإعدادات › أداة الشاشة الرئيسية: انظر إلى المعاينة، وبدّل «في مثل هذا اليوم أولاً» و«الذكريات ذات الصور أولاً»، و(مع عدة جدران) اختر جداراً واحداً.", "فعّل قفل التطبيق (الإعدادات › الخصوصية › قفل التطبيق) وانظر إلى الأداة مجدداً.", "دون ذكريات (أو على جدار فارغ): اضغط «أضف ذكرى» و«التقط صورة» على أداة متوسطة الحجم."], "تعرض الأداة ذكرى مع صورتها – من هذا اليوم في سنة سابقة إن وُجدت – وتتغيّر كل يوم. الضغط يفتح تلك الذكرى، وينتقل الجدار خلفها إلى جدارها. الإعدادات تغيّر ما تعرضه الأداة والمعاينة مطابقة لها. مع قفل التطبيق تعرض فقط «LifeThreads مقفل» دون صورة. دون ذكريات تعرض «أضف ذكرى» (تفتح شاشة الإضافة) و«التقط صورة» (تفتح الكاميرا)."],
-  "SET-05": ["قفل التطبيق", ["الإعدادات › الخصوصية › قفل التطبيق: فعّله وأكّد بـ Face ID أو البصمة أو رمز القفل.", "أغلق التطبيق وافتحه مجدداً، وانظر إليه أيضاً في مبدّل التطبيقات."], "لا يُفتح التطبيق إلا بعد فك القفل. في مبدّل التطبيقات يكون جدارك ضبابياً."],
+  "SET-06": ["التواريخ بعد السفر", ["دوّن تاريخ ذكريين.", "غيّر المنطقة الزمنية للهاتف (آيفون: الإعدادات › عام › التاريخ والوقت، أوقف «التعيين تلقائياً» واختر نيويورك؛ أندرويد: الإعدادات › النظام › التاريخ والوقت).", "افتح LifeThreads مجدداً، ثم أعد المنطقة الزمنية."], "تحتفظ كل ذكرى بالتاريخ نفسه تماماً، في الخط الزمني وفي خيط السنة أيضاً."],
+  "SET-05": ["قفل التطبيق", ["الإعدادات › الخصوصية › قفل التطبيق: فعّله وأكّد بـ Face ID أو البصمة أو رمز القفل.", "أغلق التطبيق وافتحه مجدداً، وانظر إليه أيضاً في مبدّل التطبيقات.", "اختياري: شغّل VoiceOver (آيفون) أو TalkBack (أندرويد) والتطبيق مقفل، ومرّر على الشاشة."], "لا يُفتح التطبيق إلا بعد فك القفل. في مبدّل التطبيقات يكون جدارك ضبابياً. والتطبيق مقفل يقرأ VoiceOver/TalkBack شاشة القفل فقط، لا ذكرياتك أبداً."],
   "SET-04": ["انطباعك العام", ["استخدم التطبيق بضعة أيام كما تفعل عادة."], "اكتب في الملاحظات: ما أعجبك أكثر، ما أربكك، ما افتقدته، وهل كنت ستدفع مقابل Premium."]
 };
 AREAS.forEach(function (a) { a.ar = AR_AREAS[a.key]; a.cases.forEach(function (c) { c.ar = AR[c.id]; }); });
@@ -541,7 +553,7 @@ function counts() {
 
 function report() {
   var L = T[state.lang], t = state.tester, c = counts(), lines = [];
-  lines.push(L.rTitle + " · LifeThreads 1.0.0 (21)");
+  lines.push(L.rTitle + " · LifeThreads 1.0.0 (23)");
   lines.push(L.fName + ": " + (t.name || "-") + " | " + L.fPlatform + ": " + (t.platform || "-") + " | " + L.fDevice + ": " + (t.device || "-") + " | " + L.fOs + ": " + (t.os || "-") + " | " + L.fLang + ": " + (t.lang || "-") + " | " + L.fDate + ": " + (t.date || "-"));
   lines.push(c.done + "/" + c.total + " " + L.cDone + " · " + c.pass + " " + L.cPass + " · " + c.fail + " " + L.cFail + " · " + c.blocked + " " + L.cBlock + " · " + c.na + " " + L.cNa);
   lines.push("");
