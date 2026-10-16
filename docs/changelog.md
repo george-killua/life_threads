@@ -2,7 +2,13 @@
 
 What changed in each TestFlight / Play build. Newest first.
 
-## Next build – 16 October 2026 (not uploaded yet)
+## 1.0.0 (23) – 16 October 2026 (not uploaded yet)
+
+**Better**
+- iPhone launch screen: dark with the app icon instead of a white flash.
+- Tutorial (More › Tutorial) covers everything: add (drafts), connect,
+  arrange (View with Done), search and look back, stories, walls and hidden
+  memories, family walls, the widget, privacy and backup, showing the board.
 
 **Onboarding redesign**
 - The demo wall preview comes alive: six cards hang in two rows, appear

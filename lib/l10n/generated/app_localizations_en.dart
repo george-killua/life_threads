@@ -313,7 +313,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tutorialIntro =>
-      'The basic flow: save memories, connect the related ones, then arrange the wall.';
+      'The basics first – save, connect, arrange – then everything else your wall can do.';
 
   @override
   String get gotIt => 'Got it';
@@ -326,7 +326,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tutorialAddText =>
-      'Tap Add, choose Memory or Quick photo, then save the title, date, people, and photo.';
+      'Tap +, choose Memory or Quick photo, then save the title, date, people and photo. If you leave before saving, it is kept as a draft.';
 
   @override
   String get tutorialConnectTitle => 'Connect memories';
@@ -340,7 +340,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tutorialArrangeText =>
-      'Drag cards, notes, and nails into place. Real connections draw ropes behind the items.';
+      'Drag cards, notes and nails into place. View › Arrange sorts them by date, category or place – it applies with Done.';
 
   @override
   String get tutorialShowBoardTitle => 'Show the board';
@@ -350,11 +350,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Open lifethreads.gkcoding.dev/display on another screen, choose More › Display wall, and scan the code to show a temporary read-only board.';
 
   @override
-  String get tutorialBackupTitle => 'Keep a backup';
+  String get tutorialBackupTitle => 'Privacy and backup';
 
   @override
   String get tutorialBackupText =>
-      'Before you change phones, export a backup in Settings and keep the file somewhere safe.';
+      'Settings › Privacy › App lock opens LifeThreads with Face ID. Before you change phones, export a backup in Settings › Backup & data.';
 
   @override
   String get scanDisplayQr => 'Scan display QR';
@@ -3583,4 +3583,39 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onboardingNameStaysHere =>
       'Only for greeting you – it stays on this phone.';
+
+  @override
+  String get tutorialLookBackTitle => 'Find and look back';
+
+  @override
+  String get tutorialLookBackText =>
+      'Search by title, place, person or year. More › Look back on a month shows a month\'s memories; More › Thread of the Year turns a year into a film.';
+
+  @override
+  String get tutorialStoryTitle => 'Make a story';
+
+  @override
+  String get tutorialStoryText =>
+      'More › Create story: pick memories, a template and music, then share it as an image or video.';
+
+  @override
+  String get tutorialWallsTitle => 'Walls and hidden memories';
+
+  @override
+  String get tutorialWallsText =>
+      'More › New wall keeps trips or chapters apart (Premium). Hold a card › Hide keeps it out of sight; View › Hidden memories shows it after Face ID.';
+
+  @override
+  String get tutorialFamilyTitle => 'Share with your family';
+
+  @override
+  String get tutorialFamilyText =>
+      'More › Family walls: one wall for the whole family, end-to-end encrypted. Invite others with a link.';
+
+  @override
+  String get tutorialWidgetTitle => 'A memory on your home screen';
+
+  @override
+  String get tutorialWidgetText =>
+      'Add the LifeThreads widget: a different memory every day. Settings › Home screen widget chooses which ones.';
 }

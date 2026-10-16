@@ -314,7 +314,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tutorialIntro =>
-      'Der Grundablauf: Erinnerungen speichern, verwandte verbinden und dann die Wand arrangieren.';
+      'Zuerst die Grundlagen – speichern, verbinden, anordnen – dann alles, was deine Wand sonst noch kann.';
 
   @override
   String get gotIt => 'Verstanden';
@@ -327,7 +327,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tutorialAddText =>
-      'Tippe auf Hinzufügen, wähle Erinnerung oder Schnellfoto und speichere Titel, Datum, Personen und Foto.';
+      'Tippe auf +, wähle Erinnerung oder Schnellfoto und speichere Titel, Datum, Personen und Foto. Gehst du vor dem Speichern, bleibt sie als Entwurf.';
 
   @override
   String get tutorialConnectTitle => 'Erinnerungen verbinden';
@@ -341,7 +341,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tutorialArrangeText =>
-      'Ziehe Karten, Notizen und Nägel an ihren Platz. Echte Verbindungen zeichnen Seile hinter den Elementen.';
+      'Ziehe Karten, Notizen und Nägel an ihren Platz. Ansicht › Anordnen sortiert nach Datum, Kategorie oder Ort – übernommen mit Fertig.';
 
   @override
   String get tutorialShowBoardTitle => 'Board anzeigen';
@@ -351,11 +351,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Öffne lifethreads.gkcoding.dev/display auf einem anderen Bildschirm, wähle Mehr › Wand anzeigen und scanne den Code, um ein temporäres schreibgeschütztes Board zu zeigen.';
 
   @override
-  String get tutorialBackupTitle => 'Backup behalten';
+  String get tutorialBackupTitle => 'Privatsphäre und Backup';
 
   @override
   String get tutorialBackupText =>
-      'Bevor du das Handy wechselst, exportiere in den Einstellungen ein Backup und bewahre die Datei sicher auf.';
+      'Einstellungen › Privatsphäre › App-Sperre öffnet LifeThreads mit Face ID. Bevor du das Handy wechselst, exportiere ein Backup unter Einstellungen › Sicherung & Daten.';
 
   @override
   String get scanDisplayQr => 'Display-QR scannen';
@@ -3617,4 +3617,39 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get onboardingNameStaysHere =>
       'Nur für die Begrüßung – er bleibt auf diesem Handy.';
+
+  @override
+  String get tutorialLookBackTitle => 'Finden und zurückblicken';
+
+  @override
+  String get tutorialLookBackText =>
+      'Suche nach Titel, Ort, Person oder Jahr. Mehr › Monatsrückblick zeigt die Erinnerungen eines Monats; Mehr › Faden des Jahres macht aus einem Jahr einen Film.';
+
+  @override
+  String get tutorialStoryTitle => 'Eine Story machen';
+
+  @override
+  String get tutorialStoryText =>
+      'Mehr › Story erstellen: Erinnerungen, Vorlage und Musik wählen, dann als Bild oder Video teilen.';
+
+  @override
+  String get tutorialWallsTitle => 'Wände und ausgeblendete Erinnerungen';
+
+  @override
+  String get tutorialWallsText =>
+      'Mehr › Neue Wand trennt Reisen oder Lebensabschnitte (Premium). Karte gedrückt halten › Ausblenden versteckt sie; Ansicht › Ausgeblendete Erinnerungen zeigt sie nach Face ID.';
+
+  @override
+  String get tutorialFamilyTitle => 'Mit der Familie teilen';
+
+  @override
+  String get tutorialFamilyText =>
+      'Mehr › Familienwände: eine Wand für die ganze Familie, Ende-zu-Ende-verschlüsselt. Andere per Link einladen.';
+
+  @override
+  String get tutorialWidgetTitle => 'Eine Erinnerung auf dem Home-Bildschirm';
+
+  @override
+  String get tutorialWidgetText =>
+      'Füge das LifeThreads-Widget hinzu: jeden Tag eine andere Erinnerung. Einstellungen › Widget auf dem Home-Bildschirm wählt, welche.';
 }

@@ -637,7 +637,7 @@ abstract class AppLocalizations {
   /// No description provided for @tutorialIntro.
   ///
   /// In en, this message translates to:
-  /// **'The basic flow: save memories, connect the related ones, then arrange the wall.'**
+  /// **'The basics first – save, connect, arrange – then everything else your wall can do.'**
   String get tutorialIntro;
 
   /// No description provided for @gotIt.
@@ -661,7 +661,7 @@ abstract class AppLocalizations {
   /// No description provided for @tutorialAddText.
   ///
   /// In en, this message translates to:
-  /// **'Tap Add, choose Memory or Quick photo, then save the title, date, people, and photo.'**
+  /// **'Tap +, choose Memory or Quick photo, then save the title, date, people and photo. If you leave before saving, it is kept as a draft.'**
   String get tutorialAddText;
 
   /// No description provided for @tutorialConnectTitle.
@@ -685,7 +685,7 @@ abstract class AppLocalizations {
   /// No description provided for @tutorialArrangeText.
   ///
   /// In en, this message translates to:
-  /// **'Drag cards, notes, and nails into place. Real connections draw ropes behind the items.'**
+  /// **'Drag cards, notes and nails into place. View › Arrange sorts them by date, category or place – it applies with Done.'**
   String get tutorialArrangeText;
 
   /// No description provided for @tutorialShowBoardTitle.
@@ -703,13 +703,13 @@ abstract class AppLocalizations {
   /// No description provided for @tutorialBackupTitle.
   ///
   /// In en, this message translates to:
-  /// **'Keep a backup'**
+  /// **'Privacy and backup'**
   String get tutorialBackupTitle;
 
   /// No description provided for @tutorialBackupText.
   ///
   /// In en, this message translates to:
-  /// **'Before you change phones, export a backup in Settings and keep the file somewhere safe.'**
+  /// **'Settings › Privacy › App lock opens LifeThreads with Face ID. Before you change phones, export a backup in Settings › Backup & data.'**
   String get tutorialBackupText;
 
   /// No description provided for @scanDisplayQr.
@@ -6098,6 +6098,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only for greeting you – it stays on this phone.'**
   String get onboardingNameStaysHere;
+
+  /// No description provided for @tutorialLookBackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find and look back'**
+  String get tutorialLookBackTitle;
+
+  /// No description provided for @tutorialLookBackText.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by title, place, person or year. More › Look back on a month shows a month\'s memories; More › Thread of the Year turns a year into a film.'**
+  String get tutorialLookBackText;
+
+  /// No description provided for @tutorialStoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make a story'**
+  String get tutorialStoryTitle;
+
+  /// No description provided for @tutorialStoryText.
+  ///
+  /// In en, this message translates to:
+  /// **'More › Create story: pick memories, a template and music, then share it as an image or video.'**
+  String get tutorialStoryText;
+
+  /// No description provided for @tutorialWallsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Walls and hidden memories'**
+  String get tutorialWallsTitle;
+
+  /// No description provided for @tutorialWallsText.
+  ///
+  /// In en, this message translates to:
+  /// **'More › New wall keeps trips or chapters apart (Premium). Hold a card › Hide keeps it out of sight; View › Hidden memories shows it after Face ID.'**
+  String get tutorialWallsText;
+
+  /// No description provided for @tutorialFamilyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share with your family'**
+  String get tutorialFamilyTitle;
+
+  /// No description provided for @tutorialFamilyText.
+  ///
+  /// In en, this message translates to:
+  /// **'More › Family walls: one wall for the whole family, end-to-end encrypted. Invite others with a link.'**
+  String get tutorialFamilyText;
+
+  /// No description provided for @tutorialWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A memory on your home screen'**
+  String get tutorialWidgetTitle;
+
+  /// No description provided for @tutorialWidgetText.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the LifeThreads widget: a different memory every day. Settings › Home screen widget chooses which ones.'**
+  String get tutorialWidgetText;
 }
 
 class _AppLocalizationsDelegate

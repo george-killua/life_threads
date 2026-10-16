@@ -312,7 +312,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tutorialIntro =>
-      'المسار الأساسي: احفظ الذكريات، اربط المتشابه منها، ثم رتّب الجدار.';
+      'الأساسيات أولاً – احفظ، اربط، رتّب – ثم كل ما يستطيعه جدارك أيضاً.';
 
   @override
   String get gotIt => 'فهمت';
@@ -325,7 +325,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tutorialAddText =>
-      'اضغط إضافة، اختر ذكرى أو صورة سريعة، ثم احفظ العنوان والتاريخ والأشخاص والصورة.';
+      'اضغط +، اختر ذكرى أو صورة سريعة، ثم احفظ العنوان والتاريخ والأشخاص والصورة. إن خرجت قبل الحفظ تبقى كمسودة.';
 
   @override
   String get tutorialConnectTitle => 'اربط الذكريات';
@@ -339,7 +339,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tutorialArrangeText =>
-      'اسحب البطاقات والملاحظات والمسامير إلى مكانها. الروابط الحقيقية ترسم الحبال خلف العناصر.';
+      'اسحب البطاقات والملاحظات والمسامير إلى مكانها. العرض › الترتيب يرتّبها حسب التاريخ أو الفئة أو المكان – ويُطبَّق عند الضغط على تم.';
 
   @override
   String get tutorialShowBoardTitle => 'اعرض اللوحة';
@@ -349,11 +349,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'افتح lifethreads.gkcoding.dev/display على شاشة أخرى، اختر المزيد ‹ عرض الجدار، ثم امسح الرمز لعرض لوحة مؤقتة للقراءة فقط.';
 
   @override
-  String get tutorialBackupTitle => 'احتفظ بنسخة احتياطية';
+  String get tutorialBackupTitle => 'الخصوصية والنسخ الاحتياطي';
 
   @override
   String get tutorialBackupText =>
-      'قبل تغيير هاتفك، صدّر نسخة احتياطية من الإعدادات واحفظ الملف في مكان آمن.';
+      'الإعدادات › الخصوصية › قفل التطبيق يفتح LifeThreads بـ Face ID. قبل تغيير هاتفك، صدّر نسخة احتياطية من الإعدادات › النسخ الاحتياطي والبيانات.';
 
   @override
   String get scanDisplayQr => 'مسح QR للعرض';
@@ -3634,4 +3634,39 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get onboardingNameStaysHere =>
       'للترحيب بك فقط – ويبقى على هذا الهاتف.';
+
+  @override
+  String get tutorialLookBackTitle => 'ابحث وتذكّر';
+
+  @override
+  String get tutorialLookBackText =>
+      'ابحث بالعنوان أو المكان أو الشخص أو السنة. المزيد › نظرة على شهر تعرض ذكريات شهر؛ المزيد › خيط السنة يحوّل سنة إلى فيلم.';
+
+  @override
+  String get tutorialStoryTitle => 'اصنع قصة';
+
+  @override
+  String get tutorialStoryText =>
+      'المزيد › إنشاء قصة: اختر الذكريات والقالب والموسيقى، ثم شاركها كصورة أو فيديو.';
+
+  @override
+  String get tutorialWallsTitle => 'الجدران والذكريات المخفية';
+
+  @override
+  String get tutorialWallsText =>
+      'المزيد › جدار جديد يفصل الرحلات أو المراحل (Premium). اضغط مطوّلاً على بطاقة › إخفاء لإبعادها عن النظر؛ العرض › الذكريات المخفية يعرضها بعد Face ID.';
+
+  @override
+  String get tutorialFamilyTitle => 'شارك مع عائلتك';
+
+  @override
+  String get tutorialFamilyText =>
+      'المزيد › جدران العائلة: جدار واحد لكل العائلة، بتشفير تام بين الطرفين. ادعُ الآخرين برابط.';
+
+  @override
+  String get tutorialWidgetTitle => 'ذكرى على شاشتك الرئيسية';
+
+  @override
+  String get tutorialWidgetText =>
+      'أضف أداة LifeThreads: ذكرى مختلفة كل يوم. الإعدادات › أداة الشاشة الرئيسية تحدد أيّها.';
 }
