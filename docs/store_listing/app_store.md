@@ -14,7 +14,7 @@ text 170, description 4000, keywords 100, What's New 4000).
 | Support URL | https://gkcoding.dev/lifethreads/ |
 | Marketing URL | https://gkcoding.dev/lifethreads/ |
 | Privacy policy URL | https://gkcoding.dev/lifethreads/privacy |
-| Terms (EULA) | https://gkcoding.dev/lifethreads/terms (also linked on the Premium page) |
+| Terms (EULA) | https://gkcoding.dev/lifethreads/terms/ (linked at the end of every description, as Apple requires for subscriptions, and on the Premium page) |
 | Contact | george.kassih@gkcoding.dev |
 | Primary language | English (U.S.); localizations: German, Arabic |
 
@@ -84,6 +84,9 @@ FAMILY WALLS (PREMIUM)
 Premium is a monthly or yearly subscription; a year costs about as much as seven months. Cancel any time in your App Store settings.
 
 LifeThreads is available in English, German and Arabic.
+
+Terms of Use (EULA): https://gkcoding.dev/lifethreads/terms/
+Privacy Policy: https://gkcoding.dev/lifethreads/privacy/
 ```
 
 **Keywords** (95/100 bytes)
@@ -165,6 +168,9 @@ FAMILIENWÄNDE (PREMIUM)
 Premium gibt es als Monats- oder Jahresabo; ein Jahr kostet etwa so viel wie sieben Monate. Jederzeit in den Einstellungen des App Store kündbar.
 
 LifeThreads gibt es auf Deutsch, Englisch und Arabisch.
+
+Nutzungsbedingungen (EULA): https://gkcoding.dev/lifethreads/terms/
+Datenschutzerklärung: https://gkcoding.dev/lifethreads/privacy/
 ```
 
 **Keywords** (98/100 bytes)
@@ -246,6 +252,9 @@ Premium
 Premium اشتراك شهري أو سنوي؛ السنة تكلّف تقريباً ما تكلّفه سبعة أشهر. يمكنك الإلغاء في أي وقت من إعدادات App Store.
 
 LifeThreads متاح بالعربية والإنجليزية والألمانية.
+
+شروط الاستخدام (EULA): https://gkcoding.dev/lifethreads/terms/
+سياسة الخصوصية: https://gkcoding.dev/lifethreads/privacy/
 ```
 
 **Keywords** (97/100 bytes)
