@@ -25,6 +25,14 @@ What changed in each TestFlight / Play build. Newest first.
 - The demo wall stayed empty when chosen in onboarding (the widget had
   loaded the memories before onboarding finished).
 - Look back on a month: an empty month is centered on the screen.
+- **iOS swipe back works again** on every screen, and screens slide in and
+  out. go_router 18 didn't recognise the app as a Material app on this
+  Flutter version and showed pages without transition or back gesture;
+  routes now build Material pages themselves (`material_route.dart`).
+- **A tap outside a text field closes the keyboard** on every screen, also
+  when the tap lands on a button or card; scrolling leaves it open.
+- Opening a memory from the widget switches the wall screen to the wall
+  that memory hangs on (the widget shows memories from every wall).
 - The View sheet has a Done button (at the largest text size it fills the
   screen and could only be closed by dragging).
 

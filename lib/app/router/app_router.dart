@@ -20,6 +20,7 @@ import '../../features/wall/presentation/pages/themes_page.dart';
 import '../../features/stories/presentation/pages/create_story_page.dart';
 import '../../features/wall/presentation/pages/memory_wall_page.dart';
 import '../../features/year_thread/presentation/pages/year_thread_page.dart';
+import 'material_route.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -35,35 +36,35 @@ class AppRouter {
     // themselves are handled by MemoryCapsuleDeepLinkListener.
     onException: (context, state, router) => router.go(RouteNames.home),
     routes: [
-      GoRoute(
+      materialRoute(
         path: RouteNames.home,
         builder: (context, state) => const OnboardingGate(),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.wall,
         builder: (context, state) => const MemoryWallPage(),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.settings,
         builder: (context, state) => const SettingsPage(),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.themes,
         builder: (context, state) => const ThemesPage(),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.search,
         builder: (context, state) => const MemorySearchPage(),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.backupData,
         builder: (context, state) => const BackupDataPage(),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.aboutHelp,
         builder: (context, state) => const AboutHelpPage(),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.upgrade,
         builder: (context, state) => UpgradePage(
           feature: state.extra is PremiumFeature
@@ -71,11 +72,11 @@ class AppRouter {
               : null,
         ),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.archiveTransfer,
         builder: (context, state) => const ArchiveTransferPage(),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.addMemory,
         builder: (context, state) {
           final extra = state.extra;
@@ -85,12 +86,12 @@ class AppRouter {
           return AddMemoryPage(initialPhotos: initialPhotos);
         },
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.memoryDetail,
         builder: (context, state) =>
             MemoryDetailPage(memoryId: state.pathParameters['id']!),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.editMemory,
         builder: (context, state) => EditMemoryPage(
           memoryId: state.pathParameters['id']!,
@@ -99,12 +100,12 @@ class AppRouter {
               .firstOrNull,
         ),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.manageConnections,
         builder: (context, state) =>
             ManageConnectionsPage(memoryId: state.pathParameters['id']!),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.capsuleCinema,
         // The cinema only makes sense for an import in progress.
         redirect: (context, state) =>
@@ -112,20 +113,20 @@ class AppRouter {
         builder: (context, state) =>
             CapsuleCinemaPage(draft: state.extra! as MemoryCapsuleImportDraft),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.yearThread,
         builder: (context, state) => YearThreadPage(
           initialYear: int.tryParse(state.uri.queryParameters['year'] ?? ''),
         ),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.lookBack,
         builder: (context, state) => MonthLookBackPage(
           year: int.tryParse(state.uri.queryParameters['year'] ?? ''),
           month: int.tryParse(state.uri.queryParameters['month'] ?? ''),
         ),
       ),
-      GoRoute(
+      materialRoute(
         path: RouteNames.createStory,
         // extra: the id of the memory the story starts from, if any.
         builder: (context, state) => CreateStoryPage(

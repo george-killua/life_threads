@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 
+import '../../../app/router/material_route.dart';
 import '../../../app/router/route_names.dart';
 import 'pages/family_account_page.dart';
 import 'pages/family_memory_detail_page.dart';
@@ -11,37 +12,37 @@ import 'pages/family_walls_page.dart';
 /// The family wall screens. "new" comes before ":memoryId" so it is not
 /// read as a memory id.
 final familyRoutes = <RouteBase>[
-  GoRoute(
+  materialRoute(
     path: RouteNames.familyWalls,
     builder: (context, state) => const FamilyWallsPage(),
   ),
-  GoRoute(
+  materialRoute(
     path: RouteNames.familyAccount,
     builder: (context, state) => const FamilyAccountPage(),
   ),
-  GoRoute(
+  materialRoute(
     path: RouteNames.familyWall,
     builder: (context, state) =>
         FamilyWallPage(familyId: state.pathParameters['familyId']!),
   ),
-  GoRoute(
+  materialRoute(
     path: RouteNames.familySettings,
     builder: (context, state) =>
         FamilySettingsPage(familyId: state.pathParameters['familyId']!),
   ),
-  GoRoute(
+  materialRoute(
     path: RouteNames.familyAddMemory,
     builder: (context, state) =>
         FamilyMemoryEditorPage(familyId: state.pathParameters['familyId']!),
   ),
-  GoRoute(
+  materialRoute(
     path: RouteNames.familyMemoryDetail,
     builder: (context, state) => FamilyMemoryDetailPage(
       familyId: state.pathParameters['familyId']!,
       memoryId: state.pathParameters['memoryId']!,
     ),
   ),
-  GoRoute(
+  materialRoute(
     path: RouteNames.familyEditMemory,
     builder: (context, state) => FamilyMemoryEditorPage(
       familyId: state.pathParameters['familyId']!,

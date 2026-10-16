@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/localization/locale_controller.dart';
+import '../core/widgets/dismiss_keyboard_on_tap.dart';
 import '../features/app_lock/app_lock_gate.dart';
 import '../features/capsule/presentation/widgets/memory_capsule_deep_link_listener.dart';
 import '../features/family/presentation/widgets/family_invite_link_listener.dart';
@@ -65,11 +66,8 @@ class LifeThreadsApp extends ConsumerWidget {
       // words.
       builder: (context, child) => MediaQuery.withClampedTextScaling(
         maxScaleFactor: 2,
-        child: GestureDetector(
-          // Tapping outside a text field closes the keyboard, as users expect
-          // on iOS; multi-line fields have no Done key to close it otherwise.
-          behavior: HitTestBehavior.translucent,
-          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        // A tap outside a text field closes the keyboard.
+        child: DismissKeyboardOnTap(
           child: AppLockGate(
             child: MemoryCapsuleDeepLinkListener(
               child: FamilyInviteLinkListener(
