@@ -2,7 +2,7 @@
 
 What changed in each TestFlight / Play build. Newest first.
 
-## 1.0.0 (23) – 16 October 2026 (not uploaded yet)
+## 1.0.0 (23) – 16 October 2026 (uploaded to TestFlight and Play closed testing)
 
 **Better**
 - iPhone launch screen: dark with the app icon instead of a white flash.
