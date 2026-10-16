@@ -17,8 +17,8 @@ order of these steps doesn't break anything. Status lives in
    accept the converted prices for other countries.
 5. App Store localization (display name / description):
    - English: `LifeThreads Premium` / `Unlimited memories, several walls, stories, Thread of the Year and family walls – billed yearly.`
-   - German: `LifeThreads Premium` / `Unbegrenzte Erinnerungen, mehrere Wände, Stories, Faden des Jahres und Familienwände – jährlich abgerechnet.`
-   - Arabic: `LifeThreads Premium` / `ذكريات بلا حدود، عدة جدران، قصص، خيط العام وجدران العائلة – بفوترة سنوية.`
+   - German: `LifeThreads Premium` / `Unbegrenzte Erinnerungen, mehrere Wände, Storys, Faden des Jahres und Familienwände – jährlich abgerechnet.`
+   - Arabic: `LifeThreads Premium` / `ذكريات بلا حدود، عدة جدران، قصص، خيط السنة وجدران العائلة – بفوترة سنوية.`
 6. Review information: reuse the monthly plan's screenshot (the Premium
    page) and note: "Same benefits as the monthly plan, billed yearly."
 7. In the group, put **Yearly above Monthly** (level 1 = yearly, level 2 =
@@ -56,7 +56,7 @@ characters each) and names saved in three languages:
 | Name | LifeThreads Premium (yearly) | LifeThreads Premium (jährlich) | LifeThreads Premium (سنوي) |
 | 1 | Unlimited memories | Unbegrenzte Erinnerungen | ذكريات بلا حدود |
 | 2 | Several walls and hidden memories | Mehrere Wände, Erinnerungen ausblenden | عدة جدران وذكريات مخفية |
-| 3 | Stories, films and Thread of the Year | Stories, Filme und Faden des Jahres | قصص وأفلام وخيط العام |
+| 3 | Stories, films and Thread of the Year | Stories, Filme und Faden des Jahres | قصص وأفلام وخيط السنة |
 | 4 | Family walls, end-to-end encrypted | Familienwände, durchgehend verschlüsselt | جدران العائلة بتشفير تام بين الطرفين |
 
 The monthly subscription still has its older four English benefits only
