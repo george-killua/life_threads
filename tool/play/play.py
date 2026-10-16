@@ -1,6 +1,7 @@
 """Google Play through the Android Publisher API (no fastlane needed).
 
-    export GOOGLE_PLAY_JSON_KEY_PATH=/path/to/service-account.json
+    # Key: secrets/google-play-service-account.json (gitignored), or
+    # GOOGLE_PLAY_JSON_KEY_PATH to use another file.
     python3 tool/play/play.py tracks
     python3 tool/play/play.py upload build/app/outputs/bundle/release/app-release.aab alpha completed "Release notes"
     python3 tool/play/play.py listing listing.json store_listing_assets/store_screenshots
@@ -22,7 +23,9 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
-KEY = os.environ['GOOGLE_PLAY_JSON_KEY_PATH']
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
+KEY = os.environ.get('GOOGLE_PLAY_JSON_KEY_PATH') or os.path.join(
+    ROOT, 'secrets', 'google-play-service-account.json')
 PKG = 'dev.gkcoding.lifethreads'
 creds = service_account.Credentials.from_service_account_file(
     KEY, scopes=['https://www.googleapis.com/auth/androidpublisher'])

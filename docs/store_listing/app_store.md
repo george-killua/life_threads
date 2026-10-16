@@ -19,8 +19,7 @@ text 170, description 4000, keywords 100, What's New 4000).
 | Primary language | English (U.S.); localizations: German, Arabic |
 
 The texts, screenshots and build can also be set with the API: `tool/appstore/asc.py` (key
-`~/Developer/AuthKey_DM4Y48QW72.p8`, App Manager; issuer ID in the server's
-`LIFETHREADS_APPSTORE_ISSUER_ID`). It never submits for review.
+`secrets/AuthKey_DM4Y48QW72.p8`, gitignored, App Manager). It never submits for review.
 
 App Store Connect: **Distribution → App Information** (name, subtitle, categories, privacy URL)
 and **Distribution → iOS app 1.0.0** (promotional text, description, keywords, What's New,

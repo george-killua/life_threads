@@ -56,3 +56,7 @@ app.*.map.json
 
 # Misplaced exports of another app
 /ios/Wandvue */
+
+# Store API keys (Google Play service account, App Store Connect). Never commit.
+/secrets/
+*.p8

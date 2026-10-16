@@ -1,7 +1,7 @@
 """App Store Connect through its API (no fastlane, no extra Python packages).
 
-    export ASC_KEY_PATH=~/Developer/AuthKey_XXXXXXXXXX.p8   # Key ID from the file name
-    export ASC_ISSUER_ID=<issuer id from Users and Access → Integrations>
+    # Key: secrets/AuthKey_<KEY ID>.p8 (gitignored), or ASC_KEY_PATH;
+    # ASC_ISSUER_ID overrides the team's issuer id below.
     python3 tool/appstore/asc.py status
     python3 tool/appstore/asc.py listing texts.json store_listing_assets/store_screenshots
     python3 tool/appstore/asc.py build 23
@@ -29,6 +29,18 @@ import urllib.error
 import urllib.request
 
 BUNDLE_ID = 'dev.gkcoding.lifeThreads'
+# The team's issuer id (Users and Access → Integrations); not a secret.
+ISSUER_ID = '54abbaa3-564f-4789-a6ee-f63202185418'
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
+
+
+def _key_path():
+    if os.environ.get('ASC_KEY_PATH'):
+        return os.path.expanduser(os.environ['ASC_KEY_PATH'])
+    keys = sorted(glob.glob(os.path.join(ROOT, 'secrets', 'AuthKey_*.p8')))
+    if not keys:
+        sys.exit('No App Store Connect key in secrets/ (AuthKey_<KEY ID>.p8).')
+    return keys[0]
 API = 'https://api.appstoreconnect.apple.com'
 
 
@@ -51,12 +63,12 @@ def _der_to_raw(der):
 
 
 def token():
-    key = os.path.expanduser(os.environ['ASC_KEY_PATH'])
+    key = _key_path()
     kid = re.search(r'AuthKey_([A-Z0-9]+)\.p8$', key).group(1)
     now = int(time.time())
     header = _b64(json.dumps({'alg': 'ES256', 'kid': kid, 'typ': 'JWT'}).encode())
     claims = _b64(json.dumps({
-        'iss': os.environ['ASC_ISSUER_ID'], 'iat': now, 'exp': now + 900,
+        'iss': os.environ.get('ASC_ISSUER_ID', ISSUER_ID), 'iat': now, 'exp': now + 900,
         'aud': 'appstoreconnect-v1'}).encode())
     signing_input = header + b'.' + claims
     der = subprocess.run(['openssl', 'dgst', '-sha256', '-sign', key],

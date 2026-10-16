@@ -22,15 +22,15 @@
 ```bash
 cd ~/Developer/life_threads
 flutter build appbundle --release
-export GOOGLE_PLAY_JSON_KEY_PATH="$HOME/Developer/life-threads-developer-account.json"
 python3 tool/play/play.py tracks
 python3 tool/play/play.py upload build/app/outputs/bundle/release/app-release.aab alpha completed "What's new"
 ```
 
-The key file stays outside the repo. No MapTiler key is needed: the map
+The key is `secrets/google-play-service-account.json` inside the project; `secrets/` is
+gitignored, so it is never committed (`GOOGLE_PLAY_JSON_KEY_PATH` points elsewhere if needed). No MapTiler key is needed: the map
 uses OpenFreeMap unless `--dart-define=MAPTILER_KEY=…` is passed.
 
-Uploads so far: 1.0.0 (17), (21) and (22) to `alpha` (closed testing),
+Uploads so far: 1.0.0 (17), (21), (22) and (23) to `alpha` (closed testing),
 all `completed`.
 
 ## Local Upload (old fastlane way; fastlane is not set up)
