@@ -56,7 +56,7 @@ characters each) and names saved in three languages:
 | Name | LifeThreads Premium (yearly) | LifeThreads Premium (jährlich) | LifeThreads Premium (سنوي) |
 | 1 | Unlimited memories | Unbegrenzte Erinnerungen | ذكريات بلا حدود |
 | 2 | Several walls and hidden memories | Mehrere Wände, Erinnerungen ausblenden | عدة جدران وذكريات مخفية |
-| 3 | Stories, films and Thread of the Year | Stories, Filme und Faden des Jahres | قصص وأفلام وخيط السنة |
+| 3 | Stories, films and Thread of the Year | Storys, Filme und Faden des Jahres | قصص وأفلام وخيط السنة |
 | 4 | Family walls, end-to-end encrypted | Familienwände, durchgehend verschlüsselt | جدران العائلة بتشفير تام بين الطرفين |
 
 The monthly subscription still has its older four English benefits only
