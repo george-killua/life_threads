@@ -2,6 +2,18 @@
 
 What changed in each TestFlight / Play build. Newest first.
 
+## 1.0.0 (22) – 16 October 2026 (not uploaded yet)
+
+**Thread of the Year**
+- **Memories from:** with walls of one's own, choose All my walls, My wall
+  or one wall; starts with the wall on screen.
+- Years that aren't ready yet (this year and earlier ones) show the
+  memories that already count – tap one to fix a wrong date – and **Add a
+  memory to 2024**, which starts the new memory on the same day back then
+  (a photo's own date still wins).
+- When a year is ready, the years that are nearly there are listed below
+  the film under "Almost there".
+
 ## 1.0.0 (21) – 16 October 2026
 
 Uploaded to TestFlight and to Google Play closed testing (alpha).

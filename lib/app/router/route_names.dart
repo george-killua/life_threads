@@ -29,6 +29,12 @@ class RouteNames {
       '/family/wall/:familyId/memories/:memoryId/edit';
 
   static String yearThreadFor(int year) => '$yearThread?year=$year';
+
+  /// Add a memory dated [date] (a day of a year in Thread of the Year).
+  static String addMemoryOn(DateTime date) =>
+      '$addMemory?date=${date.year.toString().padLeft(4, '0')}-'
+      '${date.month.toString().padLeft(2, '0')}-'
+      '${date.day.toString().padLeft(2, '0')}';
   static String lookBackFor(int year, int month) =>
       '$lookBack?year=$year&month=$month';
 

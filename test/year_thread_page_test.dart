@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:life_threads/app/router/route_names.dart';
 import 'package:life_threads/features/memories/data/memory_repository.dart';
+import 'package:life_threads/features/memories/domain/personal_wall.dart';
 import 'package:life_threads/features/on_this_day/data/on_this_day_notifications.dart';
 import 'package:life_threads/features/on_this_day/data/on_this_day_providers.dart';
 import 'package:life_threads/features/premium/data/premium_entitlement_controller.dart';
@@ -114,6 +115,11 @@ void main() {
             path: '/',
             builder: (context, state) =>
                 const YearThreadPage(initialYear: 2025),
+          ),
+          GoRoute(
+            path: RouteNames.addMemory,
+            builder: (context, state) =>
+                Text('ADD ${state.uri.queryParameters['date']}'),
           ),
           GoRoute(
             path: RouteNames.upgrade,
@@ -277,6 +283,56 @@ void main() {
       expect(find.text('1 of 3 memories'), findsOneWidget);
       expect(find.text('Add a memory'), findsOneWidget);
       expect(find.text('Or make a story now'), findsOneWidget);
+      // The memories that count, per year.
+      expect(find.text('One'), findsOneWidget);
+      expect(find.text('Three'), findsOneWidget);
+
+      await tester.tap(find.text('Add a memory to 2024'));
+      await settle(tester);
+      // Same day of the year, back then.
+      final now = DateTime.now();
+      expect(
+        find.textContaining('ADD 2024-${now.month.toString().padLeft(2, '0')}'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('with walls of one\'s own, the film can use one wall', (
+      tester,
+    ) async {
+      final state = MemoryState(
+        events: [
+          for (var i = 0; i < 3; i++)
+            yearMemory(
+              'trip$i',
+              DateTime(2025, i + 1),
+              title: 'Trip $i',
+            ).copyWith(wallId: 'w1'),
+          yearMemory('home', DateTime(2025, 5), title: 'At home'),
+        ],
+        connections: const [],
+        photos: const [],
+        people: const [],
+        wallItems: const [],
+        walls: [
+          PersonalWall(id: 'w1', name: 'Trips', createdAt: DateTime(2025)),
+        ],
+      );
+      await pumpPage(tester, isPremium: false, state: state);
+
+      // Starts with the wall on screen: My wall has one 2025 memory.
+      expect(find.text('Memories from'), findsOneWidget);
+      expect(find.text('1 of 3 memories'), findsOneWidget);
+
+      await tester.tap(find.text('Trips'));
+      await settle(tester);
+      expect(find.text('Trip 0'), findsOneWidget);
+      expect(find.text('At home'), findsNothing);
+
+      await tester.tap(find.text('All my walls'));
+      await settle(tester);
+      expect(find.text('At home'), findsOneWidget);
+      expect(find.text('Trip 2'), findsOneWidget);
     });
 
     testWidgets('memories can be removed, swapped and added back', (

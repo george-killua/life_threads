@@ -3577,4 +3577,15 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get homeWidgetPrivacyNote =>
       'Ausgeblendete Erinnerungen erscheinen nie auf dem Widget. Mit App-Sperre zeigt es keine Erinnerung.';
+
+  @override
+  String get yearThreadAlmostThere => 'Fast geschafft';
+
+  @override
+  String get yearThreadMemoriesFrom => 'Erinnerungen von';
+
+  @override
+  String yearThreadAddMemoryTo(String year) {
+    return 'Erinnerung zu $year hinzufügen';
+  }
 }

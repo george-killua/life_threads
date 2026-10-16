@@ -1048,5 +1048,8 @@
   "homeWidgetHowToTitle": "أضفها إلى شاشتك الرئيسية",
   "homeWidgetHowToIos": "اضغط مطوّلاً على أيقونة LifeThreads في شاشتك الرئيسية واختر حجم الأداة. أو اضغط مطوّلاً على مكان فارغ، ثم تعديل › إضافة أداة واختر LifeThreads.",
   "homeWidgetHowToAndroid": "اضغط مطوّلاً على مكان فارغ في شاشتك الرئيسية، ثم الأدوات، واسحب LifeThreads إلى المكان الذي تريده.",
-  "homeWidgetPrivacyNote": "لا تظهر الذكريات المخفية على الأداة أبداً. ومع قفل التطبيق لا تعرض أي ذكرى."
+  "homeWidgetPrivacyNote": "لا تظهر الذكريات المخفية على الأداة أبداً. ومع قفل التطبيق لا تعرض أي ذكرى.",
+  "yearThreadAlmostThere": "اقتربت",
+  "yearThreadMemoriesFrom": "ذكريات من",
+  "yearThreadAddMemoryTo": "أضف ذكرى إلى {year}"
 }

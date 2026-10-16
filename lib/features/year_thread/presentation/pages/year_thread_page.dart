@@ -14,6 +14,8 @@ import '../../../../core/localization/app_localizations_x.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../../core/rendering/story_canvas.dart';
 import '../../../memories/data/memory_repository.dart';
+import '../../../memories/domain/personal_wall.dart';
+import '../../../wall/data/current_wall.dart';
 import '../../../premium/domain/premium_feature.dart';
 import '../../../premium/presentation/premium_gate.dart';
 import '../../../stories/data/music_preview.dart';
@@ -42,7 +44,14 @@ class YearThreadPage extends ConsumerStatefulWidget {
 }
 
 class _YearThreadPageState extends ConsumerState<YearThreadPage> {
+  static const _allWalls = 'all';
+  static const _myWall = 'my';
+
   int? _year;
+
+  /// Whose memories make the film: [_allWalls], [_myWall] or a wall id.
+  /// Starts with the wall on screen; only asked with walls of one's own.
+  String? _wallScope;
 
   /// The memories the user chose; null while the suggestions are used.
   List<String>? _chosen;
@@ -94,19 +103,43 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
             body: memoryState.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, _) => Center(child: Text(error.toString())),
-              data: (state) {
+              data: (allState) {
+                final state = _scoped(allState);
                 final years = YearThread.availableYears(state);
                 final year = _resolveYear(years);
+                final almost = [
+                  for (final entry in YearThread.almostYears(state))
+                    YearThread.year(state, entry.year),
+                ];
                 return ListView(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
                   children: [
+                    if (allState.walls.isNotEmpty) ...[
+                      _WallChooser(
+                        walls: allState.walls,
+                        selected: _wallScope!,
+                        onSelected: (scope) => setState(() {
+                          _wallScope = scope;
+                          _year = null;
+                          _chosen = null;
+                        }),
+                      ),
+                      const SizedBox(height: 18),
+                    ],
                     if (year == null)
                       _NoYearYet(
-                        almost: YearThread.almostYears(state),
+                        almost: almost,
                         hasMemories: state.visibleEvents.isNotEmpty,
                       )
-                    else
+                    else ...[
                       ..._editor(context, years, YearThread.year(state, year)),
+                      // Older (and newer) years that are nearly there.
+                      if (almost.isNotEmpty) ...[
+                        const SizedBox(height: 26),
+                        _Label(context.l10n.yearThreadAlmostThere),
+                        for (final other in almost) _YearProgress(year: other),
+                      ],
+                    ],
                   ],
                 );
               },
@@ -115,6 +148,23 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
         ),
       ),
     );
+  }
+
+  /// The memories of the chosen wall(s).
+  MemoryState _scoped(MemoryState state) {
+    if (state.walls.isEmpty) return state;
+    final scope = _wallScope ??= () {
+      final current = ref.read(currentWallProvider);
+      return state.walls.any((wall) => wall.id == current) ? current! : _myWall;
+    }();
+    return switch (scope) {
+      _allWalls => state,
+      _myWall => state.onWall(null),
+      final id when state.walls.any((wall) => wall.id == id) => state.onWall(
+        id,
+      ),
+      _ => state,
+    };
   }
 
   int? _resolveYear(List<int> years) {
@@ -870,7 +920,7 @@ String _keepTogether(String part) => part.replaceAll(' ', '\u00A0');
 class _NoYearYet extends StatelessWidget {
   const _NoYearYet({required this.almost, required this.hasMemories});
 
-  final List<({int year, int count})> almost;
+  final List<YearThreadYear> almost;
   final bool hasMemories;
 
   @override
@@ -920,45 +970,10 @@ class _NoYearYet extends StatelessWidget {
             ],
           ),
         ),
-        // How close each year is.
-        for (final entry in almost.take(3)) ...[
+        // How close each year is, with the memories that count.
+        for (final year in almost.take(5)) ...[
           const SizedBox(height: 10),
-          _Panel(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      '${entry.year}',
-                      style: TextStyle(
-                        color: AppColors.gold,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        l10n.yearThreadProgress(entry.count),
-                        style: const TextStyle(fontWeight: FontWeight.w800),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(99),
-                  child: LinearProgressIndicator(
-                    value: entry.count / YearThread.minMemories,
-                    minHeight: 8,
-                    color: AppColors.gold,
-                    backgroundColor: AppColors.line,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _YearProgress(year: year),
         ],
         const SizedBox(height: 18),
         FilledButton.icon(
@@ -975,6 +990,121 @@ class _NoYearYet extends StatelessWidget {
             label: Text(l10n.yearThreadStoryInstead),
           ),
         ],
+      ],
+    );
+  }
+}
+
+/// A year that doesn't have enough memories yet: how close it is, the
+/// memories that count (open one to fix a wrong date), and a way to add one
+/// dated in that year.
+class _YearProgress extends StatelessWidget {
+  const _YearProgress({required this.year});
+
+  final YearThreadYear year;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final count = year.memories.length;
+    final now = DateTime.now();
+    // This year: today. Earlier years: the same day back then.
+    final daysInMonth = DateTime(year.year, now.month + 1, 0).day;
+    final date = DateTime(
+      year.year,
+      now.month,
+      now.day > daysInMonth ? daysInMonth : now.day,
+    );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: _Panel(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Text(
+                  '${year.year}',
+                  style: TextStyle(
+                    color: AppColors.gold,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    l10n.yearThreadProgress(count),
+                    style: const TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(99),
+              child: LinearProgressIndicator(
+                value: count / YearThread.minMemories,
+                minHeight: 8,
+                color: AppColors.gold,
+                backgroundColor: AppColors.line,
+              ),
+            ),
+            const SizedBox(height: 12),
+            for (final memory in year.memories)
+              _MemoryRow(
+                memory: memory,
+                onTap: () => context.push('/memories/${memory.event.id}'),
+              ),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: TextButton.icon(
+                key: ValueKey('year-thread-add-to-${year.year}'),
+                onPressed: () => context.push(RouteNames.addMemoryOn(date)),
+                icon: const Icon(Icons.add_rounded),
+                label: Text(l10n.yearThreadAddMemoryTo('${year.year}')),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Whose memories make the film, when one has walls of one's own.
+class _WallChooser extends StatelessWidget {
+  const _WallChooser({
+    required this.walls,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final List<PersonalWall> walls;
+  final String selected;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    Widget chip(String scope, String label) => ChoiceChip(
+      label: Text(label),
+      selected: selected == scope,
+      onSelected: (_) => onSelected(scope),
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _Label(l10n.yearThreadMemoriesFrom),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            chip(_YearThreadPageState._allWalls, l10n.homeWidgetAllWalls),
+            chip(_YearThreadPageState._myWall, l10n.myWall),
+            for (final wall in walls) chip(wall.id, wall.name),
+          ],
+        ),
       ],
     );
   }

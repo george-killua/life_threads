@@ -3543,4 +3543,15 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get homeWidgetPrivacyNote =>
       'Hidden memories never appear on the widget. With the app lock on, it shows no memory.';
+
+  @override
+  String get yearThreadAlmostThere => 'Almost there';
+
+  @override
+  String get yearThreadMemoriesFrom => 'Memories from';
+
+  @override
+  String yearThreadAddMemoryTo(String year) {
+    return 'Add a memory to $year';
+  }
 }

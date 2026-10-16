@@ -3594,4 +3594,15 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get homeWidgetPrivacyNote =>
       'لا تظهر الذكريات المخفية على الأداة أبداً. ومع قفل التطبيق لا تعرض أي ذكرى.';
+
+  @override
+  String get yearThreadAlmostThere => 'اقتربت';
+
+  @override
+  String get yearThreadMemoriesFrom => 'ذكريات من';
+
+  @override
+  String yearThreadAddMemoryTo(String year) {
+    return 'أضف ذكرى إلى $year';
+  }
 }

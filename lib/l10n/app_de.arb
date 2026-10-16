@@ -1048,5 +1048,8 @@
   "homeWidgetHowToTitle": "Zum Home-Bildschirm hinzufügen",
   "homeWidgetHowToIos": "Halte das LifeThreads-Icon auf dem Home-Bildschirm gedrückt und wähle eine Widget-Größe. Oder halte eine freie Stelle gedrückt, tippe auf Bearbeiten › Widget hinzufügen und wähle LifeThreads.",
   "homeWidgetHowToAndroid": "Halte eine freie Stelle auf dem Home-Bildschirm gedrückt, tippe auf Widgets und ziehe LifeThreads an die gewünschte Stelle.",
-  "homeWidgetPrivacyNote": "Ausgeblendete Erinnerungen erscheinen nie auf dem Widget. Mit App-Sperre zeigt es keine Erinnerung."
+  "homeWidgetPrivacyNote": "Ausgeblendete Erinnerungen erscheinen nie auf dem Widget. Mit App-Sperre zeigt es keine Erinnerung.",
+  "yearThreadAlmostThere": "Fast geschafft",
+  "yearThreadMemoriesFrom": "Erinnerungen von",
+  "yearThreadAddMemoryTo": "Erinnerung zu {year} hinzufügen"
 }

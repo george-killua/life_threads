@@ -32,12 +32,17 @@ class AddMemoryPage extends ConsumerStatefulWidget {
     super.key,
     this.initialPhotos = const [],
     this.openCamera = false,
+    this.initialDate,
   });
 
   final List<PickedMemoryPhoto> initialPhotos;
 
   /// Opens the camera right away (the widget's "Take photo").
   final bool openCamera;
+
+  /// The date to start with (Thread of the Year's "Add a memory to 2023").
+  /// A photo's own date still wins.
+  final DateTime? initialDate;
 
   @override
   ConsumerState<AddMemoryPage> createState() => _AddMemoryPageState();
@@ -77,6 +82,11 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
   void initState() {
     super.initState();
     _draftStore = ref.read(memoryDraftStoreProvider);
+    final initialDate = widget.initialDate;
+    if (initialDate != null) {
+      _occurredAt = initialDate;
+      _dateFromPhotos = true;
+    }
     _connectionReasonController.addListener(_scheduleDraftSave);
     if (widget.initialPhotos.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -601,8 +611,9 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
 
   void _syncDateFromPhotos() {
     if (_photos.isEmpty) {
-      _occurredAt = null;
-      _dateFromPhotos = false;
+      // Back to the year it was started for, if any.
+      _occurredAt = widget.initialDate;
+      _dateFromPhotos = widget.initialDate != null;
       return;
     }
     final datedPhoto = _firstWhereOrNull(

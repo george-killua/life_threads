@@ -91,6 +91,10 @@ class AppRouter {
             initialPhotos: initialPhotos,
             // From the home screen widget's "Take photo".
             openCamera: state.uri.queryParameters['camera'] == '1',
+            // From Thread of the Year: a memory for that year.
+            initialDate: DateTime.tryParse(
+              state.uri.queryParameters['date'] ?? '',
+            ),
           );
         },
       ),

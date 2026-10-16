@@ -6032,6 +6032,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hidden memories never appear on the widget. With the app lock on, it shows no memory.'**
   String get homeWidgetPrivacyNote;
+
+  /// No description provided for @yearThreadAlmostThere.
+  ///
+  /// In en, this message translates to:
+  /// **'Almost there'**
+  String get yearThreadAlmostThere;
+
+  /// No description provided for @yearThreadMemoriesFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Memories from'**
+  String get yearThreadMemoriesFrom;
+
+  /// No description provided for @yearThreadAddMemoryTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a memory to {year}'**
+  String yearThreadAddMemoryTo(String year);
 }
 
 class _AppLocalizationsDelegate

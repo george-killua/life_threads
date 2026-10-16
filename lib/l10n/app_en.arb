@@ -1683,5 +1683,15 @@
   "homeWidgetHowToTitle": "Add it to your home screen",
   "homeWidgetHowToIos": "Press and hold the LifeThreads icon on your home screen and choose a widget size. Or press and hold an empty spot, tap Edit › Add Widget and choose LifeThreads.",
   "homeWidgetHowToAndroid": "Press and hold an empty spot on your home screen, tap Widgets and drag LifeThreads to where you want it.",
-  "homeWidgetPrivacyNote": "Hidden memories never appear on the widget. With the app lock on, it shows no memory."
+  "homeWidgetPrivacyNote": "Hidden memories never appear on the widget. With the app lock on, it shows no memory.",
+  "yearThreadAlmostThere": "Almost there",
+  "yearThreadMemoriesFrom": "Memories from",
+  "yearThreadAddMemoryTo": "Add a memory to {year}",
+  "@yearThreadAddMemoryTo": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  }
 }
