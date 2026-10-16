@@ -19,9 +19,12 @@ class MemoryCapsuleShareDownloadException implements Exception {
 }
 
 class MemoryCapsuleShareDownloadService {
+  /// The largest shared memory a phone downloads; uploads check it too.
+  static const maxCapsuleBytes = 25 * 1024 * 1024;
+
   const MemoryCapsuleShareDownloadService({
     this.timeout = const Duration(seconds: 30),
-    this.maxBytes = 25 * 1024 * 1024,
+    this.maxBytes = maxCapsuleBytes,
     this.allowedHosts = const {
       'gkcoding.dev',
       'www.gkcoding.dev',

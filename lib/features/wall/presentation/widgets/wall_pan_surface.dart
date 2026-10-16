@@ -40,11 +40,35 @@ class _WallPanSurfaceState extends State<WallPanSurface> {
         // moves 1:1 with the finger at any zoom.
         final next = Matrix4.translationValues(delta.dx, delta.dy, 0)
           ..multiply(widget.controller.value);
-        widget.controller.value = next;
+        widget.controller.value = _keepBoardOnScreen(next);
       },
       onPointerUp: (event) => _release(event.pointer),
       onPointerCancel: (event) => _release(event.pointer),
       child: const SizedBox.expand(),
+    );
+  }
+
+  /// This surface spans the whole board and only catches drags where the
+  /// board is: once a swipe moved the board off screen there'd be nothing
+  /// left to drag back. So the board always covers the screen.
+  Matrix4 _keepBoardOnScreen(Matrix4 matrix) {
+    final board = context.size;
+    if (board == null) return matrix;
+    final view = View.of(context);
+    final screen =
+        MediaQuery.maybeSizeOf(context) ??
+        view.physicalSize / view.devicePixelRatio;
+    final scale = matrix.entry(0, 0);
+    double clamp(double value, double screenExtent, double boardExtent) {
+      final lowest = screenExtent - boardExtent * scale;
+      return lowest >= 0 ? value : value.clamp(lowest, 0.0);
+    }
+
+    final translation = matrix.getTranslation();
+    return matrix.clone()..setTranslationRaw(
+      clamp(translation.x, screen.width, board.width),
+      clamp(translation.y, screen.height, board.height),
+      translation.z,
     );
   }
 

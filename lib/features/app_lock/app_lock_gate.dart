@@ -53,9 +53,15 @@ class _AppLockGateState extends ConsumerState<AppLockGate>
   @override
   Widget build(BuildContext context) {
     final lock = ref.watch(appLockProvider);
+    // While locked (or not yet known) the app underneath must not be read
+    // or activated by VoiceOver/TalkBack or a keyboard either.
+    final covered = !lock.ready || lock.locked;
     return Stack(
       children: [
-        widget.child,
+        ExcludeSemantics(
+          excluding: covered,
+          child: ExcludeFocus(excluding: covered, child: widget.child),
+        ),
         if (!lock.ready)
           // The setting is being read: show nothing yet, not the memories.
           Positioned.fill(child: ColoredBox(color: AppColors.wallInk))

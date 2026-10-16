@@ -3669,4 +3669,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get tutorialWidgetText =>
       'أضف أداة LifeThreads: ذكرى مختلفة كل يوم. الإعدادات › أداة الشاشة الرئيسية تحدد أيّها.';
+
+  @override
+  String photoNumber(int number) {
+    return 'الصورة $number';
+  }
+
+  @override
+  String get familyDisplayNameNotSaved =>
+      'تعذّر حفظ اسمك على هذا الجدار. يمكنك تعيينه من إعدادات الجدار.';
 }

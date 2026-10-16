@@ -31,8 +31,13 @@ class ManageConnectionsPage extends ConsumerWidget {
             return Center(child: Text(l10n.memoryNotFound));
           }
 
+          // A visible memory never lists hidden ones (they stay behind
+          // Face ID); a hidden memory can thread to anything.
           final candidates = state.events
-              .where((event) => event.id != memoryId)
+              .where(
+                (event) =>
+                    event.id != memoryId && (memory.hidden || !event.hidden),
+              )
               .toList();
 
           return ListView(

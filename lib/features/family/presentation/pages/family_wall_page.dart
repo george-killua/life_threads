@@ -42,8 +42,9 @@ class _FamilyWallPageState extends ConsumerState<FamilyWallPage>
   String? _draggingId;
   Offset? _dragPosition;
 
-  /// Moves sent to the service, shown until the synced memory catches up.
-  final _pendingMoves = <String, Offset>{};
+  /// Where the author just dropped a card, until the saved move (or any
+  /// newer version, e.g. moved on another phone) arrives.
+  final _pendingMoves = <String, ({Offset position, int version})>{};
 
   @override
   void initState() {
@@ -68,6 +69,9 @@ class _FamilyWallPageState extends ConsumerState<FamilyWallPage>
     try {
       await service.sync(widget.familyId);
       ref.invalidate(familyMembersProvider(widget.familyId));
+      // Photos that failed to load (offline) get another try; loaded ones
+      // keep showing while they reload from the cache.
+      ref.invalidate(familyPhotoProvider);
     } catch (error) {
       if (!quiet && mounted) showFamilyError(context, error);
     }
@@ -279,7 +283,7 @@ class _FamilyWallPageState extends ConsumerState<FamilyWallPage>
   MemoryEvent _toEvent(FamilyMemory memory) {
     final position = _draggingId == memory.id && _dragPosition != null
         ? _dragPosition!
-        : _pendingMoves[memory.id] ?? Offset(memory.wallX, memory.wallY);
+        : _pendingPosition(memory) ?? Offset(memory.wallX, memory.wallY);
     return MemoryEvent(
       id: memory.id,
       title: memory.title,
@@ -328,6 +332,13 @@ class _FamilyWallPageState extends ConsumerState<FamilyWallPage>
     setState(() => _dragPosition = current + globalDelta / scale);
   }
 
+  Offset? _pendingPosition(FamilyMemory memory) {
+    final pending = _pendingMoves[memory.id];
+    return pending != null && pending.version == memory.version
+        ? pending.position
+        : null;
+  }
+
   Future<void> _endDrag(FamilyMemory memory) async {
     final position = _dragPosition;
     final moved = _draggingId == memory.id && position != null;
@@ -335,7 +346,12 @@ class _FamilyWallPageState extends ConsumerState<FamilyWallPage>
       _pointerDown = false;
       _draggingId = null;
       _dragPosition = null;
-      if (moved) _pendingMoves[memory.id] = position;
+      if (moved) {
+        _pendingMoves[memory.id] = (
+          position: position,
+          version: memory.version,
+        );
+      }
     });
     if (!moved) return;
     final service = ref.read(familyServiceOrNullProvider);

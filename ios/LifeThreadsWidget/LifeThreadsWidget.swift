@@ -51,16 +51,39 @@ struct MemoryProvider: TimelineProvider {
 
   func getSnapshot(in context: Context, completion: @escaping (MemoryEntry) -> Void) {
     guard let payload = loadPayload(), !payload.days.isEmpty else {
-      completion(placeholder(in: context))
+      // The sample memory only in the widget gallery; on the home screen an
+      // unfilled widget says to open the app (as on Android).
+      completion(context.isPreview ? placeholder(in: context) : notFilled(at: Date()))
       return
     }
     completion(entry(on: Date(), at: Date(), from: payload))
   }
 
+  /// Before the app wrote anything for the widget (not opened since it was
+  /// added, or installed fresh).
+  private func notFilled(at date: Date) -> MemoryEntry {
+    MemoryEntry(
+      date: date,
+      day: WidgetDay(
+        date: nil,
+        kind: "memory",
+        title: WidgetText.notFilledTitle,
+        subtitle: WidgetText.notFilledSubtitle,
+        memoryId: nil,
+        image: nil
+      ),
+      image: nil
+    )
+  }
+
   /// One entry per day the app prepared, switching at midnight; after the
   /// last one the widget asks again (the app refreshes it whenever it runs).
   func getTimeline(in context: Context, completion: @escaping (Timeline<MemoryEntry>) -> Void) {
-    let payload = loadPayload()
+    guard let payload = loadPayload(), !payload.days.isEmpty else {
+      // The app fills it (and reloads the timeline) when it next runs.
+      completion(Timeline(entries: [notFilled(at: Date())], policy: .never))
+      return
+    }
     let calendar = Calendar.current
     let today = calendar.startOfDay(for: Date())
     var entries = [entry(on: today, at: Date(), from: payload)]
@@ -244,6 +267,22 @@ enum WidgetText {
     case "de": return "Sommer in Split"
     case "ar": return "صيف في سبليت"
     default: return "Summer in Split"
+    }
+  }
+
+  static var notFilledTitle: String {
+    switch language {
+    case "de": return "Deine Erinnerungen"
+    case "ar": return "ذكرياتك"
+    default: return "Your memories"
+    }
+  }
+
+  static var notFilledSubtitle: String {
+    switch language {
+    case "de": return "Öffne LifeThreads einmal, um dieses Widget zu füllen."
+    case "ar": return "افتح LifeThreads مرة لملء هذه الأداة."
+    default: return "Open LifeThreads once to fill this widget."
     }
   }
 

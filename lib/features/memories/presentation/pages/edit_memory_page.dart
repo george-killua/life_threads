@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -74,9 +75,15 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
   /// The form as it was loaded or last saved, to know if anything changed.
   String? _savedSignature;
 
+  /// Photos copied into app storage on this page. Leaving it, those the
+  /// memory doesn't use (removed again, or the edit discarded) are deleted.
+  final _copiedPaths = <String>{};
+  late final MemoryRepository _repository;
+
   @override
   void initState() {
     super.initState();
+    _repository = ref.read(memoryRepositoryProvider.notifier);
     // Typing changes whether Save is active.
     _titleController.addListener(_onTextChanged);
     _descriptionController.addListener(_onTextChanged);
@@ -104,6 +111,9 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
 
   @override
   void dispose() {
+    if (_copiedPaths.isNotEmpty) {
+      unawaited(_repository.deleteUnusedPhotoCopies(_copiedPaths));
+    }
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -476,6 +486,7 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
     final picked = await ref
         .read(photoLibraryServiceProvider)
         .capturePhotoToAppStorage();
+    if (picked != null) _copiedPaths.add(picked.localPath);
     if (!mounted) return;
 
     setState(() {
@@ -562,13 +573,18 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
       (asset) => !existingAssetIds.contains(asset.id),
     );
     final copied = await service.copyAssetsToAppStorage(newAssets);
+    _copiedPaths.addAll(copied.map((photo) => photo.localPath));
     if (mounted) setState(() => _isPicking = false);
     return copied;
   }
 
   /// Follows photo GPS when a photo carries a location. Without one, a saved
   /// place is kept, while a location that came from a removed photo clears.
+  /// A named place ("Grandma's house") is never replaced by photo GPS.
   void _syncLocationFromPhotos() {
+    final namedPlace =
+        _locationLabel.trim().isNotEmpty && !isCoordinateLabel(_locationLabel);
+    if (namedPlace && !_locationFromPhotos) return;
     final locatedPhoto = _firstWhereOrNull(
       _photos,
       (photo) => photo.hasLocation,
@@ -585,7 +601,9 @@ class _EditMemoryPageState extends ConsumerState<EditMemoryPage> {
   }
 
   Future<void> _save(BuildContext context) async {
-    if (!_formKey.currentState!.validate()) return;
+    // No form: the memory was removed while this page was open.
+    final form = _formKey.currentState;
+    if (form == null || !form.validate()) return;
     setState(() => _isSaving = true);
 
     // A place from photo GPS, or a saved place that is only coordinates,

@@ -131,18 +131,21 @@ class MemoryPeopleEditor extends StatelessWidget {
                               ? null
                               : () async {
                                   setDialogState(() => isPickingContact = true);
-                                  final person = await _pickDeviceContact(
-                                    context,
-                                    fallbackRelationship:
-                                        relationshipController.text,
-                                  );
-                                  if (context.mounted && person != null) {
-                                    applyPerson(person);
-                                  }
-                                  if (context.mounted) {
-                                    setDialogState(
-                                      () => isPickingContact = false,
+                                  try {
+                                    final person = await _pickDeviceContact(
+                                      context,
+                                      fallbackRelationship:
+                                          relationshipController.text,
                                     );
+                                    if (context.mounted && person != null) {
+                                      applyPerson(person);
+                                    }
+                                  } finally {
+                                    if (context.mounted) {
+                                      setDialogState(
+                                        () => isPickingContact = false,
+                                      );
+                                    }
                                   }
                                 },
                           icon: isPickingContact
@@ -300,7 +303,8 @@ class MemoryPeopleEditor extends StatelessWidget {
     try {
       FocusManager.instance.primaryFocus?.unfocus();
       if (defaultTargetPlatform == TargetPlatform.iOS) {
-        return _pickIosContact(relationship);
+        // Awaited so a native picker error lands in the catch below.
+        return await _pickIosContact(relationship);
       }
 
       final permission = await FlutterContacts.permissions.request(
@@ -318,7 +322,7 @@ class MemoryPeopleEditor extends StatelessWidget {
       FocusManager.instance.primaryFocus?.unfocus();
       if (!context.mounted) return null;
 
-      return showModalBottomSheet<MemoryPersonDraft>(
+      return await showModalBottomSheet<MemoryPersonDraft>(
         context: context,
         useRootNavigator: true,
         isScrollControlled: true,

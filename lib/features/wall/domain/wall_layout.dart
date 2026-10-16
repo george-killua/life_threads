@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../memories/domain/memory_category.dart';
@@ -17,6 +19,9 @@ enum WallLayoutMode {
 
 class WallLayoutEngine {
   const WallLayoutEngine._();
+
+  /// The lowest a card may start: the wall board is 80000 px tall.
+  static const _lastRowY = 76000.0;
 
   static List<MemoryEvent> apply({
     required List<MemoryEvent> events,
@@ -56,12 +61,18 @@ class WallLayoutEngine {
     final sorted = [...events]
       ..sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
 
+    // Long walls continue in the next pair of columns, so every card
+    // stays on the board.
+    final perColumn = ((_lastRowY - 165) ~/ 165) + 1;
     return [
       for (var index = 0; index < sorted.length; index++)
         sorted[index].copyWith(
           wallPosition:
               manualOverrides[sorted[index].id] ??
-              Offset(150 + (index.isEven ? 0 : 360), 165 + index * 165),
+              Offset(
+                150 + (index ~/ perColumn) * 820 + (index.isEven ? 0 : 360),
+                165 + (index % perColumn) * 165,
+              ),
         ),
     ];
   }
@@ -71,6 +82,8 @@ class WallLayoutEngine {
     Map<String, Offset> manualOverrides,
   ) {
     final output = <MemoryEvent>[];
+    final categories = MemoryCategory.values.length;
+    final perColumn = ((_lastRowY - 160) ~/ 205) + 1;
     for (final category in MemoryCategory.values) {
       final group = events.where((event) => event.category == category).toList()
         ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
@@ -81,7 +94,12 @@ class WallLayoutEngine {
           event.copyWith(
             wallPosition:
                 manualOverrides[event.id] ??
-                Offset(105 + groupIndex * 365, 160 + index * 205),
+                Offset(
+                  // A very long category continues to the right of all
+                  // the others.
+                  105 + (groupIndex + (index ~/ perColumn) * categories) * 365,
+                  160 + (index % perColumn) * 205,
+                ),
           ),
         );
       }
@@ -100,22 +118,40 @@ class WallLayoutEngine {
 
     final keys = groups.keys.toList()..sort();
     final output = <MemoryEvent>[];
-    for (var groupIndex = 0; groupIndex < keys.length; groupIndex++) {
-      final group = groups[keys[groupIndex]]!
-        ..sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
-      for (var index = 0; index < group.length; index++) {
-        final event = group[index];
-        output.add(
-          event.copyWith(
-            wallPosition:
-                manualOverrides[event.id] ??
-                Offset(
-                  115 + (groupIndex % 3) * 370,
-                  165 + (groupIndex ~/ 3) * 420 + index * 180,
-                ),
-          ),
-        );
+    // Places sit three to a row; a row is as tall as its longest place, and
+    // when the board's bottom is reached the next rows start further right.
+    final perColumn = ((_lastRowY - 165) ~/ 180) + 1;
+    var rowTop = 165.0;
+    var blockLeft = 115.0;
+    for (var rowStart = 0; rowStart < keys.length; rowStart += 3) {
+      final rowKeys = keys.skip(rowStart).take(3).toList();
+      final tallest = rowKeys
+          .map((key) => groups[key]!.length.clamp(1, perColumn))
+          .reduce(math.max);
+      final rowHeight = math.max(420.0, (tallest - 1) * 180 + 240.0);
+      if (rowTop > 165 && rowTop + rowHeight - 240 > _lastRowY) {
+        rowTop = 165;
+        blockLeft += 3 * 370 + 160;
       }
+      for (var column = 0; column < rowKeys.length; column++) {
+        final group = groups[rowKeys[column]]!
+          ..sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
+        for (var index = 0; index < group.length; index++) {
+          final event = group[index];
+          output.add(
+            event.copyWith(
+              wallPosition:
+                  manualOverrides[event.id] ??
+                  Offset(
+                    // A single huge place wraps into extra columns.
+                    blockLeft + column * 370 + (index ~/ perColumn) * 1270,
+                    rowTop + (index % perColumn) * 180,
+                  ),
+            ),
+          );
+        }
+      }
+      rowTop += rowHeight;
     }
     return output;
   }

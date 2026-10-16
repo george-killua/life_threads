@@ -5,6 +5,8 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import 'wall_clock_time.dart';
+
 part 'app_database.g.dart';
 
 class MemoryEvents extends Table {
@@ -112,7 +114,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -135,6 +137,25 @@ class AppDatabase extends _$AppDatabase {
         await migrator.addColumn(memoryEvents, memoryEvents.wallId);
         await migrator.addColumn(memoryEvents, memoryEvents.hidden);
         await migrator.addColumn(wallItems, wallItems.wallId);
+      }
+      if (from < 7) {
+        // Memory dates were local instants; now wall-clock times (see
+        // wall_clock_time.dart), read in the zone the phone is in today.
+        final rows = await customSelect(
+          'SELECT id, occurred_at FROM memory_events',
+        ).get();
+        for (final row in rows) {
+          await customUpdate(
+            'UPDATE memory_events SET occurred_at = ? WHERE id = ?',
+            variables: [
+              Variable.withInt(
+                encodeWallClockFromInstant(row.read<int>('occurred_at')),
+              ),
+              Variable.withString(row.read<String>('id')),
+            ],
+            updates: {memoryEvents},
+          );
+        }
       }
     },
   );

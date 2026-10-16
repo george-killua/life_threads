@@ -148,6 +148,18 @@ void main() {
       expect(draft.photos.single.latitude, 43.5);
     });
 
+    test('keeps the wall it was started for', () async {
+      final store = MemoryDraftStore(documentsPath: () async => documents.path);
+      await store.save(
+        MemoryDraft(savedAt: DateTime(2026), title: 'Trip', toWall: 'w1'),
+      );
+      expect((await store.load())!.toWall, 'w1');
+      await store.save(
+        MemoryDraft(savedAt: DateTime(2026), title: 'Home', toWall: ''),
+      );
+      expect((await store.load())!.toWall, '');
+    });
+
     test('an empty draft is not kept', () async {
       final store = MemoryDraftStore(documentsPath: () async => documents.path);
       await store.save(MemoryDraft(savedAt: DateTime(2026), title: 'x'));

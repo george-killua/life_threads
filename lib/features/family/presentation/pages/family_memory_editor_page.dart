@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +15,7 @@ import '../../../../core/widgets/save_action.dart';
 import '../../../media/data/photo_library_service.dart';
 import '../../../media/data/picked_memory_photo.dart';
 import '../../../media/presentation/widgets/photo_grid_sheet.dart';
+import '../../../memories/data/memory_repository.dart';
 import '../../../memories/data/place_names.dart';
 import '../../../memories/domain/memory_category.dart';
 import '../../../memories/domain/memory_feeling.dart';
@@ -69,20 +72,35 @@ class _FamilyMemoryEditorPageState
     if (original == null) {
       return _title.text.trim().isNotEmpty ||
           _story.text.trim().isNotEmpty ||
-          _newPhotos.isNotEmpty;
+          _place.text.trim().isNotEmpty ||
+          _newPhotos.isNotEmpty ||
+          _category != MemoryCategory.family ||
+          _feeling != MemoryFeeling.warm ||
+          _occurredAt != null ||
+          _latitude != null;
     }
     return _title.text != original.title ||
         _story.text != original.description ||
         _place.text != original.locationLabel ||
         _category != original.category ||
         _feeling != original.feeling ||
+        _occurredAt != original.occurredAt ||
+        _latitude != original.latitude ||
+        _longitude != original.longitude ||
         _newPhotos.isNotEmpty ||
-        _keptPhotoIds.length != original.photoIds.length;
+        !listEquals(_keptPhotoIds, _originalPhotoOrder(original));
   }
+
+  /// Picked photos are copied into the personal photo folder first. Family
+  /// photos are uploaded encrypted and cached on their own, so leaving this
+  /// page (posted, removed or discarded) deletes the copies.
+  final _copiedPaths = <String>{};
+  late final MemoryRepository _personalMemories;
 
   @override
   void initState() {
     super.initState();
+    _personalMemories = ref.read(memoryRepositoryProvider.notifier);
     // Typing changes whether leaving asks first.
     for (final field in [_title, _story, _place]) {
       field.addListener(_onTextChanged);
@@ -95,6 +113,9 @@ class _FamilyMemoryEditorPageState
 
   @override
   void dispose() {
+    if (_copiedPaths.isNotEmpty) {
+      unawaited(_personalMemories.deleteUnusedPhotoCopies(_copiedPaths));
+    }
     _title.dispose();
     _story.dispose();
     _place.dispose();
@@ -111,14 +132,19 @@ class _FamilyMemoryEditorPageState
     _occurredAt = memory.occurredAt;
     _latitude = memory.latitude;
     _longitude = memory.longitude;
-    final cover = memory.coverPhotoId;
     _keptPhotoIds
       ..clear()
-      ..addAll([
-        if (cover != null && memory.photoIds.contains(cover)) cover,
-        for (final id in memory.photoIds)
-          if (id != cover) id,
-      ]);
+      ..addAll(_originalPhotoOrder(memory));
+  }
+
+  /// The memory's photos as the strip shows them: cover first.
+  static List<String> _originalPhotoOrder(FamilyMemory memory) {
+    final cover = memory.coverPhotoId;
+    return [
+      if (cover != null && memory.photoIds.contains(cover)) cover,
+      for (final id in memory.photoIds)
+        if (id != cover) id,
+    ];
   }
 
   @override
@@ -127,16 +153,23 @@ class _FamilyMemoryEditorPageState
     // Kept up to date for the storage shown when the wall is full.
     ref.watch(familyProvider(widget.familyId));
     if (_isEditing && _original == null) {
-      final memory = ref
-          .watch(familyMemoriesProvider(widget.familyId))
-          .asData
-          ?.value
+      final memories = ref.watch(familyMemoriesProvider(widget.familyId));
+      final memory = memories.asData?.value
           .where((m) => m.id == widget.memoryId)
           .firstOrNull;
       if (memory == null) {
+        // Deleted (by its author, the owner or a sync) or the list failed.
         return FamilyPageScaffold(
           title: l10n.editMemoryTitle,
-          children: const [Center(child: CircularProgressIndicator())],
+          children: [
+            if (memories.isLoading)
+              const Center(child: CircularProgressIndicator())
+            else
+              FamilyPanel(
+                icon: Icons.help_outline_rounded,
+                title: l10n.familyMemoryGone,
+              ),
+          ],
         );
       }
       _loadOriginal(memory);
@@ -172,7 +205,12 @@ class _FamilyMemoryEditorPageState
             keptPhotoIds: _keptPhotoIds,
             newPhotos: _newPhotos,
             onRemoveKept: (id) => setState(() => _keptPhotoIds.remove(id)),
-            onRemoveNew: (photo) => setState(() => _newPhotos.remove(photo)),
+            onRemoveNew: (photo) {
+              setState(() => _newPhotos.remove(photo));
+              unawaited(
+                _personalMemories.deleteUnusedPhotoCopies([photo.localPath]),
+              );
+            },
           ),
           const SizedBox(height: 10),
           Wrap(
@@ -307,6 +345,7 @@ class _FamilyMemoryEditorPageState
       );
       if (!mounted || selected == null || selected.isEmpty) return;
       final picked = await service.copyAssetsToAppStorage(selected);
+      _copiedPaths.addAll(picked.map((photo) => photo.localPath));
       if (!mounted) return;
       setState(() => _addPhotos(picked));
     } finally {
@@ -320,6 +359,7 @@ class _FamilyMemoryEditorPageState
       final photo = await ref
           .read(photoLibraryServiceProvider)
           .capturePhotoToAppStorage();
+      if (photo != null) _copiedPaths.add(photo.localPath);
       if (!mounted || photo == null) return;
       setState(() => _addPhotos([photo]));
     } finally {
@@ -418,6 +458,9 @@ class _FamilyMemoryEditorPageState
         await service.updateMemory(original, draft);
         AppLogger.event('family_memory_updated');
       }
+      // Uploaded (encrypted) and cached by the family wall: the plain
+      // copies aren't needed any more.
+      unawaited(_personalMemories.deleteUnusedPhotoCopies(_copiedPaths));
       if (!mounted) return;
       showFamilyMessage(
         context,

@@ -213,7 +213,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     return Scaffold(
       body: WallBackground(
         child: SafeArea(
+          // A failed change (e.g. a save) keeps the memories it had: show
+          // them, not the error, which the change reports on its own.
           child: memoryState.when(
+            skipError: true,
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, _) => _WallError(message: error.toString()),
             data: (allState) {
@@ -225,6 +228,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
               if (wallId != _shownWallId) {
                 _shownWallId = wallId;
                 _didSetInitialViewport = false;
+                // Face ID unlocks the hidden memories of one wall only.
+                _showHidden = false;
               }
               final state = allState.onWall(wallId, includeHidden: _showHidden);
               final filteredEvents = WallLayoutEngine.apply(
@@ -604,12 +609,14 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                   _clearDemoWall(context, repository),
                             )
                           else if (backupReminder != null &&
-                              backupReminder.shouldRemind(state.events))
+                              backupReminder.shouldRemind(allState.events))
                             _BackupReminderBanner(
+                              // A backup holds every wall and hidden memory,
+                              // not just what is on screen.
                               unsavedCount: backupReminder.unsavedMemories(
-                                state.events,
+                                allState.events,
                               ),
-                              onBackUp: () => _exportBackup(context, state),
+                              onBackUp: () => _exportBackup(context, allState),
                               onLater: () => ref
                                   .read(backupReminderProvider.notifier)
                                   .snooze(),

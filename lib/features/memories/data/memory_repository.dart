@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../app/theme/app_colors.dart';
+import '../../../core/database/wall_clock_time.dart';
 import '../../../core/database/app_database.dart' as db;
 import '../../../core/database/database_provider.dart';
 import '../../../core/localization/locale_controller.dart';
@@ -16,6 +17,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../backup/domain/backup_models.dart';
 import '../../onboarding/onboarding_preferences.dart';
 import '../../wall/domain/wall_item.dart';
+import 'memory_draft_store.dart';
 import '../domain/memory_category.dart';
 import '../domain/memory_connection.dart';
 import '../domain/memory_event.dart';
@@ -123,7 +125,11 @@ class MemoryState {
     return notes;
   }
 
+  /// Memories threaded to [id]. Hidden ones are left out unless [id] is
+  /// hidden itself (reaching it already took Face ID), so a visible memory
+  /// never reveals a hidden one, on screen or in a shared capsule.
   List<MemoryEvent> connectedEvents(String id) {
+    final includeHidden = findEvent(id)?.hidden ?? false;
     final connectedIds = connections
         .where(
           (connection) =>
@@ -136,7 +142,13 @@ class MemoryState {
         )
         .toSet();
 
-    return events.where((event) => connectedIds.contains(event.id)).toList();
+    return events
+        .where(
+          (event) =>
+              connectedIds.contains(event.id) &&
+              (includeHidden || !event.hidden),
+        )
+        .toList();
   }
 
   bool hasConnection(String firstId, String secondId) {
@@ -525,7 +537,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
           category: Value(category.name),
           memoryType: Value(memoryType.name),
           feeling: Value(feeling.name),
-          occurredAt: Value(occurredAt.millisecondsSinceEpoch),
+          occurredAt: Value(encodeWallClock(occurredAt)),
           locationLabel: Value(locationLabel),
           latitude: Value(latitude),
           longitude: Value(longitude),
@@ -725,8 +737,20 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
         }
       }
 
-      await put(_database.memoryEvents, removed.events);
-      await put(_database.wallItems, removed.wallItems);
+      // A wall deleted during the undo window: its things go to My wall,
+      // as deleteWall does with everything else that was on it.
+      final wallIds = (await _database.select(_database.personalWalls).get())
+          .map((row) => row.id)
+          .toSet();
+      bool wallGone(String? id) => id != null && !wallIds.contains(id);
+      await put(_database.memoryEvents, [
+        for (final row in removed.events)
+          wallGone(row.wallId) ? row.copyWith(wallId: const Value(null)) : row,
+      ]);
+      await put(_database.wallItems, [
+        for (final row in removed.wallItems)
+          wallGone(row.wallId) ? row.copyWith(wallId: const Value(null)) : row,
+      ]);
       await put(_database.memoryPhotos, removed.photos);
       await put(_database.memoryPeople, removed.people);
       // A thread only comes back if both of its ends are on the wall.
@@ -773,6 +797,11 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
 
   /// Deletes app-owned photo files that no memory references any more.
   /// Only files inside the app's memory_photos folder are ever touched.
+  /// Deletes photo copies that were picked and then dropped (removed before
+  /// saving, or an edit discarded); copies a memory uses are kept.
+  Future<void> deleteUnusedPhotoCopies(Iterable<String> paths) =>
+      _deleteUnreferencedPhotoFiles(paths.toSet());
+
   Future<void> _deleteUnreferencedPhotoFiles(Set<String> storedPaths) async {
     if (storedPaths.isEmpty) return;
     try {
@@ -846,6 +875,9 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       await _database.delete(_database.memoryEvents).go();
       await _database.delete(_database.personalWalls).go();
     });
+
+    // The unsaved Add-memory draft is local data too (title, notes, people).
+    await ref.read(memoryDraftStoreProvider).clear();
 
     final photosDir = await AppStoragePaths.memoryPhotosDirectory();
     if (await photosDir.exists()) {
@@ -1143,6 +1175,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
           photos: current.photos,
           people: current.people,
           wallItems: updatedItems,
+          walls: current.walls,
         ),
       );
     }
@@ -1159,6 +1192,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
 
   Future<BackupImportResult> importBackup(BackupImportData backup) async {
     final documentsPath = await AppStoragePaths.documentsPath();
+    final usedPhotoPaths = <String>{};
     final idMap = <String, String>{};
     var eventCount = 0;
     var photoCount = 0;
@@ -1227,6 +1261,11 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
               );
           wallIdMap[sourceId] = sourceId;
         }
+        String? usePhoto(String? path) {
+          if (path != null) usedPhotoPaths.add(path);
+          return path;
+        }
+
         String? wallOf(Map<String, Object?> row) {
           final id = _nullableString(row, 'wallId');
           return id == null ? null : wallIdMap[id];
@@ -1237,7 +1276,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
           final existingId = existingEventIds.contains(sourceId)
               ? sourceId
               : existingEventKeys['${_stringValue(event, 'title', fallback: 'Restored memory')}|'
-                    '${_intValue(event, 'occurredAt', fallback: -1)}|'
+                    '${encodeWallClockFromInstant(_intValue(event, 'occurredAt', fallback: -1))}|'
                     '${_intValue(event, 'createdAt', fallback: -1)}'];
           if (existingId != null) {
             idMap[sourceId] = existingId;
@@ -1269,10 +1308,12 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
                   feeling: Value(
                     _stringValue(event, 'feeling', fallback: 'warm'),
                   ),
-                  occurredAt: _intValue(
-                    event,
-                    'occurredAt',
-                    fallback: DateTime.now().millisecondsSinceEpoch,
+                  occurredAt: encodeWallClockFromInstant(
+                    _intValue(
+                      event,
+                      'occurredAt',
+                      fallback: DateTime.now().millisecondsSinceEpoch,
+                    ),
                   ),
                   createdAt: _intValue(
                     event,
@@ -1298,7 +1339,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
                     coverPhotoPath == null
                         ? null
                         : AppStoragePaths.persistOptionalPhotoPath(
-                            backup.photoPaths[coverPhotoPath],
+                            usePhoto(backup.photoPaths[coverPhotoPath]),
                             documentsPath,
                           ),
                   ),
@@ -1311,12 +1352,14 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
 
         for (final item in backup.wallItems) {
           final sourceId = _stringValue(item, 'id');
-          if (existingItemIds.contains(sourceId) ||
-              existingItemKeys.containsKey(
-                '${_stringValue(item, 'type', fallback: WallItemType.text.name)}|'
-                '${_stringValue(item, 'content')}|'
-                '${_intValue(item, 'createdAt', fallback: -1)}',
-              )) {
+          final existingItemId = existingItemIds.contains(sourceId)
+              ? sourceId
+              : existingItemKeys['${_stringValue(item, 'type', fallback: WallItemType.text.name)}|'
+                    '${_stringValue(item, 'content')}|'
+                    '${_intValue(item, 'createdAt', fallback: -1)}'];
+          if (existingItemId != null) {
+            // Kept, so threads from restored memories still reach it.
+            idMap[sourceId] = existingItemId;
             continue;
           }
           final newId = _uuid.v4();
@@ -1360,6 +1403,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
           final archivePath = _stringValue(photo, 'localPath');
           final localPath = backup.photoPaths[archivePath];
           if (eventId == null || localPath == null) continue;
+          usePhoto(localPath);
 
           await _database
               .into(_database.memoryPhotos)
@@ -1447,6 +1491,15 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
         } catch (_) {}
       }
       rethrow;
+    }
+    // Photos of memories that were already here (skipped) were copied out of
+    // the archive too; nothing points to those copies.
+    for (final path in backup.photoPaths.values.toSet()) {
+      if (usedPhotoPaths.contains(path)) continue;
+      try {
+        final file = File(path);
+        if (await file.exists()) await file.delete();
+      } catch (_) {}
     }
 
     state = await AsyncValue.guard(_loadState);
@@ -1558,7 +1611,13 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     }
   }
 
+  static const _demoCoversSyncedKey = 'demo_asset_covers_synced_v1';
+
+  /// Gives demo memories seeded before they had covers their pictures, once:
+  /// later a missing cover is the user's choice (cleared on the edit page).
   Future<void> _syncDemoAssetCovers() async {
+    final preferences = await SharedPreferences.getInstance();
+    if (preferences.getBool(_demoCoversSyncedKey) ?? false) return;
     for (final event in MemorySeedData.events) {
       await (_database.update(_database.memoryEvents)
             ..where((row) => row.id.equals(event.id))
@@ -1572,6 +1631,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
             ),
           );
     }
+    await preferences.setBool(_demoCoversSyncedKey, true);
   }
 
   db.MemoryEventsCompanion _eventToCompanion(
@@ -1592,7 +1652,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       category: Value(event.category.name),
       memoryType: Value(event.memoryType.name),
       feeling: Value(event.feeling.name),
-      occurredAt: event.occurredAt.millisecondsSinceEpoch,
+      occurredAt: encodeWallClock(event.occurredAt),
       createdAt: event.createdAt.millisecondsSinceEpoch,
       coverColorValue: event.coverColor.toARGB32(),
       wallX: event.wallPosition.dx,
@@ -1629,7 +1689,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       category: MemoryCategory.fromName(row.category),
       memoryType: MemoryType.fromName(row.memoryType),
       feeling: MemoryFeeling.fromName(row.feeling),
-      occurredAt: DateTime.fromMillisecondsSinceEpoch(row.occurredAt),
+      occurredAt: decodeWallClock(row.occurredAt),
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
       coverColor: Color(row.coverColorValue),
       wallPosition: Offset(row.wallX, row.wallY),

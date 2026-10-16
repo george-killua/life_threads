@@ -65,6 +65,9 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
   MemoryType _memoryType = MemoryType.moment;
   MemoryFeeling _feeling = MemoryFeeling.warm;
   DateTime? _occurredAt;
+
+  /// See [AddMemoryPage.toWall]; a continued draft brings its own.
+  late String? _toWall = widget.toWall;
   // True while the date was filled in from a photo rather than picked by the
   // user, so it can follow photo additions and removals.
   bool _dateFromPhotos = false;
@@ -140,7 +143,11 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
         ),
         title: Text(l10n.saveMomentTitle),
       ),
+      // A failed save leaves the memories in an error state that still has
+      // them: keep the form (the save shows its own toast) instead of
+      // replacing it with the error.
       body: memoryState.when(
+        skipError: true,
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => _ErrorState(message: error.toString()),
         data: (state) {
@@ -217,11 +224,19 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
               onPick: _openPhotoPicker,
               onCapture: _capturePhoto,
               onManageLimitedAccess: _manageLimitedPhotoAccess,
-              onRemove: (photo) => setState(() {
-                _photos.remove(photo);
-                if (_dateFromPhotos) _syncDateFromPhotos();
-                _syncLocationFromPhotos();
-              }),
+              onRemove: (photo) {
+                setState(() {
+                  _photos.remove(photo);
+                  if (_dateFromPhotos) _syncDateFromPhotos();
+                  _syncLocationFromPhotos();
+                });
+                // Its copy in app storage isn't needed any more.
+                unawaited(
+                  ref
+                      .read(memoryRepositoryProvider.notifier)
+                      .deleteUnusedPhotoCopies([photo.localPath]),
+                );
+              },
             ),
           ],
         ),
@@ -330,7 +345,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
   /// [AddMemoryPage.toWall] if that wall still exists, else the wall on
   /// screen.
   String? _targetWall() {
-    final wall = widget.toWall;
+    final wall = _toWall;
     if (wall == null) return activeWallId(ref);
     if (wall.isEmpty) return null;
     final walls = ref.read(memoryRepositoryProvider).asData?.value.walls;
@@ -353,6 +368,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     longitude: _longitude,
     connectedEventId: _connectedEventId,
     connectionReason: _connectionReasonController.text,
+    toWall: _toWall,
   );
 
   void _scheduleDraftSave() {
@@ -458,7 +474,10 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     _category = draft.category;
     _memoryType = draft.memoryType;
     _feeling = draft.feeling;
-    _occurredAt = draft.occurredAt;
+    // A draft without a date keeps the date this page was opened for
+    // ("Add a memory to 2023").
+    _occurredAt = draft.occurredAt ?? widget.initialDate;
+    _toWall = widget.toWall ?? draft.toWall;
     _dateFromPhotos = draft.dateFromPhotos;
     _latitude = draft.latitude;
     _longitude = draft.longitude;

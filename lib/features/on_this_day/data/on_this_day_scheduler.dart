@@ -55,9 +55,11 @@ List<OnThisDayNotification> onThisDayNotificationsFor(
   ];
 }
 
-/// On the first of next month at [minuteOfDay]: the month of [now] to look
-/// back on, when it has memories. Rescheduled with every change, so the
-/// count stays current. Needs `initializeDateFormatting` for the locale.
+/// On the first of a month at [minuteOfDay]: the month before it to look
+/// back on, when it has memories. That is the month of [now], or, on the
+/// 1st before the reminder time, last month (its notification is still to
+/// come today). Rescheduled with every change, so the count stays current.
+/// Needs `initializeDateFormatting` for the locale.
 OnThisDayNotification? lookBackNotificationFor(
   tz.TZDateTime now,
   List<MemoryEvent> events,
@@ -65,12 +67,17 @@ OnThisDayNotification? lookBackNotificationFor(
   AppLocalizations l10n, {
   bool private = false,
 }) {
+  final beforeReminderOnFirst =
+      now.day == 1 && now.hour * 60 + now.minute < minuteOfDay;
+  final month = beforeReminderOnFirst
+      ? MonthLookBack.previousMonth(now.year, now.month)
+      : (year: now.year, month: now.month);
   final count = events.where((event) {
     final at = event.occurredAt.toLocal();
-    return at.year == now.year && at.month == now.month;
+    return at.year == month.year && at.month == month.month;
   }).length;
   if (count == 0) return null;
-  final next = MonthLookBack.nextMonth(now.year, now.month);
+  final next = MonthLookBack.nextMonth(month.year, month.month);
   final at = tz.TZDateTime(
     now.location,
     next.year,
@@ -79,17 +86,17 @@ OnThisDayNotification? lookBackNotificationFor(
     minuteOfDay ~/ 60,
     minuteOfDay % 60,
   );
-  final month = DateFormat.MMMM(
+  final monthName = DateFormat.MMMM(
     l10n.localeName,
-  ).format(DateTime(now.year, now.month));
+  ).format(DateTime(month.year, month.month));
   return OnThisDayNotification(
     id: LocalOnThisDayNotifications.lookBackId,
     at: at,
     title: l10n.lookBackWallCardTitle,
     body: private
         ? l10n.lookBackNotificationPrivate
-        : l10n.lookBackNotificationBody(month, count),
-    lookBack: (year: now.year, month: now.month),
+        : l10n.lookBackNotificationBody(monthName, count),
+    lookBack: (year: month.year, month: month.month),
   );
 }
 

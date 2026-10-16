@@ -72,6 +72,10 @@ class ApiFamilyService implements FamilyService {
   /// before (a sync, a photo download) does not write it back.
   int _generation = 0;
 
+  /// Bumped each time a family is removed from this device (left, deleted,
+  /// removed from it), so work that started before doesn't write it back.
+  final _forgotten = <String, int>{};
+
   // Account -------------------------------------------------------------------
 
   @override
@@ -288,7 +292,9 @@ class ApiFamilyService implements FamilyService {
   }
 
   Future<void> _forgetFamily(String familyId) async {
-    await cache.deleteFamily(familyId);
+    // A sync still running for this family must not write it back.
+    _forgotten[familyId] = (_forgotten[familyId] ?? 0) + 1;
+    await _locked(familyId, () => cache.deleteFamily(familyId));
     await secrets.deleteKey(familyId);
     _memoryValues[familyId]?.set(const []);
     final families = (await cache.families())
@@ -739,6 +745,7 @@ class ApiFamilyService implements FamilyService {
   ///   the family is removed from the device.
   Future<void> _pullChanges(String familyId) async {
     final generation = _generation;
+    final forgotten = _forgotten[familyId] ?? 0;
     final ring = await _ring(familyId);
     var state = await cache.state(familyId);
     var cursor = state.cursor;
@@ -828,6 +835,9 @@ class ApiFamilyService implements FamilyService {
       await _locked(familyId, () async {
         if (generation != _generation) {
           throw const FamilyException(FamilyErrorCodes.signedOut);
+        }
+        if (forgotten != (_forgotten[familyId] ?? 0)) {
+          throw const FamilyException(FamilyErrorCodes.familyNotFound);
         }
         final memories = Map.of(await cache.memories(familyId));
         memories.removeWhere((id, _) => removals.contains(id));
@@ -927,6 +937,8 @@ class ApiFamilyService implements FamilyService {
   }
 
   Future<void> _deletePhotoFile(String familyId, String photoId) async {
+    // Not a plain id (e.g. "../x"): there is no such file in the cache.
+    if (!isSafeFamilyId(familyId) || !isSafeFamilyId(photoId)) return;
     final file = await cache.photoFile(familyId, photoId);
     if (await file.exists()) await file.delete();
   }

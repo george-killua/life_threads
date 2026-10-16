@@ -78,8 +78,13 @@ abstract final class FamilyMemoryRecord {
     double? optionalNumber(Object? value) =>
         value is num && value.isFinite ? value.toDouble() : null;
     String string(Object? value) => value is String ? value : '';
+    // Ids come from other members' records and become file names: only
+    // plain ids are accepted (no "../").
     final photoIds = record['photoIds'] is List
-        ? (record['photoIds'] as List).whereType<String>().toList()
+        ? (record['photoIds'] as List)
+              .whereType<String>()
+              .where(isSafeFamilyId)
+              .toList()
         : <String>[];
     final cover = record['coverPhotoId'];
     return FamilyMemory(
@@ -146,6 +151,11 @@ abstract final class FamilyMemoryRecord {
 }
 
 /// What the device remembers about one family between syncs.
+
+/// Ids of families, memories and photos: letters, digits, '-' and '_'.
+bool isSafeFamilyId(String id) => _safeFamilyId.hasMatch(id);
+final _safeFamilyId = RegExp(r'^[A-Za-z0-9_-]{1,128}$');
+
 class FamilySyncState {
   const FamilySyncState({
     this.cursor = '0',
@@ -233,13 +243,23 @@ class FamilyLocalCache {
   Future<Directory> get root => _rootFuture;
 
   Future<String> _familyDir(String familyId) async =>
-      p.join((await root).path, 'families', familyId);
+      p.join((await root).path, 'families', _checkedId(familyId));
 
   Future<Directory> photosDir(String familyId) async =>
       Directory(p.join(await _familyDir(familyId), 'photos'));
 
-  Future<File> photoFile(String familyId, String photoId) async =>
-      File(p.join((await photosDir(familyId)).path, '$photoId.jpg'));
+  Future<File> photoFile(String familyId, String photoId) async => File(
+    p.join((await photosDir(familyId)).path, '${_checkedId(photoId)}.jpg'),
+  );
+
+  /// Server and member supplied ids name files and folders here; anything
+  /// that isn't a plain id could reach outside the cache.
+  static String _checkedId(String id) {
+    if (!isSafeFamilyId(id)) {
+      throw ArgumentError.value(id, 'id', 'not a plain family id');
+    }
+    return id;
+  }
 
   Future<Object?> _readJson(String path) async {
     final file = File(path);

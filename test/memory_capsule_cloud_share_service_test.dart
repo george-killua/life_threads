@@ -33,6 +33,40 @@ void main() {
       );
     });
 
+    test('refuses a capsule larger than recipients download', () async {
+      final dir = await Directory.systemTemp.createTemp('capsule-share-test');
+      addTearDown(() => dir.delete(recursive: true));
+      final file = File(p.join(dir.path, 'capsule.zip'));
+      final raf = await file.open(mode: FileMode.write);
+      await raf.truncate(25 * 1024 * 1024 + 1);
+      await raf.close();
+
+      // Nothing listens there: the size check comes before any upload.
+      const service = MemoryCapsuleCloudShareService(
+        endpoint: 'http://127.0.0.1:9/not-called',
+      );
+
+      await expectLater(
+        service.uploadCapsule(
+          capsule: MemoryCapsuleExportResult(
+            path: file.path,
+            title: 'Big memory',
+            photoCount: 40,
+            noteCount: 0,
+            connectionCount: 0,
+            isEncrypted: true,
+          ),
+        ),
+        throwsA(
+          isA<MemoryCapsuleCloudShareException>().having(
+            (e) => e.message,
+            'message',
+            contains('too large'),
+          ),
+        ),
+      );
+    });
+
     test('uploads encrypted capsule multipart payload', () async {
       final dir = await Directory.systemTemp.createTemp('capsule-share-test');
       addTearDown(() => dir.delete(recursive: true));

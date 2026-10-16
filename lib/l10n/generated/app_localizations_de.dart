@@ -3652,4 +3652,13 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get tutorialWidgetText =>
       'Füge das LifeThreads-Widget hinzu: jeden Tag eine andere Erinnerung. Einstellungen › Widget auf dem Home-Bildschirm wählt, welche.';
+
+  @override
+  String photoNumber(int number) {
+    return 'Foto $number';
+  }
+
+  @override
+  String get familyDisplayNameNotSaved =>
+      'Dein Name auf dieser Wand konnte nicht gespeichert werden. Du kannst ihn in den Einstellungen der Wand festlegen.';
 }

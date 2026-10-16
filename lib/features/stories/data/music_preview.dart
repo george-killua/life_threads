@@ -29,6 +29,11 @@ class AudioplayersMusicPreview implements MusicPreview {
   AudioPlayer? _player;
   StreamSubscription<Duration>? _loop;
 
+  /// Bumped by every play and stop: a play still loading its song when a
+  /// newer call came in gives up instead of starting to play after it.
+  var _call = 0;
+  var _stopped = true;
+
   /// Created on first use, so screens that never play music never touch the
   /// platform player.
   Future<AudioPlayer> _ensurePlayer() async {
@@ -52,13 +57,24 @@ class AudioplayersMusicPreview implements MusicPreview {
     Duration start = Duration.zero,
     Duration? length,
   }) async {
+    final call = ++_call;
+    _stopped = false;
     final player = await _ensurePlayer();
     await _loop?.cancel();
     _loop = null;
     await player.stop();
+    if (call != _call) return;
     await player.setSource(AssetSource(track.assetPath));
+    if (call != _call) return;
     if (start > Duration.zero) await player.seek(start);
+    if (call != _call) return;
     await player.resume();
+    if (call != _call) {
+      // Stopped while starting: it must not keep playing. (A newer play
+      // takes over the player on its own.)
+      if (_stopped) await player.stop();
+      return;
+    }
     if (length == null) return;
     final end = start + length;
     _loop = player.onPositionChanged.listen((position) {
@@ -68,6 +84,8 @@ class AudioplayersMusicPreview implements MusicPreview {
 
   @override
   Future<void> stop() async {
+    _call++;
+    _stopped = true;
     await _loop?.cancel();
     _loop = null;
     await _player?.stop();

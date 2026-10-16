@@ -472,17 +472,25 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
     for (final image in film.images) {
       unawaited(precacheImage(image, context, onError: (_, _) {}));
     }
-    // The chosen part of the song plays with the preview.
+    // The chosen part of the song plays with the preview, following its
+    // play, pause and seek.
     final music = _music;
-    if (music != null) {
+    void playMusic(Duration from) {
+      if (music == null) return;
+      final start = MusicTrimmer.clampStart(music, film.duration, _musicStart);
       unawaited(
         _musicPreview.play(
           music,
-          start: MusicTrimmer.clampStart(music, film.duration, _musicStart),
-          length: film.duration,
+          start: start + from,
+          length: film.duration - from,
         ),
       );
     }
+
+    void pauseMusic() {
+      if (music != null) unawaited(_musicPreview.stop());
+    }
+
     await showDialog<void>(
       context: context,
       builder: (context) => Dialog(
@@ -501,7 +509,13 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
                   icon: const Icon(Icons.close_rounded),
                 ),
               ),
-              Flexible(child: YearThreadPlayer(film: film)),
+              Flexible(
+                child: YearThreadPlayer(
+                  film: film,
+                  onPlay: playMusic,
+                  onPause: pauseMusic,
+                ),
+              ),
             ],
           ),
         ),
@@ -995,7 +1009,7 @@ class _NoYearYet extends StatelessWidget {
         const SizedBox(height: 18),
         FilledButton.icon(
           key: const ValueKey('year-thread-add-memory'),
-          onPressed: () => context.push(RouteNames.addMemory),
+          onPressed: () => context.push(RouteNames.addMemoryTo(addToWall)),
           icon: const Icon(Icons.add_rounded),
           label: Text(l10n.yearThreadAddMemory),
         ),

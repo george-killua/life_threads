@@ -1069,5 +1069,7 @@
   "tutorialFamilyTitle": "Mit der Familie teilen",
   "tutorialFamilyText": "Mehr › Familienwände: eine Wand für die ganze Familie, Ende-zu-Ende-verschlüsselt. Andere per Link einladen.",
   "tutorialWidgetTitle": "Eine Erinnerung auf dem Home-Bildschirm",
-  "tutorialWidgetText": "Füge das LifeThreads-Widget hinzu: jeden Tag eine andere Erinnerung. Einstellungen › Widget auf dem Home-Bildschirm wählt, welche."
+  "tutorialWidgetText": "Füge das LifeThreads-Widget hinzu: jeden Tag eine andere Erinnerung. Einstellungen › Widget auf dem Home-Bildschirm wählt, welche.",
+  "photoNumber": "Foto {number}",
+  "familyDisplayNameNotSaved": "Dein Name auf dieser Wand konnte nicht gespeichert werden. Du kannst ihn in den Einstellungen der Wand festlegen."
 }

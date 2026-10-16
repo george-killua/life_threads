@@ -28,6 +28,62 @@ What changed in each TestFlight / Play build. Newest first.
 - Thread of the Year: "Add a memory to <year>" adds to the wall chosen under
   "Memories from".
 
+**Fixed (whole-codebase bug hunt)**
+- Privacy:
+  - A visible memory no longer shows, opens or shares a hidden memory it is
+    threaded to (detail page, Connections, shared links).
+  - One Face ID unlock shows hidden memories on that wall only.
+  - With VoiceOver/TalkBack, nothing under the lock screen can be read or
+    tapped.
+  - Removing the phone's passcode no longer locks LifeThreads for good.
+- Premium: an expired or refunded iPhone subscription now ends Premium;
+  Restore stays usable while a purchase is pending.
+- Backups and restore:
+  - "Back up" on the wall's reminder saves every wall and hidden memory, not
+    just the wall on screen.
+  - Restoring keeps threads to notes.
+  - Importing again leaves no extra photo copies.
+  - Shared memories keep their place name.
+  - Links over 25 MB are refused before uploading.
+- Memories:
+  - Dates no longer move a day after travelling west (a database update
+    converts existing memories).
+  - Moving a note or nail keeps you on your wall.
+  - Undo after deleting a wall puts the memory on My wall.
+  - A removed demo cover stays removed.
+  - A failed save keeps the form.
+  - A continued draft keeps its year and wall.
+  - Edit keeps a typed place name.
+  - Dropped photo copies are deleted.
+  - "Clear all data" also deletes the draft and signs out of family walls.
+- Family walls:
+  - Another member's record can't make your phone delete files.
+  - A retried save no longer hides another device's change.
+  - Leaving during a sync leaves nothing behind.
+  - An old session's error no longer signs you out.
+  - Creating or joining never reports a failure after it worked.
+  - Moved cards follow later changes.
+  - Covers reload on refresh.
+  - The editor asks before discarding a new date or place, shows "no longer
+    on the wall" instead of spinning, and deletes its plain photo copies.
+- Wall: a long swipe can't push the wall off screen; all of a note's edit
+  button takes taps; very large walls stay on the board in every view.
+- Stories and Thread of the Year:
+  - Songs stop when you leave or open the paywall.
+  - Pause and seek control the music.
+  - "Create story" works for a shown hidden memory.
+  - The December card only offers a year its wall can film.
+  - The empty page's "Add a memory" uses the chosen wall.
+- Look-back notifications on the 1st aren't lost; reminders follow a new
+  time zone; Arabic search finds أحمد when typing احمد.
+- Contacts: a picker error shows a message instead of a stuck button.
+- Photos: library photos use the date the camera recorded; a photo whose
+  details can't be read is still added.
+- The share toast's Delete works after leaving the page; the photo viewer
+  title is translated.
+- iPhone widget: says to open the app before its first update instead of
+  showing a sample memory.
+
 ## 1.0.0 (22) – 16 October 2026
 
 Uploaded to TestFlight and to Google Play closed testing (alpha).

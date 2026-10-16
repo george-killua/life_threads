@@ -560,7 +560,13 @@ class _SubscriptionOfferCard extends StatelessWidget {
             child: OutlinedButton.icon(
               key: const ValueKey('premium-restore'),
               style: _cardOutlined,
-              onPressed: purchaseState.isBusy ? null : onRestore,
+              // Stays available while a purchase is pending: a declined Ask
+              // to Buy may never send a final event, and Restore clears it.
+              onPressed:
+                  purchaseState.status == PremiumPurchaseStatus.loading ||
+                      purchaseState.isRestoring
+                  ? null
+                  : onRestore,
               icon: const Icon(Icons.restore_rounded),
               label: Text(context.l10n.restorePurchase),
             ),

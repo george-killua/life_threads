@@ -26,7 +26,8 @@ class WallSwitcherButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final families = ref.watch(familiesProvider).asData?.value ?? const [];
+    // Empty until family walls were used here: no family service calls.
+    final families = ref.watch(switchableFamiliesProvider);
     final current = families.where((f) => f.id == currentFamilyId).firstOrNull;
     final walls =
         ref.watch(memoryRepositoryProvider).asData?.value.walls ?? const [];
@@ -344,7 +345,8 @@ class _WallSwitcherSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final families = ref.watch(familiesProvider).asData?.value ?? const [];
+    // Empty until family walls were used here: no family service calls.
+    final families = ref.watch(switchableFamiliesProvider);
     final walls =
         ref.watch(memoryRepositoryProvider).asData?.value.walls ?? const [];
     final currentWall = ref.watch(currentWallProvider);

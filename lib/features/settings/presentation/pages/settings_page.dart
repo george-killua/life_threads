@@ -26,6 +26,8 @@ import '../../../capsule/domain/memory_capsule_models.dart';
 import '../../../capsule/presentation/widgets/memory_capsule_dialogs.dart';
 import '../../../home_widget/data/home_widget_settings.dart';
 import '../../../home_widget/domain/home_widget_days.dart';
+import '../../../family/data/family_service.dart';
+import '../../../family/presentation/family_providers.dart';
 import '../../../memories/data/memory_repository.dart';
 import '../../../on_this_day/data/on_this_day_notifications.dart';
 import '../../../on_this_day/data/on_this_day_providers.dart';
@@ -1122,6 +1124,16 @@ Future<void> _clearAllData(BuildContext context, WidgetRef ref) async {
   if (!context.mounted || confirmed != true) return;
   try {
     await ref.read(memoryRepositoryProvider.notifier).clearAllData();
+    // Family walls stay on the server, but this device signs out of them:
+    // their decrypted copies are local data too.
+    if (await ref.read(familyWallsActiveProvider.future)) {
+      try {
+        await ref.read(familyServiceProvider).signOut();
+      } catch (_) {
+        // Signing out also ends the local session when offline.
+      }
+      await ref.read(familyWallsActiveProvider.notifier).setActive(false);
+    }
   } catch (_) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(

@@ -37,6 +37,11 @@ class RouteNames {
       '${date.month.toString().padLeft(2, '0')}-'
       '${date.day.toString().padLeft(2, '0')}'
       '${wall == null ? '' : '&wall=${Uri.encodeQueryComponent(wall)}'}';
+
+  /// Add a memory on [wall] ('' for My wall, null for the wall on screen).
+  static String addMemoryTo(String? wall) => wall == null
+      ? addMemory
+      : '$addMemory?wall=${Uri.encodeQueryComponent(wall)}';
   static String lookBackFor(int year, int month) =>
       '$lookBack?year=$year&month=$month';
 

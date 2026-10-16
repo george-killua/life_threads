@@ -38,6 +38,8 @@ class WallTextNoteWidget extends StatefulWidget {
 }
 
 class _WallTextNoteWidgetState extends State<WallTextNoteWidget> {
+  static const _buttonOverhang = 9.0;
+
   var _suppressTap = false;
 
   @override
@@ -62,126 +64,137 @@ class _WallTextNoteWidgetState extends State<WallTextNoteWidget> {
             child: Transform.rotate(
               angle: sway,
               alignment: Alignment.topCenter,
+              // The edit button overhangs the note's corner; the Stack is
+              // that much larger so all of the button takes taps.
               child: SizedBox(
-                width: 198,
+                width: 198 + _buttonOverhang,
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    WallDragListener(
-                      onDragStart: widget.onDragStart,
-                      onDragUpdate: widget.onDragUpdate,
-                      onDragEnd: widget.onDragEnd,
-                      onPointerDown: () {
-                        _suppressTap = false;
-                        widget.onPointerDown();
-                      },
-                      onPointerUp: widget.onPointerUp,
-                      onDraggingChanged: (dragging) {
-                        if (dragging) _suppressTap = true;
-                      },
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onLongPress: () {
-                          if (_suppressTap) return;
-                          widget.onLongPress();
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        right: _buttonOverhang,
+                        bottom: _buttonOverhang,
+                      ),
+                      child: WallDragListener(
+                        onDragStart: widget.onDragStart,
+                        onDragUpdate: widget.onDragUpdate,
+                        onDragEnd: widget.onDragEnd,
+                        onPointerDown: () {
+                          _suppressTap = false;
+                          widget.onPointerDown();
                         },
-                        onTap: () {
-                          if (_suppressTap) return;
-                          widget.onLongPress();
+                        onPointerUp: widget.onPointerUp,
+                        onDraggingChanged: (dragging) {
+                          if (dragging) _suppressTap = true;
                         },
-                        child: Container(
-                          width: 198,
-                          padding: const EdgeInsets.fromLTRB(17, 20, 17, 17),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                widget.item.color.withValues(alpha: 0.98),
-                                widget.item.color,
-                                AppColors.cardDark,
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.4),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(
-                                  alpha: widget.isDragging ? 0.52 : 0.38,
-                                ),
-                                blurRadius: widget.isDragging ? 38 : 27,
-                                offset: Offset(0, widget.isDragging ? 22 : 15),
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onLongPress: () {
+                            if (_suppressTap) return;
+                            widget.onLongPress();
+                          },
+                          onTap: () {
+                            if (_suppressTap) return;
+                            widget.onLongPress();
+                          },
+                          child: Container(
+                            width: 198,
+                            padding: const EdgeInsets.fromLTRB(17, 20, 17, 17),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  widget.item.color.withValues(alpha: 0.98),
+                                  widget.item.color,
+                                  AppColors.cardDark,
+                                ],
                               ),
-                              BoxShadow(
-                                color: widget.item.color.withValues(
-                                  alpha: 0.18,
-                                ),
-                                blurRadius: 22,
-                                offset: const Offset(0, 8),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.4),
                               ),
-                            ],
-                          ),
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              CustomPaint(
-                                foregroundPainter: _NoteLinesPainter(),
-                                child: Text(
-                                  widget.item.content,
-                                  maxLines: 6,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: AppColors.paperInk,
-                                    fontSize: 15,
-                                    height: 1.35,
-                                    fontWeight: FontWeight.w900,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(
+                                    alpha: widget.isDragging ? 0.52 : 0.38,
+                                  ),
+                                  blurRadius: widget.isDragging ? 38 : 27,
+                                  offset: Offset(
+                                    0,
+                                    widget.isDragging ? 22 : 15,
                                   ),
                                 ),
-                              ),
-                              Positioned(
-                                top: -34,
-                                left: 63,
-                                child: Transform.rotate(
-                                  angle: 0.06,
-                                  child: Container(
-                                    width: 50,
-                                    height: 19,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.card.withValues(
-                                        alpha: 0.76,
-                                      ),
-                                      borderRadius: BorderRadius.circular(5),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.34,
+                                BoxShadow(
+                                  color: widget.item.color.withValues(
+                                    alpha: 0.18,
+                                  ),
+                                  blurRadius: 22,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                CustomPaint(
+                                  foregroundPainter: _NoteLinesPainter(),
+                                  child: Text(
+                                    widget.item.content,
+                                    maxLines: 6,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: AppColors.paperInk,
+                                      fontSize: 15,
+                                      height: 1.35,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: -34,
+                                  left: 63,
+                                  child: Transform.rotate(
+                                    angle: 0.06,
+                                    child: Container(
+                                      width: 50,
+                                      height: 19,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.card.withValues(
+                                          alpha: 0.76,
+                                        ),
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.34,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Positioned(
-                                top: -47,
-                                left: 82,
-                                child: Container(
-                                  width: 12,
-                                  height: 12,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: AppColors.gold,
+                                Positioned(
+                                  top: -47,
+                                  left: 82,
+                                  child: Container(
+                                    width: 12,
+                                    height: 12,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppColors.gold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                     Positioned(
-                      right: -9,
-                      bottom: -9,
+                      right: 0,
+                      bottom: 0,
                       child: _NoteActionButton(
                         icon: Icons.edit_rounded,
                         onTap: widget.onEdit,

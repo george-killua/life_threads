@@ -28,6 +28,23 @@ class _ScriptedHttp implements FamilyHttp {
   void close() {}
 }
 
+/// Answers every request with [answer], called when the request is sent.
+class _DelayedHttp implements FamilyHttp {
+  _DelayedHttp(this.log, this.answer);
+
+  final _ScriptedHttp log;
+  final FamilyHttpResponse Function() answer;
+
+  @override
+  Future<FamilyHttpResponse> send(FamilyHttpRequest request) async {
+    log.requests.add(request);
+    return answer();
+  }
+
+  @override
+  void close() {}
+}
+
 FamilyHttpResponse _json(int status, Map<String, Object?> body) =>
     FamilyHttpResponse(
       statusCode: status,
@@ -124,6 +141,33 @@ void main() {
     expect(http.requests.single.headers.containsKey('if-match'), isFalse);
     expect(expired, isTrue);
   });
+
+  test(
+    'a 401 for a request sent with an older token keeps the new session',
+    () async {
+      var expired = false;
+      var token = 'lts_old';
+      late final FamilyApiClient api;
+      final http = _ScriptedHttp([]);
+      api =
+          FamilyApiClient(
+              baseUrl: 'https://family.test/api/',
+              http: _DelayedHttp(http, () {
+                // Signed out and in again while the request was on its way.
+                token = 'lts_new';
+                return _json(401, {'success': false, 'code': 'unauthorized'});
+              }),
+              retryDelays: const [Duration.zero],
+            )
+            ..tokenProvider = (() async => token)
+            ..onUnauthorized = () async => expired = true;
+      await expectLater(
+        api.getJson('/account'),
+        throwsA(isA<FamilyException>()),
+      );
+      expect(expired, isFalse);
+    },
+  );
 
   test('photos are resized to 2048 px and lose their metadata', () async {
     final dir = await Directory.systemTemp.createTemp('family-photo-test');

@@ -115,6 +115,15 @@ class AppLockController extends Notifier<AppLockState> {
   /// Asks the phone to unlock the app.
   Future<void> unlock(String reason) async {
     if (!state.locked) return;
+    if (!await ref.read(appLockAuthProvider).isAvailable()) {
+      // The phone's passcode and Face ID were removed: nothing can unlock the
+      // app any more, and the switch to turn the lock off is behind it. The
+      // lock only ever borrowed the phone's lock, so it turns itself off.
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setBool(_enabledKey, false);
+      state = state.copyWith(enabled: false, locked: false);
+      return;
+    }
     if (await _check(reason)) state = state.copyWith(locked: false);
   }
 

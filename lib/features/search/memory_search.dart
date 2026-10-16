@@ -54,7 +54,9 @@ List<String> searchSuggestions(MemoryState state) {
 }
 
 /// Lower case without accents, so "grossglockner" finds "Großglockner" and
-/// "cafe" finds "Café".
+/// "cafe" finds "Café". Arabic is folded the way people type it: one alef
+/// for أ إ آ ٱ, ي for ى, ه for ة, and no vowel marks or tatweel, so
+/// "احمد" finds "أحمد".
 String _fold(String text) {
   const map = {
     'ä': 'a',
@@ -83,10 +85,22 @@ String _fold(String text) {
     'ç': 'c',
     'ñ': 'n',
     'ß': 'ss',
+    'أ': 'ا',
+    'إ': 'ا',
+    'آ': 'ا',
+    'ٱ': 'ا',
+    'ى': 'ي',
+    'ة': 'ه',
   };
   final lower = text.toLowerCase();
   final buffer = StringBuffer();
   for (final rune in lower.runes) {
+    // Arabic vowel marks (U+064B–U+065F, U+0670) and tatweel (U+0640).
+    if ((rune >= 0x064B && rune <= 0x065F) ||
+        rune == 0x0670 ||
+        rune == 0x0640) {
+      continue;
+    }
     final char = String.fromCharCode(rune);
     buffer.write(map[char] ?? char);
   }

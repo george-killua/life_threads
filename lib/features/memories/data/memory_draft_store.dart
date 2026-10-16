@@ -35,6 +35,7 @@ class MemoryDraft {
     this.longitude,
     this.connectedEventId,
     this.connectionReason = '',
+    this.toWall,
   });
 
   final DateTime savedAt;
@@ -52,6 +53,10 @@ class MemoryDraft {
   final double? longitude;
   final String? connectedEventId;
   final String connectionReason;
+
+  /// The wall it was started for (AddMemoryPage.toWall): '' is My wall,
+  /// null the wall on screen when it's saved.
+  final String? toWall;
 
   /// Worth keeping: something the user wrote or picked.
   bool get hasContent =>
@@ -103,6 +108,7 @@ class MemoryDraft {
     'longitude': longitude,
     'connectedEventId': connectedEventId,
     'connectionReason': connectionReason,
+    'toWall': toWall,
   };
 
   static MemoryDraft fromJson(
@@ -172,6 +178,7 @@ class MemoryDraft {
       longitude: number(json['longitude']),
       connectedEventId: json['connectedEventId'] as String?,
       connectionReason: json['connectionReason'] as String? ?? '',
+      toWall: json['toWall'] as String?,
     );
   }
 }

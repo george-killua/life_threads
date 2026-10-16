@@ -6158,6 +6158,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add the LifeThreads widget: a different memory every day. Settings › Home screen widget chooses which ones.'**
   String get tutorialWidgetText;
+
+  /// No description provided for @photoNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo {number}'**
+  String photoNumber(int number);
+
+  /// No description provided for @familyDisplayNameNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name on this wall couldn\'t be saved. You can set it in the wall\'s settings.'**
+  String get familyDisplayNameNotSaved;
 }
 
 class _AppLocalizationsDelegate

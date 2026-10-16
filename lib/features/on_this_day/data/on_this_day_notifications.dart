@@ -80,7 +80,7 @@ class LocalOnThisDayNotifications implements OnThisDayNotifications {
   final void Function(int year, int month) onOpenLookBack;
   final _plugin = FlutterLocalNotificationsPlugin();
   Future<void>? _ready;
-  tz.Location? _location;
+  var _timeZonesLoaded = false;
 
   static String payloadFor(String memoryId) => '$_payloadPrefix$memoryId';
 
@@ -112,9 +112,12 @@ class LocalOnThisDayNotifications implements OnThisDayNotifications {
 
   @override
   Future<tz.Location> localLocation() async {
-    final known = _location;
-    if (known != null) return known;
-    tz_data.initializeTimeZones();
+    // Asked every time: the phone may have moved to another zone since the
+    // app started (a trip), and reminders follow the phone's clock.
+    if (!_timeZonesLoaded) {
+      tz_data.initializeTimeZones();
+      _timeZonesLoaded = true;
+    }
     tz.Location location;
     try {
       final info = await FlutterTimezone.getLocalTimezone();
@@ -124,7 +127,7 @@ class LocalOnThisDayNotifications implements OnThisDayNotifications {
       location = _locationWithCurrentOffset();
     }
     tz.setLocalLocation(location);
-    return _location = location;
+    return location;
   }
 
   @override

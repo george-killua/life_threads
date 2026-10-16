@@ -23,6 +23,7 @@ import '../../data/memory_repository.dart';
 import '../../domain/memory_event.dart';
 import '../../domain/memory_photo.dart';
 import '../../domain/memory_person.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../memory_l10n.dart';
 import 'edit_memory_page.dart';
 import '../../../wall/domain/wall_item.dart';
@@ -238,12 +239,19 @@ class MemoryDetailPage extends ConsumerWidget {
         ShareResultStatus.dismissed => context.l10n.shareLinkCreated,
         ShareResultStatus.unavailable => context.l10n.shareLinkUnavailable,
       };
-      ScaffoldMessenger.of(context).showToast(
-        context.l10n.shareLinkExpiresDelete(label),
+      // The toast outlives this page (it stays up on the wall), so Delete
+      // must not depend on the page's context or ref.
+      final messenger = ScaffoldMessenger.of(context);
+      final l10n = context.l10n;
+      final shareService = ref.read(memoryCapsuleCloudShareServiceProvider);
+      messenger.showToast(
+        l10n.shareLinkExpiresDelete(label),
         action: ToastAction(
-          label: context.l10n.delete,
+          label: l10n.delete,
           onPressed: () {
-            unawaited(_deleteSharedCapsule(context, ref, cloudShare));
+            unawaited(
+              _deleteSharedCapsule(messenger, l10n, shareService, cloudShare),
+            );
           },
         ),
       );
@@ -291,23 +299,22 @@ class MemoryDetailPage extends ConsumerWidget {
   }
 
   Future<void> _deleteSharedCapsule(
-    BuildContext context,
-    WidgetRef ref,
+    ScaffoldMessengerState messenger,
+    AppLocalizations l10n,
+    MemoryCapsuleCloudShareService shareService,
     MemoryCapsuleCloudShareResult cloudShare,
   ) async {
     try {
-      await ref
-          .read(memoryCapsuleCloudShareServiceProvider)
-          .revokeShare(cloudShare);
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showToast(
-        context.l10n.sharedMemoryLinkDeleted,
+      await shareService.revokeShare(cloudShare);
+      if (!messenger.mounted) return;
+      messenger.showToast(
+        l10n.sharedMemoryLinkDeleted,
         kind: ToastKind.success,
       );
     } on MemoryCapsuleCloudShareException catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showToast(
-        context.l10n.deleteFailed(error.message),
+      if (!messenger.mounted) return;
+      messenger.showToast(
+        l10n.deleteFailed(error.message),
         kind: ToastKind.error,
       );
     }
@@ -1630,7 +1637,7 @@ class _PhotoPreviewPageState extends State<_PhotoPreviewPage> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      current.title,
+                      current.title ?? context.l10n.photoNumber(_index + 1),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -1687,15 +1694,14 @@ class _PhotoPreviewPageState extends State<_PhotoPreviewPage> {
 }
 
 class _PreviewPhoto {
-  const _PreviewPhoto({
-    required this.path,
-    required this.heroTag,
-    required this.title,
-  });
+  const _PreviewPhoto({required this.path, required this.heroTag, this.title});
 
   final String path;
   final String heroTag;
-  final String title;
+
+  /// The memory's title for its cover; null for photos, which are named
+  /// by their place in the viewer ("Photo 2").
+  final String? title;
 }
 
 class _PreviewPhotoImage extends StatelessWidget {
@@ -1759,7 +1765,6 @@ List<_PreviewPhoto> _heroPreviewPhotos(
           (photo) => _PreviewPhoto(
             path: photo.localPath,
             heroTag: 'memory-photo-${photo.id}',
-            title: _photoTitle(photos.indexOf(photo)),
           ),
         ),
   );
@@ -1772,12 +1777,9 @@ List<_PreviewPhoto> _galleryPreviewPhotos(List<MemoryPhoto> photos) {
       _PreviewPhoto(
         path: photos[index].localPath,
         heroTag: 'memory-photo-${photos[index].id}',
-        title: _photoTitle(index),
       ),
   ];
 }
-
-String _photoTitle(int index) => 'Photo ${index + 1}';
 
 String _heroSubtitle(BuildContext context, MemoryEvent event) {
   final date = _formatDate(context, event.occurredAt);

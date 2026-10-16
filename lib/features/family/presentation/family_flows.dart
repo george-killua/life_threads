@@ -293,14 +293,19 @@ Future<void> createFamilyFlow(BuildContext context) async {
     );
     if (input == null || !context.mounted) return;
 
+    var nameSaved = true;
     final family = await runWithFamilyProgress(
       context,
       l10n.familyCreating,
       () async {
         final family = await service.createFamily(input.name);
-        if (input.displayName.isNotEmpty) {
-          await service.setMyDisplayName(family.id, input.displayName);
-        }
+        // The wall exists now: a failed name must not report the creation
+        // as failed (trying again would create a second wall).
+        nameSaved = await _trySetDisplayName(
+          service,
+          family.id,
+          input.displayName,
+        );
         return family;
       },
     );
@@ -308,8 +313,26 @@ Future<void> createFamilyFlow(BuildContext context) async {
     AppLogger.event('family_created');
     if (!context.mounted) return;
     unawaited(context.push(RouteNames.familyWallFor(family.id)));
+    if (!nameSaved) {
+      showFamilyMessage(context, l10n.familyDisplayNameNotSaved);
+    }
   } catch (error) {
     if (context.mounted) showFamilyError(context, error);
+  }
+}
+
+/// Sets one's name on a new family wall; false when that failed (offline).
+Future<bool> _trySetDisplayName(
+  FamilyService service,
+  String familyId,
+  String displayName,
+) async {
+  if (displayName.isEmpty) return true;
+  try {
+    await service.setMyDisplayName(familyId, displayName);
+    return true;
+  } on Object {
+    return false;
   }
 }
 
@@ -433,15 +456,14 @@ Future<void> joinFamilyFlow(BuildContext context, Uri link) async {
   );
   if (displayName == null || !context.mounted) return;
 
+  var nameSaved = true;
   try {
     final family = await runWithFamilyProgress(
       context,
       l10n.familyJoining,
       () async {
         final family = await service.acceptInvite(link);
-        if (displayName.isNotEmpty) {
-          await service.setMyDisplayName(family.id, displayName);
-        }
+        nameSaved = await _trySetDisplayName(service, family.id, displayName);
         return family;
       },
     );
@@ -450,8 +472,10 @@ Future<void> joinFamilyFlow(BuildContext context, Uri link) async {
     if (!context.mounted) return;
     showFamilyMessage(
       context,
-      l10n.familyJoined(family.name),
-      kind: ToastKind.success,
+      nameSaved
+          ? l10n.familyJoined(family.name)
+          : l10n.familyDisplayNameNotSaved,
+      kind: nameSaved ? ToastKind.success : ToastKind.info,
     );
     unawaited(context.push(RouteNames.familyWallFor(family.id)));
   } catch (error) {

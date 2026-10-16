@@ -34,7 +34,10 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
   ProductDetails? _subscriptionProduct;
   ProductDetails? _monthly;
   ProductDetails? _yearly;
-  Completer<void>? _restoreDelivery;
+
+  /// Open while an iOS restore waits for the store's answer: true once one
+  /// of our purchases arrives, false when the store answers without one.
+  Completer<bool>? _restoreDelivery;
   Future<_RestoreOutcome>? _restoreInFlight;
 
   /// How long a store-side restore may take to deliver its transactions.
@@ -195,12 +198,14 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
       return _queryAndroidPurchases();
     }
 
-    final delivery = _restoreDelivery = Completer<void>();
+    final delivery = _restoreDelivery = Completer<bool>();
     try {
       await _store.restorePurchases();
       // purchaseStream delivers restores asynchronously after this returns.
-      await delivery.future.timeout(restoreDeliveryTimeout);
-      return _RestoreOutcome.found;
+      // StoreKit 2 always answers with the current entitlements, so an
+      // answer without our subscription means it expired or was refunded.
+      final found = await delivery.future.timeout(restoreDeliveryTimeout);
+      return found ? _RestoreOutcome.found : _RestoreOutcome.noneActive;
     } on TimeoutException {
       return _RestoreOutcome.nothingDelivered;
     } finally {
@@ -269,10 +274,8 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
   }
 
   void _showNothingFound({required bool silent}) {
-    if (state.status == PremiumPurchaseStatus.pending) {
-      if (!silent) state = state.copyWith(isRestoring: false);
-      return;
-    }
+    // A user's own Restore that finds nothing ends a stale pending state.
+    if (state.status == PremiumPurchaseStatus.pending && silent) return;
     if (!silent) {
       state = state.copyWith(
         status: _subscriptionProduct == null
@@ -297,6 +300,13 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
   }
 
   Future<void> _handlePurchases(List<PurchaseDetails> purchases) async {
+    final hasOwnPurchase = purchases.any(
+      (purchase) =>
+          PremiumProductIds.all.contains(purchase.productID) &&
+          purchase.status != PurchaseStatus.error &&
+          purchase.status != PurchaseStatus.canceled,
+    );
+    if (!hasOwnPurchase) _markRestoreDelivered(found: false);
     for (final purchase in purchases) {
       if (PremiumProductIds.all.contains(purchase.productID)) {
         await _handleOwnPurchase(purchase);
@@ -338,9 +348,9 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
     }
   }
 
-  void _markRestoreDelivered() {
+  void _markRestoreDelivered({bool found = true}) {
     final delivery = _restoreDelivery;
-    if (delivery != null && !delivery.isCompleted) delivery.complete();
+    if (delivery != null && !delivery.isCompleted) delivery.complete(found);
   }
 
   Future<void> _deliverPurchase(

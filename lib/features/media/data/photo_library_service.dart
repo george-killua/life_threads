@@ -70,7 +70,20 @@ class PhotoLibraryService {
     final fileName = '${const Uuid().v4()}$extension';
     final targetPath = p.join(photosDirectory.path, fileName);
     final copied = await source.copy(targetPath);
-    final metadata = await _extractMetadata(asset, source);
+    _PhotoMetadata metadata;
+    try {
+      metadata = await _extractMetadata(asset, source);
+    } catch (_) {
+      // Unreadable details (e.g. the place of an iCloud photo): the photo is
+      // still added, without its date and place.
+      metadata = _PhotoMetadata(
+        capturedAt: DateTime.now(),
+        hasCapturedDate: false,
+        width: asset.width,
+        height: asset.height,
+        hasDimensions: asset.width > 0 && asset.height > 0,
+      );
+    }
 
     return PickedMemoryPhoto(
       localPath: copied.path,
@@ -179,6 +192,17 @@ class PhotoLibraryService {
     AssetEntity asset,
     File file,
   ) async {
+    // When the picture was taken, as the camera wrote it: a library's
+    // creation date can be the day it was saved or imported instead.
+    try {
+      final taken = (await _exifMetadata(file)).capturedAt;
+      if (taken != null && _isReasonablePhotoDate(taken)) {
+        return (date: taken, isFromAsset: true);
+      }
+    } catch (_) {
+      // No readable EXIF: the library's date below.
+    }
+
     // photo_manager reports a missing creation date as 0 (1970-01-01).
     final hasAssetDate = (asset.createDateSecond ?? 0) > 0;
     final assetDate = asset.createDateTime;

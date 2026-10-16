@@ -539,7 +539,7 @@ class MemoryCapsuleService {
       'wallX': event.wallPosition.dx,
       'wallY': event.wallPosition.dy,
       'rotation': event.rotation,
-      'locationLabel': event.locationDisplayLabel,
+      'locationLabel': event.locationLabel,
       'latitude': event.latitude,
       'longitude': event.longitude,
       'coverPhotoPath': event.coverPhotoPath == null
@@ -605,7 +605,7 @@ class MemoryCapsuleService {
     return {
       'id': memory.id,
       'title': memory.title,
-      'locationLabel': memory.locationDisplayLabel,
+      'locationLabel': memory.locationLabel,
       'occurredAt': memory.occurredAt.millisecondsSinceEpoch,
       'label': state.connectionBetween(sourceId, memory.id)?.label,
     };

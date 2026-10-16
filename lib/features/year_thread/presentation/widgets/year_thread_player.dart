@@ -9,10 +9,23 @@ import '../../../stories/domain/story_film.dart';
 /// Plays a [StoryFilm] on screen by drawing its frames with a ticker: the
 /// same frames the export renders, so the preview is what gets shared.
 class YearThreadPlayer extends StatefulWidget {
-  const YearThreadPlayer({super.key, required this.film, this.autoplay = true});
+  const YearThreadPlayer({
+    super.key,
+    required this.film,
+    this.autoplay = true,
+    this.onPlay,
+    this.onPause,
+  });
 
   final StoryFilm film;
   final bool autoplay;
+
+  /// The film starts playing at the given point (start, resume or seek), so
+  /// the music can play along from there.
+  final ValueChanged<Duration>? onPlay;
+
+  /// The film paused or reached its end.
+  final VoidCallback? onPause;
 
   @override
   State<YearThreadPlayer> createState() => _YearThreadPlayerState();
@@ -29,7 +42,10 @@ class _YearThreadPlayerState extends State<YearThreadPlayer>
   @override
   void initState() {
     super.initState();
-    if (widget.autoplay) _ticker.start();
+    if (widget.autoplay) {
+      _ticker.start();
+      widget.onPlay?.call(Duration.zero);
+    }
   }
 
   @override
@@ -51,6 +67,7 @@ class _YearThreadPlayerState extends State<YearThreadPlayer>
     if (position >= _film.duration) {
       position = _film.duration;
       _ticker.stop();
+      widget.onPause?.call();
     }
     setState(() => _position = position);
   }
@@ -58,11 +75,13 @@ class _YearThreadPlayerState extends State<YearThreadPlayer>
   void _toggle() {
     if (_ticker.isActive) {
       _ticker.stop();
+      widget.onPause?.call();
       setState(() {});
       return;
     }
     _playStart = _position >= _film.duration ? Duration.zero : _position;
     _ticker.start();
+    widget.onPlay?.call(_playStart);
     setState(() => _position = _playStart);
   }
 
@@ -71,7 +90,10 @@ class _YearThreadPlayerState extends State<YearThreadPlayer>
     _ticker.stop();
     _position = position;
     _playStart = position;
-    if (wasPlaying) _ticker.start();
+    if (wasPlaying) {
+      _ticker.start();
+      widget.onPlay?.call(position);
+    }
     setState(() {});
   }
 

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/memory_capsule_models.dart';
+import 'memory_capsule_share_download_service.dart';
 
 final memoryCapsuleCloudShareServiceProvider =
     Provider<MemoryCapsuleCloudShareService>((ref) {
@@ -62,6 +63,14 @@ class MemoryCapsuleCloudShareService {
     if (!await file.exists()) {
       throw const MemoryCapsuleCloudShareException(
         'Capsule file was not found.',
+      );
+    }
+    // Recipients refuse anything larger, so don't upload it at all.
+    if (await file.length() >
+        MemoryCapsuleShareDownloadService.maxCapsuleBytes) {
+      throw const MemoryCapsuleCloudShareException(
+        'This memory is too large to share as a link (over 25 MB). '
+        'Remove a few photos and try again.',
       );
     }
 

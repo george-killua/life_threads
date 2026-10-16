@@ -153,7 +153,16 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text('$error')),
         data: (state) {
-          final memories = _selection.resolve(state.visibleEvents);
+          // A story started from a hidden memory (shown after Face ID) may
+          // use that memory; the picker still offers visible ones only.
+          final initial = widget.initialMemoryId == null
+              ? null
+              : state.findEvent(widget.initialMemoryId!);
+          final events = [
+            ...state.visibleEvents,
+            if (initial != null && initial.hidden) initial,
+          ];
+          final memories = _selection.resolve(events);
           if (_editing && memories.isNotEmpty) {
             // Started from a memory: its story is the first caption. Set
             // before the caption field exists, so no listener fires.
@@ -161,17 +170,15 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
               _captionReady = true;
               _caption.text = defaultStoryCaption(memories);
             }
-            return _buildEditor(context, memories, state.visibleEvents);
+            return _buildEditor(context, memories, events);
           }
           return _StoryMemoryPicker(
-            events: state.visibleEvents,
+            events: events,
             selection: _selection,
             onChanged: (selection) => setState(() => _selection = selection),
             onContinue: () => setState(() {
               if (!_captionEdited) {
-                _caption.text = defaultStoryCaption(
-                  _selection.resolve(state.visibleEvents),
-                );
+                _caption.text = defaultStoryCaption(_selection.resolve(events));
               }
               _captionReady = true;
               _editing = true;
@@ -421,6 +428,8 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
       _video ? PremiumFeature.storyVideo : PremiumFeature.storyImage;
 
   Future<void> _share(List<MemoryEvent> memories) async {
+    // The paywall or the export comes next: the preview song stops either way.
+    unawaited(_preview.stop());
     if (!await requirePremium(context, _feature)) return;
     if (!mounted) return;
     final file = await _export(memories);
@@ -436,6 +445,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
   }
 
   Future<void> _save(List<MemoryEvent> memories) async {
+    unawaited(_preview.stop());
     if (!await requirePremium(context, _feature)) return;
     if (!mounted) return;
     final file = await _export(memories);

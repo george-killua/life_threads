@@ -211,8 +211,8 @@ class FamilyApiClient {
   ///
   /// A conditional PUT is safe to retry: if the first attempt reached the
   /// server but the answer was lost, the retry fails with a version
-  /// conflict whose `currentVersion` is exactly ours + 1 by this author, and
-  /// that is reported as success.
+  /// conflict whose `currentVersion` is exactly ours + 1 and the server
+  /// holds our bytes; that is reported as success.
   Future<Map<String, Object?>> putBlob(
     String path, {
     required List<int> bytes,
@@ -238,7 +238,7 @@ class FamilyApiClient {
           timeout: blobTimeout,
           authenticated: true,
         );
-        final json = _decodeJson(await _check(response, authenticated: true));
+        final json = _decodeJson(_check(response));
         final item = json['item'];
         if (item is! Map) {
           throw const FamilyException(FamilyErrorCodes.invalidResponse);
@@ -247,7 +247,8 @@ class FamilyApiClient {
       } on FamilyApiException catch (error) {
         if (networkFailures > 0 &&
             error.code == FamilyErrorCodes.versionConflict &&
-            error.details['currentVersion'] == baseVersion + 1) {
+            error.details['currentVersion'] == baseVersion + 1 &&
+            await _storedBytesAre(path, bytes)) {
           return {'version': baseVersion + 1, 'recovered': true};
         }
         rethrow;
@@ -256,6 +257,22 @@ class FamilyApiClient {
         await Future<void>.delayed(retryDelays[networkFailures]);
         networkFailures++;
       }
+    }
+  }
+
+  /// Whether the server holds exactly [bytes] at [path]: a lost answer to
+  /// our own PUT, not another device's write of the same next version.
+  /// (Every encryption uses a fresh nonce, so equal bytes are ours.)
+  Future<bool> _storedBytesAre(String path, List<int> bytes) async {
+    try {
+      final stored = (await getBlob(path)).body;
+      if (stored.length != bytes.length) return false;
+      for (var i = 0; i < bytes.length; i++) {
+        if (stored[i] != bytes[i]) return false;
+      }
+      return true;
+    } on Object {
+      return false;
     }
   }
 
@@ -298,7 +315,7 @@ class FamilyApiClient {
           await Future<void>.delayed(retryDelays[attempt++]);
           continue;
         }
-        return _check(response, authenticated: authenticated);
+        return _check(response);
       } on _NetworkFailure catch (failure) {
         if (!idempotent || attempt >= retryDelays.length) {
           throw failure.exception;
@@ -323,8 +340,9 @@ class FamilyApiClient {
       'accept': 'application/json',
       ...headers,
     };
+    String? token;
     if (authenticated) {
-      final token = await tokenProvider?.call();
+      token = await tokenProvider?.call();
       if (token == null) {
         throw const FamilyException(FamilyErrorCodes.signedOut);
       }
@@ -350,19 +368,20 @@ class FamilyApiClient {
     } on HttpException catch (error) {
       throw _NetworkFailure(error);
     }
+    // The server rejected this session. A request sent with an older token
+    // (signed out and in again meanwhile) says nothing about the new one.
+    if (token != null &&
+        response.statusCode == 401 &&
+        await tokenProvider?.call() == token) {
+      await onUnauthorized?.call();
+    }
     return response;
   }
 
   /// Returns a 2xx response or throws the mapped [FamilyApiException].
-  Future<FamilyHttpResponse> _check(
-    FamilyHttpResponse response, {
-    required bool authenticated,
-  }) async {
+  FamilyHttpResponse _check(FamilyHttpResponse response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return response;
-    }
-    if (authenticated && response.statusCode == 401) {
-      await onUnauthorized?.call();
     }
     throw _errorFrom(response);
   }

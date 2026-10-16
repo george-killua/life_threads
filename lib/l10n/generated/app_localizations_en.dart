@@ -3618,4 +3618,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tutorialWidgetText =>
       'Add the LifeThreads widget: a different memory every day. Settings › Home screen widget chooses which ones.';
+
+  @override
+  String photoNumber(int number) {
+    return 'Photo $number';
+  }
+
+  @override
+  String get familyDisplayNameNotSaved =>
+      'Your name on this wall couldn\'t be saved. You can set it in the wall\'s settings.';
 }

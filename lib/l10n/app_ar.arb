@@ -1069,5 +1069,7 @@
   "tutorialFamilyTitle": "شارك مع عائلتك",
   "tutorialFamilyText": "المزيد › جدران العائلة: جدار واحد لكل العائلة، بتشفير تام بين الطرفين. ادعُ الآخرين برابط.",
   "tutorialWidgetTitle": "ذكرى على شاشتك الرئيسية",
-  "tutorialWidgetText": "أضف أداة LifeThreads: ذكرى مختلفة كل يوم. الإعدادات › أداة الشاشة الرئيسية تحدد أيّها."
+  "tutorialWidgetText": "أضف أداة LifeThreads: ذكرى مختلفة كل يوم. الإعدادات › أداة الشاشة الرئيسية تحدد أيّها.",
+  "photoNumber": "الصورة {number}",
+  "familyDisplayNameNotSaved": "تعذّر حفظ اسمك على هذا الجدار. يمكنك تعيينه من إعدادات الجدار."
 }
