@@ -56,7 +56,9 @@ elif sys.argv[1] == 'listing':
     texts = json.load(open(sys.argv[2]))
     shots = sys.argv[3]
     # Play's language codes -> the screenshot folders' languages.
-    folder = {'en-US': 'en', 'de-DE': 'de', 'ar': 'ar'}
+    folder = {'en-US': 'en', 'en-GB': 'en', 'de-DE': 'de', 'ar': 'ar'}
+    assets = os.path.join(os.path.dirname(os.path.abspath(shots)))
+    icon = os.path.join(assets, 'lifethreads_app_icon_512.png')
     slots = {'phoneScreenshots': 'play-phone',
              'sevenInchScreenshots': 'play-tablet-7',
              'tenInchScreenshots': 'play-tablet-10'}
@@ -73,6 +75,18 @@ elif sys.argv[1] == 'listing':
         edits.listings().update(packageName=PKG, editId=eid, language=lang,
             body={'language': lang, **body}).execute()
         print('texts', lang)
+        # Every language gets the icon and its feature graphic, so none falls
+        # back to a missing image.
+        graphics = {'icon': icon, 'featureGraphic': os.path.join(
+            assets, 'google_play', f'feature_graphic_{folder[lang]}.png')}
+        for slot, path in graphics.items():
+            if not os.path.exists(path):
+                continue
+            edits.images().deleteall(packageName=PKG, editId=eid,
+                language=lang, imageType=slot).execute()
+            edits.images().upload(packageName=PKG, editId=eid, language=lang,
+                imageType=slot, media_body=MediaFileUpload(path, mimetype='image/png')).execute()
+            print('  ', slot)
         for slot, size in slots.items():
             files = sorted(glob.glob(os.path.join(shots, size, folder[lang], '*.png')))
             if not files:

@@ -10,11 +10,11 @@ description 4000, release notes 500).
 | Version | 1.0.0 (23), from `pubspec.yaml` |
 | Store name | LifeThreads: Memory Journal (the name on the phone stays "LifeThreads") |
 | Category | Lifestyle (alternative: Photography) |
-| Contact email | info@gkcoding.dev |
+| Contact email | george.kassih@gkcoding.dev (as set in Play Console) |
 | Website | https://gkcoding.dev/lifethreads/ |
 | Privacy policy | https://gkcoding.dev/lifethreads/privacy |
 | Account / data deletion | https://gkcoding.dev/lifethreads/delete-data |
-| Default language | English (United States) – en-US; translations: de-DE, ar |
+| Default language | English (United Kingdom) – en-GB, set when the app was created; translations: en-US, de-DE, ar. Both English listings use the English texts below. |
 
 Play Console: **Grow users → Store presence → Store listings → Default store listing**, and
 **Manage translations** for de-DE and ar. Managed publishing is off: changes go to Google's
