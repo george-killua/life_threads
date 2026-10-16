@@ -15,7 +15,7 @@ text 170, description 4000, keywords 100, What's New 4000).
 | Marketing URL | https://gkcoding.dev/lifethreads/ |
 | Privacy policy URL | https://gkcoding.dev/lifethreads/privacy |
 | Terms (EULA) | https://gkcoding.dev/lifethreads/terms (also linked on the Premium page) |
-| Contact | info@gkcoding.dev |
+| Contact | george.kassih@gkcoding.dev |
 | Primary language | English (U.S.); localizations: German, Arabic |
 
 The texts, screenshots and build can also be set with the API: `tool/appstore/asc.py` (key
@@ -318,7 +318,7 @@ LifeThreads is a private memory wall. No account is needed: on first launch choo
 
 Premium (auto-renewing subscriptions "lifethreads_premium_yearly" and "lifethreads_premium_monthly", same benefits) unlocks unlimited memories (free: 30), more walls, Premium wall themes, Create Story (story images and videos with music), Thread of the Year, On this day and family walls. Open it from Settings or any Premium feature; the Premium page shows the price, the renewal terms and links to the Terms of Use and Privacy Policy, plus Restore.
 
-Family walls (Premium) are shared, end-to-end encrypted walls. They need Sign in with Apple; creating a wall needs an active subscription (verified with the App Store Server API). Members join by a one-time invite link and need no subscription of their own (the owner's covers the wall). When a member leaves or is removed, the owner's app switches the wall to a new encryption key. Every member can report a memory or a member and block members; reports are reviewed within 24 hours (info@gkcoding.dev). Account deletion: Family walls > Account > Delete account.
+Family walls (Premium) are shared, end-to-end encrypted walls. They need Sign in with Apple; creating a wall needs an active subscription (verified with the App Store Server API). Members join by a one-time invite link and need no subscription of their own (the owner's covers the wall). When a member leaves or is removed, the owner's app switches the wall to a new encryption key. Every member can report a memory or a member and block members; reports are reviewed within 24 hours (george.kassih@gkcoding.dev). Account deletion: Family walls > Account > Delete account.
 
 Also in this version: a home screen widget (Settings > Home screen widget), an optional app lock with Face ID (Settings > Privacy), hidden memories (View > Hidden memories, after Face ID) and a free full backup (Settings > Backup).
 
