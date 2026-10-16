@@ -400,7 +400,14 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     if (resume ?? false) {
       _applyDraft(draft);
     } else {
-      await _draftStore.clear(deletePhotosOf: draft);
+      final saved = ref.read(memoryRepositoryProvider).asData?.value;
+      await _draftStore.clear(
+        deletePhotosOf: draft,
+        keepPhotos: {
+          for (final photo in saved?.photos ?? const []) photo.localPath,
+          for (final event in saved?.events ?? const []) ?event.coverPhotoPath,
+        },
+      );
       if (!mounted) return;
     }
     _draftReady = true;

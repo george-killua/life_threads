@@ -13,6 +13,11 @@ What changed in each TestFlight / Play build. Newest first.
   (a photo's own date still wins).
 - When a year is ready, the years that are nearly there are listed below
   the film under "Almost there".
+- **Fixed:** after saving a memory, a draft autosave that was still
+  writing could bring it back as a draft; the next "Add memory" then asked
+  to continue it, and "Start new" could delete the saved memory's photo
+  copies. Draft saves and clears now run in order, and "Start new" never
+  deletes a photo a saved memory uses.
 - **Demo memories you changed count as yours** (Thread of the Year, On this
   day): once their date, title or story differs from the demo wall. Untouched
   demo memories still stay out.

@@ -155,6 +155,41 @@ void main() {
       expect(await store.load(), isNull);
     });
 
+    test('a save still running when the memory is saved does not come '
+        'back', () async {
+      final store = MemoryDraftStore(documentsPath: () async => documents.path);
+      // Not awaited: the debounced autosave is still writing.
+      final pending = store.save(
+        MemoryDraft(savedAt: DateTime(2026), title: 'Saved memory'),
+      );
+      await store.clear();
+      await pending;
+      expect(await store.load(), isNull);
+    });
+
+    test('start over keeps photos that saved memories use', () async {
+      final shared = File('${documents.path}/shared.jpg')
+        ..writeAsStringSync('x');
+      final own = File('${documents.path}/own.jpg')..writeAsStringSync('x');
+      PickedMemoryPhoto photo(File file) => PickedMemoryPhoto(
+        localPath: file.path,
+        capturedAt: DateTime(2026),
+        width: 1,
+        height: 1,
+        hasCapturedDate: false,
+        hasDimensions: false,
+      );
+      final store = MemoryDraftStore(documentsPath: () async => documents.path);
+      final draft = MemoryDraft(
+        savedAt: DateTime(2026),
+        photos: [photo(shared), photo(own)],
+      );
+      await store.save(draft);
+      await store.clear(deletePhotosOf: draft, keepPhotos: {shared.path});
+      expect(shared.existsSync(), isTrue);
+      expect(own.existsSync(), isFalse);
+    });
+
     test('start over deletes the draft photo copies', () async {
       final photo = File('${documents.path}/p.jpg')..writeAsStringSync('x');
       final store = MemoryDraftStore(documentsPath: () async => documents.path);

@@ -61,14 +61,13 @@ tags: [protocol, wal]
 - takeScreenshot: WAL-04_connected_memories
 
 # WAL-05: edit the title, then delete a memory.
-- runFlow:
-    file: ../subflows/scroll_to.yaml
-    env:
-      TARGET: "Edit story"
-      DIRECTION: UP
-- tapOn: "Edit story"
+# The pencil in the fixed top bar ("Edit story" is also the label of the
+# story card's pencil, which can sit behind the bar).
+- waitForAnimationToEnd
+- tapOn: "Edit Memory"
+# Save is only on the edit screen.
 - extendedWaitUntil:
-    visible: "Edit Memory"
+    visible: "Save"
     timeout: 10000
 - tapOn: "Summer in Split"
 - eraseText: 30

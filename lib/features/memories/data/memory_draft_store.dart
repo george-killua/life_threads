@@ -187,7 +187,15 @@ class MemoryDraftStore {
 
   final Future<String> Function() _documentsPath;
 
+  // Saves and clears run one after another: a save still writing when the
+  // memory is saved must not bring the draft back after the clear.
+  Future<void> _queue = Future.value();
+
+  Future<void> _enqueue(Future<void> Function() job) =>
+      _queue = _queue.then((_) => job());
+
   Future<MemoryDraft?> load() async {
+    await _queue;
     try {
       final preferences = await SharedPreferences.getInstance();
       final raw = preferences.getString(_key);
@@ -211,7 +219,9 @@ class MemoryDraftStore {
     }
   }
 
-  Future<void> save(MemoryDraft draft) async {
+  Future<void> save(MemoryDraft draft) => _enqueue(() => _save(draft));
+
+  Future<void> _save(MemoryDraft draft) async {
     try {
       final preferences = await SharedPreferences.getInstance();
       if (!draft.hasContent) {
@@ -228,13 +238,25 @@ class MemoryDraftStore {
   }
 
   /// Forgets the draft. With [deletePhotosOf] that draft's photo copies go
-  /// too (the user started over); not after saving, when the memory uses
-  /// them.
-  Future<void> clear({MemoryDraft? deletePhotosOf}) async {
+  /// too (the user started over) – except [keepPhotos], the ones saved
+  /// memories use; not after saving, when the memory uses them.
+  Future<void> clear({
+    MemoryDraft? deletePhotosOf,
+    Set<String> keepPhotos = const {},
+  }) => _enqueue(
+    () => _clear(deletePhotosOf: deletePhotosOf, keepPhotos: keepPhotos),
+  );
+
+  Future<void> _clear({
+    MemoryDraft? deletePhotosOf,
+    required Set<String> keepPhotos,
+  }) async {
     try {
       final preferences = await SharedPreferences.getInstance();
       await preferences.remove(_key);
       for (final photo in deletePhotosOf?.photos ?? const []) {
+        // Never a photo a saved memory uses.
+        if (keepPhotos.contains(photo.localPath)) continue;
         final file = File(photo.localPath);
         if (await file.exists()) await file.delete();
       }
