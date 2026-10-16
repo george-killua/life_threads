@@ -24,6 +24,9 @@ class FamilyWallsPage extends ConsumerWidget {
 
     return FamilyPageScaffold(
       title: l10n.familyWallsTitle,
+      // Always a way home, also when this is the only page left.
+      onBack: () =>
+          context.canPop() ? context.pop() : context.go(RouteNames.wall),
       actions: [
         if (account != null)
           IconButton(

@@ -498,6 +498,9 @@ void main() {
       await tapAndSettle(tester, key('family-content-choice-confirm'));
       expect(member.calls, contains('leaveFamily:true'));
       expect(find.textContaining('No family walls yet'), findsOneWidget);
+      // Back still leads home (the list was the only page left before).
+      await tapAndSettle(tester, find.byTooltip('Back'));
+      expect(find.text('MY WALL'), findsOneWidget);
     });
 
     testWidgets('family wall: author name on cards; blocked authors hidden', (

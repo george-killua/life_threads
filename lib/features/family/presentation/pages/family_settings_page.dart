@@ -224,10 +224,18 @@ class FamilySettingsPage extends ConsumerWidget {
         () => service.deleteFamily(family.id),
       );
       AppLogger.event('family_deleted');
-      if (context.mounted) context.go(RouteNames.familyWalls);
+      if (context.mounted) _backToFamilyWalls(context);
     } catch (error) {
       if (context.mounted) showFamilyError(context, error);
     }
+  }
+
+  /// The wall is gone: show the family walls list on top of "My wall", so
+  /// back (and the back swipe) still lead home.
+  static void _backToFamilyWalls(BuildContext context) {
+    final router = GoRouter.of(context);
+    router.go(RouteNames.wall);
+    router.push(RouteNames.familyWalls);
   }
 
   Future<void> _leave(BuildContext context, Family family) async {
@@ -251,7 +259,7 @@ class FamilySettingsPage extends ConsumerWidget {
         () => service.leaveFamily(family.id, deleteMyContent: deleteContent),
       );
       AppLogger.event('family_left');
-      if (context.mounted) context.go(RouteNames.familyWalls);
+      if (context.mounted) _backToFamilyWalls(context);
     } catch (error) {
       if (context.mounted) showFamilyError(context, error);
     }
