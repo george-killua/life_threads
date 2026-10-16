@@ -13,6 +13,10 @@ analyzer:
   exclude:
     # Local plugins have their own analysis_options and dependencies.
     - packages/**
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
 
 linter:
   # The lint rules applied to this project can be customized in the
