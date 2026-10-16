@@ -166,10 +166,10 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('wall-view-button')));
     await settle(tester);
     await tester.tap(find.text('By date'));
+    await tester.tap(find.byKey(const ValueKey('wall-view-done')));
     await settle(tester);
-    // Close the View sheet by tapping the wall above it.
-    await tester.tapAt(const Offset(20, 20));
-    await settle(tester);
+    // Past the cards' move to their new places.
+    await tester.pump(const Duration(milliseconds: 700));
     final b = tester.getCenter(card('B'));
     final g = await tester.startGesture(b);
     await step(g, const Offset(30, 0), tester);

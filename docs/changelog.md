@@ -4,6 +4,13 @@ What changed in each TestFlight / Play build. Newest first.
 
 ## 1.0.0 (22) – 16 October 2026 (not uploaded yet)
 
+**View sheet**
+- Choices apply only with **Done**; closing the sheet another way leaves
+  the wall as it was. Hidden memories still ask for Face ID right away.
+- After Done the cards **move** from their old places to the new
+  arrangement (threads follow), and a new category **fades** cards out and
+  in. Not with Reduce Motion.
+
 **Thread of the Year**
 - **Memories from:** with walls of one's own, choose All my walls, My wall
   or one wall; starts with the wall on screen.

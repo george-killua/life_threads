@@ -1,5 +1,5 @@
 # Picks OPTION in the wall's View sheet (Wall/Timeline/Map, Freeform/By date/...,
-# All/Family/Travel/Personal), then closes the sheet.
+# All/Family/Travel/Personal), then applies it with Done.
 appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding.lifethreads'}"
 ---
 - tapOn: "View"
@@ -7,18 +7,8 @@ appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding
     visible: "Show as"
     timeout: 10000
 - tapOn: "${OPTION}"
-- runFlow:
-    when:
-      visible: "Show as"
-    commands:
-      - tapOn:
-          point: 50%, 8%
-# At the largest text size the sheet covers the tap point: Done instead.
-- runFlow:
-    when:
-      visible: "Show as"
-    commands:
-      - tapOn: "Done"
+# Changes apply with Done.
+- tapOn: "Done"
 - extendedWaitUntil:
     notVisible: "Show as"
     timeout: 10000

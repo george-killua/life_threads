@@ -53,8 +53,16 @@ void main() {
 
     await tester.tap(find.text('Kategorie'));
     await settle(tester);
-    // Close the sheet (as the system back gesture does).
+    // Closed without "Fertig" (system back gesture): nothing changes.
     await tester.binding.handlePopRoute();
+    await settle(tester);
+    expect(find.text('Nach Datum'), findsNothing);
+    expect(find.byKey(const ValueKey('wall-view-custom-dot')), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey('wall-view-button')));
+    await settle(tester);
+    await tester.tap(find.text('Kategorie'));
+    await tester.tap(find.byKey(const ValueKey('wall-view-done')));
     await settle(tester);
     expect(find.text('Nach Datum'), findsNothing);
     expect(find.byKey(const ValueKey('wall-view-custom-dot')), findsOneWidget);

@@ -65,7 +65,7 @@ class MemoryWallPage extends ConsumerStatefulWidget {
 }
 
 class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   /// Virtual board large enough that placement feels unbounded.
   /// Wall coordinates are free; widgets are shifted by [_boardOrigin] into this box.
   static const _boardOrigin = Offset(-40000, -40000);
@@ -77,6 +77,18 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
   late final AnimationController _windController;
   final TransformationController _wallController = TransformationController();
+
+  /// Moves the cards to a new arrangement and fades them for a new category
+  /// after the View sheet's Done.
+  late final AnimationController _viewTransition;
+
+  /// Where each card on the wall was last drawn (wall coordinates).
+  Map<String, Offset> _shownPositions = const {};
+
+  /// Set while [_viewTransition] runs: where the cards started, and the
+  /// category shown before (null: unchanged).
+  Map<String, Offset>? _transitionFrom;
+  WallFilter? _transitionFilter;
 
   /// The wall whose memories are on screen (null: "My wall").
   String? _shownWallId;
@@ -114,6 +126,22 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       vsync: this,
       duration: const Duration(seconds: 7),
     )..repeat();
+    _viewTransition =
+        AnimationController(
+            vsync: this,
+            duration: const Duration(milliseconds: 650),
+          )
+          ..addListener(() {
+            if (mounted) setState(() {});
+          })
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.completed && mounted) {
+              setState(() {
+                _transitionFrom = null;
+                _transitionFilter = null;
+              });
+            }
+          });
     WidgetsBinding.instance.addPostFrameCallback((_) => _namePlacesOnce());
   }
 
@@ -162,6 +190,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   @override
   void dispose() {
     _windController.dispose();
+    _viewTransition.dispose();
     _wallController.dispose();
     super.dispose();
   }
@@ -205,7 +234,23 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                 mode: _layoutMode,
                 manualOverrides:
                     _manualLayoutOverrides[_layoutMode] ?? const {},
-              ).map(_withPendingMemory).toList();
+              ).map(_withPendingMemory).map(_inTransition).toList();
+              // Cards of the category shown before, fading out where they
+              // were.
+              final from = _transitionFrom;
+              final previousFilter = _transitionFilter;
+              final leavingEvents = from == null || previousFilter == null
+                  ? const <MemoryEvent>[]
+                  : [
+                      for (final event in state.events)
+                        if (from.containsKey(event.id) &&
+                            !_filter.matches(event.category))
+                          event.copyWith(wallPosition: from[event.id]),
+                    ];
+              _shownPositions = {
+                for (final event in filteredEvents)
+                  event.id: event.wallPosition,
+              };
               final displayWallItems = _displayWallItems(state, filteredEvents);
               final boardEvents = filteredEvents
                   .map(_toBoardLocalMemory)
@@ -387,6 +432,29 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                                 _endDrag(repository, item.id),
                                           ),
                                         },
+                                    for (final event in leavingEvents)
+                                      if (onScreen(
+                                        _toBoardLocal(event.wallPosition),
+                                        event.id,
+                                      ))
+                                        MemoryCard(
+                                          key: ValueKey('leaving-${event.id}'),
+                                          event: _toBoardLocalMemory(event),
+                                          windValue: _windController.value,
+                                          isDragging: false,
+                                          hasConnection: false,
+                                          opacity: 1 - _transitionValue,
+                                          interactive: false,
+                                          onTap: () {},
+                                          onLongPress: () {},
+                                          onEdit: () {},
+                                          onConnect: () {},
+                                          onPointerDown: () {},
+                                          onPointerUp: () {},
+                                          onDragStart: () {},
+                                          onDragUpdate: (_) {},
+                                          onDragEnd: () {},
+                                        ),
                                     for (final event in filteredEvents)
                                       if (onScreen(
                                         _toBoardLocal(event.wallPosition),
@@ -395,6 +463,16 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                         MemoryCard(
                                           event: _toBoardLocalMemory(event),
                                           windValue: _windController.value,
+                                          // New in this category: fades in.
+                                          opacity:
+                                              _transitionFilter != null &&
+                                                  !(_transitionFrom
+                                                          ?.containsKey(
+                                                            event.id,
+                                                          ) ??
+                                                      true)
+                                              ? _transitionValue
+                                              : 1,
                                           isDragging:
                                               _draggingNodeId == event.id,
                                           hasConnection: connectedMemoryIds
@@ -663,6 +741,20 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     );
   }
 
+  /// How far the View transition is, eased.
+  double get _transitionValue =>
+      Curves.easeInOutCubic.transform(_viewTransition.value);
+
+  /// During the View transition: [event] on its way from where it was to
+  /// its new place.
+  MemoryEvent _inTransition(MemoryEvent event) {
+    final start = _transitionFrom?[event.id];
+    if (start == null || event.id == _draggingNodeId) return event;
+    return event.copyWith(
+      wallPosition: Offset.lerp(start, event.wallPosition, _transitionValue),
+    );
+  }
+
   MemoryEvent _withPendingMemory(MemoryEvent event) {
     if (_draggingKind == _DragTargetKind.memory &&
         _draggingNodeId == event.id &&
@@ -795,35 +887,59 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
   /// Showing hidden memories asks for Face ID (or the passcode) first,
   /// where the phone has one. Returns whether they are shown now.
-  Future<bool> _setShowHidden(bool show) async {
-    if (show) {
-      final auth = ref.read(appLockAuthProvider);
-      final reason = context.l10n.showHiddenReason;
-      if (await auth.isAvailable() && !await auth.authenticate(reason)) {
-        return false;
-      }
-    }
-    if (mounted) setState(() => _showHidden = show);
-    return show;
+  /// Whether hidden memories may be shown: after Face ID or the passcode.
+  /// The wall shows them once the View sheet is closed with Done.
+  Future<bool> _authorizeHidden(bool show) async {
+    if (!show) return true;
+    final auth = ref.read(appLockAuthProvider);
+    final reason = context.l10n.showHiddenReason;
+    return !await auth.isAvailable() || await auth.authenticate(reason);
   }
 
-  Future<void> _showViewSheet(BuildContext context) {
-    return showModalBottomSheet<void>(
+  /// The View sheet: the wall changes only with Done; closing it any other
+  /// way leaves the wall as it was.
+  Future<void> _showViewSheet(BuildContext context) async {
+    final choice = await showModalBottomSheet<_ViewChoice>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
       builder: (_) => _WallViewSheet(
-        mode: _mode,
-        layout: _layoutMode,
-        filter: _filter,
+        current: _ViewChoice(
+          mode: _mode,
+          layout: _layoutMode,
+          filter: _filter,
+          showHidden: _showHidden,
+        ),
         hasHidden: _wallHasHidden(),
-        showHidden: _showHidden,
-        onModeChanged: (mode) => setState(() => _mode = mode),
-        onLayoutChanged: (layout) => setState(() => _layoutMode = layout),
-        onFilterChanged: (filter) => setState(() => _filter = filter),
-        onShowHiddenChanged: _setShowHidden,
+        onAuthorizeHidden: _authorizeHidden,
       ),
     );
+    if (choice == null || !mounted) return;
+    _applyView(choice);
+  }
+
+  /// Applies the View sheet's choice. On the wall, a new arrangement moves
+  /// the cards from where they were and a new category fades cards out and
+  /// in (not with Reduce Motion).
+  void _applyView(_ViewChoice choice) {
+    final rearranged = choice.layout != _layoutMode;
+    final refiltered = choice.filter != _filter;
+    final animate =
+        choice.mode == _WallViewMode.wall &&
+        _mode == _WallViewMode.wall &&
+        (rearranged || refiltered) &&
+        !MediaQuery.disableAnimationsOf(context);
+    setState(() {
+      if (animate) {
+        _transitionFrom = Map.of(_shownPositions);
+        _transitionFilter = refiltered ? _filter : null;
+        _viewTransition.forward(from: 0);
+      }
+      _mode = choice.mode;
+      _layoutMode = choice.layout;
+      _filter = choice.filter;
+      _showHidden = choice.showHidden;
+    });
   }
 
   void _startDrag(String nodeId, Offset startPosition, _DragTargetKind kind) {
@@ -2662,43 +2778,47 @@ class _WallMoreButton extends StatelessWidget {
 
 /// How the wall is shown: view, arrangement and category filter. Changes
 /// apply as you tap, so the sheet can stay open while you compare.
-class _WallViewSheet extends StatefulWidget {
-  const _WallViewSheet({
+/// What the View sheet sets: returned by Done.
+class _ViewChoice {
+  const _ViewChoice({
     required this.mode,
     required this.layout,
     required this.filter,
-    required this.onModeChanged,
-    required this.onLayoutChanged,
-    required this.onFilterChanged,
-    required this.hasHidden,
     required this.showHidden,
-    required this.onShowHiddenChanged,
   });
 
   final _WallViewMode mode;
   final WallLayoutMode layout;
   final WallFilter filter;
-  final ValueChanged<_WallViewMode> onModeChanged;
-  final ValueChanged<WallLayoutMode> onLayoutChanged;
-  final ValueChanged<WallFilter> onFilterChanged;
+  final bool showHidden;
+}
+
+class _WallViewSheet extends StatefulWidget {
+  const _WallViewSheet({
+    required this.current,
+    required this.hasHidden,
+    required this.onAuthorizeHidden,
+  });
+
+  /// How the wall is shown now.
+  final _ViewChoice current;
 
   /// The wall has hidden memories; the switch shows only then.
   final bool hasHidden;
-  final bool showHidden;
 
-  /// Returns whether hidden memories are shown after the change (Face ID
-  /// can refuse).
-  final Future<bool> Function(bool show) onShowHiddenChanged;
+  /// Whether hidden memories may be shown (Face ID can refuse).
+  final Future<bool> Function(bool show) onAuthorizeHidden;
 
   @override
   State<_WallViewSheet> createState() => _WallViewSheetState();
 }
 
+/// Choices stay in the sheet until Done.
 class _WallViewSheetState extends State<_WallViewSheet> {
-  late var _mode = widget.mode;
-  late var _layout = widget.layout;
-  late var _filter = widget.filter;
-  late var _showHidden = widget.showHidden;
+  late var _mode = widget.current.mode;
+  late var _layout = widget.current.layout;
+  late var _filter = widget.current.filter;
+  late var _showHidden = widget.current.showHidden;
 
   @override
   Widget build(BuildContext context) {
@@ -2725,7 +2845,15 @@ class _WallViewSheetState extends State<_WallViewSheet> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  key: const ValueKey('wall-view-done'),
+                  onPressed: () => Navigator.of(context).pop(
+                    _ViewChoice(
+                      mode: _mode,
+                      layout: _layout,
+                      filter: _filter,
+                      showHidden: _showHidden,
+                    ),
+                  ),
                   child: Text(l10n.done),
                 ),
               ],
@@ -2769,7 +2897,6 @@ class _WallViewSheetState extends State<_WallViewSheet> {
               selected: {_mode},
               onSelectionChanged: (selection) {
                 setState(() => _mode = selection.single);
-                widget.onModeChanged(selection.single);
               },
             ),
             if (_mode == _WallViewMode.wall) ...[
@@ -2784,7 +2911,6 @@ class _WallViewSheetState extends State<_WallViewSheet> {
                       label: _layoutLabel(context, layout),
                       onSelected: () {
                         setState(() => _layout = layout);
-                        widget.onLayoutChanged(layout);
                       },
                     ),
                 ],
@@ -2800,7 +2926,6 @@ class _WallViewSheetState extends State<_WallViewSheet> {
                     label: _filterLabel(context, filter),
                     onSelected: () {
                       setState(() => _filter = filter);
-                      widget.onFilterChanged(filter);
                     },
                   ),
               ],
@@ -2822,8 +2947,10 @@ class _WallViewSheetState extends State<_WallViewSheet> {
                   ),
                   value: _showHidden,
                   onChanged: (value) async {
-                    final shown = await widget.onShowHiddenChanged(value);
-                    if (mounted) setState(() => _showHidden = shown);
+                    final allowed = await widget.onAuthorizeHidden(value);
+                    if (mounted && allowed) {
+                      setState(() => _showHidden = value);
+                    }
                   },
                 ),
               ),
