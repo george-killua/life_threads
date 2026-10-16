@@ -292,4 +292,34 @@ class MemorySeedData {
 
   static bool isDemoEventId(String id) =>
       eventIds.contains(id) || legacyEventIds.contains(id);
+
+  /// The demo memories in every language of the app.
+  static final _seedsByLanguage = [
+    for (final locale in AppLocalizations.supportedLocales)
+      localizedEvents(lookupAppLocalizations(locale)),
+  ];
+
+  /// A demo memory still as the demo wall made it: date, title and story
+  /// unchanged (in any of the app's languages). Once the user changes one,
+  /// it is theirs and counts like their own memories (Thread of the Year,
+  /// On this day).
+  static bool isUntouchedDemo(MemoryEvent event) {
+    if (legacyEventIds.contains(event.id)) return true;
+    if (!eventIds.contains(event.id)) return false;
+    final at = event.occurredAt;
+    for (final seeds in _seedsByLanguage) {
+      for (final seed in seeds) {
+        if (seed.id != event.id) continue;
+        final seedAt = seed.occurredAt;
+        if (seedAt.year == at.year &&
+            seedAt.month == at.month &&
+            seedAt.day == at.day &&
+            seed.title == event.title &&
+            seed.description == event.description) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }

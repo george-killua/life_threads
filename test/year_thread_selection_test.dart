@@ -21,10 +21,13 @@ void main() {
       expect(YearThread.availableYears(state), [2025, 2023]);
     });
 
-    test('demo memories do not count', () {
-      final demo = MemorySeedData.events.first;
+    test('untouched demo memories do not count, changed ones do', () {
+      // The demo's own 2025 memory, as the demo wall made it.
+      final demo = MemorySeedData.events.firstWhere(
+        (event) => event.occurredAt.year == 2025,
+      );
       final state = yearState([
-        demo.copyWith(occurredAt: DateTime(2025, 1, 1)),
+        demo,
         yearMemory('a', DateTime(2025, 2, 1)),
         yearMemory('b', DateTime(2025, 3, 1)),
       ]);
@@ -34,6 +37,14 @@ void main() {
         'a',
         'b',
       ]);
+
+      // Re-dated by the user: theirs now.
+      final mine = yearState([
+        demo.copyWith(occurredAt: DateTime(2025, 1, 1)),
+        yearMemory('a', DateTime(2025, 2, 1)),
+        yearMemory('b', DateTime(2025, 3, 1)),
+      ]);
+      expect(YearThread.availableYears(mine), [2025]);
     });
 
     test('an empty wall has no years', () {

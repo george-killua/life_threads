@@ -157,12 +157,12 @@ abstract final class YearThread {
   /// in one month still gets its best memories.
   static const monthPenalty = 3.0;
 
-  /// Years with enough memories for a film, newest first. Demo memories do
-  /// not count.
+  /// Years with enough memories for a film, newest first. Demo memories
+  /// count only once the user changed them.
   static List<int> availableYears(MemoryState state) {
     final counts = <int, int>{};
     for (final event in state.visibleEvents) {
-      if (MemorySeedData.isDemoEventId(event.id)) continue;
+      if (MemorySeedData.isUntouchedDemo(event)) continue;
       counts.update(event.occurredAt.year, (n) => n + 1, ifAbsent: () => 1);
     }
     return [
@@ -176,7 +176,7 @@ abstract final class YearThread {
   static List<({int year, int count})> almostYears(MemoryState state) {
     final counts = <int, int>{};
     for (final event in state.visibleEvents) {
-      if (MemorySeedData.isDemoEventId(event.id)) continue;
+      if (MemorySeedData.isUntouchedDemo(event)) continue;
       counts.update(event.occurredAt.year, (n) => n + 1, ifAbsent: () => 1);
     }
     return [
@@ -208,7 +208,7 @@ abstract final class YearThread {
     final memories = [
       for (final event in state.visibleEvents)
         if (event.occurredAt.year == year &&
-            !MemorySeedData.isDemoEventId(event.id))
+            !MemorySeedData.isUntouchedDemo(event))
           YearThreadMemory(
             event: event,
             photoPath: _photoPath(state, event),

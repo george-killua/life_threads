@@ -41,7 +41,7 @@ class OnThisDay {
   ) {
     final matches = <OnThisDayMatch>[];
     for (final event in events) {
-      if (MemorySeedData.isDemoEventId(event.id)) continue;
+      if (MemorySeedData.isUntouchedDemo(event)) continue;
       final occurred = event.occurredAt.toLocal();
       if (occurred.year >= day.year) continue;
       if (!_isAnniversary(occurred, day)) continue;

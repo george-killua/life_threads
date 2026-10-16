@@ -56,11 +56,11 @@ void main() {
       expect(matches, isEmpty);
     });
 
-    test('leaves out the demo wall', () {
-      final demoId = MemorySeedData.eventIds.first;
-      final demo = memory(demoId, DateTime(2024, 3, 5));
+    test('leaves out the demo wall as it came', () {
+      final demo = MemorySeedData.events.first;
+      final day = DateTime(2026, demo.occurredAt.month, demo.occurredAt.day);
 
-      expect(OnThisDay.matchesOn(DateTime(2026, 3, 5), [demo]), isEmpty);
+      expect(OnThisDay.matchesOn(day, [demo]), isEmpty);
     });
 
     test('a Feb 29 memory comes back on Feb 28 in non-leap years', () {

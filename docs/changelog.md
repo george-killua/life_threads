@@ -13,6 +13,9 @@ What changed in each TestFlight / Play build. Newest first.
   (a photo's own date still wins).
 - When a year is ready, the years that are nearly there are listed below
   the film under "Almost there".
+- **Demo memories you changed count as yours** (Thread of the Year, On this
+  day): once their date, title or story differs from the demo wall. Untouched
+  demo memories still stay out.
 
 ## 1.0.0 (21) – 16 October 2026
 
