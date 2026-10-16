@@ -13,6 +13,12 @@ appId: "${maestro.platform == 'ios' ? 'dev.gkcoding.lifeThreads' : 'dev.gkcoding
     commands:
       - tapOn:
           point: 50%, 8%
+# At the largest text size the sheet covers the tap point: Done instead.
+- runFlow:
+    when:
+      visible: "Show as"
+    commands:
+      - tapOn: "Done"
 - extendedWaitUntil:
     notVisible: "Show as"
     timeout: 10000

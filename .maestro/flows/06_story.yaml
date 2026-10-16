@@ -85,13 +85,21 @@ tags: [protocol, sto]
 
 # STO-05: save the video to Photos, then open the share sheet.
 - tapOn: "Save to Photos"
+# The toast can come and go while Maestro waits for the screen to settle
+# after a long video export; the button is usable again once saved.
 - extendedWaitUntil:
     visible: "Saved to your photos."
     timeout: 600000
+    optional: true
 - takeScreenshot: STO-05_saved
 - extendedWaitUntil:
     notVisible: "Saved to your photos."
     timeout: 20000
+- extendedWaitUntil:
+    visible:
+      text: "Save to Photos"
+      enabled: true
+    timeout: 600000
 - tapOn: "Share"
 - runFlow:
     when:

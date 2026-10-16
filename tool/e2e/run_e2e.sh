@@ -7,6 +7,7 @@
 #   tool/e2e/run_e2e.sh --android       # Android emulator only
 #   tool/e2e/run_e2e.sh --both          # iOS and Android in parallel
 #   tool/e2e/run_e2e.sh --flow 02_add_memory   # one flow only
+#   tool/e2e/run_e2e.sh --large         # only the largest-text-size flow (iOS)
 #
 # Two kinds of tests run on each device:
 #   - Maestro flows (.maestro/flows): the real app, tapped like a person,
@@ -41,6 +42,7 @@ while [[ $# -gt 0 ]]; do
     --android) RUN_IOS=0; RUN_ANDROID=1 ;;
     --both) RUN_IOS=1; RUN_ANDROID=1 ;;
     --flow) FLOW="$2"; shift ;;
+    --large) FLOW="__large__" ;;
     *) echo "Unknown option $1"; exit 2 ;;
   esac
   shift
@@ -215,14 +217,16 @@ device_list="$(IFS=,; echo "${devices[*]}")"
 #    (Two separate Maestro processes get in each other's way.)
 target=".maestro/flows"
 [[ -n "$FLOW" ]] && target=".maestro/flows/$FLOW.yaml"
+if [[ "$FLOW" != "__large__" ]]; then
 log "Maestro flows on ${device_list}"
 maestro test --device "$device_list" --shard-all "${#devices[@]}" "$target" \
   "${maestro_env[@]}" --format junit --output "$OUT/maestro-junit.xml" \
   --test-output-dir "$OUT/maestro" >"$OUT/maestro.log" 2>&1
 echo $? >"$OUT/maestro.exit"
+fi
 
 # 2b. iOS at the largest text size (SET-02): every main screen once more.
-if [[ -z "$FLOW" && -f "$OUT/.ios_device" ]]; then
+if [[ ( -z "$FLOW" || "$FLOW" == "__large__" ) && -f "$OUT/.ios_device" ]]; then
   ios_udid="$(cat "$OUT/.ios_device")"
   log "Large text flow on iOS"
   xcrun simctl ui "$ios_udid" content_size accessibility-extra-extra-extra-large

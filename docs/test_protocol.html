@@ -1,0 +1,604 @@
+<title>LifeThreads Test Protocol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a single protocol column; a sticky status strip on top; each test is a row card with ID, steps, expected result and a result switch. */
+:root {
+  --bg: #f7f4f0;
+  --surface: #ffffff;
+  --surface-2: #efe9e2;
+  --fg: #231b1f;
+  --muted: #6d6168;
+  --line: #e0d7cf;
+  --gold: #a8741a;
+  --gold-soft: #f3e3c4;
+  --plum: #4a2a3d;
+  --pass: #2f7d4f;
+  --pass-bg: #e2f2e8;
+  --fail: #b3362f;
+  --fail-bg: #f8e1df;
+  --block: #9a6a12;
+  --block-bg: #f6ead1;
+  --na: #6d6168;
+  --na-bg: #ece6e1;
+  --font-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --font-arabic: "IBM Plex Sans Arabic", "Geeza Pro", "Segoe UI", Tahoma, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18121a; --surface: #221a24; --surface-2: #2b212e; --fg: #f1e9e4; --muted: #b3a5ad;
+    --line: #3a2e3d; --gold: #e0b25c; --gold-soft: #3b2e1e; --plum: #d9c2d0;
+    --pass: #7fd3a0; --pass-bg: #1d3327; --fail: #f2948c; --fail-bg: #3d2120;
+    --block: #e8c06e; --block-bg: #3a2f19; --na: #b3a5ad; --na-bg: #2f2730;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #18121a; --surface: #221a24; --surface-2: #2b212e; --fg: #f1e9e4; --muted: #b3a5ad;
+  --line: #3a2e3d; --gold: #e0b25c; --gold-soft: #3b2e1e; --plum: #d9c2d0;
+  --pass: #7fd3a0; --pass-bg: #1d3327; --fail: #f2948c; --fail-bg: #3d2120;
+  --block: #e8c06e; --block-bg: #3a2f19; --na: #b3a5ad; --na-bg: #2f2730;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 860px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 64px; display: flex; flex-direction: column; gap: 28px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(28px, 6vw, 40px); letter-spacing: -0.5px; }
+h2 { font-size: 22px; }
+h3 { font-size: 17px; }
+p { margin: 0; }
+.mono { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.3px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--gold); }
+
+header.doc { display: flex; flex-direction: column; gap: 14px; }
+.head-row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+.lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.lang button { background: transparent; color: var(--muted); border: 0; padding: 6px 14px; font: 500 13px var(--font-body); cursor: pointer; }
+.lang button[aria-pressed="true"] { background: var(--plum); color: var(--bg); }
+.meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.meta div { padding: 10px 12px; border-inline-end: 1px solid var(--line); border-bottom: 1px solid var(--line); min-width: 0; }
+.meta dt { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+.meta dd { margin: 2px 0 0; font-weight: 600; overflow-wrap: anywhere; }
+.lead { max-width: 65ch; color: var(--fg); }
+
+.status { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 10px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.bar { display: flex; height: 8px; border-radius: 99px; overflow: hidden; background: var(--surface-2); }
+.bar span { display: block; height: 100%; transition: width .3s; }
+.bar .p { background: var(--pass); } .bar .f { background: var(--fail); } .bar .b { background: var(--block); } .bar .n { background: var(--na); }
+.counts { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.counts b { color: var(--fg); }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
+
+section.block { display: flex; flex-direction: column; gap: 14px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+label.f { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); min-width: 0; }
+input, select, textarea { font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100%; }
+textarea { min-height: 60px; resize: vertical; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+ul.rules { margin: 0; padding-inline-start: 20px; display: flex; flex-direction: column; gap: 6px; max-width: 70ch; }
+.note { background: var(--gold-soft); border-radius: 10px; padding: 12px 14px; font-size: 14px; }
+
+.area-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; border-bottom: 2px solid var(--fg); padding-bottom: 6px; }
+.area-head .mono { color: var(--muted); }
+.case { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; grid-template-columns: 1fr; gap: 10px; border-inline-start-width: 4px; }
+.case[data-r="pass"] { border-inline-start-color: var(--pass); }
+.case[data-r="fail"] { border-inline-start-color: var(--fail); }
+.case[data-r="blocked"] { border-inline-start-color: var(--block); }
+.case[data-r="na"] { border-inline-start-color: var(--na); }
+.case-top { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.case-top .id { font-family: var(--font-mono); font-size: 12.5px; color: var(--gold); font-weight: 500; }
+.tag { font-family: var(--font-mono); font-size: 11px; padding: 1px 7px; border-radius: 99px; background: var(--surface-2); color: var(--muted); }
+.tag.p1 { background: var(--plum); color: var(--bg); }
+.cols { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; }
+@media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }
+.cols > div { min-width: 0; }
+.cols h4 { margin: 0 0 4px; font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+ol.steps { margin: 0; padding-inline-start: 20px; display: flex; flex-direction: column; gap: 3px; }
+.res { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.res button { font: 500 13px var(--font-body); border: 1px solid var(--line); background: transparent; color: var(--fg); border-radius: 99px; padding: 5px 12px; cursor: pointer; }
+.res button[data-v="pass"][aria-pressed="true"] { background: var(--pass-bg); color: var(--pass); border-color: var(--pass); }
+.res button[data-v="fail"][aria-pressed="true"] { background: var(--fail-bg); color: var(--fail); border-color: var(--fail); }
+.res button[data-v="blocked"][aria-pressed="true"] { background: var(--block-bg); color: var(--block); border-color: var(--block); }
+.res button[data-v="na"][aria-pressed="true"] { background: var(--na-bg); color: var(--na); border-color: var(--na); }
+.case textarea { min-height: 44px; font-size: 14px; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { font: 600 14px var(--font-body); border-radius: 10px; padding: 10px 16px; cursor: pointer; border: 1px solid var(--plum); background: var(--plum); color: var(--bg); }
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.btn.danger { background: transparent; color: var(--fail); border-color: var(--fail); }
+.confirm { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 14px; }
+pre#report { direction: auto; unicode-bidi: plaintext; background: var(--surface-2); border-radius: 10px; padding: 12px; font: 12.5px/1.5 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 320px; overflow: auto; margin: 0; }
+.addr { font-family: var(--font-mono); background: var(--surface-2); padding: 2px 8px; border-radius: 6px; user-select: all; }
+footer { color: var(--muted); font-size: 13px; }
+:root[lang="ar"] body, :root[lang="ar"] h1, :root[lang="ar"] h2, :root[lang="ar"] h3, :root[lang="ar"] input, :root[lang="ar"] textarea, :root[lang="ar"] .res button, :root[lang="ar"] .btn { font-family: var(--font-arabic); }
+:root[lang="ar"] h1 { letter-spacing: 0; }
+.ltr { direction: ltr; unicode-bidi: isolate; }
+@media (prefers-reduced-motion: reduce) { .bar span { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="doc">
+    <div class="head-row">
+      <span class="eyebrow">LT-TP-100 · Beta</span>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" id="lang-en" data-lang="en">English</button>
+        <button type="button" id="lang-de" data-lang="de">Deutsch</button>
+        <button type="button" id="lang-ar" data-lang="ar">العربية</button>
+      </div>
+    </div>
+    <h1 data-t="title"></h1>
+    <p class="lead" data-t="lead"></p>
+    <dl class="meta">
+      <div><dt data-t="mApp"></dt><dd class="ltr">LifeThreads – Memory Wall</dd></div>
+      <div><dt data-t="mBuild"></dt><dd class="ltr">1.0.0 (21)</dd></div>
+      <div><dt data-t="mPlatforms"></dt><dd>iOS (TestFlight) · Android (Play)</dd></div>
+      <div><dt data-t="mPeriod"></dt><dd data-t="period"></dd></div>
+      <div><dt data-t="mContact"></dt><dd class="ltr">info@gkcoding.dev</dd></div>
+    </dl>
+  </header>
+
+  <div class="status" aria-live="polite">
+    <div class="bar" aria-hidden="true"><span class="p"></span><span class="f"></span><span class="b"></span><span class="n"></span></div>
+    <div class="counts" id="counts"></div>
+  </div>
+
+  <section class="block" id="tester">
+    <div class="area-head"><h2 data-t="sTester"></h2><span class="mono" data-t="sTesterHint"></span></div>
+    <div class="panel">
+      <div class="form">
+        <label class="f"><span data-t="fName"></span><input id="f-name" autocomplete="name"></label>
+        <label class="f"><span data-t="fPlatform"></span>
+          <select id="f-platform"><option value=""></option><option>iPhone / iPad</option><option>Android</option></select></label>
+        <label class="f"><span data-t="fDevice"></span><input id="f-device" placeholder="iPhone 15, Pixel 8, Galaxy S23 …"></label>
+        <label class="f"><span data-t="fOs"></span><input id="f-os" placeholder="iOS 27.0 / Android 16"></label>
+        <label class="f"><span data-t="fLang"></span>
+          <select id="f-lang"><option value=""></option><option>English</option><option>Deutsch</option><option>العربية</option></select></label>
+        <label class="f"><span data-t="fDate"></span><input id="f-date" type="date"></label>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="howto">
+    <div class="area-head"><h2 data-t="sHow"></h2></div>
+    <ul class="rules" id="rules"></ul>
+    <div class="note" data-t="money"></div>
+  </section>
+
+  <div id="areas" class="block"></div>
+
+  <section class="block" id="finish">
+    <div class="area-head"><h2 data-t="sReport"></h2></div>
+    <p class="lead" data-t="reportLead"></p>
+    <div class="actions">
+      <button class="btn" type="button" id="copy" data-t="copy"></button>
+      <span class="addr ltr">info@gkcoding.dev</span>
+      <span id="copied" class="mono" hidden></span>
+    </div>
+    <pre id="report"></pre>
+    <div class="actions">
+      <button class="btn danger" type="button" id="reset" data-t="reset"></button>
+      <span class="confirm" id="reset-confirm" hidden>
+        <span data-t="resetQ"></span>
+        <button class="btn danger" type="button" id="reset-yes" data-t="resetYes"></button>
+        <button class="btn ghost" type="button" id="reset-no" data-t="resetNo"></button>
+      </span>
+    </div>
+  </section>
+
+  <footer data-t="footer"></footer>
+</div>
+
+<script>
+var T = {
+  en: {
+    title: "LifeThreads beta test protocol",
+    lead: "Thank you for testing LifeThreads before it launches. This protocol walks you through every feature of the app. Work through the tests in order, mark each one as Pass, Fail or Blocked, and write down anything that felt wrong or confusing. Your answers stay in this browser until you copy the report at the end.",
+    mApp: "App", mBuild: "Build", mPlatforms: "Platforms", mPeriod: "Test period", mContact: "Report to",
+    period: "17 Oct – 15 Nov 2026",
+    sTester: "Tester", sTesterHint: "fill in once", fName: "Your name", fPlatform: "Platform", fDevice: "Device model", fOs: "System version", fLang: "App language", fDate: "Test date",
+    sHow: "How to test",
+    rules: [
+      "Install the app: on iPhone through the TestFlight invitation email, on Android through the Google Play test link you received.",
+      "Use your own real memories where you can. Real photos and real stories show problems that test data hides.",
+      "Pass: works as described. Fail: something is wrong, write what happened. Blocked: you could not run the test (for example you have only one phone). N/A: does not apply to you.",
+      "For every Fail, note the exact steps and, if possible, take a screenshot and send it with your report.",
+      "P1 tests matter most. If you are short on time, do those first."
+    ],
+    money: "Premium: on iPhone (TestFlight) purchases are test purchases and cost nothing. On Android please do not buy with a real card: redeem the promo code George sent you instead (test PRM-04). It gives you 2 months of Premium for free.",
+    expected: "Expected result", steps: "Steps", notes: "Notes (what happened, device details)",
+    pass: "Pass", fail: "Fail", blocked: "Blocked", na: "N/A",
+    cTotal: "tests", cDone: "done", cPass: "pass", cFail: "fail", cBlock: "blocked", cNa: "n/a",
+    sReport: "Send your report",
+    reportLead: "When you are done, copy the report and send it by email or message to George. Failed and blocked tests come first.",
+    copy: "Copy report", copied: "Copied.", copyFail: "Select the text below and copy it.",
+    reset: "Clear all my answers", resetQ: "Clear every result and note in this browser?", resetYes: "Yes, clear", resetNo: "Keep",
+    footer: "LifeThreads by GK Coding · Test protocol for build 1.0.0 (21) · Your answers are saved only in this browser.",
+    rTitle: "LIFETHREADS TEST REPORT", rIssues: "FAILED / BLOCKED", rAll: "ALL RESULTS", rNone: "none", rOpen: "not tested"
+  },
+  de: {
+    title: "LifeThreads Beta-Testprotokoll",
+    lead: "Danke, dass du LifeThreads vor dem Start testest. Dieses Protokoll führt dich durch alle Funktionen der App. Arbeite die Tests der Reihe nach durch, markiere jeden als Bestanden, Fehler oder Blockiert und notiere alles, was falsch oder verwirrend war. Deine Antworten bleiben in diesem Browser, bis du am Ende den Bericht kopierst.",
+    mApp: "App", mBuild: "Build", mPlatforms: "Plattformen", mPeriod: "Testzeitraum", mContact: "Bericht an",
+    period: "17. Okt – 15. Nov 2026",
+    sTester: "Tester:in", sTesterHint: "einmal ausfüllen", fName: "Dein Name", fPlatform: "Plattform", fDevice: "Gerätemodell", fOs: "Systemversion", fLang: "App-Sprache", fDate: "Testdatum",
+    sHow: "So testest du",
+    rules: [
+      "Installiere die App: auf dem iPhone über die TestFlight-Einladung per E-Mail, auf Android über den Google-Play-Testlink, den du bekommen hast.",
+      "Nimm wenn möglich deine echten Erinnerungen. Echte Fotos und Geschichten zeigen Fehler, die Testdaten verstecken.",
+      "Bestanden: funktioniert wie beschrieben. Fehler: etwas stimmt nicht, schreib auf, was passiert ist. Blockiert: du konntest den Test nicht machen (z. B. nur ein Handy). N/A: betrifft dich nicht.",
+      "Notiere bei jedem Fehler die genauen Schritte und schick wenn möglich einen Screenshot mit.",
+      "P1-Tests sind am wichtigsten. Wenn du wenig Zeit hast, mach diese zuerst."
+    ],
+    money: "Premium: Auf dem iPhone (TestFlight) sind Käufe Testkäufe und kosten nichts. Auf Android bitte nicht mit echter Karte kaufen: Löse stattdessen den Promo-Code ein, den George dir geschickt hat (Test PRM-04). Damit bekommst du 2 Monate Premium gratis.",
+    expected: "Erwartetes Ergebnis", steps: "Schritte", notes: "Notizen (was ist passiert, Gerätedetails)",
+    pass: "Bestanden", fail: "Fehler", blocked: "Blockiert", na: "N/A",
+    cTotal: "Tests", cDone: "erledigt", cPass: "bestanden", cFail: "Fehler", cBlock: "blockiert", cNa: "n/a",
+    sReport: "Bericht senden",
+    reportLead: "Wenn du fertig bist, kopiere den Bericht und schick ihn per E-Mail oder Nachricht an George. Fehler und blockierte Tests stehen oben.",
+    copy: "Bericht kopieren", copied: "Kopiert.", copyFail: "Markiere den Text unten und kopiere ihn.",
+    reset: "Alle meine Antworten löschen", resetQ: "Alle Ergebnisse und Notizen in diesem Browser löschen?", resetYes: "Ja, löschen", resetNo: "Behalten",
+    footer: "LifeThreads von GK Coding · Testprotokoll für Build 1.0.0 (21) · Deine Antworten werden nur in diesem Browser gespeichert.",
+    rTitle: "LIFETHREADS TESTBERICHT", rIssues: "FEHLER / BLOCKIERT", rAll: "ALLE ERGEBNISSE", rNone: "keine", rOpen: "nicht getestet"
+  }
+};
+
+// Each case: id, priority, title, steps, expected — in English and German.
+var AREAS = [
+ { key: "INS", en: "Install and first start", de: "Installation und erster Start", cases: [
+  { id: "INS-01", p: 1,
+    en: ["Install the beta", ["iPhone: open the TestFlight email, install TestFlight, then tap Install for LifeThreads.", "Android: open the test link, tap Become a tester, then install LifeThreads from the Play Store."], "The app installs. The icon is a gold heart on a dark background and the name under it is LifeThreads."],
+    de: ["Beta installieren", ["iPhone: TestFlight-E-Mail öffnen, TestFlight installieren, dann bei LifeThreads auf Installieren tippen.", "Android: Testlink öffnen, Tester werden tippen, dann LifeThreads im Play Store installieren."], "Die App installiert sich. Das Icon ist ein goldenes Herz auf dunklem Grund, darunter steht LifeThreads."] },
+  { id: "INS-02", p: 1,
+    en: ["Onboarding", ["Open the app.", "Swipe through the intro screens.", "Enter your name."], "The intro is readable and the app greets you by name. The texts are in your phone's language (English, German or Arabic)."],
+    de: ["Onboarding", ["App öffnen.", "Durch die Einführung wischen.", "Deinen Namen eingeben."], "Die Einführung ist gut lesbar und die App begrüßt dich mit Namen. Die Texte sind in der Sprache deines Handys (Deutsch, Englisch oder Arabisch)."] },
+  { id: "INS-03", p: 2,
+    en: ["Demo wall", ["On the screen Choose how to begin, open Preview demo wall.", "Look around, then leave the demo and start your own wall."], "The demo wall shows example memories marked as a demo. Your own wall starts empty and the demo memories are not mixed into it."],
+    de: ["Demo-Wand", ["Auf dem Bildschirm Wie möchtest du beginnen die Demo-Wand-Vorschau öffnen.", "Umschauen, dann die Demo verlassen und die eigene Wand starten."], "Die Demo-Wand zeigt Beispiel-Erinnerungen mit Demo-Hinweis. Deine eigene Wand startet leer, ohne Demo-Erinnerungen."] }
+ ]},
+ { key: "WAL", en: "Your memory wall", de: "Deine Erinnerungswand", cases: [
+  { id: "WAL-01", p: 1,
+    en: ["Add a memory with photos", ["Tap + to add a memory.", "Choose a type (Moment, Trip, Person, Place or Note).", "Write a title and a short story, set the date.", "Add 1–5 photos from your gallery.", "Choose a feeling and save."], "The memory appears as a card on the wall with its photo, title and date."],
+    de: ["Erinnerung mit Fotos hinzufügen", ["Auf + tippen.", "Eine Art wählen (Moment, Reise, Person, Ort oder Notiz).", "Titel und kurze Geschichte schreiben, Datum setzen.", "1–5 Fotos aus der Galerie hinzufügen.", "Ein Gefühl wählen und speichern."], "Die Erinnerung erscheint als Karte an der Wand, mit Foto, Titel und Datum."] },
+  { id: "WAL-02", p: 1,
+    en: ["Photo permission", ["When asked, allow access to only some photos (Selected photos / limited access).", "Add another memory and pick a photo."], "The app explains why it needs photos and works with limited access. You can add more photos to the selection without a crash."],
+    de: ["Fotozugriff", ["Wenn gefragt, nur Zugriff auf ausgewählte Fotos erlauben.", "Eine weitere Erinnerung anlegen und ein Foto wählen."], "Die App erklärt, warum sie Fotos braucht, und funktioniert mit eingeschränktem Zugriff. Weitere Fotos lassen sich ohne Absturz freigeben."] },
+  { id: "WAL-03", p: 1,
+    en: ["Move around the wall", ["Add at least 5 memories.", "Pinch to zoom, drag to move the wall.", "Drag a card to a new spot."], "Zooming and moving are smooth. Cards stay where you put them, also after closing and reopening the app."],
+    de: ["Auf der Wand bewegen", ["Mindestens 5 Erinnerungen anlegen.", "Mit zwei Fingern zoomen, Wand verschieben.", "Eine Karte an eine neue Stelle ziehen."], "Zoomen und Verschieben laufen flüssig. Karten bleiben, wo du sie hinlegst, auch nach Neustart der App."] },
+  { id: "WAL-04", p: 1,
+    en: ["Connect two memories with a thread", ["Open a memory and choose its connections.", "Connect it to another memory and write why they belong together."], "A thread line connects the two cards on the wall. The reason is shown in the memory."],
+    de: ["Zwei Erinnerungen mit einem Faden verbinden", ["Eine Erinnerung öffnen und die Verbindungen wählen.", "Mit einer anderen Erinnerung verbinden und schreiben, warum sie zusammengehören."], "Ein Faden verbindet die beiden Karten an der Wand. Der Grund steht in der Erinnerung."] },
+  { id: "WAL-05", p: 1,
+    en: ["Open, edit and delete", ["Tap a card to open the memory.", "Edit the title and add a photo, save.", "Delete a test memory."], "The detail page shows all photos and the story like a chapter. Changes are saved. A deleted memory disappears from wall, timeline and map."],
+    de: ["Öffnen, bearbeiten, löschen", ["Eine Karte antippen.", "Titel ändern, ein Foto hinzufügen, speichern.", "Eine Test-Erinnerung löschen."], "Die Detailseite zeigt alle Fotos und die Geschichte wie ein Kapitel. Änderungen werden gespeichert. Gelöschte Erinnerungen verschwinden aus Wand, Zeitleiste und Karte."] },
+  { id: "WAL-06", p: 2,
+    en: ["Timeline and map", ["Switch from Wall to Timeline.", "Switch to Map.", "Use the category filter on the wall."], "The timeline is ordered by date. The map shows memories with a place, grouped by location. The filter shows only the chosen kind."],
+    de: ["Zeitleiste und Karte", ["Von Wand auf Zeitleiste wechseln.", "Auf Karte wechseln.", "Den Kategorie-Filter an der Wand nutzen."], "Die Zeitleiste ist nach Datum sortiert. Die Karte zeigt Erinnerungen mit Ort, nach Ort gruppiert. Der Filter zeigt nur die gewählte Art."] },
+  { id: "WAL-07", p: 2,
+    en: ["People and places", ["In a memory, add a person from your contacts.", "Add a photo that has a location (taken with your phone camera)."], "The person is listed in the memory. The place is filled in from the photo and the memory shows up on the map."],
+    de: ["Menschen und Orte", ["In einer Erinnerung eine Person aus den Kontakten hinzufügen.", "Ein Foto mit Standort hinzufügen (mit der Handykamera aufgenommen)."], "Die Person steht in der Erinnerung. Der Ort wird aus dem Foto übernommen und die Erinnerung erscheint auf der Karte."] },
+  { id: "WAL-08", p: 2,
+    en: ["Free limit", ["Without Premium, add memories until you reach 30 (only if you have time)."], "At 30 memories the app explains the free limit kindly and offers Premium. Nothing you saved is lost."],
+    de: ["Gratis-Limit", ["Ohne Premium Erinnerungen anlegen, bis es 30 sind (nur wenn du Zeit hast)."], "Bei 30 Erinnerungen erklärt die App das Gratis-Limit freundlich und bietet Premium an. Nichts Gespeichertes geht verloren."] },
+  { id: "WAL-09", p: 2,
+    en: ["Search, several walls, hidden memories", ["Tap the magnifier and search for a place, a person or a year.", "Premium: More › New wall, give it a name. Use Move memories here (or a memory's menu › Move to wall).", "Open a memory's menu and choose Hide. Then View › Hidden memories."], "Search finds memories as you type. Each wall shows only its own memories; the switcher at the top changes walls. A hidden memory leaves the wall and comes back only after Face ID or the passcode."],
+    de: ["Suche, mehrere Wände, ausgeblendete Erinnerungen", ["Auf die Lupe tippen und nach einem Ort, einer Person oder einem Jahr suchen.", "Premium: Mehr › Neue Wand, benennen. Erinnerungen hierher verschieben nutzen (oder im Menü einer Erinnerung › Auf Wand verschieben).", "Im Menü einer Erinnerung Ausblenden wählen. Dann Ansicht › Ausgeblendete Erinnerungen."], "Die Suche findet Erinnerungen beim Tippen. Jede Wand zeigt nur ihre eigenen Erinnerungen; oben wechselst du die Wand. Eine ausgeblendete Erinnerung verschwindet von der Wand und kommt nur nach Face ID oder Code zurück."] },
+  { id: "WAL-10", p: 2,
+    en: ["Edit pencils, Undo, Open in Maps", ["Open a memory and tap the pencil on a section (for example Gallery).", "Delete a memory, then tap Undo in the message at the bottom.", "On the Place card tap Open in Maps."], "The pencil opens the edit screen at that section. Undo brings the memory back. Maps opens at the memory's place."],
+    de: ["Bearbeiten-Stifte, Rückgängig, In Karten öffnen", ["Eine Erinnerung öffnen und auf den Stift eines Abschnitts tippen (z. B. Galerie).", "Eine Erinnerung löschen, dann in der Meldung unten Rückgängig tippen.", "Auf der Ort-Karte In Karten öffnen tippen."], "Der Stift öffnet die Bearbeitung genau bei diesem Abschnitt. Rückgängig holt die Erinnerung zurück. Karten öffnet sich beim Ort der Erinnerung."] },
+  { id: "WAL-11", p: 1,
+    en: ["Unfinished memory kept as a draft", ["Tap + › Memory, type a title and pick a photo.", "Leave with the back arrow without saving (or close the app completely).", "Tap + › Memory again."], "Leaving shows “Kept as a draft”. Next time the app asks “Continue where you left off?”: Continue draft brings back the title and photo, Start new begins empty."],
+    de: ["Unfertige Erinnerung bleibt als Entwurf", ["Auf + › Erinnerung tippen, einen Titel schreiben und ein Foto wählen.", "Mit dem Zurück-Pfeil gehen, ohne zu speichern (oder die App ganz schließen).", "Wieder auf + › Erinnerung tippen."], "Beim Verlassen erscheint „Als Entwurf behalten“. Beim nächsten Mal fragt die App „Weitermachen, wo du aufgehört hast?“: Entwurf fortsetzen bringt Titel und Foto zurück, Neu beginnen startet leer."] },
+  { id: "WAL-12", p: 2,
+    en: ["Look back on a month", ["Open More › Look back on a month.", "Use the arrows to move to other months.", "In the first week of a month: check the card on the wall for the month before."], "You see “Your September” (for example) with its memories, the people and places in them, and Create story. An empty month says so in the middle of the screen, with Add a memory."],
+    de: ["Monatsrückblick", ["Mehr › Monatsrückblick öffnen.", "Mit den Pfeilen zu anderen Monaten wechseln.", "In der ersten Woche eines Monats: die Karte an der Wand für den Vormonat ansehen."], "Du siehst z. B. „Dein September“ mit seinen Erinnerungen, den Menschen und Orten darin und Story erstellen. Ein leerer Monat sagt das in der Bildschirmmitte, mit Erinnerung hinzufügen."] },
+  { id: "WAL-13", p: 1,
+    en: ["Home screen widget", ["iPhone: long-press the LifeThreads icon and pick a widget size (or Edit › Add widget › LifeThreads). Android: long-press the home screen › Widgets › LifeThreads.", "Tap the widget.", "Turn on the app lock (Settings › Privacy › App lock) and look at the widget again."], "The widget shows a memory with its photo – one from this day in an earlier year when there is one – and changes each day. A tap opens that memory. With the app lock on it only says “LifeThreads is locked”, without a photo."],
+    de: ["Widget auf dem Home-Bildschirm", ["iPhone: lange auf das LifeThreads-Icon drücken und eine Widget-Größe wählen (oder Bearbeiten › Widget hinzufügen › LifeThreads). Android: lange auf den Home-Bildschirm drücken › Widgets › LifeThreads.", "Auf das Widget tippen.", "Die App-Sperre einschalten (Einstellungen › Privatsphäre › App-Sperre) und das Widget wieder ansehen."], "Das Widget zeigt eine Erinnerung mit Foto – eine von diesem Tag in einem früheren Jahr, wenn es eine gibt – und wechselt jeden Tag. Ein Tippen öffnet diese Erinnerung. Mit App-Sperre steht nur „LifeThreads ist gesperrt“ da, ohne Foto."] }
+ ]},
+ { key: "PRM", en: "Premium", de: "Premium", cases: [
+  { id: "PRM-01", p: 1,
+    en: ["Premium page", ["Open Settings, then Premium."], "The page shows the yearly plan first (with its saving) and the monthly plan, both priced by the store, what Premium includes, the renewal terms, and links to Terms and Privacy that open."],
+    de: ["Premium-Seite", ["Einstellungen öffnen, dann Premium."], "Die Seite zeigt zuerst das Jahresabo (mit Ersparnis) und das Monatsabo, beide mit Preis aus dem Store, was Premium enthält, die Verlängerungsbedingungen und funktionierende Links zu AGB und Datenschutz."] },
+  { id: "PRM-02", p: 1,
+    en: ["Subscribe (iPhone only)", ["iPhone/TestFlight: tap Subscribe and confirm the test purchase.", "Android: skip this test (mark N/A) and do PRM-04 instead."], "The App Store sheet opens. After confirming, the page shows Premium Active and Premium features unlock."],
+    de: ["Abonnieren (nur iPhone)", ["iPhone/TestFlight: Abonnieren tippen und den Testkauf bestätigen.", "Android: diesen Test überspringen (N/A) und stattdessen PRM-04 machen."], "Das App-Store-Fenster öffnet sich. Nach der Bestätigung zeigt die Seite Premium aktiv und die Premium-Funktionen sind frei."] },
+  { id: "PRM-03", p: 2,
+    en: ["Restore", ["Delete the app, install it again, open Premium and tap Restore."], "Premium is active again without paying a second time."],
+    de: ["Wiederherstellen", ["App löschen, neu installieren, Premium öffnen und Wiederherstellen tippen."], "Premium ist wieder aktiv, ohne erneut zu zahlen."] },
+  { id: "PRM-04", p: 1,
+    en: ["Redeem your promo code (Android)", ["Open the Play Store app, tap your profile picture, then Payments & subscriptions, then Redeem code.", "Enter the code from George and confirm.", "Open LifeThreads. If Premium is not active yet, open Premium and tap Restore."], "The Play Store confirms 2 months free. LifeThreads shows Premium Active."],
+    de: ["Promo-Code einlösen (Android)", ["Play-Store-App öffnen, auf dein Profilbild tippen, dann Zahlungen und Abos, dann Code einlösen.", "Den Code von George eingeben und bestätigen.", "LifeThreads öffnen. Falls Premium noch nicht aktiv ist, Premium öffnen und Wiederherstellen tippen."], "Der Play Store bestätigt 2 Monate gratis. LifeThreads zeigt Premium aktiv."] }
+ ]},
+ { key: "STO", en: "Create Story", de: "Story erstellen", cases: [
+  { id: "STO-01", p: 1,
+    en: ["Choose memories", ["Open Create Story.", "Pick 3–6 memories. With 7 or more memories, use the search bar (name, place or year)."], "You can pick and unpick memories. The search finds memories by title, place and year."],
+    de: ["Erinnerungen wählen", ["Story erstellen öffnen.", "3–6 Erinnerungen wählen. Ab 7 Erinnerungen die Suche nutzen (Name, Ort oder Jahr)."], "Erinnerungen lassen sich an- und abwählen. Die Suche findet nach Titel, Ort und Jahr."] },
+  { id: "STO-02", p: 1,
+    en: ["Story image", ["Try the templates Single memory, Thread, Collage and Quote.", "Write a caption."], "Each template looks good with your photos. Text is never cut off."],
+    de: ["Story-Bild", ["Die Vorlagen Einzelne Erinnerung, Faden, Collage und Zitat ausprobieren.", "Eine Bildunterschrift schreiben."], "Jede Vorlage sieht mit deinen Fotos gut aus. Kein Text wird abgeschnitten."] },
+  { id: "STO-03", p: 1,
+    en: ["Reorder, add, remove", ["In the editor, hold and drag a memory to change the order.", "Add one more memory, remove one."], "The story updates right away in the new order."],
+    de: ["Sortieren, hinzufügen, entfernen", ["Im Editor eine Erinnerung halten und ziehen, um die Reihenfolge zu ändern.", "Eine Erinnerung hinzufügen, eine entfernen."], "Die Story aktualisiert sich sofort in der neuen Reihenfolge."] },
+  { id: "STO-04", p: 1,
+    en: ["Video with music", ["Switch on Video.", "Choose a mood and a song, listen to it.", "Drag the trimmer to choose which part of the song plays.", "Create the video."], "The video plays with the chosen part of the song. Making it takes a few seconds and shows progress."],
+    de: ["Video mit Musik", ["Video einschalten.", "Eine Stimmung und einen Song wählen, anhören.", "Den Regler ziehen, um den Songteil zu wählen.", "Video erstellen."], "Das Video spielt mit dem gewählten Songteil. Das Erstellen dauert ein paar Sekunden und zeigt den Fortschritt."] },
+  { id: "STO-05", p: 1,
+    en: ["Share and save", ["Save the video to your photos.", "Share an image to Instagram Stories, WhatsApp or Snapchat."], "The file is in your gallery. Instagram/WhatsApp open with the story ready to post, in the right format (9:16)."],
+    de: ["Teilen und speichern", ["Das Video in deinen Fotos speichern.", "Ein Bild in Instagram Stories, WhatsApp oder Snapchat teilen."], "Die Datei ist in deiner Galerie. Instagram/WhatsApp öffnen sich mit der fertigen Story im richtigen Format (9:16)."] }
+ ]},
+ { key: "YR", en: "Thread of the Year", de: "Faden des Jahres", cases: [
+  { id: "YR-01", p: 2,
+    en: ["Your year as a film", ["Open Thread of the Year (on the wall card or in the menu).", "Choose a year with several memories.", "Swap, remove or add memories; choose music.", "Preview, then export the video and an image."], "The film plays your memories in order with music and ends with a short summary (places, people, feeling). Export and save work."],
+    de: ["Dein Jahr als Film", ["Faden des Jahres öffnen (Karte an der Wand oder im Menü).", "Ein Jahr mit mehreren Erinnerungen wählen.", "Erinnerungen tauschen, entfernen oder hinzufügen; Musik wählen.", "Vorschau ansehen, dann Video und Bild exportieren."], "Der Film zeigt deine Erinnerungen der Reihe nach mit Musik und endet mit einer kurzen Zusammenfassung (Orte, Menschen, Gefühl). Export und Speichern funktionieren."] }
+ ]},
+ { key: "OTD", en: "On this day", de: "An diesem Tag", cases: [
+  { id: "OTD-01", p: 2,
+    en: ["Daily reminder", ["Create a memory dated exactly one year ago today.", "Switch on the On this day reminder and allow notifications.", "Set the time a few minutes ahead and wait."], "The memory is shown as 1 year ago today. A notification arrives at the chosen time and opens the memory."],
+    de: ["Tägliche Erinnerung", ["Eine Erinnerung mit Datum genau heute vor einem Jahr anlegen.", "Die An-diesem-Tag-Erinnerung einschalten und Mitteilungen erlauben.", "Die Uhrzeit ein paar Minuten in die Zukunft stellen und warten."], "Die Erinnerung wird als heute vor 1 Jahr gezeigt. Eine Mitteilung kommt zur gewählten Zeit und öffnet die Erinnerung."] }
+ ]},
+ { key: "FAM", en: "Family walls", de: "Familienwände", cases: [
+  { id: "FAM-01", p: 1,
+    en: ["Sign in and create a family wall", ["Open Family walls.", "Sign in with Google (or Apple on iPhone) and accept the rules.", "Create a family wall and give it a name."], "With Premium the wall is created and opens. Without Premium the app explains that creating a wall needs Premium."],
+    de: ["Anmelden und Familienwand erstellen", ["Familienwände öffnen.", "Mit Google (oder Apple auf dem iPhone) anmelden und die Regeln akzeptieren.", "Eine Familienwand erstellen und benennen."], "Mit Premium wird die Wand erstellt und geöffnet. Ohne Premium erklärt die App, dass Erstellen Premium braucht."] },
+  { id: "FAM-02", p: 1,
+    en: ["Invite and join (two phones)", ["On the wall, create an invite link and send it to a second person.", "The second person opens the link, signs in and joins (joining is free)."], "The second person sees the family wall. Both see each other in the member list."],
+    de: ["Einladen und beitreten (zwei Handys)", ["An der Wand einen Einladungslink erstellen und an eine zweite Person schicken.", "Die zweite Person öffnet den Link, meldet sich an und tritt bei (Beitreten ist gratis)."], "Die zweite Person sieht die Familienwand. Beide sehen sich in der Mitgliederliste."] },
+  { id: "FAM-03", p: 1,
+    en: ["Share memories in the family", ["Add a memory with a photo to the family wall.", "Edit it, then check on the other phone."], "The memory appears on the other phone within a short time, with photo and text."],
+    de: ["Erinnerungen in der Familie teilen", ["Eine Erinnerung mit Foto an die Familienwand hängen.", "Bearbeiten, dann auf dem anderen Handy nachsehen."], "Die Erinnerung erscheint nach kurzer Zeit auf dem anderen Handy, mit Foto und Text."] },
+  { id: "FAM-04", p: 2,
+    en: ["Report, block, remove", ["Report a test memory (choose a reason).", "Block a member, then unblock.", "As owner, remove a member; as member, leave a wall."], "Each action asks for confirmation and works. Removed members no longer see the wall."],
+    de: ["Melden, blockieren, entfernen", ["Eine Test-Erinnerung melden (Grund wählen).", "Ein Mitglied blockieren, dann entsperren.", "Als Besitzer:in ein Mitglied entfernen; als Mitglied eine Wand verlassen."], "Jede Aktion fragt nach und funktioniert. Entfernte Mitglieder sehen die Wand nicht mehr."] },
+  { id: "FAM-05", p: 3,
+    en: ["Delete the account", ["Family walls, Account, Delete account (only at the end of your testing)."], "The account and the walls you own are deleted. Your private wall on the phone stays untouched."],
+    de: ["Konto löschen", ["Familienwände, Konto, Konto löschen (erst am Ende deiner Tests)."], "Konto und deine eigenen Familienwände werden gelöscht. Deine private Wand auf dem Handy bleibt unberührt."] }
+ ]},
+ { key: "BAK", en: "Backup and sharing", de: "Backup und Teilen", cases: [
+  { id: "BAK-01", p: 1,
+    en: ["Back up everything", ["Settings, Backup: create a backup with a password.", "Save the file (Files, Google Drive, email to yourself)."], "One .zip file with all memories and photos is created. The app warns you to keep the password safe."],
+    de: ["Alles sichern", ["Einstellungen, Backup: ein Backup mit Passwort erstellen.", "Die Datei speichern (Dateien, Google Drive, E-Mail an dich)."], "Eine .zip-Datei mit allen Erinnerungen und Fotos entsteht. Die App weist darauf hin, das Passwort gut aufzubewahren."] },
+  { id: "BAK-02", p: 1,
+    en: ["Restore a backup", ["Import the backup (on the same phone after reinstalling, or on another phone).", "Enter the password."], "All memories and photos come back. Memories already on the wall are kept and not duplicated."],
+    de: ["Backup wiederherstellen", ["Das Backup importieren (am selben Handy nach Neuinstallation oder auf einem anderen).", "Passwort eingeben."], "Alle Erinnerungen und Fotos sind wieder da. Vorhandene Erinnerungen bleiben und werden nicht doppelt angelegt."] },
+  { id: "BAK-03", p: 2,
+    en: ["Send one memory as a capsule", ["Open a memory and share it as a capsule, with or without a password.", "Open the link on another phone with LifeThreads and import it."], "The other person sees the memory with its photos and can add it to their wall."],
+    de: ["Eine Erinnerung als Kapsel schicken", ["Eine Erinnerung öffnen und als Kapsel teilen, mit oder ohne Passwort.", "Den Link auf einem anderen Handy mit LifeThreads öffnen und importieren."], "Die andere Person sieht die Erinnerung mit Fotos und kann sie an ihre Wand hängen."] },
+  { id: "BAK-04", p: 3,
+    en: ["Show the wall on a big screen", ["On a computer or TV browser open lifethreads.gkcoding.dev/display.", "In the app tap Display wall (QR) and scan the code."], "Your wall appears read-only in the browser and ends by itself after a while."],
+    de: ["Wand auf großem Bildschirm zeigen", ["Am Computer- oder TV-Browser lifethreads.gkcoding.dev/display öffnen.", "In der App Wand anzeigen (QR) tippen und den Code scannen."], "Deine Wand erscheint schreibgeschützt im Browser und endet nach einiger Zeit von selbst."] }
+ ]},
+ { key: "SET", en: "Settings and overall feel", de: "Einstellungen und Gesamteindruck", cases: [
+  { id: "SET-01", p: 2,
+    en: ["Themes and name", ["Settings: change your name.", "Try the wall themes (Warm Memory Room, Midnight Archive, Soft Paper Wall, Travel Corkboard)."], "The greeting shows the new name. Every theme is readable; Premium themes are marked."],
+    de: ["Designs und Name", ["Einstellungen: Namen ändern.", "Die Wand-Designs ausprobieren (Warm Memory Room, Midnight Archive, Soft Paper Wall, Travel Corkboard)."], "Die Begrüßung zeigt den neuen Namen. Jedes Design ist gut lesbar; Premium-Designs sind gekennzeichnet."] },
+  { id: "SET-02", p: 2,
+    en: ["Language and text size", ["Change the phone language to Arabic (or German/English) and open the app.", "Set a larger text size in the phone settings."], "The app follows the language; Arabic reads right to left without overlapping text. Large text stays readable."],
+    de: ["Sprache und Textgröße", ["Handysprache auf Arabisch (oder Englisch) stellen und die App öffnen.", "In den Handy-Einstellungen eine größere Schrift wählen."], "Die App folgt der Sprache; Arabisch läuft von rechts nach links ohne überlappenden Text. Große Schrift bleibt lesbar."] },
+  { id: "SET-03", p: 2,
+    en: ["Offline and restart", ["Turn on flight mode, use the app, add a memory.", "Close the app fully and open it again."], "Your own wall works offline. Everything is still there after the restart."],
+    de: ["Offline und Neustart", ["Flugmodus an, App benutzen, eine Erinnerung anlegen.", "App ganz schließen und wieder öffnen."], "Deine eigene Wand funktioniert offline. Nach dem Neustart ist alles noch da."] },
+  { id: "SET-05", p: 1,
+    en: ["App lock", ["Settings › Privacy › App lock: turn it on and confirm with Face ID, fingerprint or passcode.", "Close the app and open it again; also look at it in the app switcher."], "The app opens only after unlocking. In the app switcher your wall is blurred."],
+    de: ["App-Sperre", ["Einstellungen › Privatsphäre › App-Sperre: einschalten und mit Face ID, Fingerabdruck oder Code bestätigen.", "App schließen und wieder öffnen; auch im App-Umschalter ansehen."], "Die App öffnet sich erst nach dem Entsperren. Im App-Umschalter ist deine Wand verschwommen."] },
+  { id: "SET-04", p: 1,
+    en: ["Your overall impression", ["Use the app for a few days as you normally would."], "Write in the notes: what you liked most, what confused you, what you missed, and whether you would pay for Premium."],
+    de: ["Dein Gesamteindruck", ["Die App ein paar Tage ganz normal nutzen."], "Schreib in die Notizen: was dir am besten gefiel, was dich verwirrt hat, was dir fehlte und ob du für Premium zahlen würdest."] }
+ ]}
+];
+
+T.ar = {
+  title: "بروتوكول الاختبار التجريبي لـ LifeThreads",
+  lead: "شكراً لأنك تختبر LifeThreads قبل إطلاقه. يأخذك هذا البروتوكول عبر كل ميزات التطبيق. نفّذ الاختبارات بالترتيب، وعلّم كل اختبار بـ ناجح أو خطأ أو متعذّر، واكتب أي شيء بدا خاطئاً أو مربكاً. تبقى إجاباتك في هذا المتصفح حتى تنسخ التقرير في النهاية.",
+  mApp: "التطبيق", mBuild: "الإصدار", mPlatforms: "المنصّات", mPeriod: "فترة الاختبار", mContact: "أرسل التقرير إلى",
+  period: "17 أكتوبر – 15 نوفمبر 2026",
+  sTester: "المختبِر", sTesterHint: "املأ مرة واحدة", fName: "اسمك", fPlatform: "المنصّة", fDevice: "طراز الجهاز", fOs: "إصدار النظام", fLang: "لغة التطبيق", fDate: "تاريخ الاختبار",
+  sHow: "كيف تختبر",
+  rules: [
+    "ثبّت التطبيق: على الآيفون عبر رسالة دعوة TestFlight، وعلى أندرويد عبر رابط اختبار Google Play الذي وصلك.",
+    "استخدم ذكرياتك الحقيقية قدر الإمكان. الصور والقصص الحقيقية تكشف مشاكل تخفيها بيانات الاختبار.",
+    "ناجح: يعمل كما هو موصوف. خطأ: هناك مشكلة، اكتب ما حدث. متعذّر: لم تستطع تنفيذ الاختبار (مثلاً لديك هاتف واحد فقط). لا ينطبق: لا يخصّك.",
+    "عند كل خطأ اكتب الخطوات بالضبط، وأرسل لقطة شاشة مع تقريرك إن أمكن.",
+    "اختبارات P1 هي الأهم. إن كان وقتك ضيقاً فابدأ بها."
+  ],
+  money: "Premium: على الآيفون (TestFlight) المشتريات تجريبية ولا تكلّف شيئاً. على أندرويد لا تشترِ ببطاقة حقيقية من فضلك، بل استخدم الرمز الترويجي الذي أرسله لك جورج (الاختبار PRM-04). يمنحك شهرين من Premium مجاناً.",
+  expected: "النتيجة المتوقعة", steps: "الخطوات", notes: "ملاحظات (ماذا حدث، تفاصيل الجهاز)",
+  pass: "ناجح", fail: "خطأ", blocked: "متعذّر", na: "لا ينطبق",
+  cTotal: "اختبار", cDone: "منجز", cPass: "ناجح", cFail: "خطأ", cBlock: "متعذّر", cNa: "لا ينطبق",
+  sReport: "أرسل تقريرك",
+  reportLead: "عندما تنتهي، انسخ التقرير وأرسله إلى جورج بالبريد أو برسالة. الاختبارات الفاشلة والمتعذّرة تظهر أولاً.",
+  copy: "نسخ التقرير", copied: "تم النسخ.", copyFail: "حدّد النص في الأسفل وانسخه.",
+  reset: "مسح كل إجاباتي", resetQ: "مسح كل النتائج والملاحظات من هذا المتصفح؟", resetYes: "نعم، امسح", resetNo: "إبقاء",
+  footer: "LifeThreads من GK Coding · بروتوكول اختبار للإصدار 1.0.0 (21) · تُحفظ إجاباتك في هذا المتصفح فقط.",
+  rTitle: "تقرير اختبار LIFETHREADS", rIssues: "أخطاء / متعذّر", rAll: "كل النتائج", rNone: "لا شيء", rOpen: "لم يُختبر"
+};
+var AR_AREAS = { INS: "التثبيت والتشغيل الأول", WAL: "جدار ذكرياتك", PRM: "Premium", STO: "إنشاء قصة", YR: "خيط السنة", OTD: "في مثل هذا اليوم", FAM: "جدران العائلة", BAK: "النسخ الاحتياطي والمشاركة", SET: "الإعدادات والانطباع العام" };
+var AR = {
+  "INS-01": ["تثبيت النسخة التجريبية", ["آيفون: افتح رسالة TestFlight، ثبّت TestFlight، ثم اضغط تثبيت بجانب LifeThreads.", "أندرويد: افتح رابط الاختبار، اضغط «أصبح مختبِراً»، ثم ثبّت LifeThreads من متجر Play."], "يُثبَّت التطبيق. الأيقونة قلب ذهبي على خلفية داكنة، وتحتها اسم LifeThreads."],
+  "INS-02": ["البداية", ["افتح التطبيق.", "مرّر عبر شاشات التعريف.", "أدخل اسمك."], "التعريف واضح والتطبيق يرحّب بك باسمك. النصوص بلغة هاتفك (العربية أو الألمانية أو الإنجليزية)."],
+  "INS-03": ["الجدار التجريبي", ["في شاشة «اختر كيف تبدأ» افتح «معاينة جدار تجريبي».", "تجوّل فيه، ثم امسح العرض وابدأ جدارك الخاص."], "يعرض الجدار التجريبي ذكريات أمثلة مع إشارة أنها تجريبية. جدارك الخاص يبدأ فارغاً بلا ذكريات تجريبية."],
+  "WAL-01": ["إضافة ذكرى مع صور", ["اضغط + لإضافة ذكرى.", "اختر نوعاً (لحظة، رحلة، شخص، مكان أو ملاحظة).", "اكتب عنواناً وقصة قصيرة وحدّد التاريخ.", "أضف من 1 إلى 5 صور من معرضك.", "اختر شعوراً واحفظ."], "تظهر الذكرى كبطاقة على الجدار مع صورتها وعنوانها وتاريخها."],
+  "WAL-02": ["إذن الصور", ["عند السؤال اسمح بالوصول إلى صور محددة فقط.", "أضف ذكرى أخرى واختر صورة."], "يشرح التطبيق لماذا يحتاج الصور ويعمل مع الوصول المحدود. يمكنك إضافة صور أخرى للاختيار دون أن يتعطل."],
+  "WAL-03": ["التنقّل على الجدار", ["أضف 5 ذكريات على الأقل.", "قرّب بإصبعين واسحب لتحريك الجدار.", "اسحب بطاقة إلى مكان جديد."], "التقريب والتحريك سلسان. تبقى البطاقات حيث وضعتها حتى بعد إغلاق التطبيق وفتحه."],
+  "WAL-04": ["ربط ذكريين بخيط", ["افتح ذكرى واختر روابطها.", "اربطها بذكرى أخرى واكتب لماذا تنتميان لبعضهما."], "يربط خيط بين البطاقتين على الجدار، ويظهر السبب داخل الذكرى."],
+  "WAL-05": ["فتح وتعديل وحذف", ["اضغط بطاقة لفتح الذكرى.", "عدّل العنوان وأضف صورة، ثم احفظ.", "احذف ذكرى تجريبية."], "تعرض صفحة التفاصيل كل الصور والقصة كفصل. تُحفظ التعديلات. الذكرى المحذوفة تختفي من الجدار والخط الزمني والخريطة."],
+  "WAL-06": ["الخط الزمني والخريطة", ["انتقل من الجدار إلى الخط الزمني.", "انتقل إلى الخريطة.", "استخدم فلتر الفئات على الجدار."], "الخط الزمني مرتّب حسب التاريخ. تعرض الخريطة الذكريات التي لها مكان مجمّعة حسب الموقع. يعرض الفلتر النوع المختار فقط."],
+  "WAL-07": ["الأشخاص والأماكن", ["في ذكرى، أضف شخصاً من جهات اتصالك.", "أضف صورة فيها موقع (التقطتها بكاميرا هاتفك)."], "يظهر الشخص في الذكرى. يُؤخذ المكان من الصورة وتظهر الذكرى على الخريطة."],
+  "WAL-08": ["الحدّ المجاني", ["دون Premium، أضف ذكريات حتى تصل إلى 30 (إن كان لديك وقت)."], "عند 30 ذكرى يشرح التطبيق الحدّ المجاني بلطف ويعرض Premium. لا يضيع شيء مما حفظته."],
+  "PRM-01": ["صفحة Premium", ["افتح الإعدادات ثم Premium."], "تعرض الصفحة الاشتراك السنوي أولاً (مع نسبة التوفير) ثم الشهري، بأسعار المتجر، وما يشمله Premium، وشروط التجديد، وروابط تعمل للشروط والخصوصية."],
+  "PRM-02": ["الاشتراك (آيفون فقط)", ["آيفون/TestFlight: اضغط اشترك وأكّد الشراء التجريبي.", "أندرويد: تخطَّ هذا الاختبار (لا ينطبق) ونفّذ PRM-04 بدلاً منه."], "تُفتح نافذة App Store. بعد التأكيد تعرض الصفحة «Premium مفعّل» وتُفتح ميزات Premium."],
+  "PRM-03": ["الاستعادة", ["احذف التطبيق، ثبّته من جديد، افتح Premium واضغط «استعادة الاشتراك»."], "يعود Premium مفعّلاً دون دفع مرة ثانية."],
+  "PRM-04": ["استخدام الرمز الترويجي (أندرويد)", ["افتح تطبيق متجر Play، اضغط صورة ملفك، ثم «الدفعات والاشتراكات»، ثم «استرداد رمز».", "أدخل الرمز الذي أرسله جورج وأكّد.", "افتح LifeThreads. إن لم يكن Premium مفعّلاً بعد، افتح Premium واضغط «استعادة الاشتراك»."], "يؤكّد متجر Play شهرين مجاناً، ويعرض LifeThreads «Premium مفعّل»."],
+  "STO-01": ["اختيار الذكريات", ["افتح «إنشاء قصة».", "اختر من 3 إلى 6 ذكريات. إن كان لديك 7 ذكريات أو أكثر فاستخدم شريط البحث (الاسم أو المكان أو السنة)."], "يمكنك اختيار الذكريات وإلغاء اختيارها. يجد البحث الذكريات حسب العنوان والمكان والسنة."],
+  "STO-02": ["صورة القصة", ["جرّب القوالب: ذكرى واحدة، خيط، مجموعة صور، اقتباس.", "اكتب تعليقاً."], "يبدو كل قالب جميلاً مع صورك، ولا يُقصّ أي نص."],
+  "STO-03": ["الترتيب والإضافة والحذف", ["في المحرّر اضغط مطوّلاً على ذكرى واسحبها لتغيير الترتيب.", "أضف ذكرى واحدة واحذف أخرى."], "تتحدّث القصة فوراً بالترتيب الجديد."],
+  "STO-04": ["فيديو مع موسيقى", ["فعّل الفيديو.", "اختر مزاجاً وأغنية واستمع إليها.", "اسحب المقطّع لاختيار الجزء الذي يُعزف من الأغنية.", "أنشئ الفيديو."], "يعمل الفيديو مع الجزء المختار من الأغنية. يستغرق الإنشاء بضع ثوانٍ ويعرض التقدّم."],
+  "STO-05": ["المشاركة والحفظ", ["احفظ الفيديو في صورك.", "شارك صورة في قصص إنستغرام أو واتساب أو سناب شات."], "الملف موجود في معرضك. يُفتح إنستغرام/واتساب والقصة جاهزة للنشر بالمقاس الصحيح (9:16)."],
+  "YR-01": ["سنتك كفيلم", ["افتح «خيط السنة» (من بطاقة الجدار أو القائمة).", "اختر سنة فيها عدة ذكريات.", "بدّل الذكريات أو احذفها أو أضفها، واختر الموسيقى.", "شاهد المعاينة، ثم صدِّر الفيديو وصورة."], "يعرض الفيلم ذكرياتك بالترتيب مع موسيقى وينتهي بملخّص قصير (الأماكن، الأشخاص، الشعور). يعمل التصدير والحفظ."],
+  "OTD-01": ["التذكير اليومي", ["أنشئ ذكرى بتاريخ اليوم نفسه قبل سنة.", "فعّل تذكير «في مثل هذا اليوم» واسمح بالإشعارات.", "اضبط الوقت بعد بضع دقائق وانتظر."], "تظهر الذكرى كـ «قبل سنة في مثل هذا اليوم». يصل إشعار في الوقت المختار ويفتح الذكرى."],
+  "FAM-01": ["تسجيل الدخول وإنشاء جدار عائلة", ["افتح «جدران العائلة».", "سجّل الدخول بحساب Google (أو Apple على الآيفون) ووافق على القواعد.", "أنشئ جدار عائلة وسمِّه."], "مع Premium يُنشأ الجدار ويُفتح. دون Premium يشرح التطبيق أن الإنشاء يحتاج Premium."],
+  "FAM-02": ["الدعوة والانضمام (هاتفان)", ["على الجدار أنشئ رابط دعوة وأرسله لشخص ثانٍ.", "يفتح الشخص الثاني الرابط ويسجّل الدخول وينضم (الانضمام مجاني)."], "يرى الشخص الثاني جدار العائلة، ويرى كلاكما الآخر في قائمة الأعضاء."],
+  "FAM-03": ["مشاركة الذكريات في العائلة", ["أضف ذكرى مع صورة إلى جدار العائلة.", "عدّلها، ثم تحقّق على الهاتف الآخر."], "تظهر الذكرى على الهاتف الآخر بعد وقت قصير مع الصورة والنص."],
+  "FAM-04": ["الإبلاغ والحظر والإزالة", ["أبلغ عن ذكرى تجريبية (اختر سبباً).", "احظر عضواً ثم ألغِ الحظر.", "كمالك أزِل عضواً، وكعضو غادر جداراً."], "كل إجراء يطلب تأكيداً ويعمل. العضو المُزال لا يرى الجدار بعد ذلك."],
+  "FAM-05": ["حذف الحساب", ["جدران العائلة، الحساب، حذف الحساب (فقط في نهاية اختباراتك)."], "يُحذف الحساب وجدران العائلة التي تملكها. يبقى جدارك الخاص على الهاتف كما هو."],
+  "BAK-01": ["نسخ احتياطي لكل شيء", ["الإعدادات، النسخ الاحتياطي: أنشئ نسخة احتياطية بكلمة مرور.", "احفظ الملف (الملفات، Google Drive، أو بريد إلى نفسك)."], "يُنشأ ملف .zip واحد فيه كل الذكريات والصور. ينبّهك التطبيق إلى حفظ كلمة المرور جيداً."],
+  "BAK-02": ["استعادة نسخة احتياطية", ["استورد النسخة الاحتياطية (على نفس الهاتف بعد إعادة التثبيت أو على هاتف آخر).", "أدخل كلمة المرور."], "تعود كل الذكريات والصور. الذكريات الموجودة تبقى ولا تتكرّر."],
+  "BAK-03": ["إرسال ذكرى واحدة ككبسولة", ["افتح ذكرى وشاركها ككبسولة، بكلمة مرور أو بدونها.", "افتح الرابط على هاتف آخر فيه LifeThreads واستوردها."], "يرى الشخص الآخر الذكرى مع صورها ويستطيع إضافتها إلى جداره."],
+  "BAK-04": ["عرض الجدار على شاشة كبيرة", ["على متصفح حاسوب أو تلفاز افتح lifethreads.gkcoding.dev/display.", "في التطبيق اضغط «عرض الجدار» (QR) وامسح الرمز."], "يظهر جدارك للقراءة فقط في المتصفح وينتهي تلقائياً بعد فترة."],
+  "SET-01": ["المظاهر والاسم", ["الإعدادات: غيّر اسمك.", "جرّب مظاهر الجدار (غرفة ذكريات دافئة وغيرها)."], "تعرض التحية الاسم الجديد. كل مظهر واضح القراءة، ومظاهر Premium مميّزة."],
+  "SET-02": ["اللغة وحجم الخط", ["غيّر لغة الهاتف إلى العربية (أو الألمانية/الإنجليزية) وافتح التطبيق.", "اختر خطاً أكبر من إعدادات الهاتف."], "يتبع التطبيق اللغة، والعربية من اليمين إلى اليسار دون تداخل في النص. يبقى الخط الكبير مقروءاً."],
+  "SET-03": ["دون إنترنت وإعادة التشغيل", ["فعّل وضع الطيران، استخدم التطبيق وأضف ذكرى.", "أغلق التطبيق تماماً وافتحه من جديد."], "جدارك الخاص يعمل دون إنترنت، وكل شيء باقٍ بعد إعادة التشغيل."],
+  "WAL-09": ["البحث وعدة جدران والذكريات المخفية", ["اضغط العدسة وابحث عن مكان أو شخص أو سنة.", "Premium: المزيد › جدار جديد وسمِّه. استخدم «انقل ذكريات إلى هنا» (أو قائمة الذكرى › نقل إلى جدار).", "من قائمة ذكرى اختر «إخفاء». ثم العرض › الذكريات المخفية."], "يجد البحث الذكريات أثناء الكتابة. كل جدار يعرض ذكرياته فقط، وتبدّل الجدار من الأعلى. الذكرى المخفية تختفي من الجدار ولا تعود إلا بعد Face ID أو رمز القفل."],
+  "WAL-10": ["أقلام التعديل والتراجع والفتح في الخرائط", ["افتح ذكرى واضغط القلم على قسم (مثلاً المعرض).", "احذف ذكرى ثم اضغط «تراجع» في الرسالة بالأسفل.", "في بطاقة المكان اضغط «فتح في الخرائط»."], "يفتح القلم شاشة التعديل عند هذا القسم. يعيد «تراجع» الذكرى. تُفتح الخرائط عند مكان الذكرى."],
+  "WAL-11": ["الذكرى غير المكتملة تبقى مسودة", ["اضغط + › ذكرى، اكتب عنواناً واختر صورة.", "اخرج بسهم الرجوع دون حفظ (أو أغلق التطبيق تماماً).", "اضغط + › ذكرى مرة أخرى."], "عند الخروج تظهر «حُفظت كمسودة». في المرة التالية يسأل التطبيق «هل تتابع من حيث توقفت؟»: «متابعة المسودة» تعيد العنوان والصورة، و«ابدأ من جديد» يبدأ فارغاً."],
+  "WAL-12": ["نظرة على شهر", ["افتح المزيد › نظرة على شهر.", "استخدم الأسهم للانتقال إلى أشهر أخرى.", "في الأسبوع الأول من الشهر: انظر إلى البطاقة على الجدار للشهر السابق."], "ترى مثلاً «ذكريات سبتمبر» مع ذكرياته والأشخاص والأماكن فيها و«إنشاء قصة». الشهر الفارغ يقول ذلك في وسط الشاشة مع «أضف ذكرى»."],
+  "WAL-13": ["أداة الشاشة الرئيسية", ["آيفون: اضغط مطوّلاً على أيقونة LifeThreads واختر حجم الأداة (أو تعديل › إضافة أداة › LifeThreads). أندرويد: اضغط مطوّلاً على الشاشة الرئيسية › الأدوات › LifeThreads.", "اضغط على الأداة.", "فعّل قفل التطبيق (الإعدادات › الخصوصية › قفل التطبيق) وانظر إلى الأداة مجدداً."], "تعرض الأداة ذكرى مع صورتها – من هذا اليوم في سنة سابقة إن وُجدت – وتتغيّر كل يوم. الضغط يفتح تلك الذكرى. مع قفل التطبيق تعرض فقط «LifeThreads مقفل» دون صورة."],
+  "SET-05": ["قفل التطبيق", ["الإعدادات › الخصوصية › قفل التطبيق: فعّله وأكّد بـ Face ID أو البصمة أو رمز القفل.", "أغلق التطبيق وافتحه مجدداً، وانظر إليه أيضاً في مبدّل التطبيقات."], "لا يُفتح التطبيق إلا بعد فك القفل. في مبدّل التطبيقات يكون جدارك ضبابياً."],
+  "SET-04": ["انطباعك العام", ["استخدم التطبيق بضعة أيام كما تفعل عادة."], "اكتب في الملاحظات: ما أعجبك أكثر، ما أربكك، ما افتقدته، وهل كنت ستدفع مقابل Premium."]
+};
+AREAS.forEach(function (a) { a.ar = AR_AREAS[a.key]; a.cases.forEach(function (c) { c.ar = AR[c.id]; }); });
+
+var KEY = "lt-test-protocol-v1";
+var state = { lang: "en", res: {}, notes: {}, tester: {} };
+try { var saved = JSON.parse(localStorage.getItem(KEY) || "null"); if (saved) state = Object.assign(state, saved); } catch (e) {}
+if (!saved) { try { var nl = (navigator.language || "").toLowerCase(); if (nl.indexOf("de") === 0) state.lang = "de"; else if (nl.indexOf("ar") === 0) state.lang = "ar"; } catch (e) {} }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+function el(tag, attrs, kids) {
+  var n = document.createElement(tag);
+  if (attrs) for (var k in attrs) { if (k === "text") n.textContent = attrs[k]; else n.setAttribute(k, attrs[k]); }
+  (kids || []).forEach(function (c) { if (c) n.appendChild(c); });
+  return n;
+}
+
+function allCases() { var out = []; AREAS.forEach(function (a) { a.cases.forEach(function (c) { out.push(c); }); }); return out; }
+
+function renderAreas() {
+  var L = T[state.lang], root = document.getElementById("areas");
+  root.textContent = "";
+  AREAS.forEach(function (a) {
+    var sec = el("section", { "class": "block", id: "area-" + a.key });
+    sec.appendChild(el("div", { "class": "area-head" }, [el("h2", { text: a[state.lang] }), el("span", { "class": "mono", text: a.key + " · " + a.cases.length })]));
+    a.cases.forEach(function (c) {
+      var d = c[state.lang], r = state.res[c.id] || "";
+      var card = el("article", { "class": "case", "data-r": r, id: "case-" + c.id });
+      card.appendChild(el("div", { "class": "case-top" }, [
+        el("span", { "class": "id ltr", text: c.id }),
+        el("h3", { text: d[0] }),
+        el("span", { "class": "tag" + (c.p === 1 ? " p1" : ""), text: "P" + c.p })
+      ]));
+      var ol = el("ol", { "class": "steps" });
+      d[1].forEach(function (s) { ol.appendChild(el("li", { text: s })); });
+      card.appendChild(el("div", { "class": "cols" }, [
+        el("div", null, [el("h4", { text: L.steps }), ol]),
+        el("div", null, [el("h4", { text: L.expected }), el("p", { text: d[2] })])
+      ]));
+      var res = el("div", { "class": "res", role: "group", "aria-label": c.id });
+      ["pass", "fail", "blocked", "na"].forEach(function (v) {
+        var b = el("button", { type: "button", "data-v": v, "aria-pressed": String(r === v), text: L[v] });
+        b.addEventListener("click", function () {
+          state.res[c.id] = state.res[c.id] === v ? "" : v;
+          save(); card.setAttribute("data-r", state.res[c.id]);
+          res.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-v") === state.res[c.id])); });
+          update();
+        });
+        res.appendChild(b);
+      });
+      card.appendChild(res);
+      var ta = el("textarea", { id: "note-" + c.id, placeholder: L.notes, "aria-label": c.id + " " + L.notes });
+      ta.value = state.notes[c.id] || "";
+      ta.addEventListener("input", function () { state.notes[c.id] = ta.value; save(); update(); });
+      card.appendChild(ta);
+      sec.appendChild(card);
+    });
+    root.appendChild(sec);
+  });
+}
+
+function applyText() {
+  var L = T[state.lang];
+  document.documentElement.lang = state.lang;
+  document.documentElement.dir = state.lang === "ar" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-t]").forEach(function (n) { var v = L[n.getAttribute("data-t")]; if (typeof v === "string") n.textContent = v; });
+  var ul = document.getElementById("rules"); ul.textContent = "";
+  L.rules.forEach(function (r) { ul.appendChild(el("li", { text: r })); });
+  document.getElementById("lang-en").setAttribute("aria-pressed", String(state.lang === "en"));
+  document.getElementById("lang-de").setAttribute("aria-pressed", String(state.lang === "de"));
+  document.getElementById("lang-ar").setAttribute("aria-pressed", String(state.lang === "ar"));
+  renderAreas(); update();
+}
+
+function counts() {
+  var c = { total: 0, pass: 0, fail: 0, blocked: 0, na: 0 };
+  allCases().forEach(function (x) { c.total++; var r = state.res[x.id]; if (r) c[r]++; });
+  c.done = c.pass + c.fail + c.blocked + c.na; return c;
+}
+
+function report() {
+  var L = T[state.lang], t = state.tester, c = counts(), lines = [];
+  lines.push(L.rTitle + " · LifeThreads 1.0.0 (21)");
+  lines.push(L.fName + ": " + (t.name || "-") + " | " + L.fPlatform + ": " + (t.platform || "-") + " | " + L.fDevice + ": " + (t.device || "-") + " | " + L.fOs + ": " + (t.os || "-") + " | " + L.fLang + ": " + (t.lang || "-") + " | " + L.fDate + ": " + (t.date || "-"));
+  lines.push(c.done + "/" + c.total + " " + L.cDone + " · " + c.pass + " " + L.cPass + " · " + c.fail + " " + L.cFail + " · " + c.blocked + " " + L.cBlock + " · " + c.na + " " + L.cNa);
+  lines.push("");
+  lines.push("== " + L.rIssues + " ==");
+  var issues = allCases().filter(function (x) { return state.res[x.id] === "fail" || state.res[x.id] === "blocked"; });
+  if (!issues.length) lines.push(L.rNone);
+  issues.forEach(function (x) { lines.push("[" + L[state.res[x.id]].toUpperCase() + "] " + x.id + " " + x[state.lang][0] + (state.notes[x.id] ? "\n    " + state.notes[x.id].replace(/\n/g, "\n    ") : "")); });
+  lines.push("");
+  lines.push("== " + L.rAll + " ==");
+  allCases().forEach(function (x) {
+    var r = state.res[x.id];
+    lines.push(x.id + "  " + (r ? L[r] : L.rOpen) + "  " + x[state.lang][0] + (state.notes[x.id] && r !== "fail" && r !== "blocked" ? " — " + state.notes[x.id].replace(/\n/g, " ") : ""));
+  });
+  return lines.join("\n");
+}
+
+function update() {
+  var L = T[state.lang], c = counts(), bar = document.querySelector(".bar");
+  ["p", "f", "b", "n"].forEach(function (k, i) {
+    var v = [c.pass, c.fail, c.blocked, c.na][i];
+    bar.querySelector("." + k).style.width = (100 * v / c.total) + "%";
+  });
+  var ct = document.getElementById("counts"); ct.textContent = "";
+  [[c.done + "/" + c.total, L.cDone, null], [c.pass, L.cPass, "var(--pass)"], [c.fail, L.cFail, "var(--fail)"], [c.blocked, L.cBlock, "var(--block)"], [c.na, L.cNa, "var(--na)"]].forEach(function (p) {
+    var s = el("span");
+    if (p[2]) { var d = el("span", { "class": "dot" }); d.style.background = p[2]; s.appendChild(d); }
+    s.appendChild(el("b", { text: String(p[0]) })); s.appendChild(document.createTextNode(" " + p[1]));
+    ct.appendChild(s);
+  });
+  document.getElementById("report").textContent = report();
+}
+
+["name", "platform", "device", "os", "lang", "date"].forEach(function (f) {
+  var n = document.getElementById("f-" + f);
+  if (state.tester[f]) n.value = state.tester[f];
+  n.addEventListener("input", function () { state.tester[f] = n.value; save(); update(); });
+  n.addEventListener("change", function () { state.tester[f] = n.value; save(); update(); });
+});
+if (!state.tester.date) { var dd = new Date(); document.getElementById("f-date").value = dd.toISOString().slice(0, 10); state.tester.date = document.getElementById("f-date").value; }
+
+document.querySelectorAll(".lang button").forEach(function (b) {
+  b.addEventListener("click", function () { state.lang = b.getAttribute("data-lang"); save(); applyText(); });
+});
+
+document.getElementById("copy").addEventListener("click", function () {
+  var L = T[state.lang], msg = document.getElementById("copied"), text = report();
+  function selectIt() { var r = document.createRange(); r.selectNodeContents(document.getElementById("report")); var s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+  var done = function (ok) { msg.textContent = ok ? L.copied : L.copyFail; msg.hidden = false; if (!ok) selectIt(); setTimeout(function () { msg.hidden = true; }, 4000); };
+  try { navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); }); } catch (e) { done(false); }
+});
+
+document.getElementById("reset").addEventListener("click", function () { document.getElementById("reset-confirm").hidden = false; });
+document.getElementById("reset-no").addEventListener("click", function () { document.getElementById("reset-confirm").hidden = true; });
+document.getElementById("reset-yes").addEventListener("click", function () {
+  state.res = {}; state.notes = {}; save();
+  document.getElementById("reset-confirm").hidden = true; applyText();
+});
+
+applyText();
+</script>

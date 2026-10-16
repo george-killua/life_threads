@@ -1,12 +1,14 @@
 # Automated end-to-end tests
 
-The beta test protocol (LT-TP-100) runs automatically on an iOS simulator, and
+The beta test protocol (LT-TP-100, for testers: [test_protocol.html](test_protocol.html),
+published at <https://claude.ai/artifact/32V2EoPvTj2dPQ88hASUb3>) runs automatically on an iOS simulator, and
 optionally an Android emulator at the same time:
 
 ```bash
 tool/e2e/run_e2e.sh                 # iOS simulator: build, prepare, run everything
 tool/e2e/run_e2e.sh --no-build      # reuse the last build
 tool/e2e/run_e2e.sh --flow 03_wall  # one Maestro flow
+tool/e2e/run_e2e.sh --large         # only the largest-text-size flow
 tool/e2e/run_e2e.sh --android       # Android emulator (slow on this Mac)
 tool/e2e/run_e2e.sh --both          # iOS and Android in parallel
 ```

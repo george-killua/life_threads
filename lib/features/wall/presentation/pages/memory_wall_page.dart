@@ -2711,9 +2711,24 @@ class _WallViewSheetState extends State<_WallViewSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              l10n.wallViewButton,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+            // Done closes the sheet also when it fills the screen (large
+            // text) and for screen reader users.
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.wallViewButton,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(l10n.done),
+                ),
+              ],
             ),
             _SheetSectionLabel(l10n.wallShowAs),
             SegmentedButton<_WallViewMode>(

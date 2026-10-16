@@ -36,6 +36,16 @@ tags: [protocol, bak]
           visible: "Save"
           timeout: 15000
       - tapOn: "Save"
+      # The Files sheet sometimes misses the first tap.
+      - runFlow:
+          when:
+            visible: "On My iPhone|Browse"
+          commands:
+            - tapOn:
+                point: 91%, 11%
+      - extendedWaitUntil:
+          notVisible: "On My iPhone"
+          timeout: 15000
       - takeScreenshot: BAK-01_exported
       # Delete one memory, then restore the backup.
       - runFlow: ../subflows/leave_backup.yaml
@@ -50,6 +60,21 @@ tags: [protocol, bak]
       - inputText: "Lina-2026"
       - tapOn: "Import Archive"
       - tapOn: "Choose Archive"
+      - extendedWaitUntil:
+          visible: "lifethreads_encrypted_.*zip, zip.*"
+          timeout: 20000
+          optional: true
+      # Files doesn't always list the new file under Recents yet.
+      - runFlow:
+          when:
+            notVisible: "lifethreads_encrypted_.*zip, zip.*"
+          commands:
+            - tapOn: "Browse"
+            - runFlow:
+                when:
+                  visible: "On My iPhone"
+                commands:
+                  - tapOn: "On My iPhone"
       - extendedWaitUntil:
           visible: "lifethreads_encrypted_.*zip, zip.*"
           timeout: 20000

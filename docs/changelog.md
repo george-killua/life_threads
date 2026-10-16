@@ -2,7 +2,7 @@
 
 What changed in each TestFlight / Play build. Newest first.
 
-## Next build – 16 October 2026 (not uploaded yet)
+## 1.0.0 (21) – 16 October 2026
 
 **New**
 - **Home screen widget** (iPhone and Android, free): a memory from your wall
@@ -21,8 +21,15 @@ What changed in each TestFlight / Play build. Newest first.
   January). With On this day reminders on, a notification on the 1st:
   "September: 5 memories to look back on."
 
-**Tests**: 370 automated tests pass; new UI test flow `13_drafts_look_back`
-(WAL-11, WAL-12) written but not run yet.
+**Fixed**
+- The demo wall stayed empty when chosen in onboarding (the widget had
+  loaded the memories before onboarding finished).
+- Look back on a month: an empty month is centered on the screen.
+- The View sheet has a Done button (at the largest text size it fills the
+  screen and could only be closed by dragging).
+
+**Tests**: 370 automated tests pass; UI test flow `13_drafts_look_back`
+(WAL-11, WAL-12) added.
 
 ## 1.0.0 (20) – 15 October 2026
 

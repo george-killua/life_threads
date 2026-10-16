@@ -55,6 +55,10 @@ tags: [protocol, wal]
     notVisible: "Summer in Split.*"
     timeout: 10000
 - tapOn: "View"
+- extendedWaitUntil:
+    visible: "Show as"
+    timeout: 10000
+- waitForAnimationToEnd   # the sheet slides up
 - tapOn: "(?s)Hidden memories.*"
 # Hidden memories show only after Face ID or the passcode: the simulator
 # asks for its passcode.
