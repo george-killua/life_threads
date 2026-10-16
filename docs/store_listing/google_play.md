@@ -8,7 +8,7 @@ description 4000, release notes 500).
 |---|---|
 | Package | `dev.gkcoding.lifethreads` |
 | Version | 1.0.0 (17), from `pubspec.yaml` |
-| Store name | LifeThreads – Memory Wall (the name on the phone stays "LifeThreads") |
+| Store name | LifeThreads: Memory Journal (the name on the phone stays "LifeThreads") |
 | Category | Lifestyle (alternative: Photography) |
 | Contact email | info@gkcoding.dev |
 | Website | https://gkcoding.dev/lifethreads/ |
@@ -22,22 +22,22 @@ overview → Send changes for review** (managed publishing is on).
 
 ## English (en-US)
 
-**App name** (25/30)
+**App name** (27/30)
 
 ```text
-LifeThreads – Memory Wall
+LifeThreads: Memory Journal
 ```
 
-**Short description** (72/80)
+**Short description** (78/80)
 
 ```text
-A private memory wall: photos, stories and places, connected by threads.
+Private photo diary & memory journal for family, trips and stories with music.
 ```
 
-**Full description** (1784/4000)
+**Full description** (1803/4000)
 
 ```text
-LifeThreads is a private memory wall for the moments you never want to lose.
+LifeThreads is a private memory journal and photo diary for the moments you never want to lose.
 
 Pin your memories to a wall: the photos, the place, who was there and how it felt. Connect them with threads – your first home, the day your child was born, the summer by the sea – and watch your life become one story.
 
@@ -96,19 +96,19 @@ LifeThreads 1.0 is here.
 **App name** (25/30)
 
 ```text
-LifeThreads – Memory Wall
+LifeThreads: Erinnerungen
 ```
 
-**Short description** (80/80)
+**Short description** (75/80)
 
 ```text
-Deine private Erinnerungswand: Fotos, Geschichten und Orte, mit Fäden verbunden.
+Privates Foto-Tagebuch: Erinnerungen an Familie & Reisen, Storys mit Musik.
 ```
 
-**Full description** (2036/4000)
+**Full description** (2056/4000)
 
 ```text
-LifeThreads ist eine private Erinnerungswand für die Momente, die du nie verlieren willst.
+LifeThreads ist dein privates Foto-Tagebuch und Erinnerungsalbum für die Momente, die du nie verlieren willst.
 
 Pinne deine Erinnerungen an eine Wand: die Fotos, den Ort, wer dabei war und wie es sich angefühlt hat. Verbinde sie mit Fäden – das erste Zuhause, der Tag, an dem dein Kind geboren wurde, der Sommer am Meer – und sieh, wie dein Leben zu einer Geschichte wird.
 
@@ -164,22 +164,22 @@ LifeThreads 1.0 ist da.
 
 ## العربية (ar)
 
-**App name** (25/30)
+**App name** (24/30)
 
 ```text
-LifeThreads – Memory Wall
+LifeThreads: دفتر ذكريات
 ```
 
-**Short description** (54/80)
+**Short description** (64/80)
 
 ```text
-جدار ذكرياتك الخاص: صور وقصص وأماكن تربطها خيوط حياتك.
+يوميات بالصور ودفتر ذكريات خاص: العائلة والسفر وقصص مع الموسيقى.
 ```
 
-**Full description** (1475/4000)
+**Full description** (1495/4000)
 
 ```text
-LifeThreads جدار ذكريات خاص للّحظات التي لا تريد أن تفقدها أبداً.
+LifeThreads دفتر ذكريات ويوميات بالصور، خاص بك، للّحظات التي لا تريد أن تفقدها أبداً.
 
 علّق ذكرياتك على جدار: الصور، والمكان، ومن كان معك، وكيف كان الشعور. اربطها بخيوط – بيتك الأول، يوم وُلد طفلك، صيف على البحر – وشاهد حياتك تصبح قصة واحدة.
 

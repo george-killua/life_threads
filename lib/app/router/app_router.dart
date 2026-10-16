@@ -65,6 +65,10 @@ class AppRouter {
         builder: (context, state) => const AboutHelpPage(),
       ),
       materialRoute(
+        path: RouteNames.homeWidgetSettings,
+        builder: (context, state) => const HomeWidgetSettingsPage(),
+      ),
+      materialRoute(
         path: RouteNames.upgrade,
         builder: (context, state) => UpgradePage(
           feature: state.extra is PremiumFeature
@@ -83,7 +87,11 @@ class AppRouter {
           final initialPhotos = extra is List<PickedMemoryPhoto>
               ? extra
               : const <PickedMemoryPhoto>[];
-          return AddMemoryPage(initialPhotos: initialPhotos);
+          return AddMemoryPage(
+            initialPhotos: initialPhotos,
+            // From the home screen widget's "Take photo".
+            openCamera: state.uri.queryParameters['camera'] == '1',
+          );
         },
       ),
       materialRoute(

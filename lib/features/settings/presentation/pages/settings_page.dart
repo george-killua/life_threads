@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
@@ -21,8 +24,11 @@ import '../../../backup/presentation/widgets/archive_password_dialog.dart';
 import '../../../capsule/data/memory_capsule_service.dart';
 import '../../../capsule/domain/memory_capsule_models.dart';
 import '../../../capsule/presentation/widgets/memory_capsule_dialogs.dart';
+import '../../../home_widget/data/home_widget_settings.dart';
+import '../../../home_widget/domain/home_widget_days.dart';
 import '../../../memories/data/memory_repository.dart';
 import '../../../on_this_day/data/on_this_day_notifications.dart';
+import '../../../on_this_day/data/on_this_day_providers.dart';
 import '../../../on_this_day/data/on_this_day_settings.dart';
 import '../../../onboarding/onboarding_preferences.dart';
 import '../../../premium/data/premium_entitlement_controller.dart';
@@ -142,6 +148,13 @@ class SettingsPage extends ConsumerWidget {
                   title: l10n.settingsGroupMore,
                   children: [
                     _SettingsRow(
+                      key: const ValueKey('settings-home-widget'),
+                      icon: Icons.widgets_rounded,
+                      title: l10n.homeWidgetSettingsTitle,
+                      value: l10n.homeWidgetSettingsSubtitle,
+                      onTap: () => context.push(RouteNames.homeWidgetSettings),
+                    ),
+                    _SettingsRow(
                       key: const ValueKey('settings-backup-data'),
                       icon: Icons.enhanced_encryption_rounded,
                       title: l10n.backupDataTitle,
@@ -233,6 +246,267 @@ class BackupDataPage extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Settings › Home screen widget: which memories it shows, what comes
+/// first, today's memory as a preview, and how to add the widget.
+class HomeWidgetSettingsPage extends ConsumerWidget {
+  const HomeWidgetSettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final memories = ref.watch(memoryRepositoryProvider).asData?.value;
+    final settings =
+        ref.watch(homeWidgetSettingsProvider).asData?.value ??
+        const HomeWidgetSettings();
+    final controller = ref.read(homeWidgetSettingsProvider.notifier);
+    final walls = memories?.walls ?? const [];
+    final wallIds = {for (final wall in walls) wall.id};
+    // A deleted wall falls back to every wall.
+    final source =
+        settings.source == HomeWidgetSettings.allWalls ||
+            settings.source == HomeWidgetSettings.myWall ||
+            wallIds.contains(settings.source)
+        ? settings.source
+        : HomeWidgetSettings.allWalls;
+    final today = ref.watch(onThisDayTodayProvider);
+    final preview = homeWidgetDays(
+      today,
+      settings.filter(memories?.visibleEvents ?? const [], wallIds),
+      l10n,
+      days: 1,
+      onThisDayFirst: settings.onThisDayFirst,
+      photosFirst: settings.photosFirst,
+    ).single;
+    final locked = ref.watch(appLockProvider).enabled;
+
+    Widget choice(String value, IconData icon, String title) => _SettingsRow(
+      key: ValueKey('home-widget-source-$value'),
+      icon: icon,
+      title: title,
+      mergeSemantics: true,
+      onTap: () => controller.setSource(value),
+      trailing: Icon(
+        source == value
+            ? Icons.radio_button_checked_rounded
+            : Icons.radio_button_off_rounded,
+        color: source == value ? AppColors.gold : AppColors.muted,
+      ),
+    );
+
+    return Scaffold(
+      body: WallBackground(
+        child: SafeArea(
+          child: TopBarPage(
+            title: l10n.homeWidgetSettingsTitle,
+            body: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+              children: [
+                _HomeWidgetPreview(day: preview, locked: locked),
+                const SizedBox(height: 18),
+                // With one wall there is nothing to choose.
+                if (walls.isNotEmpty)
+                  _SettingsGroup(
+                    title: l10n.homeWidgetSourceTitle,
+                    children: [
+                      choice(
+                        HomeWidgetSettings.allWalls,
+                        Icons.dashboard_rounded,
+                        l10n.homeWidgetAllWalls,
+                      ),
+                      choice(
+                        HomeWidgetSettings.myWall,
+                        Icons.person_rounded,
+                        l10n.myWall,
+                      ),
+                      for (final wall in walls)
+                        choice(
+                          wall.id,
+                          Icons.dashboard_customize_rounded,
+                          wall.name,
+                        ),
+                    ],
+                  ),
+                _SettingsGroup(
+                  title: l10n.homeWidgetOrderTitle,
+                  children: [
+                    _SettingsRow(
+                      key: const ValueKey('home-widget-on-this-day'),
+                      icon: Icons.event_repeat_rounded,
+                      title: l10n.homeWidgetOnThisDayFirst,
+                      value: l10n.homeWidgetOnThisDayFirstBody,
+                      mergeSemantics: true,
+                      onTap: () => controller.setOnThisDayFirst(
+                        !settings.onThisDayFirst,
+                      ),
+                      trailing: Switch.adaptive(
+                        value: settings.onThisDayFirst,
+                        onChanged: controller.setOnThisDayFirst,
+                      ),
+                    ),
+                    _SettingsRow(
+                      key: const ValueKey('home-widget-photos-first'),
+                      icon: Icons.photo_library_rounded,
+                      title: l10n.homeWidgetPhotosFirst,
+                      value: l10n.homeWidgetPhotosFirstBody,
+                      mergeSemantics: true,
+                      onTap: () =>
+                          controller.setPhotosFirst(!settings.photosFirst),
+                      trailing: Switch.adaptive(
+                        value: settings.photosFirst,
+                        onChanged: controller.setPhotosFirst,
+                      ),
+                    ),
+                  ],
+                ),
+                _SettingsGroup(
+                  title: l10n.homeWidgetHowToTitle,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        defaultTargetPlatform == TargetPlatform.android
+                            ? l10n.homeWidgetHowToAndroid
+                            : l10n.homeWidgetHowToIos,
+                        style: const TextStyle(height: 1.45),
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: Text(
+                    l10n.homeWidgetPrivacyNote,
+                    style: TextStyle(color: AppColors.muted, height: 1.4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Today's widget, roughly as on the home screen.
+class _HomeWidgetPreview extends StatelessWidget {
+  const _HomeWidgetPreview({required this.day, required this.locked});
+
+  final HomeWidgetDay day;
+  final bool locked;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final path = locked ? null : day.memory?.coverPhotoPath;
+    final isAsset = path?.startsWith('assets/') ?? false;
+    final hasPhoto = path != null && (isAsset || File(path).existsSync());
+    final title = locked
+        ? l10n.appLockLockedTitle
+        : day.isEmpty
+        ? l10n.whatHappenedToday
+        : day.title;
+    final subtitle = locked
+        ? l10n.homeWidgetLocked
+        : day.isEmpty
+        ? l10n.addAMemory
+        : day.subtitle;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsetsDirectional.only(start: 6, bottom: 8),
+          child: Text(
+            l10n.homeWidgetPreviewTitle,
+            style: TextStyle(
+              color: AppColors.gold,
+              fontSize: 13,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+        Semantics(
+          container: true,
+          label: '${l10n.homeWidgetPreviewTitle}: $subtitle, $title',
+          excludeSemantics: true,
+          child: AspectRatio(
+            aspectRatio: 2.1,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [AppColors.panelWarm, AppColors.wallInk],
+                      ),
+                    ),
+                  ),
+                  if (hasPhoto)
+                    isAsset
+                        ? Image.asset(path, fit: BoxFit.cover)
+                        : Image.file(
+                            File(path),
+                            fit: BoxFit.cover,
+                            cacheWidth: 900,
+                          ),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        stops: [0.25, 0.6, 1],
+                        colors: [
+                          Colors.transparent,
+                          Color(0x73000000),
+                          Color(0xD9000000),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          subtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: AppColors.gold,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -7,6 +7,7 @@ class RouteNames {
   static const themes = '/settings/themes';
   static const backupData = '/settings/backup';
   static const aboutHelp = '/settings/about';
+  static const homeWidgetSettings = '/settings/widget';
   static const upgrade = '/upgrade';
   static const search = '/search';
   static const archiveTransfer = '/archive/transfer';

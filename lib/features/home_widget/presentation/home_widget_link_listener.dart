@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../app/router/route_names.dart';
 import '../../memories/data/memory_repository.dart';
 import '../../wall/data/current_wall.dart';
 
-/// Opens the memory a home screen widget shows when it is tapped
-/// (`lifethreads://memory/<id>`). A tap on an empty widget
-/// (`lifethreads://wall`) just opens the app. Other links are left to their
+/// Opens what a home screen widget tap asks for: a memory
+/// (`lifethreads://memory/<id>`), or on an empty widget a new memory
+/// (`lifethreads://add`, with `?camera=1` straight to the camera).
+/// `lifethreads://wall` just opens the app. Other links are left to their
 /// own listeners.
 ///
 /// The widget shows memories from every wall, so the wall screen behind the
@@ -25,6 +27,13 @@ class HomeWidgetLinkListener extends ConsumerStatefulWidget {
     if (uri.scheme != 'lifethreads' || uri.host != 'memory') return null;
     final segments = uri.pathSegments.where((s) => s.isNotEmpty).toList();
     return segments.length == 1 ? segments.single : null;
+  }
+
+  /// For `lifethreads://add`: whether to open the camera; null for any
+  /// other link.
+  static bool? addMemoryCameraFrom(Uri uri) {
+    if (uri.scheme != 'lifethreads' || uri.host != 'add') return null;
+    return uri.queryParameters['camera'] == '1';
   }
 
   @override
@@ -63,7 +72,8 @@ class _HomeWidgetLinkListenerState
 
   void _handleLink(Uri uri) {
     final memoryId = HomeWidgetLinkListener.memoryIdFrom(uri);
-    if (memoryId == null) return;
+    final camera = HomeWidgetLinkListener.addMemoryCameraFrom(uri);
+    if (memoryId == null && camera == null) return;
     // The launch link can arrive both as the initial link and on the stream.
     final now = DateTime.now();
     final last = _lastOpened;
@@ -74,7 +84,15 @@ class _HomeWidgetLinkListenerState
     }
     _lastLink = uri.toString();
     _lastOpened = now;
-    WidgetsBinding.instance.addPostFrameCallback((_) => _open(memoryId));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (memoryId != null) {
+        _open(memoryId);
+      } else if (mounted) {
+        AppRouter.router.push(
+          camera! ? '${RouteNames.addMemory}?camera=1' : RouteNames.addMemory,
+        );
+      }
+    });
     WidgetsBinding.instance.scheduleFrame();
   }
 

@@ -1669,5 +1669,19 @@
     }
   },
   "lookBackNotificationPrivate": "Your month in memories is ready.",
-  "homeWidgetLocked": "Open LifeThreads to see your memories."
+  "homeWidgetLocked": "Open LifeThreads to see your memories.",
+  "homeWidgetSettingsTitle": "Home screen widget",
+  "homeWidgetSettingsSubtitle": "Which memories it shows",
+  "homeWidgetPreviewTitle": "Today on your widget",
+  "homeWidgetSourceTitle": "Which memories",
+  "homeWidgetAllWalls": "All my walls",
+  "homeWidgetOrderTitle": "Shown first",
+  "homeWidgetOnThisDayFirst": "On this day first",
+  "homeWidgetOnThisDayFirstBody": "A memory from this day in an earlier year comes first.",
+  "homeWidgetPhotosFirst": "Memories with photos first",
+  "homeWidgetPhotosFirstBody": "Others only when none has a photo.",
+  "homeWidgetHowToTitle": "Add it to your home screen",
+  "homeWidgetHowToIos": "Press and hold the LifeThreads icon on your home screen and choose a widget size. Or press and hold an empty spot, tap Edit › Add Widget and choose LifeThreads.",
+  "homeWidgetHowToAndroid": "Press and hold an empty spot on your home screen, tap Widgets and drag LifeThreads to where you want it.",
+  "homeWidgetPrivacyNote": "Hidden memories never appear on the widget. With the app lock on, it shows no memory."
 }

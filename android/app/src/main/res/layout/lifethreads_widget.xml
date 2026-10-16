@@ -54,5 +54,40 @@
             android:textColor="#FFFFFFFF"
             android:textSize="17sp"
             android:textStyle="bold" />
+
+        <!-- No memory yet: ways to add the first one. -->
+        <LinearLayout
+            android:id="@+id/widget_actions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/widget_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/widget_button"
+                android:maxLines="1"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:textColor="#FF0A070B"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_photo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/widget_button"
+                android:maxLines="1"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:textColor="#FF0A070B"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 </FrameLayout>

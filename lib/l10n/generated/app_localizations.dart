@@ -5948,6 +5948,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open LifeThreads to see your memories.'**
   String get homeWidgetLocked;
+
+  /// No description provided for @homeWidgetSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Home screen widget'**
+  String get homeWidgetSettingsTitle;
+
+  /// No description provided for @homeWidgetSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which memories it shows'**
+  String get homeWidgetSettingsSubtitle;
+
+  /// No description provided for @homeWidgetPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today on your widget'**
+  String get homeWidgetPreviewTitle;
+
+  /// No description provided for @homeWidgetSourceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which memories'**
+  String get homeWidgetSourceTitle;
+
+  /// No description provided for @homeWidgetAllWalls.
+  ///
+  /// In en, this message translates to:
+  /// **'All my walls'**
+  String get homeWidgetAllWalls;
+
+  /// No description provided for @homeWidgetOrderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown first'**
+  String get homeWidgetOrderTitle;
+
+  /// No description provided for @homeWidgetOnThisDayFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'On this day first'**
+  String get homeWidgetOnThisDayFirst;
+
+  /// No description provided for @homeWidgetOnThisDayFirstBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A memory from this day in an earlier year comes first.'**
+  String get homeWidgetOnThisDayFirstBody;
+
+  /// No description provided for @homeWidgetPhotosFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Memories with photos first'**
+  String get homeWidgetPhotosFirst;
+
+  /// No description provided for @homeWidgetPhotosFirstBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Others only when none has a photo.'**
+  String get homeWidgetPhotosFirstBody;
+
+  /// No description provided for @homeWidgetHowToTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add it to your home screen'**
+  String get homeWidgetHowToTitle;
+
+  /// No description provided for @homeWidgetHowToIos.
+  ///
+  /// In en, this message translates to:
+  /// **'Press and hold the LifeThreads icon on your home screen and choose a widget size. Or press and hold an empty spot, tap Edit › Add Widget and choose LifeThreads.'**
+  String get homeWidgetHowToIos;
+
+  /// No description provided for @homeWidgetHowToAndroid.
+  ///
+  /// In en, this message translates to:
+  /// **'Press and hold an empty spot on your home screen, tap Widgets and drag LifeThreads to where you want it.'**
+  String get homeWidgetHowToAndroid;
+
+  /// No description provided for @homeWidgetPrivacyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden memories never appear on the widget. With the app lock on, it shows no memory.'**
+  String get homeWidgetPrivacyNote;
 }
 
 class _AppLocalizationsDelegate

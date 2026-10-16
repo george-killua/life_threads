@@ -1034,5 +1034,19 @@
   "lookBackNextMonth": "Nächster Monat",
   "lookBackNotificationBody": "{month}: {count, plural, =1{1 Erinnerung} other{{count} Erinnerungen}} zum Zurückblicken.",
   "lookBackNotificationPrivate": "Dein Monat in Erinnerungen ist bereit.",
-  "homeWidgetLocked": "Öffne LifeThreads, um deine Erinnerungen zu sehen."
+  "homeWidgetLocked": "Öffne LifeThreads, um deine Erinnerungen zu sehen.",
+  "homeWidgetSettingsTitle": "Widget auf dem Home-Bildschirm",
+  "homeWidgetSettingsSubtitle": "Welche Erinnerungen es zeigt",
+  "homeWidgetPreviewTitle": "Heute auf deinem Widget",
+  "homeWidgetSourceTitle": "Welche Erinnerungen",
+  "homeWidgetAllWalls": "Alle meine Wände",
+  "homeWidgetOrderTitle": "Zuerst gezeigt",
+  "homeWidgetOnThisDayFirst": "An diesem Tag zuerst",
+  "homeWidgetOnThisDayFirstBody": "Eine Erinnerung von diesem Tag in einem früheren Jahr kommt zuerst.",
+  "homeWidgetPhotosFirst": "Erinnerungen mit Fotos zuerst",
+  "homeWidgetPhotosFirstBody": "Andere nur, wenn keine ein Foto hat.",
+  "homeWidgetHowToTitle": "Zum Home-Bildschirm hinzufügen",
+  "homeWidgetHowToIos": "Halte das LifeThreads-Icon auf dem Home-Bildschirm gedrückt und wähle eine Widget-Größe. Oder halte eine freie Stelle gedrückt, tippe auf Bearbeiten › Widget hinzufügen und wähle LifeThreads.",
+  "homeWidgetHowToAndroid": "Halte eine freie Stelle auf dem Home-Bildschirm gedrückt, tippe auf Widgets und ziehe LifeThreads an die gewünschte Stelle.",
+  "homeWidgetPrivacyNote": "Ausgeblendete Erinnerungen erscheinen nie auf dem Widget. Mit App-Sperre zeigt es keine Erinnerung."
 }

@@ -1034,5 +1034,19 @@
   "lookBackNextMonth": "الشهر التالي",
   "lookBackNotificationBody": "{month}: {count, plural, =1{ذكرى واحدة} =2{ذكريان} few{{count} ذكريات} many{{count} ذكرى} other{{count} ذكرى}} لتستعيدها.",
   "lookBackNotificationPrivate": "شهرك في ذكريات جاهز.",
-  "homeWidgetLocked": "افتح LifeThreads لترى ذكرياتك."
+  "homeWidgetLocked": "افتح LifeThreads لترى ذكرياتك.",
+  "homeWidgetSettingsTitle": "أداة الشاشة الرئيسية",
+  "homeWidgetSettingsSubtitle": "أي ذكريات تعرضها",
+  "homeWidgetPreviewTitle": "اليوم على أداتك",
+  "homeWidgetSourceTitle": "أي ذكريات",
+  "homeWidgetAllWalls": "كل جدراني",
+  "homeWidgetOrderTitle": "يُعرض أولاً",
+  "homeWidgetOnThisDayFirst": "في مثل هذا اليوم أولاً",
+  "homeWidgetOnThisDayFirstBody": "تأتي أولاً ذكرى من هذا اليوم في سنة سابقة.",
+  "homeWidgetPhotosFirst": "الذكريات ذات الصور أولاً",
+  "homeWidgetPhotosFirstBody": "غيرها فقط إن لم تكن لأيٍّ منها صورة.",
+  "homeWidgetHowToTitle": "أضفها إلى شاشتك الرئيسية",
+  "homeWidgetHowToIos": "اضغط مطوّلاً على أيقونة LifeThreads في شاشتك الرئيسية واختر حجم الأداة. أو اضغط مطوّلاً على مكان فارغ، ثم تعديل › إضافة أداة واختر LifeThreads.",
+  "homeWidgetHowToAndroid": "اضغط مطوّلاً على مكان فارغ في شاشتك الرئيسية، ثم الأدوات، واسحب LifeThreads إلى المكان الذي تريده.",
+  "homeWidgetPrivacyNote": "لا تظهر الذكريات المخفية على الأداة أبداً. ومع قفل التطبيق لا تعرض أي ذكرى."
 }

@@ -3497,4 +3497,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeWidgetLocked => 'Open LifeThreads to see your memories.';
+
+  @override
+  String get homeWidgetSettingsTitle => 'Home screen widget';
+
+  @override
+  String get homeWidgetSettingsSubtitle => 'Which memories it shows';
+
+  @override
+  String get homeWidgetPreviewTitle => 'Today on your widget';
+
+  @override
+  String get homeWidgetSourceTitle => 'Which memories';
+
+  @override
+  String get homeWidgetAllWalls => 'All my walls';
+
+  @override
+  String get homeWidgetOrderTitle => 'Shown first';
+
+  @override
+  String get homeWidgetOnThisDayFirst => 'On this day first';
+
+  @override
+  String get homeWidgetOnThisDayFirstBody =>
+      'A memory from this day in an earlier year comes first.';
+
+  @override
+  String get homeWidgetPhotosFirst => 'Memories with photos first';
+
+  @override
+  String get homeWidgetPhotosFirstBody => 'Others only when none has a photo.';
+
+  @override
+  String get homeWidgetHowToTitle => 'Add it to your home screen';
+
+  @override
+  String get homeWidgetHowToIos =>
+      'Press and hold the LifeThreads icon on your home screen and choose a widget size. Or press and hold an empty spot, tap Edit › Add Widget and choose LifeThreads.';
+
+  @override
+  String get homeWidgetHowToAndroid =>
+      'Press and hold an empty spot on your home screen, tap Widgets and drag LifeThreads to where you want it.';
+
+  @override
+  String get homeWidgetPrivacyNote =>
+      'Hidden memories never appear on the widget. With the app lock on, it shows no memory.';
 }

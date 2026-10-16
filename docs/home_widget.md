@@ -2,6 +2,27 @@
 
 A memory from the wall on the home screen, on iPhone and Android. Free.
 
+## Settings
+
+Settings › More › **Home screen widget** (`HomeWidgetSettingsPage`):
+
+- a preview of today's widget;
+- **Which memories** (only with walls of one's own): all walls, My wall, or
+  one named wall – a deleted wall falls back to all;
+- **On this day first** and **Memories with photos first** (both on by
+  default);
+- how to add the widget on iPhone or Android.
+
+Stored in shared preferences (`home_widget_source`,
+`home_widget_on_this_day_first`, `home_widget_photos_first`).
+
+## Empty widget
+
+Without memories the widget says "What happened today?" with **Add a
+memory** and **Take photo** buttons (medium and large; a small widget opens
+"add" as a whole). Links: `lifethreads://add` and
+`lifethreads://add?camera=1` (opens the camera on the add screen).
+
 ## What it shows
 
 For each of the next 7 days the app picks one memory:
@@ -39,8 +60,9 @@ safety form don't change.
 | Android channel | `MainActivity.kt` |
 
 The app and the widget share the payload as JSON:
-`{"days":[{"date":"2026-10-16","title":"…","subtitle":"…","memoryId":"…","image":"images/….jpg"}]}`
-(`date` is null for the single locked entry). iPhone: App Group
+`{"addLabel":"…","photoLabel":"…","days":[{"date":"2026-10-16","kind":"memory","title":"…","subtitle":"…","memoryId":"…","image":"images/….jpg"}]}`
+(`kind` is `memory`, `empty` or `locked`; `date` is null for the single
+locked entry). iPhone: App Group
 `group.dev.gkcoding.lifeThreads`, key `home_widget_payload`, photos in
 `<group>/home_widget/`. Android: preferences `lifethreads_home_widget`,
 photos in `files/home_widget/`.

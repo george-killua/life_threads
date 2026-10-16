@@ -31,6 +31,11 @@ What changed in each TestFlight / Play build. Newest first.
   routes now build Material pages themselves (`material_route.dart`).
 - **A tap outside a text field closes the keyboard** on every screen, also
   when the tap lands on a button or card; scrolling leaves it open.
+- **Widget settings** (Settings › Home screen widget): which wall's
+  memories, On this day first, memories with photos first, a preview and
+  how to add the widget.
+- **Empty widget** offers **Add a memory** and **Take photo** (straight to
+  the camera).
 - Opening a memory from the widget switches the wall screen to the wall
   that memory hangs on (the widget shows memories from every wall).
 - The View sheet has a Done button (at the largest text size it fills the

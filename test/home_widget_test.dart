@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
 import 'package:life_threads/features/app_lock/app_lock.dart';
+import 'package:life_threads/features/home_widget/data/home_widget_settings.dart';
 import 'package:life_threads/features/home_widget/data/home_widget_sync.dart';
 import 'package:life_threads/features/home_widget/domain/home_widget_days.dart';
 import 'package:life_threads/features/home_widget/presentation/home_widget_link_listener.dart';
@@ -79,8 +80,50 @@ void main() {
     test('an empty wall invites to save today', () {
       final day = homeWidgetDays(DateTime(2026, 10, 16), const [], l10n).first;
       expect(day.memory, isNull);
+      expect(day.isEmpty, isTrue);
       expect(day.title, 'What happened today?');
     });
+
+    test('settings: no on-this-day priority, photos not preferred', () {
+      final events = [
+        memory('anniversary', DateTime(2023, 10, 16)),
+        memory('photo', DateTime(2025, 1, 5)).copyWith(coverPhotoPath: '/a'),
+      ];
+      final plain = homeWidgetDays(
+        DateTime(2026, 10, 16),
+        events,
+        l10n,
+        days: 2,
+      );
+      expect(plain.first.memory?.id, 'anniversary');
+      expect(plain[1].memory?.id, 'photo'); // only the photo one otherwise
+      final off = homeWidgetDays(
+        DateTime(2026, 10, 16),
+        events,
+        l10n,
+        days: 2,
+        onThisDayFirst: false,
+        photosFirst: false,
+      );
+      expect(off.map((d) => d.subtitle).toSet(), {'Remember this'});
+      expect(off.map((d) => d.memory?.id).toSet(), {'anniversary', 'photo'});
+    });
+  });
+
+  test('widget settings choose a wall', () {
+    final events = [
+      memory('mine', DateTime(2025)),
+      memory('trip', DateTime(2025)).copyWith(wallId: 'w1'),
+    ];
+    List<String> ids(String source, [Set<String> walls = const {'w1'}]) =>
+        HomeWidgetSettings(
+          source: source,
+        ).filter(events, walls).map((e) => e.id).toList();
+    expect(ids(HomeWidgetSettings.allWalls), ['mine', 'trip']);
+    expect(ids(HomeWidgetSettings.myWall), ['mine']);
+    expect(ids('w1'), ['trip']);
+    // A deleted wall: every wall again.
+    expect(ids('w1', const {}), ['mine', 'trip']);
   });
 
   test('widget links open memories only', () {
@@ -97,6 +140,24 @@ void main() {
     expect(
       HomeWidgetLinkListener.memoryIdFrom(
         Uri.parse('https://gkcoding.dev/lifethreads/share/x'),
+      ),
+      isNull,
+    );
+    expect(
+      HomeWidgetLinkListener.addMemoryCameraFrom(
+        Uri.parse('lifethreads://add'),
+      ),
+      isFalse,
+    );
+    expect(
+      HomeWidgetLinkListener.addMemoryCameraFrom(
+        Uri.parse('lifethreads://add?camera=1'),
+      ),
+      isTrue,
+    );
+    expect(
+      HomeWidgetLinkListener.addMemoryCameraFrom(
+        Uri.parse('lifethreads://memory/x'),
       ),
       isNull,
     );
@@ -172,6 +233,7 @@ void main() {
       expect(days, hasLength(1));
       final day = days.single as Map;
       expect(day['date'], isNull);
+      expect(day['kind'], 'locked');
       expect(day['memoryId'], isNull);
       expect(day['image'], isNull);
       expect(day['title'], 'LifeThreads is locked');

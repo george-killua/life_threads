@@ -61,7 +61,9 @@ class LifeThreadsWidgetProvider : AppWidgetProvider() {
 
         private fun views(context: Context, widgetId: Int): RemoteViews {
             val views = RemoteViews(context.packageName, R.layout.lifethreads_widget)
-            val day = today(context)
+            val payload = payload(context)
+            val day = payload?.let { today(it) }
+            val isEmpty = day?.optStringOrNull("kind") == "empty"
             views.setTextViewText(
                 R.id.widget_subtitle,
                 day?.optString("subtitle")
@@ -85,34 +87,62 @@ class LifeThreadsWidgetProvider : AppWidgetProvider() {
             }
 
             val memoryId = day?.optStringOrNull("memoryId")
-            val link = if (memoryId != null) {
-                Uri.parse("lifethreads://memory/${Uri.encode(memoryId)}")
-            } else {
-                Uri.parse("lifethreads://wall")
+            val link = when {
+                isEmpty -> ADD_LINK
+                memoryId != null -> "lifethreads://memory/${Uri.encode(memoryId)}"
+                else -> "lifethreads://wall"
             }
-            val intent = Intent(Intent.ACTION_VIEW, link, context, MainActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            views.setOnClickPendingIntent(
-                R.id.widget_root,
-                PendingIntent.getActivity(
-                    context,
-                    widgetId,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-                ),
-            )
+            views.setOnClickPendingIntent(R.id.widget_root, open(context, widgetId * 3, link))
+
+            // No memory yet: buttons to add the first one.
+            if (isEmpty) {
+                views.setViewVisibility(R.id.widget_actions, View.VISIBLE)
+                views.setTextViewText(
+                    R.id.widget_add,
+                    "+ " + (payload?.optStringOrNull("addLabel") ?: "Add a memory"),
+                )
+                views.setTextViewText(
+                    R.id.widget_photo,
+                    payload?.optStringOrNull("photoLabel") ?: "Take photo",
+                )
+                views.setOnClickPendingIntent(R.id.widget_add, open(context, widgetId * 3 + 1, ADD_LINK))
+                views.setOnClickPendingIntent(
+                    R.id.widget_photo,
+                    open(context, widgetId * 3 + 2, "$ADD_LINK?camera=1"),
+                )
+            } else {
+                views.setViewVisibility(R.id.widget_actions, View.GONE)
+            }
             return views
         }
 
-        /** Today's entry, else the latest earlier one, else the first. */
-        private fun today(context: Context): JSONObject? {
-            val payload = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+        private const val ADD_LINK = "lifethreads://add"
+
+        /** Opens the app at [link]; [requestCode] keeps the intents apart. */
+        private fun open(context: Context, requestCode: Int, link: String): PendingIntent {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link), context, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            return PendingIntent.getActivity(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+
+        private fun payload(context: Context): JSONObject? {
+            val raw = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
                 .getString(PAYLOAD_KEY, null) ?: return null
-            val days = try {
-                JSONObject(payload).getJSONArray("days")
+            return try {
+                JSONObject(raw)
             } catch (_: Exception) {
-                return null
+                null
             }
+        }
+
+        /** Today's entry, else the latest earlier one, else the first. */
+        private fun today(payload: JSONObject): JSONObject? {
+            val days = payload.optJSONArray("days") ?: return null
             if (days.length() == 0) return null
             val key = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
             var earlier: JSONObject? = null

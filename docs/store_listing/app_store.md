@@ -8,7 +8,7 @@ text 170, description 4000, keywords 100, What's New 4000).
 |---|---|
 | Bundle ID | `dev.gkcoding.lifeThreads` (Apple ID 6821782747, team 443GVR9G8M) |
 | Version | 1.0.0 (15), from `pubspec.yaml`; the App Store version must also be named 1.0.0 |
-| Name | LifeThreads – Memory Wall (the name on the home screen stays "LifeThreads") |
+| Name | LifeThreads: Memory Journal (the name on the home screen stays "LifeThreads") |
 | Primary / secondary category | Lifestyle / Photo & Video |
 | Copyright | 2026 GK Coding |
 | Support URL | https://gkcoding.dev/lifethreads/ |
@@ -24,16 +24,16 @@ screenshots). Add the German and Arabic localizations from the language menu at 
 
 ## English – App Store Connect: English (U.S.)
 
-**Name** (25/30)
+**Name** (27/30)
 
 ```text
-LifeThreads – Memory Wall
+LifeThreads: Memory Journal
 ```
 
-**Subtitle** (29/30)
+**Subtitle** (30/30)
 
 ```text
-Private photo & story journal
+Photo diary for family & trips
 ```
 
 **Promotional text** (149/170)
@@ -42,10 +42,10 @@ Private photo & story journal
 Turn your memories into stories with music, relive your year as a film, and share a private wall with your family. Your own wall stays on your phone.
 ```
 
-**Description** (1784/4000)
+**Description** (1803/4000)
 
 ```text
-LifeThreads is a private memory wall for the moments you never want to lose.
+LifeThreads is a private memory journal and photo diary for the moments you never want to lose.
 
 Pin your memories to a wall: the photos, the place, who was there and how it felt. Connect them with threads – your first home, the day your child was born, the summer by the sea – and watch your life become one story.
 
@@ -84,10 +84,10 @@ LifeThreads is free with up to 30 memories, full backups, the wall, timeline and
 LifeThreads is available in English, German and Arabic.
 ```
 
-**Keywords** (94/100 bytes)
+**Keywords** (98/100 bytes)
 
 ```text
-memories,journal,diary,photo,timeline,family,story,scrapbook,travel,moments,album,life,private
+scrapbook,timeline,story,travel,moments,album,gratitude,baby,keepsake,anniversary,private,vacation
 ```
 
 **What's New in this version** (422/4000)
@@ -110,13 +110,13 @@ LifeThreads 1.0 is here.
 **Name** (25/30)
 
 ```text
-LifeThreads – Memory Wall
+LifeThreads: Erinnerungen
 ```
 
-**Subtitle** (26/30)
+**Subtitle** (25/30)
 
 ```text
-Private Foto- & Story-Wand
+Foto-Tagebuch für Familie
 ```
 
 **Promotional text** (156/170)
@@ -125,10 +125,10 @@ Private Foto- & Story-Wand
 Mach aus Erinnerungen Storys mit Musik, erlebe dein Jahr als Film und teile eine private Wand mit deiner Familie. Deine eigene Wand bleibt auf deinem Handy.
 ```
 
-**Description** (2036/4000)
+**Description** (2056/4000)
 
 ```text
-LifeThreads ist eine private Erinnerungswand für die Momente, die du nie verlieren willst.
+LifeThreads ist dein privates Foto-Tagebuch und Erinnerungsalbum für die Momente, die du nie verlieren willst.
 
 Pinne deine Erinnerungen an eine Wand: die Fotos, den Ort, wer dabei war und wie es sich angefühlt hat. Verbinde sie mit Fäden – das erste Zuhause, der Tag, an dem dein Kind geboren wurde, der Sommer am Meer – und sieh, wie dein Leben zu einer Geschichte wird.
 
@@ -167,10 +167,10 @@ LifeThreads ist kostenlos mit bis zu 30 Erinnerungen, vollständigen Backups, Wa
 LifeThreads gibt es auf Deutsch, Englisch und Arabisch.
 ```
 
-**Keywords** (97/100 bytes)
+**Keywords** (98/100 bytes)
 
 ```text
-erinnerungen,tagebuch,fotoalbum,zeitleiste,familie,story,reise,momente,fotos,leben,privat,journal
+fotoalbum,zeitleiste,story,reise,momente,privat,journal,baby,dankbarkeit,jahrestag,urlaub,andenken
 ```
 
 **What's New in this version** (463/4000)
@@ -190,16 +190,16 @@ LifeThreads 1.0 ist da.
 
 ## العربية – App Store Connect: Arabic
 
-**Name** (25/30)
+**Name** (24/30)
 
 ```text
-LifeThreads – Memory Wall
+LifeThreads: دفتر ذكريات
 ```
 
-**Subtitle** (20/30)
+**Subtitle** (28/30)
 
 ```text
-جدار خاص لصورك وقصصك
+يوميات بالصور للعائلة والسفر
 ```
 
 **Promotional text** (108/170)
@@ -208,10 +208,10 @@ LifeThreads – Memory Wall
 حوّل ذكرياتك إلى قصص مع الموسيقى، وعِش سنتك كفيلم، وشارك جداراً خاصاً مع عائلتك. جدارك الخاص يبقى على هاتفك.
 ```
 
-**Description** (1475/4000)
+**Description** (1495/4000)
 
 ```text
-LifeThreads جدار ذكريات خاص للّحظات التي لا تريد أن تفقدها أبداً.
+LifeThreads دفتر ذكريات ويوميات بالصور، خاص بك، للّحظات التي لا تريد أن تفقدها أبداً.
 
 علّق ذكرياتك على جدار: الصور، والمكان، ومن كان معك، وكيف كان الشعور. اربطها بخيوط – بيتك الأول، يوم وُلد طفلك، صيف على البحر – وشاهد حياتك تصبح قصة واحدة.
 
@@ -250,10 +250,10 @@ LifeThreads مجاني حتى 30 ذكرى، مع نسخ احتياطية كام�
 LifeThreads متاح بالعربية والإنجليزية والألمانية.
 ```
 
-**Keywords** (92/100 bytes)
+**Keywords** (79/100 bytes)
 
 ```text
-ذكريات,يوميات,ألبوم,صور,عائلة,قصة,سفر,لحظات,مذكرات
+ذكرى,ألبوم,عائلة,قصة,لحظات,مذكرات,رحلات,طفل
 ```
 
 **What's New in this version** (349/4000)

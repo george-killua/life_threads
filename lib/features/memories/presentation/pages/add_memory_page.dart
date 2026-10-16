@@ -28,9 +28,16 @@ import '../widgets/memory_people_editor.dart';
 import '../../../../core/widgets/app_toast.dart';
 
 class AddMemoryPage extends ConsumerStatefulWidget {
-  const AddMemoryPage({super.key, this.initialPhotos = const []});
+  const AddMemoryPage({
+    super.key,
+    this.initialPhotos = const [],
+    this.openCamera = false,
+  });
 
   final List<PickedMemoryPhoto> initialPhotos;
+
+  /// Opens the camera right away (the widget's "Take photo").
+  final bool openCamera;
 
   @override
   ConsumerState<AddMemoryPage> createState() => _AddMemoryPageState();
@@ -345,6 +352,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     if (draft == null || limitReached) {
       // At the limit the draft waits for Premium untouched.
       _draftReady = !limitReached;
+      if (widget.openCamera && !limitReached) unawaited(_capturePhoto());
       return;
     }
     final l10n = context.l10n;
@@ -387,6 +395,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     }
     _draftReady = true;
     setState(() {});
+    if (widget.openCamera) unawaited(_capturePhoto());
   }
 
   void _applyDraft(MemoryDraft draft) {

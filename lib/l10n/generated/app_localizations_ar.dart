@@ -3547,4 +3547,51 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get homeWidgetLocked => 'افتح LifeThreads لترى ذكرياتك.';
+
+  @override
+  String get homeWidgetSettingsTitle => 'أداة الشاشة الرئيسية';
+
+  @override
+  String get homeWidgetSettingsSubtitle => 'أي ذكريات تعرضها';
+
+  @override
+  String get homeWidgetPreviewTitle => 'اليوم على أداتك';
+
+  @override
+  String get homeWidgetSourceTitle => 'أي ذكريات';
+
+  @override
+  String get homeWidgetAllWalls => 'كل جدراني';
+
+  @override
+  String get homeWidgetOrderTitle => 'يُعرض أولاً';
+
+  @override
+  String get homeWidgetOnThisDayFirst => 'في مثل هذا اليوم أولاً';
+
+  @override
+  String get homeWidgetOnThisDayFirstBody =>
+      'تأتي أولاً ذكرى من هذا اليوم في سنة سابقة.';
+
+  @override
+  String get homeWidgetPhotosFirst => 'الذكريات ذات الصور أولاً';
+
+  @override
+  String get homeWidgetPhotosFirstBody =>
+      'غيرها فقط إن لم تكن لأيٍّ منها صورة.';
+
+  @override
+  String get homeWidgetHowToTitle => 'أضفها إلى شاشتك الرئيسية';
+
+  @override
+  String get homeWidgetHowToIos =>
+      'اضغط مطوّلاً على أيقونة LifeThreads في شاشتك الرئيسية واختر حجم الأداة. أو اضغط مطوّلاً على مكان فارغ، ثم تعديل › إضافة أداة واختر LifeThreads.';
+
+  @override
+  String get homeWidgetHowToAndroid =>
+      'اضغط مطوّلاً على مكان فارغ في شاشتك الرئيسية، ثم الأدوات، واسحب LifeThreads إلى المكان الذي تريده.';
+
+  @override
+  String get homeWidgetPrivacyNote =>
+      'لا تظهر الذكريات المخفية على الأداة أبداً. ومع قفل التطبيق لا تعرض أي ذكرى.';
 }

@@ -9,6 +9,8 @@ private let containerFolder = "home_widget"
 /// One day as the app wrote it; see `HomeWidgetSync` in the Flutter code.
 struct WidgetDay: Decodable {
   let date: String?
+  /// "memory", "empty" (no memory yet) or "locked".
+  let kind: String?
   let title: String
   let subtitle: String
   let memoryId: String?
@@ -17,12 +19,18 @@ struct WidgetDay: Decodable {
 
 private struct WidgetPayload: Decodable {
   let days: [WidgetDay]
+  let addLabel: String?
+  let photoLabel: String?
 }
 
 struct MemoryEntry: TimelineEntry {
   let date: Date
   let day: WidgetDay?
   let image: UIImage?
+  var addLabel = "Add a memory"
+  var photoLabel = "Take photo"
+
+  var isEmpty: Bool { day?.kind == "empty" }
 }
 
 struct MemoryProvider: TimelineProvider {
@@ -31,6 +39,7 @@ struct MemoryProvider: TimelineProvider {
       date: Date(),
       day: WidgetDay(
         date: nil,
+        kind: "memory",
         title: WidgetText.placeholderTitle,
         subtitle: WidgetText.placeholderSubtitle,
         memoryId: nil,
@@ -41,32 +50,34 @@ struct MemoryProvider: TimelineProvider {
   }
 
   func getSnapshot(in context: Context, completion: @escaping (MemoryEntry) -> Void) {
-    let days = loadDays()
-    if days.isEmpty {
+    guard let payload = loadPayload(), !payload.days.isEmpty else {
       completion(placeholder(in: context))
-    } else {
-      completion(entry(on: Date(), at: Date(), from: days))
+      return
     }
+    completion(entry(on: Date(), at: Date(), from: payload))
   }
 
   /// One entry per day the app prepared, switching at midnight; after the
   /// last one the widget asks again (the app refreshes it whenever it runs).
   func getTimeline(in context: Context, completion: @escaping (Timeline<MemoryEntry>) -> Void) {
-    let days = loadDays()
+    let payload = loadPayload()
     let calendar = Calendar.current
     let today = calendar.startOfDay(for: Date())
-    var entries = [entry(on: today, at: Date(), from: days)]
+    var entries = [entry(on: today, at: Date(), from: payload)]
     for offset in 1..<7 {
       guard let day = calendar.date(byAdding: .day, value: offset, to: today) else { continue }
-      entries.append(entry(on: day, at: day, from: days))
+      entries.append(entry(on: day, at: day, from: payload))
     }
     let refresh = calendar.date(byAdding: .day, value: 7, to: today) ?? today
     completion(Timeline(entries: entries, policy: .after(refresh)))
   }
 
-  private func entry(on day: Date, at date: Date, from days: [WidgetDay]) -> MemoryEntry {
-    let chosen = pick(day, from: days)
-    return MemoryEntry(date: date, day: chosen, image: chosen.flatMap(loadImage))
+  private func entry(on day: Date, at date: Date, from payload: WidgetPayload?) -> MemoryEntry {
+    let chosen = pick(day, from: payload?.days ?? [])
+    var entry = MemoryEntry(date: date, day: chosen, image: chosen.flatMap(loadImage))
+    if let label = payload?.addLabel { entry.addLabel = label }
+    if let label = payload?.photoLabel { entry.photoLabel = label }
+    return entry
   }
 
   /// The day's own entry, else the latest earlier one, else the first (a
@@ -89,13 +100,12 @@ struct MemoryProvider: TimelineProvider {
     return formatter.string(from: date)
   }
 
-  private func loadDays() -> [WidgetDay] {
+  private func loadPayload() -> WidgetPayload? {
     guard
       let json = UserDefaults(suiteName: appGroup)?.string(forKey: payloadKey),
-      let data = json.data(using: .utf8),
-      let payload = try? JSONDecoder().decode(WidgetPayload.self, from: data)
-    else { return [] }
-    return payload.days
+      let data = json.data(using: .utf8)
+    else { return nil }
+    return try? JSONDecoder().decode(WidgetPayload.self, from: data)
   }
 
   private func loadImage(_ day: WidgetDay) -> UIImage? {
@@ -131,13 +141,39 @@ struct LifeThreadsWidgetView: View {
         .foregroundColor(.white)
         .lineLimit(2)
         .shadow(color: .black.opacity(0.5), radius: 3, y: 1)
+      // No memory yet: ways to add the first one (buttons need a medium or
+      // large widget; a small one opens "add" as a whole).
+      if entry.isEmpty && family != .systemSmall {
+        HStack(spacing: 8) {
+          actionButton(entry.addLabel, systemImage: "plus", url: Self.addURL)
+          actionButton(entry.photoLabel, systemImage: "camera.fill", url: Self.cameraURL)
+        }
+        .padding(.top, 8)
+      }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
     .widgetURL(link)
     .widgetBackground(background)
   }
 
+  private static let addURL = URL(string: "lifethreads://add")!
+  private static let cameraURL = URL(string: "lifethreads://add?camera=1")!
+
+  private func actionButton(_ title: String, systemImage: String, url: URL) -> some View {
+    Link(destination: url) {
+      Label(title, systemImage: systemImage)
+        .font(.system(size: 13, weight: .heavy))
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
+        .foregroundColor(Self.ink)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
+        .background(Capsule().fill(Self.gold))
+    }
+  }
+
   private var link: URL? {
+    if entry.isEmpty { return Self.addURL }
     if let id = entry.day?.memoryId,
        let encoded = id.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) {
       return URL(string: "lifethreads://memory/\(encoded)")

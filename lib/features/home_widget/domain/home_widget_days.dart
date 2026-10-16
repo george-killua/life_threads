@@ -19,11 +19,18 @@ class HomeWidgetDay {
   /// The memory a tap opens and whose cover photo is shown; null opens the
   /// wall.
   final MemoryEvent? memory;
+
+  /// [date] null: the one entry of a locked app.
+  bool get isLocked => date == null;
+
+  /// No memory yet: the widget offers to add one.
+  bool get isEmpty => !isLocked && memory == null;
 }
 
 /// The widget's next [days] days from [today]: a memory from that day in an
-/// earlier year, else one to remember (memories with a photo first, a
-/// different one each day), else an invitation to save today.
+/// earlier year (with [onThisDayFirst]), else one to remember (with
+/// [photosFirst] memories with a photo first; a different one each day),
+/// else an invitation to save today.
 ///
 /// The widget switches at midnight by itself, so the app needs to run only
 /// once in a while.
@@ -32,20 +39,23 @@ List<HomeWidgetDay> homeWidgetDays(
   List<MemoryEvent> events,
   AppLocalizations l10n, {
   int days = 7,
+  bool onThisDayFirst = true,
+  bool photosFirst = true,
 }) {
   final start = DateTime(today.year, today.month, today.day);
   final withPhoto = [
     for (final event in events)
       if (event.coverPhotoPath?.isNotEmpty ?? false) event,
   ];
-  final candidates = (withPhoto.isEmpty ? [...events] : withPhoto)
-    ..sort((a, b) => a.id.compareTo(b.id));
+  final candidates =
+      (!photosFirst || withPhoto.isEmpty ? [...events] : withPhoto)
+        ..sort((a, b) => a.id.compareTo(b.id));
 
   return [
     for (var offset = 0; offset < days; offset++)
       _dayFor(
         DateTime(start.year, start.month, start.day + offset),
-        events,
+        onThisDayFirst ? events : const [],
         candidates,
         l10n,
       ),

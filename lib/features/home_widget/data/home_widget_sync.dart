@@ -18,6 +18,7 @@ import '../../memories/data/memory_repository.dart';
 import '../../memories/domain/memory_event.dart';
 import '../../on_this_day/data/on_this_day_providers.dart';
 import '../domain/home_widget_days.dart';
+import 'home_widget_settings.dart';
 
 final homeWidgetBridgeProvider = Provider<HomeWidgetBridge>(
   (ref) => const MethodChannelHomeWidgetBridge(),
@@ -72,16 +73,22 @@ class HomeWidgetSync extends Notifier<void> {
 
   @override
   void build() {
-    final events = ref
-        .watch(memoryRepositoryProvider)
-        .asData
-        ?.value
-        .visibleEvents;
+    final memories = ref.watch(memoryRepositoryProvider).asData?.value;
+    final settings = ref.watch(homeWidgetSettingsProvider).asData?.value;
+    final events = settings?.filter(memories?.visibleEvents ?? const [], {
+      for (final wall in memories?.walls ?? const []) wall.id,
+    });
     final lock = ref.watch(appLockProvider);
     final selectedLocale = ref.watch(localeControllerProvider);
     // Refreshed when the app comes back to the foreground.
     final today = ref.watch(onThisDayTodayProvider);
-    if (events == null || !lock.ready || selectedLocale.isLoading) return;
+    if (memories == null ||
+        events == null ||
+        settings == null ||
+        !lock.ready ||
+        selectedLocale.isLoading) {
+      return;
+    }
 
     final l10n = _localizations(selectedLocale.value);
     final bridge = ref.read(homeWidgetBridgeProvider);
@@ -89,7 +96,14 @@ class HomeWidgetSync extends Notifier<void> {
     _queue = _queue.then((_) async {
       if (generation != _generation) return;
       try {
-        await _sync(bridge, events, today, l10n, locked: lock.enabled);
+        await _sync(
+          bridge,
+          events,
+          today,
+          l10n,
+          settings: settings,
+          locked: lock.enabled,
+        );
       } catch (error, stackTrace) {
         AppLogger.recordCrash(error, stackTrace);
       }
@@ -101,6 +115,7 @@ class HomeWidgetSync extends Notifier<void> {
     List<MemoryEvent> events,
     DateTime today,
     AppLocalizations l10n, {
+    required HomeWidgetSettings settings,
     required bool locked,
   }) async {
     final container = await bridge.containerPath();
@@ -116,7 +131,13 @@ class HomeWidgetSync extends Notifier<void> {
               subtitle: l10n.homeWidgetLocked,
             ),
           ]
-        : homeWidgetDays(today, events, l10n);
+        : homeWidgetDays(
+            today,
+            events,
+            l10n,
+            onThisDayFirst: settings.onThisDayFirst,
+            photosFirst: settings.photosFirst,
+          );
 
     final imageNames = <String, String>{};
     for (final day in days) {
@@ -134,10 +155,18 @@ class HomeWidgetSync extends Notifier<void> {
 
     await bridge.update(
       jsonEncode({
+        // Buttons of the empty widget.
+        'addLabel': l10n.addAMemory,
+        'photoLabel': l10n.takePhoto,
         'days': [
           for (final day in days)
             {
               'date': day.date == null ? null : _dateKey(day.date!),
+              'kind': day.isLocked
+                  ? 'locked'
+                  : day.isEmpty
+                  ? 'empty'
+                  : 'memory',
               'title': day.title,
               'subtitle': day.subtitle,
               'memoryId': day.memory?.id,

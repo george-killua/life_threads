@@ -3530,4 +3530,51 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get homeWidgetLocked =>
       'Öffne LifeThreads, um deine Erinnerungen zu sehen.';
+
+  @override
+  String get homeWidgetSettingsTitle => 'Widget auf dem Home-Bildschirm';
+
+  @override
+  String get homeWidgetSettingsSubtitle => 'Welche Erinnerungen es zeigt';
+
+  @override
+  String get homeWidgetPreviewTitle => 'Heute auf deinem Widget';
+
+  @override
+  String get homeWidgetSourceTitle => 'Welche Erinnerungen';
+
+  @override
+  String get homeWidgetAllWalls => 'Alle meine Wände';
+
+  @override
+  String get homeWidgetOrderTitle => 'Zuerst gezeigt';
+
+  @override
+  String get homeWidgetOnThisDayFirst => 'An diesem Tag zuerst';
+
+  @override
+  String get homeWidgetOnThisDayFirstBody =>
+      'Eine Erinnerung von diesem Tag in einem früheren Jahr kommt zuerst.';
+
+  @override
+  String get homeWidgetPhotosFirst => 'Erinnerungen mit Fotos zuerst';
+
+  @override
+  String get homeWidgetPhotosFirstBody =>
+      'Andere nur, wenn keine ein Foto hat.';
+
+  @override
+  String get homeWidgetHowToTitle => 'Zum Home-Bildschirm hinzufügen';
+
+  @override
+  String get homeWidgetHowToIos =>
+      'Halte das LifeThreads-Icon auf dem Home-Bildschirm gedrückt und wähle eine Widget-Größe. Oder halte eine freie Stelle gedrückt, tippe auf Bearbeiten › Widget hinzufügen und wähle LifeThreads.';
+
+  @override
+  String get homeWidgetHowToAndroid =>
+      'Halte eine freie Stelle auf dem Home-Bildschirm gedrückt, tippe auf Widgets und ziehe LifeThreads an die gewünschte Stelle.';
+
+  @override
+  String get homeWidgetPrivacyNote =>
+      'Ausgeblendete Erinnerungen erscheinen nie auf dem Widget. Mit App-Sperre zeigt es keine Erinnerung.';
 }
