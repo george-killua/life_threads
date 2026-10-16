@@ -30,8 +30,8 @@ python3 tool/play/play.py upload build/app/outputs/bundle/release/app-release.aa
 The key file stays outside the repo. No MapTiler key is needed: the map
 uses OpenFreeMap unless `--dart-define=MAPTILER_KEY=…` is passed.
 
-Uploads so far: 1.0.0 (17) and 1.0.0 (21) to `alpha` (closed testing),
-both `completed`.
+Uploads so far: 1.0.0 (17), (21) and (22) to `alpha` (closed testing),
+all `completed`.
 
 ## Local Upload (old fastlane way; fastlane is not set up)
 

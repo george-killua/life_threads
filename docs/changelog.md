@@ -2,7 +2,9 @@
 
 What changed in each TestFlight / Play build. Newest first.
 
-## 1.0.0 (22) – 16 October 2026 (not uploaded yet)
+## 1.0.0 (22) – 16 October 2026
+
+Uploaded to TestFlight and to Google Play closed testing (alpha).
 
 **View sheet**
 - Choices apply only with **Done**; closing the sheet another way leaves
