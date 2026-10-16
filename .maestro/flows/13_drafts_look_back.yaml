@@ -47,7 +47,8 @@ tags: [protocol, wal]
 - extendedWaitUntil:
     visible: "Your .*"
     timeout: 10000
-- assertVisible: "\\d+ memor(y|ies)"
+- assertVisible: ".*Summer in Split.*"
+- assertVisible: "Create story"
 - takeScreenshot: WAL-12_look_back
 - tapOn: "Previous month"
 - assertVisible: "Your .*"
