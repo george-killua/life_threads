@@ -20,6 +20,14 @@ What changed in each TestFlight / Play build. Newest first.
 - The name step says the name stays on the phone.
 - No motion with Reduce Motion.
 
+**Fixed (QA bug hunt)**
+- Closing "Continue where you left off?" with the back button no longer
+  deletes the draft and its photos; the draft stays for later.
+- The widget's "Take photo" no longer opens the camera when the free limit
+  is reached and the app was just started.
+- Thread of the Year: "Add a memory to <year>" adds to the wall chosen under
+  "Memories from".
+
 ## 1.0.0 (22) – 16 October 2026
 
 Uploaded to TestFlight and to Google Play closed testing (alpha).

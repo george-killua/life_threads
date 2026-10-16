@@ -30,11 +30,13 @@ class RouteNames {
 
   static String yearThreadFor(int year) => '$yearThread?year=$year';
 
-  /// Add a memory dated [date] (a day of a year in Thread of the Year).
-  static String addMemoryOn(DateTime date) =>
+  /// Add a memory dated [date] (a day of a year in Thread of the Year), on
+  /// [wall]: '' for My wall, a wall id, or null for the wall on screen.
+  static String addMemoryOn(DateTime date, {String? wall}) =>
       '$addMemory?date=${date.year.toString().padLeft(4, '0')}-'
       '${date.month.toString().padLeft(2, '0')}-'
-      '${date.day.toString().padLeft(2, '0')}';
+      '${date.day.toString().padLeft(2, '0')}'
+      '${wall == null ? '' : '&wall=${Uri.encodeQueryComponent(wall)}'}';
   static String lookBackFor(int year, int month) =>
       '$lookBack?year=$year&month=$month';
 

@@ -95,6 +95,7 @@ class AppRouter {
             initialDate: DateTime.tryParse(
               state.uri.queryParameters['date'] ?? '',
             ),
+            toWall: state.uri.queryParameters['wall'],
           );
         },
       ),

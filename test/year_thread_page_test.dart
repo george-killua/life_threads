@@ -118,8 +118,10 @@ void main() {
           ),
           GoRoute(
             path: RouteNames.addMemory,
-            builder: (context, state) =>
-                Text('ADD ${state.uri.queryParameters['date']}'),
+            builder: (context, state) => Text(
+              'ADD ${state.uri.queryParameters['date']}'
+              ' wall=${state.uri.queryParameters['wall']}',
+            ),
           ),
           GoRoute(
             path: RouteNames.upgrade,
@@ -333,6 +335,15 @@ void main() {
       await settle(tester);
       expect(find.text('At home'), findsOneWidget);
       expect(find.text('Trip 2'), findsOneWidget);
+
+      // On My wall, a memory added to a year goes to My wall.
+      await tester.tap(find.text('My wall'));
+      await settle(tester);
+      await tester.tap(find.text('Add a memory to 2025'));
+      await settle(tester);
+      expect(find.textContaining('ADD 2025-'), findsOneWidget);
+      expect(find.textContaining('wall='), findsOneWidget);
+      expect(find.textContaining('wall=null'), findsNothing);
     });
 
     testWidgets('memories can be removed, swapped and added back', (

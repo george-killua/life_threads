@@ -33,12 +33,17 @@ class AddMemoryPage extends ConsumerStatefulWidget {
     this.initialPhotos = const [],
     this.openCamera = false,
     this.initialDate,
+    this.toWall,
   });
 
   final List<PickedMemoryPhoto> initialPhotos;
 
   /// Opens the camera right away (the widget's "Take photo").
   final bool openCamera;
+
+  /// The wall the memory goes to: null for the wall on screen, '' for My
+  /// wall, or a wall id (Thread of the Year's chosen wall).
+  final String? toWall;
 
   /// The date to start with (Thread of the Year's "Add a memory to 2023").
   /// A photo's own date still wins.
@@ -322,6 +327,16 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     };
   }
 
+  /// [AddMemoryPage.toWall] if that wall still exists, else the wall on
+  /// screen.
+  String? _targetWall() {
+    final wall = widget.toWall;
+    if (wall == null) return activeWallId(ref);
+    if (wall.isEmpty) return null;
+    final walls = ref.read(memoryRepositoryProvider).asData?.value.walls;
+    return walls?.any((w) => w.id == wall) ?? false ? wall : activeWallId(ref);
+  }
+
   MemoryDraft _currentDraft() => MemoryDraft(
     savedAt: DateTime.now(),
     title: _titleController.text,
@@ -352,9 +367,17 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
   /// let it go.
   Future<void> _restoreDraft() async {
     final draft = await _draftStore.load();
+    // The free limit needs the memories: opened from the widget on a cold
+    // start they may still be loading.
+    MemoryState? state;
+    PremiumEntitlement? entitlement;
+    try {
+      state = await ref.read(memoryRepositoryProvider.future);
+      entitlement = await ref.read(premiumEntitlementProvider.future);
+    } catch (_) {
+      // Shown by the page itself.
+    }
     if (!mounted) return;
-    final state = ref.read(memoryRepositoryProvider).asData?.value;
-    final entitlement = ref.read(premiumEntitlementProvider).asData?.value;
     final limitReached =
         state != null &&
         !(entitlement?.canCreateMemory(state.events.length) ??
@@ -397,7 +420,12 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
       ),
     );
     if (!mounted) return;
-    if (resume ?? false) {
+    // Closed without an answer (back button): leave, the draft stays.
+    if (resume == null) {
+      _backToWall(context);
+      return;
+    }
+    if (resume) {
       _applyDraft(draft);
     } else {
       final saved = ref.read(memoryRepositoryProvider).asData?.value;
@@ -733,7 +761,7 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
         connectedEventId: _connectedEventId,
         connectionReason: _connectionReasonController.text.trim(),
         people: _people,
-        wallId: activeWallId(ref),
+        wallId: _targetWall(),
         photos: [
           for (final photo in _photos)
             MemoryPhotoDraft(

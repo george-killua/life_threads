@@ -130,6 +130,7 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
                       _NoYearYet(
                         almost: almost,
                         hasMemories: state.visibleEvents.isNotEmpty,
+                        addToWall: _addToWall,
                       )
                     else ...[
                       ..._editor(context, years, YearThread.year(state, year)),
@@ -137,7 +138,8 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
                       if (almost.isNotEmpty) ...[
                         const SizedBox(height: 26),
                         _Label(context.l10n.yearThreadAlmostThere),
-                        for (final other in almost) _YearProgress(year: other),
+                        for (final other in almost)
+                          _YearProgress(year: other, wall: _addToWall),
                       ],
                     ],
                   ],
@@ -149,6 +151,14 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
       ),
     );
   }
+
+  /// Where "Add a memory to (year)" puts the memory: the chosen wall ('' for
+  /// My wall), or the wall on screen with All my walls.
+  String? get _addToWall => switch (_wallScope) {
+    null || _allWalls => null,
+    _myWall => '',
+    final id => id,
+  };
 
   /// The memories of the chosen wall(s).
   MemoryState _scoped(MemoryState state) {
@@ -918,9 +928,16 @@ String _keepTogether(String part) => part.replaceAll(' ', '\u00A0');
 /// Before any year has enough memories: how close each year is, and what
 /// to do now, instead of an empty screen.
 class _NoYearYet extends StatelessWidget {
-  const _NoYearYet({required this.almost, required this.hasMemories});
+  const _NoYearYet({
+    required this.almost,
+    required this.hasMemories,
+    this.addToWall,
+  });
 
   final List<YearThreadYear> almost;
+
+  /// See [_YearProgress.wall].
+  final String? addToWall;
   final bool hasMemories;
 
   @override
@@ -973,7 +990,7 @@ class _NoYearYet extends StatelessWidget {
         // How close each year is, with the memories that count.
         for (final year in almost.take(5)) ...[
           const SizedBox(height: 10),
-          _YearProgress(year: year),
+          _YearProgress(year: year, wall: addToWall),
         ],
         const SizedBox(height: 18),
         FilledButton.icon(
@@ -999,9 +1016,13 @@ class _NoYearYet extends StatelessWidget {
 /// memories that count (open one to fix a wrong date), and a way to add one
 /// dated in that year.
 class _YearProgress extends StatelessWidget {
-  const _YearProgress({required this.year});
+  const _YearProgress({required this.year, this.wall});
 
   final YearThreadYear year;
+
+  /// The wall a memory added here goes to: '' for My wall, a wall id, or
+  /// null for the wall on screen.
+  final String? wall;
 
   @override
   Widget build(BuildContext context) {
@@ -1060,7 +1081,8 @@ class _YearProgress extends StatelessWidget {
               alignment: AlignmentDirectional.centerStart,
               child: TextButton.icon(
                 key: ValueKey('year-thread-add-to-${year.year}'),
-                onPressed: () => context.push(RouteNames.addMemoryOn(date)),
+                onPressed: () =>
+                    context.push(RouteNames.addMemoryOn(date, wall: wall)),
                 icon: const Icon(Icons.add_rounded),
                 label: Text(l10n.yearThreadAddMemoryTo('${year.year}')),
               ),
