@@ -2,7 +2,7 @@
 
 What changed in each TestFlight / Play build. Newest first.
 
-## Next build (not uploaded yet)
+## 1.0.0 (24) – 17 October 2026 (TestFlight, Play closed testing; replaces 23 in App Review)
 
 **App Review 1.2 (user-generated content)**
 - Family walls filter objectionable words on the device before anything is

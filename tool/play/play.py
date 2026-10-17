@@ -18,11 +18,15 @@ Status: completed (rolls out to the track's testers) or draft.
 import glob
 import json
 import os
+import socket
 import sys
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
+# Bundles are over 100 MB: give each request time, and retry on a dropped
+# connection (the upload is resumable).
+socket.setdefaulttimeout(600)
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 KEY = os.environ.get('GOOGLE_PLAY_JSON_KEY_PATH') or os.path.join(
     ROOT, 'secrets', 'google-play-service-account.json')
@@ -42,7 +46,8 @@ elif sys.argv[1] == 'upload':
     aab, track, status = sys.argv[2], sys.argv[3], sys.argv[4]
     notes = sys.argv[5] if len(sys.argv) > 5 else None
     bundle = edits.bundles().upload(packageName=PKG, editId=eid,
-        media_body=MediaFileUpload(aab, mimetype='application/octet-stream', resumable=True)).execute()
+        media_body=MediaFileUpload(aab, mimetype='application/octet-stream', resumable=True,
+            chunksize=16 * 1024 * 1024)).execute(num_retries=5)
     vc = bundle['versionCode']
     print('uploaded versionCode', vc)
     release = {'versionCodes': [str(vc)], 'status': status, 'name': f'1.0.0 ({vc})'}
