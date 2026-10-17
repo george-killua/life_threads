@@ -135,7 +135,7 @@ footer { color: var(--muted); font-size: 13px; }
     <p class="lead" data-t="lead"></p>
     <dl class="meta">
       <div><dt data-t="mApp"></dt><dd class="ltr">LifeThreads: Memory Journal</dd></div>
-      <div><dt data-t="mBuild"></dt><dd class="ltr">1.0.0 (23)</dd></div>
+      <div><dt data-t="mBuild"></dt><dd class="ltr">1.0.0 (24)</dd></div>
       <div><dt data-t="mPlatforms"></dt><dd>iOS (TestFlight) · Android (Play)</dd></div>
       <div><dt data-t="mPeriod"></dt><dd data-t="period"></dd></div>
       <div><dt data-t="mContact"></dt><dd class="ltr">info@gkcoding.dev</dd></div>
@@ -217,7 +217,7 @@ var T = {
     reportLead: "When you are done, copy the report and send it by email or message to George. Failed and blocked tests come first.",
     copy: "Copy report", copied: "Copied.", copyFail: "Select the text below and copy it.",
     reset: "Clear all my answers", resetQ: "Clear every result and note in this browser?", resetYes: "Yes, clear", resetNo: "Keep",
-    footer: "LifeThreads by GK Coding · Test protocol for build 1.0.0 (23) · Your answers are saved only in this browser.",
+    footer: "LifeThreads by GK Coding · Test protocol for build 1.0.0 (24) · Your answers are saved only in this browser.",
     rTitle: "LIFETHREADS TEST REPORT", rIssues: "FAILED / BLOCKED", rAll: "ALL RESULTS", rNone: "none", rOpen: "not tested"
   },
   de: {
@@ -242,7 +242,7 @@ var T = {
     reportLead: "Wenn du fertig bist, kopiere den Bericht und schick ihn per E-Mail oder Nachricht an George. Fehler und blockierte Tests stehen oben.",
     copy: "Bericht kopieren", copied: "Kopiert.", copyFail: "Markiere den Text unten und kopiere ihn.",
     reset: "Alle meine Antworten löschen", resetQ: "Alle Ergebnisse und Notizen in diesem Browser löschen?", resetYes: "Ja, löschen", resetNo: "Behalten",
-    footer: "LifeThreads von GK Coding · Testprotokoll für Build 1.0.0 (23) · Deine Antworten werden nur in diesem Browser gespeichert.",
+    footer: "LifeThreads von GK Coding · Testprotokoll für Build 1.0.0 (24) · Deine Antworten werden nur in diesem Browser gespeichert.",
     rTitle: "LIFETHREADS TESTBERICHT", rIssues: "FEHLER / BLOCKIERT", rAll: "ALLE ERGEBNISSE", rNone: "keine", rOpen: "nicht getestet"
   }
 };
@@ -361,6 +361,9 @@ var AREAS = [
   { id: "FAM-07", p: 2,
     en: ["Removing someone secures the wall (three accounts)", ["You need three people (or phones) on one test wall: the owner, A and B.", "Owner: Settings of the wall › remove B. Watch the message Removing and securing the wall.", "Owner: post a new memory. A: open the wall.", "Owner: invite someone new (C) with a fresh link; C joins."], "Removing shows the securing message and finishes without an error. A still sees all old memories and the new one, and can post. B no longer sees the wall. C sees the old memories too."],
     de: ["Entfernen sichert die Wand (drei Konten)", ["Du brauchst drei Personen (oder Handys) auf einer Testwand: Besitzer:in, A und B.", "Besitzer:in: Einstellungen der Wand › B entfernen. Auf die Meldung Wird entfernt, die Wand wird gesichert achten.", "Besitzer:in: eine neue Erinnerung posten. A: die Wand öffnen.", "Besitzer:in: jemand Neues (C) mit frischem Link einladen; C tritt bei."], "Das Entfernen zeigt die Meldung zum Sichern und endet ohne Fehler. A sieht weiter alle alten Erinnerungen und die neue und kann posten. B sieht die Wand nicht mehr. C sieht auch die alten Erinnerungen."] },
+  { id: "FAM-08", p: 1,
+    en: ["Offensive words are blocked", ["On a test family wall tap Add memory and use an offensive word as the title (for example an insult in English, German or Arabic). Save.", "Also try it as the wall's name (rename) and as your display name.", "Then post a normal memory, also one with a word like Scunthorpe or Kassel."], "Each blocked text shows: This has words that aren't allowed on family walls, and nothing is posted (the other members see nothing). Normal memories, also with Scunthorpe or Kassel, post as usual."],
+    de: ["Beleidigende Wörter werden blockiert", ["Auf einer Test-Familienwand Erinnerung hinzufügen tippen und ein beleidigendes Wort als Titel nehmen (zum Beispiel eine Beleidigung auf Deutsch, Englisch oder Arabisch). Speichern.", "Auch als Namen der Wand (umbenennen) und als deinen Anzeigenamen probieren.", "Danach eine normale Erinnerung posten, auch eine mit einem Wort wie Kassel oder Scunthorpe."], "Jeder blockierte Text zeigt: Das enthält Wörter, die auf Familienwänden nicht erlaubt sind, und nichts wird gepostet (die anderen Mitglieder sehen nichts). Normale Erinnerungen, auch mit Kassel oder Scunthorpe, werden wie gewohnt gepostet."] },
   { id: "FAM-05", p: 3,
     en: ["Delete the account", ["Family walls, Account, Delete account (only at the end of your testing)."], "The account and the walls you own are deleted. Your private wall on the phone stays untouched."],
     de: ["Konto löschen", ["Familienwände, Konto, Konto löschen (erst am Ende deiner Tests)."], "Konto und deine eigenen Familienwände werden gelöscht. Deine private Wand auf dem Handy bleibt unberührt."] }
@@ -395,6 +398,9 @@ var AREAS = [
   { id: "SET-06", p: 3,
     en: ["Dates after travelling", ["Note the date of two memories.", "Change the phone's time zone (iPhone: Settings › General › Date & Time, turn off Set Automatically, pick New York; Android: Settings › System › Date & time).", "Open LifeThreads again, then set the time zone back."], "Every memory keeps exactly the same date, also in the timeline and in Thread of the Year."],
     de: ["Daten nach einer Reise", ["Das Datum von zwei Erinnerungen notieren.", "Die Zeitzone des Handys ändern (iPhone: Einstellungen › Allgemein › Datum & Uhrzeit, Automatisch einstellen aus, New York wählen; Android: Einstellungen › System › Datum & Uhrzeit).", "LifeThreads wieder öffnen, danach die Zeitzone zurückstellen."], "Jede Erinnerung behält genau dasselbe Datum, auch in der Zeitleiste und im Faden des Jahres."] },
+  { id: "SET-07", p: 2,
+    en: ["Terms and privacy in your language", ["Set the app or phone language to German, then Arabic.", "Open Settings › Privacy policy and Terms of use, the links on the Premium page, and the rules link before joining a family wall."], "Each link opens the page in that language (German or Arabic), with a switch for English · Deutsch · العربية at the top."],
+    de: ["Nutzungsbedingungen und Datenschutz in deiner Sprache", ["App- oder Handysprache auf Deutsch stellen, dann auf Arabisch.", "Einstellungen › Datenschutzerklärung und Nutzungsbedingungen öffnen, die Links auf der Premium-Seite und den Regeln-Link vor dem Beitritt zu einer Familienwand."], "Jeder Link öffnet die Seite in dieser Sprache (Deutsch oder Arabisch), oben mit der Umschaltung English · Deutsch · العربية."] },
   { id: "SET-04", p: 1,
     en: ["Your overall impression", ["Use the app for a few days as you normally would."], "Write in the notes: what you liked most, what confused you, what you missed, and whether you would pay for Premium."],
     de: ["Dein Gesamteindruck", ["Die App ein paar Tage ganz normal nutzen."], "Schreib in die Notizen: was dir am besten gefiel, was dich verwirrt hat, was dir fehlte und ob du für Premium zahlen würdest."] }
@@ -423,7 +429,7 @@ T.ar = {
   reportLead: "عندما تنتهي، انسخ التقرير وأرسله إلى جورج بالبريد أو برسالة. الاختبارات الفاشلة والمتعذّرة تظهر أولاً.",
   copy: "نسخ التقرير", copied: "تم النسخ.", copyFail: "حدّد النص في الأسفل وانسخه.",
   reset: "مسح كل إجاباتي", resetQ: "مسح كل النتائج والملاحظات من هذا المتصفح؟", resetYes: "نعم، امسح", resetNo: "إبقاء",
-  footer: "LifeThreads من GK Coding · بروتوكول اختبار للإصدار 1.0.0 (23) · تُحفظ إجاباتك في هذا المتصفح فقط.",
+  footer: "LifeThreads من GK Coding · بروتوكول اختبار للإصدار 1.0.0 (24) · تُحفظ إجاباتك في هذا المتصفح فقط.",
   rTitle: "تقرير اختبار LIFETHREADS", rIssues: "أخطاء / متعذّر", rAll: "كل النتائج", rNone: "لا شيء", rOpen: "لم يُختبر"
 };
 var AR_AREAS = { INS: "التثبيت والتشغيل الأول", WAL: "جدار ذكرياتك", PRM: "Premium", STO: "إنشاء قصة", YR: "خيط السنة", OTD: "في مثل هذا اليوم", FAM: "جدران العائلة", BAK: "النسخ الاحتياطي والمشاركة", SET: "الإعدادات والانطباع العام" };
@@ -456,6 +462,7 @@ var AR = {
   "FAM-04": ["الإبلاغ والحظر والإزالة", ["أبلغ عن ذكرى تجريبية (اختر سبباً).", "احظر عضواً ثم ألغِ الحظر.", "كمالك أزِل عضواً، وكعضو غادر جداراً."], "كل إجراء يطلب تأكيداً ويعمل. العضو المُزال لا يرى الجدار بعد ذلك."],
   "FAM-06": ["مغادرة جدار عائلة أو حذفه", ["كعضو افتح إعدادات جدار واختر «مغادرة»؛ أو كمالك احذف الجدار (استخدم جداراً تجريبياً).", "في قائمة جدران العائلة التي تظهر بعدها اضغط سهم الرجوع (أو اسحب للرجوع على الآيفون)."], "يختفي الجدار من قائمتك، والرجوع يعيدك إلى جدارك الخاص. لا تعلق أبداً على شاشة."],
   "FAM-07": ["الإزالة تؤمّن الجدار (ثلاثة حسابات)", ["تحتاج ثلاثة أشخاص (أو هواتف) على جدار تجريبي واحد: المالك وA وB.", "المالك: إعدادات الجدار › أزِل B. لاحظ رسالة «جارٍ الإزالة وتأمين الجدار».", "المالك: انشر ذكرى جديدة. A: افتح الجدار.", "المالك: ادعُ شخصاً جديداً (C) برابط جديد؛ ينضم C."], "تظهر رسالة التأمين وتنتهي الإزالة دون خطأ. يرى A كل الذكريات القديمة والجديدة ويستطيع النشر. لا يرى B الجدار بعد ذلك. ويرى C الذكريات القديمة أيضاً."],
+  "FAM-08": ["حظر الكلمات المسيئة", ["على جدار عائلة تجريبي اضغط «إضافة ذكرى» واكتب كلمة مسيئة كعنوان (مثلاً شتيمة بالعربية أو الإنجليزية أو الألمانية)، ثم احفظ.", "جرّب ذلك أيضاً كاسم للجدار (إعادة التسمية) وكاسمك الظاهر.", "ثم انشر ذكرى عادية، ومنها ذكرى فيها كلمة مثل «كسرة خبز»."], "يظهر لكل نص محظور: «يحتوي النص على كلمات غير مسموح بها على جدران العائلة» ولا يُنشر شيء (لا يرى الأعضاء الآخرون شيئاً). وتُنشر الذكريات العادية، ومنها «كسرة خبز»، كالمعتاد."],
   "FAM-05": ["حذف الحساب", ["جدران العائلة، الحساب، حذف الحساب (فقط في نهاية اختباراتك)."], "يُحذف الحساب وجدران العائلة التي تملكها. يبقى جدارك الخاص على الهاتف كما هو."],
   "BAK-01": ["نسخ احتياطي لكل شيء", ["الإعدادات، النسخ الاحتياطي: أنشئ نسخة احتياطية بكلمة مرور.", "احفظ الملف (الملفات، Google Drive، أو بريد إلى نفسك)."], "يُنشأ ملف .zip واحد فيه كل الذكريات والصور. ينبّهك التطبيق إلى حفظ كلمة المرور جيداً."],
   "BAK-02": ["استعادة نسخة احتياطية", ["استورد النسخة الاحتياطية (على نفس الهاتف بعد إعادة التثبيت أو على هاتف آخر).", "أدخل كلمة المرور.", "يسأل التطبيق «استيراد نسخة احتياطية؟» ويذكر عدد الذكريات فيها. جرّب «إلغاء» مرة، ثم استورد مجدداً وأكّد."], "الإلغاء لا يستورد شيئاً. بعد التأكيد تعود كل الذكريات والصور مع الخيوط. الذكريات الموجودة تبقى ولا تتكرّر."],
@@ -470,6 +477,7 @@ var AR = {
   "WAL-12": ["نظرة على شهر", ["افتح المزيد › نظرة على شهر.", "استخدم الأسهم للانتقال إلى أشهر أخرى.", "في الأسبوع الأول من الشهر: انظر إلى البطاقة على الجدار للشهر السابق."], "ترى مثلاً «ذكريات سبتمبر» مع ذكرياته والأشخاص والأماكن فيها و«إنشاء قصة». الشهر الفارغ يقول ذلك في وسط الشاشة مع «أضف ذكرى»."],
   "WAL-13": ["أداة الشاشة الرئيسية", ["آيفون: اضغط مطوّلاً على أيقونة LifeThreads واختر حجم الأداة (أو تعديل › إضافة أداة › LifeThreads). أندرويد: اضغط مطوّلاً على الشاشة الرئيسية › الأدوات › LifeThreads.", "اضغط على الأداة.", "الإعدادات › أداة الشاشة الرئيسية: انظر إلى المعاينة، وبدّل «في مثل هذا اليوم أولاً» و«الذكريات ذات الصور أولاً»، و(مع عدة جدران) اختر جداراً واحداً.", "فعّل قفل التطبيق (الإعدادات › الخصوصية › قفل التطبيق) وانظر إلى الأداة مجدداً.", "دون ذكريات (أو على جدار فارغ): اضغط «أضف ذكرى» و«التقط صورة» على أداة متوسطة الحجم."], "تعرض الأداة ذكرى مع صورتها – من هذا اليوم في سنة سابقة إن وُجدت – وتتغيّر كل يوم. الضغط يفتح تلك الذكرى، وينتقل الجدار خلفها إلى جدارها. الإعدادات تغيّر ما تعرضه الأداة والمعاينة مطابقة لها. مع قفل التطبيق تعرض فقط «LifeThreads مقفل» دون صورة. دون ذكريات تعرض «أضف ذكرى» (تفتح شاشة الإضافة) و«التقط صورة» (تفتح الكاميرا)."],
   "SET-06": ["التواريخ بعد السفر", ["دوّن تاريخ ذكريين.", "غيّر المنطقة الزمنية للهاتف (آيفون: الإعدادات › عام › التاريخ والوقت، أوقف «التعيين تلقائياً» واختر نيويورك؛ أندرويد: الإعدادات › النظام › التاريخ والوقت).", "افتح LifeThreads مجدداً، ثم أعد المنطقة الزمنية."], "تحتفظ كل ذكرى بالتاريخ نفسه تماماً، في الخط الزمني وفي خيط السنة أيضاً."],
+  "SET-07": ["الشروط والخصوصية بلغتك", ["اجعل لغة التطبيق أو الهاتف الألمانية ثم العربية.", "افتح الإعدادات › سياسة الخصوصية وشروط الاستخدام، والروابط في صفحة Premium، ورابط القواعد قبل الانضمام إلى جدار عائلة."], "يفتح كل رابط الصفحة بتلك اللغة (الألمانية أو العربية)، وفي أعلاها مفتاح English · Deutsch · العربية."],
   "SET-05": ["قفل التطبيق", ["الإعدادات › الخصوصية › قفل التطبيق: فعّله وأكّد بـ Face ID أو البصمة أو رمز القفل.", "أغلق التطبيق وافتحه مجدداً، وانظر إليه أيضاً في مبدّل التطبيقات.", "اختياري: شغّل VoiceOver (آيفون) أو TalkBack (أندرويد) والتطبيق مقفل، ومرّر على الشاشة."], "لا يُفتح التطبيق إلا بعد فك القفل. في مبدّل التطبيقات يكون جدارك ضبابياً. والتطبيق مقفل يقرأ VoiceOver/TalkBack شاشة القفل فقط، لا ذكرياتك أبداً."],
   "SET-04": ["انطباعك العام", ["استخدم التطبيق بضعة أيام كما تفعل عادة."], "اكتب في الملاحظات: ما أعجبك أكثر، ما أربكك، ما افتقدته، وهل كنت ستدفع مقابل Premium."]
 };
@@ -553,7 +561,7 @@ function counts() {
 
 function report() {
   var L = T[state.lang], t = state.tester, c = counts(), lines = [];
-  lines.push(L.rTitle + " · LifeThreads 1.0.0 (23)");
+  lines.push(L.rTitle + " · LifeThreads 1.0.0 (24)");
   lines.push(L.fName + ": " + (t.name || "-") + " | " + L.fPlatform + ": " + (t.platform || "-") + " | " + L.fDevice + ": " + (t.device || "-") + " | " + L.fOs + ": " + (t.os || "-") + " | " + L.fLang + ": " + (t.lang || "-") + " | " + L.fDate + ": " + (t.date || "-"));
   lines.push(c.done + "/" + c.total + " " + L.cDone + " · " + c.pass + " " + L.cPass + " · " + c.fail + " " + L.cFail + " · " + c.blocked + " " + L.cBlock + " · " + c.na + " " + L.cNa);
   lines.push("");
