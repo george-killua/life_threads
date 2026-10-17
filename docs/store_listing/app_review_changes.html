@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LifeThreads 1.0 – Notes for App Review</title>
+<style>
+  body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: #1d1a1c; font-size: 11pt; line-height: 1.5; margin: 0; }
+  h1 { font-size: 20pt; margin: 0 0 4px; }
+  h2 { font-size: 13pt; margin: 22px 0 6px; padding-bottom: 3px; border-bottom: 1px solid #d8c9a6; }
+  .meta { color: #8a6a22; font-weight: 600; margin: 0 0 14px; }
+  table { border-collapse: collapse; width: 100%; margin: 6px 0; }
+  th, td { border: 1px solid #ddd; padding: 6px 8px; text-align: left; vertical-align: top; }
+  th { background: #f6efe0; }
+  li { margin: 3px 0; }
+  code { background: #f4f1ec; padding: 1px 4px; border-radius: 3px; font-size: 10pt; }
+  @page { margin: 18mm 16mm; }
+</style>
+</head>
+<body>
+<h1>LifeThreads 1.0 – Notes for App Review</h1>
+<p class="meta">Build 24 · GK Coding · george.kassih@gkcoding.dev</p>
+
+<h2>What changed since the last submission (build 23)</h2>
+<table>
+  <tr><th>Guideline</th><th>Change</th></tr>
+  <tr><td>1.2 User-Generated Content</td><td>Family walls now <b>filter objectionable words on the device before anything is posted</b>: memory title, story and place, the wall's name and the member's display name, in English, German and Arabic. A blocked post shows the message “This has words that aren't allowed on family walls. Please change the text and try again.” and nothing is sent. Family walls are end-to-end encrypted, so the check runs on the device before encryption.</td></tr>
+  <tr><td>3.1.2 Subscriptions</td><td>Every App Store description (English, German, Arabic) ends with a working link to the Terms of Use (EULA) and the Privacy Policy. German and Arabic link their own translated pages.</td></tr>
+  <tr><td>—</td><td>The Terms of Use and Privacy Policy links in the app (Settings, Premium page, family wall rules) open in the app's language.</td></tr>
+</table>
+
+<h2>How to test the filter</h2>
+<ol>
+  <li>On the wall tap <b>⋯ › Family walls</b> and sign in with Apple.</li>
+  <li>Accept the family wall rules and create a wall (needs a Sandbox subscription: Settings › Premium).</li>
+  <li>Tap <b>Add memory</b> and type an offensive word as the title, then save. The app shows the message above and nothing is posted.</li>
+  <li>The same check applies to the wall's name (rename) and to your display name.</li>
+</ol>
+
+<h2>Safeguards for family walls (guideline 1.2)</h2>
+<table>
+  <tr><th>Requirement</th><th>In LifeThreads</th></tr>
+  <tr><td>Terms with zero tolerance</td><td>Before using family walls, everyone accepts the family wall rules (zero tolerance for objectionable content and abusive users), linked to the Terms of Use: gkcoding.dev/lifethreads/terms</td></tr>
+  <tr><td>Filtering</td><td>On-device word filter before posting (new in build 24).</td></tr>
+  <tr><td>Reporting</td><td>Any memory or member can be reported from the wall. Reports reach GK Coding and are reviewed within 24 hours; violating content is removed and the account suspended or deleted.</td></tr>
+  <tr><td>Blocking</td><td>Any member can be blocked; their memories are hidden. The owner can remove members and their memories.</td></tr>
+  <tr><td>Contact</td><td>info@gkcoding.dev, published on gkcoding.dev/lifethreads and in the app.</td></tr>
+</table>
+
+<h2>Features and where to find them (guideline 2.5.19)</h2>
+<p>There are no hidden, dormant or undocumented features. Everything in the app:</p>
+<ul>
+  <li>Memory wall, timeline and map; add, connect and arrange memories (free up to 30 memories).</li>
+  <li>Premium (<code>lifethreads_premium_yearly</code>, <code>lifethreads_premium_monthly</code>): unlimited memories, more walls, wall themes, Create Story with music, Thread of the Year, On this day, family walls. Settings › Premium shows price, renewal terms, Terms/Privacy links and Restore.</li>
+  <li>Family walls: ⋯ › Family walls. Account deletion: ⋯ › Family walls › Account › Delete account.</li>
+  <li>Home screen widget: Settings › Home screen widget.</li>
+  <li>App lock with Face ID: Settings › Privacy. Hidden memories: View › Hidden memories (after Face ID).</li>
+  <li>Free full backup: Settings › Backup &amp; data.</li>
+  <li>Show the wall on another screen: ⋯ › Display wall.</li>
+  <li>Music in Create Story is CC0 (HoliznaCC0, Komiku): Settings › Music credits.</li>
+</ul>
+<p>No sign-in is needed for the app itself: on first launch choose “Preview demo wall” to see nine sample memories.</p>
+</body>
+</html>

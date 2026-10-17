@@ -1,0 +1,24 @@
+WHAT CHANGED IN THIS SUBMISSION (build 24)
+- Guideline 1.2: family walls now filter objectionable words on the device before anything is posted (memory title, story and place, wall name, display name; English, German and Arabic). A blocked post shows "This has words that aren't allowed on family walls" and is not sent. To try it: on the wall tap ⋯ > Family walls, open a wall, tap Add memory and use an offensive word as the title.
+- Guideline 3.1.2: every App Store description links the Terms of Use (EULA) and the Privacy Policy; German and Arabic link their own translated pages.
+- Terms and Privacy links in the app open in the app's language.
+Details are in the attached PDF.
+
+ABOUT THE APP
+LifeThreads is a private memory wall. No account is needed: on first launch choose "Preview demo wall" to see nine sample memories, or start an empty wall.
+
+Premium (auto-renewing subscriptions "lifethreads_premium_yearly" and "lifethreads_premium_monthly", same benefits) unlocks unlimited memories (free: 30), more walls, Premium wall themes, Create Story (story images and videos with music), Thread of the Year, On this day and family walls. Open it from Settings or any Premium feature; the Premium page shows the price, the renewal terms, links to the Terms of Use and Privacy Policy, and Restore.
+
+FAMILY WALLS (user-generated content, guideline 1.2)
+Family walls (Premium) are shared, end-to-end encrypted walls. They need Sign in with Apple; creating a wall needs an active subscription (verified with the App Store Server API). Members join by a one-time invite link and need no subscription of their own. Safeguards:
+- Rules first: before using family walls everyone accepts the family wall rules (zero tolerance for objectionable content and abusive users), linked to the Terms of Use.
+- Filter: objectionable words are blocked on the device before posting.
+- Report: any memory or member can be reported from the wall; reports reach us and are reviewed within 24 hours; violating content is removed and the account suspended or deleted.
+- Block: any member can be blocked; their memories are hidden.
+- The owner can remove members and their memories. Contact: info@gkcoding.dev (also on gkcoding.dev/lifethreads).
+When a member leaves or is removed, the owner's app switches the wall to a new encryption key. Find them under ⋯ > Family walls on the wall. Account deletion: ⋯ > Family walls > Account > Delete account.
+
+ALSO IN THIS VERSION
+Home screen widget (Settings > Home screen widget), optional app lock with Face ID (Settings > Privacy), hidden memories (View > Hidden memories, after Face ID), free full backup (Settings > Backup & data), showing the wall on another screen (⋯ > Display wall). There are no hidden or undocumented features.
+
+All music in Create Story is CC0 (HoliznaCC0, Komiku); sources are in Settings > Music credits.
