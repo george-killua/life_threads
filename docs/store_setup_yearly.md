@@ -90,7 +90,7 @@ The Premium, privacy and terms pages (website repo commit `ababd26`) are
 ready. Upload only the LifeThreads pages (not the whole site):
 
 ```bash
-rsync -az ~/Desktop/development/Projects/gk_coding_website/web/lifethreads/ gkcoding-vps:/var/www/subdomains/root/lifethreads/
+rsync -az ~/Developer/gk_coding_website/web/lifethreads/ gkcoding-vps:/var/www/subdomains/root/lifethreads/
 ```
 
 Then check: <https://gkcoding.dev/lifethreads/premium/> shows €34.99 /
