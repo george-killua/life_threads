@@ -5757,6 +5757,12 @@ abstract class AppLocalizations {
   /// **'That name is too long. Please use a shorter one.'**
   String get familyErrorNameTooLong;
 
+  /// No description provided for @familyErrorContentNotAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'This has words that aren\'t allowed on family walls. Please change the text and try again.'**
+  String get familyErrorContentNotAllowed;
+
   /// No description provided for @familyErrorPhotoUnreadable.
   ///
   /// In en, this message translates to:

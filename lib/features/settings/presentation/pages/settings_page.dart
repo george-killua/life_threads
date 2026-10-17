@@ -12,6 +12,7 @@ import '../../../../core/widgets/top_bar_page.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
+import '../../../../core/localization/legal_links.dart';
 import '../../../../core/localization/locale_controller.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../../l10n/generated/app_localizations.dart';
@@ -551,7 +552,7 @@ class AboutHelpPage extends StatelessWidget {
                       icon: Icons.policy_rounded,
                       onTap: () => _openExternalUrl(
                         context,
-                        Uri.parse('https://gkcoding.dev/lifethreads/privacy'),
+                        LegalLinks.privacy(context),
                         eventName: 'privacy_policy_opened',
                       ),
                     ),
@@ -560,7 +561,7 @@ class AboutHelpPage extends StatelessWidget {
                       icon: Icons.gavel_rounded,
                       onTap: () => _openExternalUrl(
                         context,
-                        Uri.parse('https://gkcoding.dev/lifethreads/terms'),
+                        LegalLinks.terms(context),
                         eventName: 'terms_opened',
                       ),
                     ),

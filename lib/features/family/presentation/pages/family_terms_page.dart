@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
+import '../../../../core/localization/legal_links.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../domain/family_models.dart';
 import '../family_flows.dart';
@@ -109,10 +110,11 @@ class _FamilyTermsPageState extends State<FamilyTermsPage> {
   }
 
   Future<void> _openTerms() async {
+    final terms = LegalLinks.terms(context);
     try {
-      await launchUrl(familyTermsUri, mode: LaunchMode.externalApplication);
+      await launchUrl(terms, mode: LaunchMode.externalApplication);
     } catch (_) {
-      if (mounted) showFamilyMessage(context, familyTermsUri.toString());
+      if (mounted) showFamilyMessage(context, terms.toString());
     }
   }
 

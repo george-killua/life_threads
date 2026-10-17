@@ -1569,6 +1569,7 @@
   "familyErrorVerificationUnavailable": "Your Premium could not be checked right now. Please try again later.",
   "familyErrorPurchaseLinkedElsewhere": "This Premium purchase is already linked to another family wall account. Sign in with that account, or contact info@gkcoding.dev.",
   "familyErrorNameTooLong": "That name is too long. Please use a shorter one.",
+  "familyErrorContentNotAllowed": "This has words that aren't allowed on family walls. Please change the text and try again.",
   "familyErrorPhotoUnreadable": "One of the photos could not be read. Remove it and try again.",
   "familyErrorTooLarge": "This is too large to upload. Try fewer or smaller photos.",
   "familyReportEvidenceNote": "To review it, GK Coding receives this memory's title and story with your report. Its photos are never sent.",

@@ -8,6 +8,7 @@ import '../../../../core/widgets/top_bar_page.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
+import '../../../../core/localization/legal_links.dart';
 import '../../../memories/data/memory_repository.dart';
 import '../../../wall/presentation/widgets/wall_background.dart';
 import '../../data/premium_billing_controller.dart';
@@ -808,9 +809,6 @@ String get _storeName => switch (defaultTargetPlatform) {
 class _LegalLinks extends StatelessWidget {
   const _LegalLinks();
 
-  static final _terms = Uri.parse('https://gkcoding.dev/lifethreads/terms');
-  static final _privacy = Uri.parse('https://gkcoding.dev/lifethreads/privacy');
-
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -831,10 +829,14 @@ class _LegalLinks extends StatelessWidget {
     return Wrap(
       alignment: WrapAlignment.center,
       children: [
-        link(l10n.viewTerms, _terms, const ValueKey('premium-terms')),
+        link(
+          l10n.viewTerms,
+          LegalLinks.terms(context),
+          const ValueKey('premium-terms'),
+        ),
         link(
           l10n.viewPrivacyPolicy,
-          _privacy,
+          LegalLinks.privacy(context),
           const ValueKey('premium-privacy'),
         ),
       ],

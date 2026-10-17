@@ -3378,6 +3378,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'هذا الاسم طويل جداً. يُرجى استخدام اسم أقصر.';
 
   @override
+  String get familyErrorContentNotAllowed =>
+      'يحتوي النص على كلمات غير مسموح بها على جدران العائلة. يُرجى تعديله والمحاولة مرة أخرى.';
+
+  @override
   String get familyErrorPhotoUnreadable =>
       'تعذّرت قراءة إحدى الصور. أزلها وحاول مجدداً.';
 

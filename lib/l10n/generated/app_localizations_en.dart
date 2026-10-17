@@ -3346,6 +3346,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'That name is too long. Please use a shorter one.';
 
   @override
+  String get familyErrorContentNotAllowed =>
+      'This has words that aren\'t allowed on family walls. Please change the text and try again.';
+
+  @override
   String get familyErrorPhotoUnreadable =>
       'One of the photos could not be read. Remove it and try again.';
 

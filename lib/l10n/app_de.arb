@@ -1003,6 +1003,7 @@
   "familyErrorVerificationUnavailable": "Dein Premium konnte gerade nicht geprüft werden. Bitte versuche es später erneut.",
   "familyErrorPurchaseLinkedElsewhere": "Dieser Premium-Kauf ist schon mit einem anderen Familienwand-Konto verknüpft. Melde dich mit diesem Konto an oder schreib an info@gkcoding.dev.",
   "familyErrorNameTooLong": "Dieser Name ist zu lang. Bitte nimm einen kürzeren.",
+  "familyErrorContentNotAllowed": "Das enthält Wörter, die auf Familienwänden nicht erlaubt sind. Bitte ändere den Text und versuch es noch einmal.",
   "familyErrorPhotoUnreadable": "Eines der Fotos konnte nicht gelesen werden. Entferne es und versuche es erneut.",
   "familyErrorTooLarge": "Das ist zu groß zum Hochladen. Versuche es mit weniger oder kleineren Fotos.",
   "familyReportEvidenceNote": "Zur Prüfung erhält GK Coding mit deiner Meldung den Titel und die Geschichte dieser Erinnerung. Ihre Fotos werden nie gesendet.",

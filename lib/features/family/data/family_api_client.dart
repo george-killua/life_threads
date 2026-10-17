@@ -116,6 +116,10 @@ abstract final class FamilyErrorCodes {
   static const photoUnreadable = 'photo_unreadable';
   static const memoryNotFound = 'memory_not_found';
 
+  /// The text has words that aren't allowed on family walls (checked on the
+  /// device, see FamilyContentFilter).
+  static const contentNotAllowed = 'content_not_allowed';
+
   // Key rotation (server codes).
   static const keyOutdated = 'key_outdated';
   static const keyNotFound = 'key_not_found';

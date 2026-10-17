@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 
 import '../domain/family_models.dart';
 import 'family_api_client.dart';
+import 'family_content_filter.dart';
 import 'family_crypto.dart';
 import 'family_invite_link.dart';
 import 'family_local_cache.dart';
@@ -690,6 +691,7 @@ class ApiFamilyService implements FamilyService {
 
   @override
   Future<Family> createFamily(String name) async {
+    _checkContent([name]);
     final key = FamilyKey.generate();
     final ring = await FamilyKeyRing.single(key);
     final json = await api.sendJson(
@@ -713,6 +715,7 @@ class ApiFamilyService implements FamilyService {
 
   @override
   Future<void> renameFamily(String familyId, String name) async {
+    _checkContent([name]);
     final ring = await _ring(familyId);
     final json = await api.sendJson(
       'PATCH',
@@ -837,6 +840,7 @@ class ApiFamilyService implements FamilyService {
 
   @override
   Future<void> setMyDisplayName(String familyId, String displayName) async {
+    _checkContent([displayName]);
     final ring = await _ring(familyId);
     final accountId = (await _currentAccountId())!;
     final encrypted = await cipher.encryptString(
@@ -1329,8 +1333,16 @@ class ApiFamilyService implements FamilyService {
   }
 
   @override
-  Future<FamilyMemory> addMemory(String familyId, FamilyMemoryDraft draft) =>
-      _withCurrentKey(familyId, (ring) => _addMemory(familyId, draft, ring));
+  Future<FamilyMemory> addMemory(
+    String familyId,
+    FamilyMemoryDraft draft,
+  ) async {
+    _checkDraft(draft);
+    return _withCurrentKey(
+      familyId,
+      (ring) => _addMemory(familyId, draft, ring),
+    );
+  }
 
   Future<FamilyMemory> _addMemory(
     String familyId,
@@ -1373,10 +1385,24 @@ class ApiFamilyService implements FamilyService {
   Future<FamilyMemory> updateMemory(
     FamilyMemory memory,
     FamilyMemoryDraft draft,
-  ) => _withCurrentKey(
-    memory.familyId,
-    (ring) => _updateMemory(memory, draft, ring),
-  );
+  ) async {
+    _checkDraft(draft);
+    return _withCurrentKey(
+      memory.familyId,
+      (ring) => _updateMemory(memory, draft, ring),
+    );
+  }
+
+  void _checkDraft(FamilyMemoryDraft draft) =>
+      _checkContent([draft.title, draft.description, draft.locationLabel]);
+
+  /// Objectionable words never reach a family wall: checked on the device,
+  /// before anything is encrypted or uploaded (see [FamilyContentFilter]).
+  static void _checkContent(Iterable<String?> texts) {
+    if (!FamilyContentFilter.allows(texts)) {
+      throw const FamilyException(FamilyErrorCodes.contentNotAllowed);
+    }
+  }
 
   Future<FamilyMemory> _updateMemory(
     FamilyMemory memory,

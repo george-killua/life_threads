@@ -22,9 +22,6 @@ import 'family_providers.dart';
 import 'pages/family_sign_in_page.dart';
 import 'pages/family_terms_page.dart';
 
-/// Where the family wall rules live on the web.
-final familyTermsUri = Uri.parse('https://gkcoding.dev/lifethreads/terms');
-
 /// Error codes that mean the user backed out (e.g. closed the Apple or
 /// Google sheet): nothing to report.
 const _cancelCodes = {
@@ -61,6 +58,7 @@ String familyErrorMessage(AppLocalizations l10n, Object error) {
     'purchase_linked_to_other_account' =>
       l10n.familyErrorPurchaseLinkedElsewhere,
     'name_too_long' => l10n.familyErrorNameTooLong,
+    'content_not_allowed' => l10n.familyErrorContentNotAllowed,
     'photo_unreadable' => l10n.familyErrorPhotoUnreadable,
     'too_large' => l10n.familyErrorTooLarge,
     'already_member' => l10n.familyErrorAlreadyMember,

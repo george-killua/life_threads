@@ -1003,6 +1003,7 @@
   "familyErrorVerificationUnavailable": "تعذّر التحقق من اشتراك Premium الآن. حاول مجدداً لاحقاً.",
   "familyErrorPurchaseLinkedElsewhere": "شراء Premium هذا مرتبط بالفعل بحساب آخر لجدران العائلة. سجّل الدخول بذلك الحساب أو راسلنا على info@gkcoding.dev.",
   "familyErrorNameTooLong": "هذا الاسم طويل جداً. يُرجى استخدام اسم أقصر.",
+  "familyErrorContentNotAllowed": "يحتوي النص على كلمات غير مسموح بها على جدران العائلة. يُرجى تعديله والمحاولة مرة أخرى.",
   "familyErrorPhotoUnreadable": "تعذّرت قراءة إحدى الصور. أزلها وحاول مجدداً.",
   "familyErrorTooLarge": "هذا كبير جداً للرفع. جرّب صوراً أقل أو أصغر.",
   "familyReportEvidenceNote": "لمراجعة البلاغ تتلقى GK Coding عنوان هذه الذكرى وقصتها مع بلاغك. لا تُرسل صورها أبداً.",

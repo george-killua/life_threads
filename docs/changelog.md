@@ -2,6 +2,20 @@
 
 What changed in each TestFlight / Play build. Newest first.
 
+## Next build (not uploaded yet)
+
+**App Review 1.2 (user-generated content)**
+- Family walls filter objectionable words on the device before anything is
+  posted: memory titles, stories and places, the wall's name and the
+  member's display name, in English, German and Arabic. A blocked post shows
+  "This has words that aren't allowed on family walls" and is not sent.
+  Ordinary words that only contain a blocked word ("Scunthorpe", "grape",
+  "Niger", "كسر") pass.
+
+**Better**
+- Terms of Use and Privacy Policy (Settings, Premium page, family wall rules)
+  open in the app's language: German and Arabic pages on gkcoding.dev.
+
 ## 1.0.0 (23) – 16 October 2026 (uploaded to TestFlight and Play closed testing)
 
 **Better**
