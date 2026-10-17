@@ -1,6 +1,6 @@
 # LifeThreads Terms of Use
 
-Effective date: October 12, 2026
+Effective date: October 17, 2026
 
 LifeThreads is developed by GK Coding.
 
@@ -78,7 +78,7 @@ Contact for safety concerns: `info@gkcoding.dev`
 
 ## 8. Purchases
 
-Optional premium features may be sold as a monthly subscription through Google Play or the App Store. Payments are processed by the store provider. Refunds follow the store’s policies.
+Optional premium features may be sold as a monthly or yearly subscription through Google Play or the App Store. Payments are processed by the store provider. Refunds follow the store’s policies.
 
 Starting a family wall, inviting members, and uploading to it need an active Premium subscription of the wall's owner, which GK Coding verifies with the store. Members do not need their own subscription. If the owner's subscription ends, the wall stays readable but new invites and uploads stop until it is renewed.
 

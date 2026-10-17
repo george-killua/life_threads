@@ -1,6 +1,6 @@
 # LifeThreads Privacy Policy
 
-Effective date: October 15, 2026
+Effective date: October 17, 2026
 
 LifeThreads is developed by GK Coding.
 
@@ -144,7 +144,7 @@ Family walls are optional shared walls for people you invite, for example your f
 
 ## 9. Purchases and Premium Unlock
 
-LifeThreads may offer an optional monthly Premium subscription through Google Play Billing or the Apple App Store.
+LifeThreads may offer an optional Premium subscription (monthly or yearly) through Google Play Billing or the Apple App Store.
 
 Purchases are processed by Google Play or Apple. GK Coding does not receive or store your payment card details.
 
@@ -158,7 +158,7 @@ LifeThreads uses internet access for:
 
 - loading map tiles when map features are opened
 - looking up place names for photo locations with Apple's or Google's geocoding service
-- communicating with Google Play Billing for optional purchases and purchase restoration
+- communicating with Google Play Billing or the App Store for optional purchases and purchase restoration
 - uploading encrypted shared memory capsules when you choose cloud sharing
 - downloading shared memory capsules when you open a LifeThreads share link
 - sending a temporary wall snapshot when you choose to display your wall on another screen
