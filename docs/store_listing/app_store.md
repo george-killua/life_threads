@@ -14,9 +14,13 @@ text 170, description 4000, keywords 100, What's New 4000).
 | Support URL | https://gkcoding.dev/lifethreads/ |
 | Marketing URL | https://gkcoding.dev/lifethreads/ |
 | Privacy policy URL | https://gkcoding.dev/lifethreads/privacy |
-| Terms (EULA) | https://gkcoding.dev/lifethreads/terms/ (linked at the end of every description, as Apple requires for subscriptions, and on the Premium page) |
+| Terms (EULA) | https://gkcoding.dev/lifethreads/terms/ (German `/terms/de/`, Arabic `/terms/ar/`; privacy the same under `/privacy/`) (linked at the end of every description, as Apple requires for subscriptions, and on the Premium page) |
 | Contact | george.kassih@gkcoding.dev |
 | Primary language | English (U.S.); localizations: German, Arabic |
+
+Next version: upload the texts in `docs/store_listing/app_store_texts.json` (German and Arabic
+descriptions link the translated terms and privacy pages, `/de/` and `/ar/`):
+`python3 tool/appstore/asc.py listing docs/store_listing/app_store_texts.json store_listing_assets/store_screenshots`
 
 The texts, screenshots and build can also be set with the API: `tool/appstore/asc.py` (key
 `secrets/AuthKey_DM4Y48QW72.p8`, gitignored, App Manager). It never submits for review.
@@ -169,8 +173,8 @@ Premium gibt es als Monats- oder Jahresabo; ein Jahr kostet etwa so viel wie sie
 
 LifeThreads gibt es auf Deutsch, Englisch und Arabisch.
 
-Nutzungsbedingungen (EULA): https://gkcoding.dev/lifethreads/terms/
-Datenschutzerklärung: https://gkcoding.dev/lifethreads/privacy/
+Nutzungsbedingungen (EULA): https://gkcoding.dev/lifethreads/terms/de/
+Datenschutzerklärung: https://gkcoding.dev/lifethreads/privacy/de/
 ```
 
 **Keywords** (98/100 bytes)
@@ -253,8 +257,8 @@ Premium اشتراك شهري أو سنوي؛ السنة تكلّف تقريبا
 
 LifeThreads متاح بالعربية والإنجليزية والألمانية.
 
-شروط الاستخدام (EULA): https://gkcoding.dev/lifethreads/terms/
-سياسة الخصوصية: https://gkcoding.dev/lifethreads/privacy/
+شروط الاستخدام (EULA): https://gkcoding.dev/lifethreads/terms/ar/
+سياسة الخصوصية: https://gkcoding.dev/lifethreads/privacy/ar/
 ```
 
 **Keywords** (97/100 bytes)
