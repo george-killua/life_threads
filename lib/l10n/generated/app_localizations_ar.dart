@@ -3703,4 +3703,199 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get familyRemovingMember => 'جارٍ الإزالة وتأمين الجدار…';
+
+  @override
+  String get tourSkip => 'تخطٍّ';
+
+  @override
+  String get tourNext => 'التالي';
+
+  @override
+  String get tourDone => 'تم';
+
+  @override
+  String get tourTapIt => 'اضغط عليه';
+
+  @override
+  String get tourEnd => 'إنهاء الجولة';
+
+  @override
+  String get tourShowMeHow => 'أرني كيف';
+
+  @override
+  String get tourShowMeHowSubtitle => 'جولة دقيقتين مع ذكريات تجريبية';
+
+  @override
+  String get tourWelcomeTitle => 'مرحباً بك في جدارك';
+
+  @override
+  String get tourWelcomeBody =>
+      'لنتعرّف على LifeThreads معاً باستخدام ذكريات وصور تجريبية. اتبع الحلقة الذهبية، وفي النهاية تقرر هل تبقيها.';
+
+  @override
+  String get tourCardTitle => 'كل بطاقة ذكرى';
+
+  @override
+  String get tourCardBody =>
+      'صور وقصة ومكان وشعور. اسحب البطاقات لترتيبها وكبّر بإصبعين. اضغط على هذه لتفتحها.';
+
+  @override
+  String get tourConnectTitle => 'اربط الذكريات';
+
+  @override
+  String get tourConnectBody =>
+      'الخيوط تربط اللحظات: رحلة بشخص، مكان بشعور. اضغط على «ربط».';
+
+  @override
+  String get tourConnectionsTitle => 'اختر ما ينتمي معاً';
+
+  @override
+  String get tourConnectionsBody =>
+      'اختر ذكريات أخرى واكتب لماذا تنتمي معاً، فيظهر الخيط بين البطاقات على جدارك.';
+
+  @override
+  String get tourAddTitle => 'احفظ لحظة جديدة';
+
+  @override
+  String get tourAddBody => 'اضغط على + لتضيف شيئاً إلى جدارك.';
+
+  @override
+  String get tourAddMemoryTitle => 'ذكرى';
+
+  @override
+  String get tourAddMemoryBody =>
+      'اختر «ذكرى». هنا أيضاً الملاحظات والمسامير للترتيب.';
+
+  @override
+  String get tourAddTextTitle => 'تكفي بضع كلمات';
+
+  @override
+  String get tourAddTextBody =>
+      'أضفنا لك صورة تجريبية وعنواناً. عادةً تختار صورك أو تلتقط صورة، ويُؤخذ التاريخ والمكان من الصورة.';
+
+  @override
+  String get tourSaveTitle => 'علّقها على الجدار';
+
+  @override
+  String get tourSaveBody =>
+      'اضغط «احفظ الآن». يمكنك إضافة المشاعر والأشخاص والخيوط لاحقاً.';
+
+  @override
+  String get tourCameraTitle => 'صورة سريعة';
+
+  @override
+  String get tourCameraBody =>
+      'الكاميرا تحفظ اللحظة فوراً، وتضيف الكلمات لاحقاً.';
+
+  @override
+  String get tourViewTitle => 'طرق عرض مختلفة';
+
+  @override
+  String get tourViewBody => 'اضغط على «عرض».';
+
+  @override
+  String get tourViewModesTitle => 'جدار، خط زمني، خريطة';
+
+  @override
+  String get tourViewModesBody =>
+      'شاهد حياتك كجدار أو بترتيب زمني أو على خريطة. هنا أيضاً الفئات وطرق الترتيب والذكريات المخفية (بعد بصمة الوجه).';
+
+  @override
+  String get tourViewDoneTitle => 'العودة إلى الجدار';
+
+  @override
+  String get tourViewDoneBody => 'اضغط «تم».';
+
+  @override
+  String get tourSearchTitle => 'ابحث عن أي ذكرى';
+
+  @override
+  String get tourSearchBody => 'اضغط على العدسة.';
+
+  @override
+  String get tourSearchPageTitle => 'البحث';
+
+  @override
+  String get tourSearchPageBody =>
+      'اكتب اسماً أو مكاناً أو شخصاً أو سنة، وتظهر النتائج أثناء الكتابة.';
+
+  @override
+  String get tourMoreTitle => 'كل ما تبقى';
+
+  @override
+  String get tourMoreBody =>
+      'القصص وسنتك والنظرة إلى الوراء والجدران الإضافية والإعدادات في هذه القائمة. اضغط عليها.';
+
+  @override
+  String get tourStoryTitle => 'أنشئ قصة';
+
+  @override
+  String get tourStoryBody => 'اضغط «إنشاء قصة».';
+
+  @override
+  String get tourStoryPageTitle => 'قصص مع موسيقى';
+
+  @override
+  String get tourStoryPageBody =>
+      'اختر ذكريات وقالباً، أو فعّل الفيديو لفيلم قصير مع موسيقى لإنستغرام وواتساب وغيرها. الحفظ والمشاركة ضمن Premium.';
+
+  @override
+  String get tourYearTitle => 'خيط السنة';
+
+  @override
+  String get tourYearBody =>
+      'سنتك كفيلم قصير مع موسيقى: ذكرياتك بالترتيب ثم أماكن السنة وأشخاصها ومشاعرها (Premium).';
+
+  @override
+  String get tourLookBackTitle => 'نظرة على شهر';
+
+  @override
+  String get tourLookBackBody =>
+      'كل شهر في ذكريات مع أشخاصه وأماكنه. و«في مثل هذا اليوم» يذكّرك بالسنوات السابقة (Premium).';
+
+  @override
+  String get tourWallsTitle => 'جدران إضافية';
+
+  @override
+  String get tourWallsBody =>
+      'جدار لكل طفل أو رحلة أو مشروع: ⋯ › جدار جديد (Premium). ومن الأعلى تنتقل بين الجدران.';
+
+  @override
+  String get tourFamilyTitle => 'جدران العائلة';
+
+  @override
+  String get tourFamilyBody =>
+      'جدار مشترك يضيف إليه الجميع لحظاتهم، مشفّر من طرف إلى طرف. يحتاج Premium من يُنشئه فقط، والعائلة تنضم مجاناً.';
+
+  @override
+  String get tourSettingsTitle => 'الإعدادات';
+
+  @override
+  String get tourSettingsBody =>
+      'انسخ كل شيء احتياطياً مجاناً، واقفل التطبيق ببصمة الوجه، واضبط أداة الشاشة الرئيسية و«في مثل هذا اليوم»، واختر لغتك.';
+
+  @override
+  String get tourFinishTitle => 'هذا كل شيء!';
+
+  @override
+  String get tourFinishBody => 'أصبحت تعرف طريقك. اجعل الجدار جدارك الآن.';
+
+  @override
+  String get tourDemoPhotoTitle => 'يوم على البحيرة';
+
+  @override
+  String get tourRemoveDemoTitle => 'هل تبدأ جدارك الخاص؟';
+
+  @override
+  String get tourRemoveDemoBody =>
+      'استخدمت الجولة ذكريات وصوراً تجريبية. هل تحذفها الآن وتبدأ بصورك الخاصة؟';
+
+  @override
+  String get tourRemoveDemoRemove => 'احذفها وابدأ';
+
+  @override
+  String get tourRemoveDemoKeep => 'أبقِها الآن';
+
+  @override
+  String get tourRemovedToast => 'حُذفت الذكريات التجريبية. جدارك جاهز.';
 }

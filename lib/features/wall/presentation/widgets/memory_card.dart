@@ -10,6 +10,7 @@ import '../../../memories/presentation/memory_l10n.dart';
 import '../../domain/wall_card_style.dart';
 import 'metallic_ball_pin.dart';
 import 'wall_drag_listener.dart';
+import '../../../tour/coach.dart';
 
 class MemoryCard extends StatefulWidget {
   const MemoryCard({
@@ -31,6 +32,7 @@ class MemoryCard extends StatefulWidget {
     this.footnote,
     this.opacity = 1,
     this.interactive = true,
+    this.coachId,
   });
 
   /// Fading in or out while the View sheet's category changes.
@@ -38,6 +40,9 @@ class MemoryCard extends StatefulWidget {
 
   /// False for a card that is fading out: taps and drags pass through.
   final bool interactive;
+
+  /// Set on the card the guided tour points at.
+  final String? coachId;
 
   final MemoryEvent event;
   final double windValue;
@@ -84,95 +89,97 @@ class _MemoryCardState extends State<MemoryCard> {
       child: Positioned(
         left: widget.event.wallPosition.dx,
         top: widget.event.wallPosition.dy,
-        child: IgnorePointer(
-          ignoring: !widget.interactive,
-          child: AnimatedScale(
-            scale: scale,
-            duration: const Duration(milliseconds: 120),
-            curve: Curves.easeOutCubic,
-            child: Transform.translate(
-              offset: Offset(0, bob),
-              child: Transform.rotate(
-                angle: widget.event.rotation + sway,
-                alignment: Alignment.topCenter,
-                // A hidden memory, shown from the View sheet, stays faded.
-                child: Opacity(
-                  opacity:
-                      (widget.event.hidden ? 0.5 : 1) *
-                      widget.opacity.clamp(0.0, 1.0),
-                  child: Column(
-                    children: [
-                      if (widget.hasConnection)
-                        _HangingThread(isDragging: widget.isDragging)
-                      else
-                        const SizedBox(height: 34),
-                      SizedBox(
-                        width: 190,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            WallDragListener(
-                              onDragStart: widget.onDragStart,
-                              onDragUpdate: widget.onDragUpdate,
-                              onDragEnd: widget.onDragEnd,
-                              onPointerDown: () {
-                                _suppressTap = false;
-                                widget.onPointerDown();
-                              },
-                              onPointerUp: widget.onPointerUp,
-                              onDraggingChanged: (dragging) {
-                                if (dragging) _suppressTap = true;
-                              },
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () {
-                                  if (_suppressTap) return;
-                                  widget.onTap();
+        child: _coach(
+          IgnorePointer(
+            ignoring: !widget.interactive,
+            child: AnimatedScale(
+              scale: scale,
+              duration: const Duration(milliseconds: 120),
+              curve: Curves.easeOutCubic,
+              child: Transform.translate(
+                offset: Offset(0, bob),
+                child: Transform.rotate(
+                  angle: widget.event.rotation + sway,
+                  alignment: Alignment.topCenter,
+                  // A hidden memory, shown from the View sheet, stays faded.
+                  child: Opacity(
+                    opacity:
+                        (widget.event.hidden ? 0.5 : 1) *
+                        widget.opacity.clamp(0.0, 1.0),
+                    child: Column(
+                      children: [
+                        if (widget.hasConnection)
+                          _HangingThread(isDragging: widget.isDragging)
+                        else
+                          const SizedBox(height: 34),
+                        SizedBox(
+                          width: 190,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              WallDragListener(
+                                onDragStart: widget.onDragStart,
+                                onDragUpdate: widget.onDragUpdate,
+                                onDragEnd: widget.onDragEnd,
+                                onPointerDown: () {
+                                  _suppressTap = false;
+                                  widget.onPointerDown();
                                 },
-                                onLongPress: () {
-                                  if (_suppressTap) return;
-                                  widget.onLongPress();
+                                onPointerUp: widget.onPointerUp,
+                                onDraggingChanged: (dragging) {
+                                  if (dragging) _suppressTap = true;
                                 },
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    _PhotoPaper(
-                                      event: widget.event,
-                                      isDragging: widget.isDragging,
-                                      footnote: widget.footnote,
-                                    ),
-                                    _Tape(isDragging: widget.isDragging),
-                                    if (widget.hasConnection)
-                                      _Pin(isDragging: widget.isDragging),
-                                  ],
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    if (_suppressTap) return;
+                                    widget.onTap();
+                                  },
+                                  onLongPress: () {
+                                    if (_suppressTap) return;
+                                    widget.onLongPress();
+                                  },
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      _PhotoPaper(
+                                        event: widget.event,
+                                        isDragging: widget.isDragging,
+                                        footnote: widget.footnote,
+                                      ),
+                                      _Tape(isDragging: widget.isDragging),
+                                      if (widget.hasConnection)
+                                        _Pin(isDragging: widget.isDragging),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            if (widget.showActions)
-                              Positioned(
-                                top: 10,
-                                right: 10,
-                                child: Row(
-                                  children: [
-                                    _CardActionButton(
-                                      icon: Icons.edit_rounded,
-                                      onTap: widget.onEdit,
-                                      tooltip: context.l10n.editMemoryTooltip,
-                                    ),
-                                    const SizedBox(width: 7),
-                                    _CardActionButton(
-                                      icon: Icons.hub_rounded,
-                                      onTap: widget.onConnect,
-                                      tooltip:
-                                          context.l10n.connectMemoryTooltip,
-                                    ),
-                                  ],
+                              if (widget.showActions)
+                                Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child: Row(
+                                    children: [
+                                      _CardActionButton(
+                                        icon: Icons.edit_rounded,
+                                        onTap: widget.onEdit,
+                                        tooltip: context.l10n.editMemoryTooltip,
+                                      ),
+                                      const SizedBox(width: 7),
+                                      _CardActionButton(
+                                        icon: Icons.hub_rounded,
+                                        onTap: widget.onConnect,
+                                        tooltip:
+                                            context.l10n.connectMemoryTooltip,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -181,6 +188,11 @@ class _MemoryCardState extends State<MemoryCard> {
         ),
       ),
     );
+  }
+
+  Widget _coach(Widget card) {
+    final id = widget.coachId;
+    return id == null ? card : CoachTarget(id: id, child: card);
   }
 }
 

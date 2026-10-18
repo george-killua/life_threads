@@ -3682,4 +3682,202 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get familyRemovingMember => 'Wird entfernt, die Wand wird gesichert…';
+
+  @override
+  String get tourSkip => 'Überspringen';
+
+  @override
+  String get tourNext => 'Weiter';
+
+  @override
+  String get tourDone => 'Fertig';
+
+  @override
+  String get tourTapIt => 'Antippen';
+
+  @override
+  String get tourEnd => 'Tour beenden';
+
+  @override
+  String get tourShowMeHow => 'Zeig mir, wie es geht';
+
+  @override
+  String get tourShowMeHowSubtitle =>
+      'Eine 2-Minuten-Tour mit Beispiel-Erinnerungen';
+
+  @override
+  String get tourWelcomeTitle => 'Willkommen an deiner Wand';
+
+  @override
+  String get tourWelcomeBody =>
+      'Wir gehen LifeThreads gemeinsam durch, mit Beispiel-Erinnerungen und Demo-Bildern. Folge dem goldenen Ring. Am Ende entscheidest du, ob sie bleiben.';
+
+  @override
+  String get tourCardTitle => 'Jede Karte ist eine Erinnerung';
+
+  @override
+  String get tourCardBody =>
+      'Fotos, eine Geschichte, der Ort und das Gefühl. Ziehe Karten, um sie anzuordnen, zoome mit zwei Fingern. Tippe diese an, um sie zu öffnen.';
+
+  @override
+  String get tourConnectTitle => 'Erinnerungen verbinden';
+
+  @override
+  String get tourConnectBody =>
+      'Fäden verbinden Momente: eine Reise mit einem Menschen, einen Ort mit einem Gefühl. Tippe auf Verbinden.';
+
+  @override
+  String get tourConnectionsTitle => 'Wähle, was zusammengehört';
+
+  @override
+  String get tourConnectionsBody =>
+      'Wähle andere Erinnerungen und schreib, warum sie zusammengehören. Der Faden hängt dann zwischen den Karten an deiner Wand.';
+
+  @override
+  String get tourAddTitle => 'Einen neuen Moment festhalten';
+
+  @override
+  String get tourAddBody => 'Tippe auf +, um etwas an deine Wand zu hängen.';
+
+  @override
+  String get tourAddMemoryTitle => 'Eine Erinnerung';
+
+  @override
+  String get tourAddMemoryBody =>
+      'Wähle Erinnerung. Hier gibt es auch Notizen und Nägel zum Anordnen.';
+
+  @override
+  String get tourAddTextTitle => 'Ein paar Worte reichen';
+
+  @override
+  String get tourAddTextBody =>
+      'Wir haben dir ein Demo-Bild und einen Titel eingefügt. Sonst wählst du eigene Fotos oder machst eins. Datum und Ort kommen aus dem Foto.';
+
+  @override
+  String get tourSaveTitle => 'An die Wand hängen';
+
+  @override
+  String get tourSaveBody =>
+      'Tippe auf Jetzt speichern. Gefühle, Menschen und Fäden kannst du später ergänzen.';
+
+  @override
+  String get tourCameraTitle => 'Schnelles Foto';
+
+  @override
+  String get tourCameraBody =>
+      'Die Kamera hält einen Moment sofort fest. Die Worte ergänzt du später.';
+
+  @override
+  String get tourViewTitle => 'Verschiedene Ansichten';
+
+  @override
+  String get tourViewBody => 'Tippe auf Ansicht.';
+
+  @override
+  String get tourViewModesTitle => 'Wand, Zeitleiste, Karte';
+
+  @override
+  String get tourViewModesBody =>
+      'Sieh dein Leben als Wand, nach Zeit sortiert oder auf einer Karte. Hier sind auch Kategorien, Anordnungen und ausgeblendete Erinnerungen (nach Face ID).';
+
+  @override
+  String get tourViewDoneTitle => 'Zurück zur Wand';
+
+  @override
+  String get tourViewDoneBody => 'Tippe auf Fertig.';
+
+  @override
+  String get tourSearchTitle => 'Jede Erinnerung finden';
+
+  @override
+  String get tourSearchBody => 'Tippe auf die Lupe.';
+
+  @override
+  String get tourSearchPageTitle => 'Suche';
+
+  @override
+  String get tourSearchPageBody =>
+      'Tippe einen Namen, einen Ort, eine Person oder ein Jahr. Ergebnisse erscheinen beim Tippen.';
+
+  @override
+  String get tourMoreTitle => 'Alles Weitere';
+
+  @override
+  String get tourMoreBody =>
+      'Storys, dein Jahr, Rückblicke, weitere Wände und Einstellungen sind in diesem Menü. Tippe es an.';
+
+  @override
+  String get tourStoryTitle => 'Story erstellen';
+
+  @override
+  String get tourStoryBody => 'Tippe auf Story erstellen.';
+
+  @override
+  String get tourStoryPageTitle => 'Storys mit Musik';
+
+  @override
+  String get tourStoryPageBody =>
+      'Wähle Erinnerungen und eine Vorlage, oder schalte Video ein für einen kurzen Film mit Musik, fertig für Instagram, WhatsApp und mehr. Speichern und Teilen gehören zu Premium.';
+
+  @override
+  String get tourYearTitle => 'Faden des Jahres';
+
+  @override
+  String get tourYearBody =>
+      'Dein Jahr als kurzer Film mit Musik: deine Erinnerungen der Reihe nach, dann die Orte, Menschen und Gefühle des Jahres (Premium).';
+
+  @override
+  String get tourLookBackTitle => 'Monatsrückblick';
+
+  @override
+  String get tourLookBackBody =>
+      'Jeder Monat in Erinnerungen, mit den Menschen und Orten darin. „An diesem Tag“ erinnert dich an frühere Jahre (Premium).';
+
+  @override
+  String get tourWallsTitle => 'Weitere Wände';
+
+  @override
+  String get tourWallsBody =>
+      'Eine Wand für jedes Kind, eine Reise oder ein Projekt: ⋯ › Neue Wand (Premium). Oben wechselst du die Wand.';
+
+  @override
+  String get tourFamilyTitle => 'Familienwände';
+
+  @override
+  String get tourFamilyBody =>
+      'Eine gemeinsame Wand, an der alle ihre Momente hinzufügen, Ende-zu-Ende-verschlüsselt. Nur wer sie erstellt, braucht Premium; die Familie ist kostenlos dabei.';
+
+  @override
+  String get tourSettingsTitle => 'Einstellungen';
+
+  @override
+  String get tourSettingsBody =>
+      'Alles kostenlos sichern, die App mit Face ID sperren, das Widget und „An diesem Tag“ einrichten und deine Sprache wählen.';
+
+  @override
+  String get tourFinishTitle => 'Das war’s!';
+
+  @override
+  String get tourFinishBody =>
+      'Du kennst dich jetzt aus. Mach die Wand zu deiner.';
+
+  @override
+  String get tourDemoPhotoTitle => 'Ein Tag am See';
+
+  @override
+  String get tourRemoveDemoTitle => 'Deine eigene Wand starten?';
+
+  @override
+  String get tourRemoveDemoBody =>
+      'Die Tour hat Beispiel-Erinnerungen und Demo-Bilder benutzt. Jetzt entfernen und mit deinen eigenen Fotos starten?';
+
+  @override
+  String get tourRemoveDemoRemove => 'Entfernen und starten';
+
+  @override
+  String get tourRemoveDemoKeep => 'Vorerst behalten';
+
+  @override
+  String get tourRemovedToast =>
+      'Demo-Erinnerungen entfernt. Deine Wand ist bereit.';
 }

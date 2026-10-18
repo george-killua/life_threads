@@ -3648,4 +3648,200 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get familyRemovingMember => 'Removing and securing the wall…';
+
+  @override
+  String get tourSkip => 'Skip';
+
+  @override
+  String get tourNext => 'Next';
+
+  @override
+  String get tourDone => 'Done';
+
+  @override
+  String get tourTapIt => 'Tap it';
+
+  @override
+  String get tourEnd => 'End tour';
+
+  @override
+  String get tourShowMeHow => 'Show me how';
+
+  @override
+  String get tourShowMeHowSubtitle => 'A 2-minute tour with example memories';
+
+  @override
+  String get tourWelcomeTitle => 'Welcome to your wall';
+
+  @override
+  String get tourWelcomeBody =>
+      'Let\'s walk through LifeThreads together with example memories and demo pictures. Follow the gold ring. At the end you decide whether to keep them.';
+
+  @override
+  String get tourCardTitle => 'Every card is a memory';
+
+  @override
+  String get tourCardBody =>
+      'Photos, a story, the place and how it felt. Drag cards to arrange them, pinch to zoom. Tap this one to open it.';
+
+  @override
+  String get tourConnectTitle => 'Connect memories';
+
+  @override
+  String get tourConnectBody =>
+      'Threads tie moments together: a trip to a person, a place to a feeling. Tap Connect.';
+
+  @override
+  String get tourConnectionsTitle => 'Choose what belongs together';
+
+  @override
+  String get tourConnectionsBody =>
+      'Pick other memories and write why they belong together. The thread then hangs between the cards on your wall.';
+
+  @override
+  String get tourAddTitle => 'Save a new moment';
+
+  @override
+  String get tourAddBody => 'Tap + to add something to your wall.';
+
+  @override
+  String get tourAddMemoryTitle => 'A memory';
+
+  @override
+  String get tourAddMemoryBody =>
+      'Choose Memory. Text notes and nails for arranging are here too.';
+
+  @override
+  String get tourAddTextTitle => 'A few words are enough';
+
+  @override
+  String get tourAddTextBody =>
+      'We added a demo picture and a title for you. Normally you pick your own photos or take one. The date and place come from the photo.';
+
+  @override
+  String get tourSaveTitle => 'Hang it on the wall';
+
+  @override
+  String get tourSaveBody =>
+      'Tap Save now. Feelings, people and threads can follow later.';
+
+  @override
+  String get tourCameraTitle => 'Quick photo';
+
+  @override
+  String get tourCameraBody =>
+      'The camera saves a moment right away. You add the words later.';
+
+  @override
+  String get tourViewTitle => 'Different views';
+
+  @override
+  String get tourViewBody => 'Tap View.';
+
+  @override
+  String get tourViewModesTitle => 'Wall, timeline, map';
+
+  @override
+  String get tourViewModesBody =>
+      'See your life as a wall, in order of time, or on a map. Categories, arrangements and hidden memories (after Face ID) are here too.';
+
+  @override
+  String get tourViewDoneTitle => 'Back to the wall';
+
+  @override
+  String get tourViewDoneBody => 'Tap Done.';
+
+  @override
+  String get tourSearchTitle => 'Find any memory';
+
+  @override
+  String get tourSearchBody => 'Tap the magnifier.';
+
+  @override
+  String get tourSearchPageTitle => 'Search';
+
+  @override
+  String get tourSearchPageBody =>
+      'Type a name, a place, a person or a year. Results appear as you type.';
+
+  @override
+  String get tourMoreTitle => 'Everything else';
+
+  @override
+  String get tourMoreBody =>
+      'Stories, your year, looking back, more walls and settings are in this menu. Tap it.';
+
+  @override
+  String get tourStoryTitle => 'Create a story';
+
+  @override
+  String get tourStoryBody => 'Tap Create story.';
+
+  @override
+  String get tourStoryPageTitle => 'Stories with music';
+
+  @override
+  String get tourStoryPageBody =>
+      'Pick memories and a template, or switch on Video for a short film with music, ready for Instagram, WhatsApp and more. Saving and sharing is part of Premium.';
+
+  @override
+  String get tourYearTitle => 'Thread of the Year';
+
+  @override
+  String get tourYearBody =>
+      'Your year as a short film with music: your memories in order, then the places, people and feelings of the year (Premium).';
+
+  @override
+  String get tourLookBackTitle => 'Look back on a month';
+
+  @override
+  String get tourLookBackBody =>
+      'Each month in memories, with the people and places in it. On this day reminds you of earlier years (Premium).';
+
+  @override
+  String get tourWallsTitle => 'More walls';
+
+  @override
+  String get tourWallsBody =>
+      'A wall for each child, a trip or a project: ⋯ › New wall (Premium). The name at the top switches walls.';
+
+  @override
+  String get tourFamilyTitle => 'Family walls';
+
+  @override
+  String get tourFamilyBody =>
+      'One shared wall where everyone adds their moments, end-to-end encrypted. Only the person who creates it needs Premium; family joins free.';
+
+  @override
+  String get tourSettingsTitle => 'Settings';
+
+  @override
+  String get tourSettingsBody =>
+      'Back up everything for free, lock the app with Face ID, set up the home screen widget and On this day, and choose your language.';
+
+  @override
+  String get tourFinishTitle => 'That\'s it!';
+
+  @override
+  String get tourFinishBody =>
+      'You know your way around. Now make the wall your own.';
+
+  @override
+  String get tourDemoPhotoTitle => 'A day at the lake';
+
+  @override
+  String get tourRemoveDemoTitle => 'Start your own wall?';
+
+  @override
+  String get tourRemoveDemoBody =>
+      'The tour used example memories and demo pictures. Remove them now and start with your own photos?';
+
+  @override
+  String get tourRemoveDemoRemove => 'Remove and start';
+
+  @override
+  String get tourRemoveDemoKeep => 'Keep them for now';
+
+  @override
+  String get tourRemovedToast => 'Demo memories removed. Your wall is ready.';
 }

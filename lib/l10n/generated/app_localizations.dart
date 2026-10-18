@@ -6194,6 +6194,360 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Removing and securing the wall…'**
   String get familyRemovingMember;
+
+  /// No description provided for @tourSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get tourSkip;
+
+  /// No description provided for @tourNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get tourNext;
+
+  /// No description provided for @tourDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get tourDone;
+
+  /// No description provided for @tourTapIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap it'**
+  String get tourTapIt;
+
+  /// No description provided for @tourEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'End tour'**
+  String get tourEnd;
+
+  /// No description provided for @tourShowMeHow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show me how'**
+  String get tourShowMeHow;
+
+  /// No description provided for @tourShowMeHowSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A 2-minute tour with example memories'**
+  String get tourShowMeHowSubtitle;
+
+  /// No description provided for @tourWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to your wall'**
+  String get tourWelcomeTitle;
+
+  /// No description provided for @tourWelcomeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s walk through LifeThreads together with example memories and demo pictures. Follow the gold ring. At the end you decide whether to keep them.'**
+  String get tourWelcomeBody;
+
+  /// No description provided for @tourCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Every card is a memory'**
+  String get tourCardTitle;
+
+  /// No description provided for @tourCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos, a story, the place and how it felt. Drag cards to arrange them, pinch to zoom. Tap this one to open it.'**
+  String get tourCardBody;
+
+  /// No description provided for @tourConnectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect memories'**
+  String get tourConnectTitle;
+
+  /// No description provided for @tourConnectBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Threads tie moments together: a trip to a person, a place to a feeling. Tap Connect.'**
+  String get tourConnectBody;
+
+  /// No description provided for @tourConnectionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose what belongs together'**
+  String get tourConnectionsTitle;
+
+  /// No description provided for @tourConnectionsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick other memories and write why they belong together. The thread then hangs between the cards on your wall.'**
+  String get tourConnectionsBody;
+
+  /// No description provided for @tourAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a new moment'**
+  String get tourAddTitle;
+
+  /// No description provided for @tourAddBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to add something to your wall.'**
+  String get tourAddBody;
+
+  /// No description provided for @tourAddMemoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A memory'**
+  String get tourAddMemoryTitle;
+
+  /// No description provided for @tourAddMemoryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Memory. Text notes and nails for arranging are here too.'**
+  String get tourAddMemoryBody;
+
+  /// No description provided for @tourAddTextTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A few words are enough'**
+  String get tourAddTextTitle;
+
+  /// No description provided for @tourAddTextBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We added a demo picture and a title for you. Normally you pick your own photos or take one. The date and place come from the photo.'**
+  String get tourAddTextBody;
+
+  /// No description provided for @tourSaveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hang it on the wall'**
+  String get tourSaveTitle;
+
+  /// No description provided for @tourSaveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Save now. Feelings, people and threads can follow later.'**
+  String get tourSaveBody;
+
+  /// No description provided for @tourCameraTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick photo'**
+  String get tourCameraTitle;
+
+  /// No description provided for @tourCameraBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The camera saves a moment right away. You add the words later.'**
+  String get tourCameraBody;
+
+  /// No description provided for @tourViewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Different views'**
+  String get tourViewTitle;
+
+  /// No description provided for @tourViewBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap View.'**
+  String get tourViewBody;
+
+  /// No description provided for @tourViewModesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wall, timeline, map'**
+  String get tourViewModesTitle;
+
+  /// No description provided for @tourViewModesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'See your life as a wall, in order of time, or on a map. Categories, arrangements and hidden memories (after Face ID) are here too.'**
+  String get tourViewModesBody;
+
+  /// No description provided for @tourViewDoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the wall'**
+  String get tourViewDoneTitle;
+
+  /// No description provided for @tourViewDoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Done.'**
+  String get tourViewDoneBody;
+
+  /// No description provided for @tourSearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find any memory'**
+  String get tourSearchTitle;
+
+  /// No description provided for @tourSearchBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the magnifier.'**
+  String get tourSearchBody;
+
+  /// No description provided for @tourSearchPageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get tourSearchPageTitle;
+
+  /// No description provided for @tourSearchPageBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a name, a place, a person or a year. Results appear as you type.'**
+  String get tourSearchPageBody;
+
+  /// No description provided for @tourMoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything else'**
+  String get tourMoreTitle;
+
+  /// No description provided for @tourMoreBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Stories, your year, looking back, more walls and settings are in this menu. Tap it.'**
+  String get tourMoreBody;
+
+  /// No description provided for @tourStoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a story'**
+  String get tourStoryTitle;
+
+  /// No description provided for @tourStoryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Create story.'**
+  String get tourStoryBody;
+
+  /// No description provided for @tourStoryPageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stories with music'**
+  String get tourStoryPageTitle;
+
+  /// No description provided for @tourStoryPageBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick memories and a template, or switch on Video for a short film with music, ready for Instagram, WhatsApp and more. Saving and sharing is part of Premium.'**
+  String get tourStoryPageBody;
+
+  /// No description provided for @tourYearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thread of the Year'**
+  String get tourYearTitle;
+
+  /// No description provided for @tourYearBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your year as a short film with music: your memories in order, then the places, people and feelings of the year (Premium).'**
+  String get tourYearBody;
+
+  /// No description provided for @tourLookBackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Look back on a month'**
+  String get tourLookBackTitle;
+
+  /// No description provided for @tourLookBackBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Each month in memories, with the people and places in it. On this day reminds you of earlier years (Premium).'**
+  String get tourLookBackBody;
+
+  /// No description provided for @tourWallsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'More walls'**
+  String get tourWallsTitle;
+
+  /// No description provided for @tourWallsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A wall for each child, a trip or a project: ⋯ › New wall (Premium). The name at the top switches walls.'**
+  String get tourWallsBody;
+
+  /// No description provided for @tourFamilyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family walls'**
+  String get tourFamilyTitle;
+
+  /// No description provided for @tourFamilyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'One shared wall where everyone adds their moments, end-to-end encrypted. Only the person who creates it needs Premium; family joins free.'**
+  String get tourFamilyBody;
+
+  /// No description provided for @tourSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get tourSettingsTitle;
+
+  /// No description provided for @tourSettingsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Back up everything for free, lock the app with Face ID, set up the home screen widget and On this day, and choose your language.'**
+  String get tourSettingsBody;
+
+  /// No description provided for @tourFinishTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s it!'**
+  String get tourFinishTitle;
+
+  /// No description provided for @tourFinishBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You know your way around. Now make the wall your own.'**
+  String get tourFinishBody;
+
+  /// No description provided for @tourDemoPhotoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A day at the lake'**
+  String get tourDemoPhotoTitle;
+
+  /// No description provided for @tourRemoveDemoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start your own wall?'**
+  String get tourRemoveDemoTitle;
+
+  /// No description provided for @tourRemoveDemoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The tour used example memories and demo pictures. Remove them now and start with your own photos?'**
+  String get tourRemoveDemoBody;
+
+  /// No description provided for @tourRemoveDemoRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove and start'**
+  String get tourRemoveDemoRemove;
+
+  /// No description provided for @tourRemoveDemoKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep them for now'**
+  String get tourRemoveDemoKeep;
+
+  /// No description provided for @tourRemovedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo memories removed. Your wall is ready.'**
+  String get tourRemovedToast;
 }
 
 class _AppLocalizationsDelegate

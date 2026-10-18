@@ -26,6 +26,8 @@ import '../../domain/memory_type.dart';
 import '../memory_l10n.dart';
 import '../widgets/memory_people_editor.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../tour/app_tour.dart';
+import '../../../tour/coach.dart';
 
 class AddMemoryPage extends ConsumerStatefulWidget {
   const AddMemoryPage({
@@ -152,8 +154,8 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
         error: (error, _) => _ErrorState(message: error.toString()),
         data: (state) {
           final canCreate =
-              entitlement?.canCreateMemory(state.events.length) ??
-              state.events.length < PremiumEntitlement.freeMemoryLimit;
+              entitlement?.canCreateMemory(state.countedMemories) ??
+              state.countedMemories < PremiumEntitlement.freeMemoryLimit;
           if (!canCreate) return const _MemoryLimitReached();
 
           return Column(
@@ -196,14 +198,17 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
         subtitle: l10n.addMemoryStepSubtitle,
         child: Column(
           children: [
-            TextField(
-              controller: _titleController,
-              textInputAction: TextInputAction.next,
-              decoration: InputDecoration(
-                labelText: l10n.momentLabel,
-                hintText: l10n.momentHint,
+            CoachTarget(
+              id: TourTargets.addTitle,
+              child: TextField(
+                controller: _titleController,
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                  labelText: l10n.momentLabel,
+                  hintText: l10n.momentHint,
+                ),
+                onChanged: (_) => setState(() {}),
               ),
-              onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 14),
             TextField(
@@ -396,8 +401,8 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     if (!mounted) return;
     final limitReached =
         state != null &&
-        !(entitlement?.canCreateMemory(state.events.length) ??
-            state.events.length < PremiumEntitlement.freeMemoryLimit);
+        !(entitlement?.canCreateMemory(state.countedMemories) ??
+            state.countedMemories < PremiumEntitlement.freeMemoryLimit);
     if (draft == null || limitReached) {
       // At the limit the draft waits for Premium untouched.
       _draftReady = !limitReached;
@@ -738,8 +743,8 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     final entitlement = ref.read(premiumEntitlementProvider).asData?.value;
     final canCreate =
         state == null ||
-        (entitlement?.canCreateMemory(state.events.length) ??
-            state.events.length < PremiumEntitlement.freeMemoryLimit);
+        (entitlement?.canCreateMemory(state.countedMemories) ??
+            state.countedMemories < PremiumEntitlement.freeMemoryLimit);
     if (!canCreate) {
       context.go(RouteNames.upgrade);
       return;
@@ -765,6 +770,11 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
     if (!mounted) return;
 
     final repository = ref.read(memoryRepositoryProvider.notifier);
+    // A memory saved during the guided tour (with its demo picture) is
+    // removed with the demo memories afterwards.
+    final before = appTourRunning
+        ? {for (final event in state?.events ?? const []) event.id}
+        : null;
     await repository.addMemory(
       NewMemoryDraft(
         title: title,
@@ -804,6 +814,13 @@ class _AddMemoryPageState extends ConsumerState<AddMemoryPage> {
         this.context,
       ).showToast(this.context.l10n.memorySaveFailed, kind: ToastKind.error);
       return;
+    }
+    if (before != null) {
+      final after = ref.read(memoryRepositoryProvider).asData?.value.events;
+      await TourMemories.remember([
+        for (final event in after ?? const [])
+          if (!before.contains(event.id)) event.id,
+      ]);
     }
     _saved = true;
     _draftTimer?.cancel();
@@ -1292,9 +1309,12 @@ class _BottomControls extends StatelessWidget {
               const SizedBox.shrink(),
             const Spacer(),
             if (step == 0) ...[
-              TextButton(
-                onPressed: isSaving ? null : onSaveNow,
-                child: Text(l10n.saveNow),
+              CoachTarget(
+                id: TourTargets.saveNow,
+                child: TextButton(
+                  onPressed: isSaving ? null : onSaveNow,
+                  child: Text(l10n.saveNow),
+                ),
               ),
               const SizedBox(width: 8),
             ],

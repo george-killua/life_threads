@@ -2,6 +2,20 @@
 
 What changed in each TestFlight / Play build. Newest first.
 
+## Next build (not uploaded yet)
+
+**New: "Show me how" guided tour**
+- A 2-minute tour on the real screens with the demo memories and their
+  pictures: open a memory, connect it with a thread, add a memory (with a
+  demo picture) and save it, the quick-photo camera, View (wall, timeline,
+  map, hidden memories), search, Create story, Thread of the Year, Look back,
+  more walls, family walls and settings. The screen dims and a gold ring
+  shows what to tap; info steps have Next, every step has Skip.
+- At the end (and when skipped) it asks: remove the demo memories and the
+  memory saved on the tour and start with your own photos, or keep them.
+- Start it from the last onboarding page (main button) or ⋯ › Tutorial.
+- Untouched demo memories no longer count toward the 30 free memories.
+
 ## 1.0.0 (24) – 17 October 2026 (TestFlight, Play closed testing; replaces 23 in App Review)
 
 **App Review 1.2 (user-generated content)**

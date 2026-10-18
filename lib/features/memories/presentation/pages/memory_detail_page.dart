@@ -28,6 +28,8 @@ import '../memory_l10n.dart';
 import 'edit_memory_page.dart';
 import '../../../wall/domain/wall_item.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../tour/app_tour.dart';
+import '../../../tour/coach.dart';
 
 class MemoryDetailPage extends ConsumerWidget {
   const MemoryDetailPage({super.key, required this.memoryId});
@@ -675,14 +677,17 @@ class _ChapterActions extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: OutlinedButton.icon(
-                onPressed: onConnect,
-                icon: const Icon(Icons.hub_rounded),
-                label: Text(context.l10n.connect),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.amber,
-                  side: BorderSide(color: AppColors.line),
-                  padding: const EdgeInsets.symmetric(vertical: 15),
+              child: CoachTarget(
+                id: TourTargets.connect,
+                child: OutlinedButton.icon(
+                  onPressed: onConnect,
+                  icon: const Icon(Icons.hub_rounded),
+                  label: Text(context.l10n.connect),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.amber,
+                    side: BorderSide(color: AppColors.line),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
                 ),
               ),
             ),

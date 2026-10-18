@@ -174,6 +174,11 @@ class MemoryState {
     return null;
   }
 
+  /// The memories the free limit counts: untouched demo memories (the demo
+  /// wall, the guided tour) are not the user's own.
+  int get countedMemories =>
+      events.where((event) => !MemorySeedData.isUntouchedDemo(event)).length;
+
   bool get hasDemoWall {
     return events.any((event) => MemorySeedData.isDemoEventId(event.id));
   }
@@ -1616,12 +1621,38 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     });
   }
 
-  Future<void> _insertDemoRows() async {
+  /// Puts the demo memories on My wall for the guided tour, below the
+  /// user's own memories there so nothing overlaps. Does nothing when they
+  /// are already there; returns whether they were added.
+  Future<bool> addDemoMemories() async {
+    final rows = await _database.select(_database.memoryEvents).get();
+    if (rows.any((row) => MemorySeedData.isDemoEventId(row.id))) return false;
+    final own = [
+      for (final row in rows)
+        if (row.wallId == null) row.wallY,
+    ];
+    final below = own.isEmpty
+        ? 0.0
+        : own.reduce((a, b) => a > b ? a : b) + 420;
+    await _database.transaction(() => _insertDemoRows(offsetY: below));
+    state = await AsyncValue.guard(_loadState);
+    return true;
+  }
+
+  Future<void> _insertDemoRows({double offsetY = 0}) async {
     final l10n = MemorySeedData.localizationsForLocale(await _appLocale());
     for (final event in MemorySeedData.localizedEvents(l10n)) {
       await _database
           .into(_database.memoryEvents)
-          .insert(_eventToCompanion(event));
+          .insert(
+            _eventToCompanion(
+              offsetY == 0
+                  ? event
+                  : event.copyWith(
+                      wallPosition: event.wallPosition.translate(0, offsetY),
+                    ),
+            ),
+          );
     }
     for (final connection in MemorySeedData.localizedConnections(l10n)) {
       await _database

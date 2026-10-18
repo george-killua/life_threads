@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
+import '../../../tour/app_tour.dart';
 
 Future<void> showLifeThreadsTutorialSheet(BuildContext context) {
+  final outerContext = context;
   return showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
@@ -49,7 +51,27 @@ Future<void> showLifeThreadsTutorialSheet(BuildContext context) {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 14),
+                // The guided tour: the same, done once on the real screens.
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    key: const ValueKey('tutorial-show-me-how'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      startAppTour(outerContext);
+                    },
+                    icon: const Icon(Icons.school_rounded),
+                    label: Text(l10n.tourShowMeHow),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.tourShowMeHowSubtitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: AppColors.muted, fontSize: 12.5),
+                ),
+                const SizedBox(height: 14),
                 const Flexible(
                   child: SingleChildScrollView(
                     child: LifeThreadsTutorialSteps(showTitle: false),
@@ -58,7 +80,7 @@ Future<void> showLifeThreadsTutorialSheet(BuildContext context) {
                 const SizedBox(height: 18),
                 SizedBox(
                   width: double.infinity,
-                  child: FilledButton.icon(
+                  child: OutlinedButton.icon(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.check_rounded),
                     label: Text(l10n.gotIt),

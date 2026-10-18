@@ -11,6 +11,7 @@ import '../features/home_widget/presentation/home_widget_link_listener.dart';
 import '../features/memories/data/memory_repository.dart';
 import '../features/on_this_day/data/on_this_day_scheduler.dart';
 import '../features/premium/data/premium_billing_controller.dart';
+import '../features/tour/coach.dart';
 import '../features/wall/data/wall_theme_controller.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'router/app_router.dart';
@@ -72,7 +73,8 @@ class LifeThreadsApp extends ConsumerWidget {
             child: MemoryCapsuleDeepLinkListener(
               child: FamilyInviteLinkListener(
                 child: HomeWidgetLinkListener(
-                  child: child ?? const SizedBox.shrink(),
+                  // The guided tour's hints, above every screen.
+                  child: CoachLayer(child: child ?? const SizedBox.shrink()),
                 ),
               ),
             ),

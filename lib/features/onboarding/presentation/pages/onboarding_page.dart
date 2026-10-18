@@ -9,6 +9,7 @@ import '../../../memories/data/memory_repository.dart';
 import '../../onboarding_preferences.dart';
 import '../widgets/onboarding_demo_wall_preview.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../tour/app_tour.dart';
 
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
@@ -151,9 +152,23 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     _PageDots(count: _pageCount, index: _pageIndex),
                     const SizedBox(height: 16),
                     if (_isLastPage) ...[
+                      // The guided tour first: it walks through the app with
+                      // the demo memories.
                       SizedBox(
                         width: double.infinity,
                         child: FilledButton.icon(
+                          key: const ValueKey('onboarding-show-me-how'),
+                          onPressed: _isContinuing
+                              ? null
+                              : () => _continue(useDemoWall: false, tour: true),
+                          icon: const Icon(Icons.school_rounded),
+                          label: Text(l10n.tourShowMeHow),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
                           onPressed: _isContinuing
                               ? null
                               : () => _continue(useDemoWall: true),
@@ -232,7 +247,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     );
   }
 
-  Future<void> _continue({required bool useDemoWall}) async {
+  Future<void> _continue({required bool useDemoWall, bool tour = false}) async {
     if (!_canAdvanceFromName) {
       await _pageController.animateToPage(
         2,
@@ -263,6 +278,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
     if (!mounted) return;
     setState(() => _isContinuing = false);
+    // The tour puts up the demo memories itself and opens the wall.
+    if (tour) return startAppTour(context);
     context.go(RouteNames.wall);
   }
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
+import '../../../tour/app_tour.dart';
+import '../../../tour/coach.dart';
 
 /// The wall's main action: a round "+" that opens the "Add to your wall"
 /// sheet (memory, quick photo, text note, nail).
@@ -44,16 +46,19 @@ class ExpandableAddButton extends StatelessWidget {
             ),
           ],
         ),
-        child: FilledButton(
-          key: const ValueKey('wall-add-button'),
-          style: FilledButton.styleFrom(
-            shape: const CircleBorder(),
-            fixedSize: const Size.square(size),
-            minimumSize: const Size.square(size),
-            padding: EdgeInsets.zero,
+        child: CoachTarget(
+          id: TourTargets.add,
+          child: FilledButton(
+            key: const ValueKey('wall-add-button'),
+            style: FilledButton.styleFrom(
+              shape: const CircleBorder(),
+              fixedSize: const Size.square(size),
+              minimumSize: const Size.square(size),
+              padding: EdgeInsets.zero,
+            ),
+            onPressed: () => _open(context),
+            child: const Icon(Icons.add_rounded, size: 32),
           ),
-          onPressed: () => _open(context),
-          child: const Icon(Icons.add_rounded, size: 32),
         ),
       ),
     );
@@ -132,12 +137,16 @@ class _AddSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 14),
-            for (final item in items)
-              _AddRow(
-                icon: item.icon,
-                label: item.label,
-                subtitle: item.subtitle,
-                onTap: () => Navigator.of(context).pop(item.action),
+            for (final (index, item) in items.indexed)
+              // The first row (Memory) is where the guided tour points.
+              _maybeTourTarget(
+                index == 0,
+                _AddRow(
+                  icon: item.icon,
+                  label: item.label,
+                  subtitle: item.subtitle,
+                  onTap: () => Navigator.of(context).pop(item.action),
+                ),
               ),
           ],
         ),
@@ -145,6 +154,9 @@ class _AddSheet extends StatelessWidget {
     );
   }
 }
+
+Widget _maybeTourTarget(bool target, Widget row) =>
+    target ? CoachTarget(id: TourTargets.addMemory, child: row) : row;
 
 class _AddRow extends StatelessWidget {
   const _AddRow({

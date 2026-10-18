@@ -56,6 +56,9 @@ import '../widgets/wall_nail.dart';
 import '../widgets/wall_pan_surface.dart';
 import '../widgets/wall_text_note.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../memories/data/memory_seed_data.dart';
+import '../../../tour/app_tour.dart';
+import '../../../tour/coach.dart';
 
 class MemoryWallPage extends ConsumerStatefulWidget {
   const MemoryWallPage({super.key});
@@ -97,6 +100,10 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   var _showHidden = false;
 
   bool _didSetInitialViewport = false;
+
+  /// The guided tour started: show the plain wall and frame its demo cards.
+  bool _frameTourCards = false;
+  bool _tourWasRunning = false;
   bool _isRouteTransitioning = false;
   bool _isCapturingPhotos = false;
   WallFilter _filter = WallFilter.all;
@@ -122,6 +129,8 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
   @override
   void initState() {
     super.initState();
+    Coach.instance.addListener(_onTour);
+    _onTour(initial: true);
     _windController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 7),
@@ -189,6 +198,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
 
   @override
   void dispose() {
+    Coach.instance.removeListener(_onTour);
     _windController.dispose();
     _viewTransition.dispose();
     _wallController.dispose();
@@ -287,10 +297,20 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                   state.events.isNotEmpty || state.wallItems.isNotEmpty;
               // The free limit counts the memories on every wall.
               final canCreateMemory =
-                  entitlement?.canCreateMemory(allState.events.length) ??
-                  allState.events.length < PremiumEntitlement.freeMemoryLimit;
+                  entitlement?.canCreateMemory(allState.countedMemories) ??
+                  allState.countedMemories < PremiumEntitlement.freeMemoryLimit;
 
               if (_mode == _WallViewMode.wall) {
+                if (_frameTourCards) {
+                  final demo = [
+                    for (final event in boardEvents)
+                      if (MemorySeedData.isDemoEventId(event.id)) event,
+                  ];
+                  if (demo.isNotEmpty) {
+                    _frameTourCards = false;
+                    _setInitialViewport(context, demo, const []);
+                  }
+                }
                 _setInitialViewport(context, boardEvents, boardWallItems);
               }
 
@@ -466,6 +486,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                         event.id,
                                       ))
                                         MemoryCard(
+                                          coachId: event.id == tourCardMemoryId
+                                              ? TourTargets.card
+                                              : null,
                                           event: _toBoardLocalMemory(event),
                                           windValue: _windController.value,
                                           // New in this category: fades in.
@@ -674,19 +697,22 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                               ),
                             ),
                             const SizedBox(width: 12),
-                            _CameraCaptureFab(
-                              onPressed: _isCapturingPhotos
-                                  ? null
-                                  : () => _guardMemoryCreation(
-                                      canCreateMemory,
-                                      () => _capturePhotosForNewMemory(),
-                                    ),
+                            CoachTarget(
+                              id: TourTargets.camera,
+                              child: _CameraCaptureFab(
+                                onPressed: _isCapturingPhotos
+                                    ? null
+                                    : () => _guardMemoryCreation(
+                                        canCreateMemory,
+                                        () => _capturePhotosForNewMemory(),
+                                      ),
+                              ),
                             ),
                             const SizedBox(width: 10),
                             ExpandableAddButton(
                               onAddEvent: () => _guardMemoryCreation(
                                 canCreateMemory,
-                                () => _pushRoute(RouteNames.addMemory),
+                                _addMemory,
                               ),
                               onAddQuickPhoto: () => _guardMemoryCreation(
                                 canCreateMemory,
@@ -710,19 +736,22 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            _CameraCaptureFab(
-                              onPressed: _isCapturingPhotos
-                                  ? null
-                                  : () => _guardMemoryCreation(
-                                      canCreateMemory,
-                                      () => _capturePhotosForNewMemory(),
-                                    ),
+                            CoachTarget(
+                              id: TourTargets.camera,
+                              child: _CameraCaptureFab(
+                                onPressed: _isCapturingPhotos
+                                    ? null
+                                    : () => _guardMemoryCreation(
+                                        canCreateMemory,
+                                        () => _capturePhotosForNewMemory(),
+                                      ),
+                              ),
                             ),
                             const SizedBox(width: 10),
                             ExpandableAddButton(
                               onAddEvent: () => _guardMemoryCreation(
                                 canCreateMemory,
-                                () => _pushRoute(RouteNames.addMemory),
+                                _addMemory,
                               ),
                               onAddQuickPhoto: () => _guardMemoryCreation(
                                 canCreateMemory,
@@ -1042,6 +1071,37 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     );
     // Convert board-local scene coords back to free wall coordinates.
     return local + _boardOrigin - const Offset(90, 70);
+  }
+
+  /// When the guided tour starts, the wall shows every card in its own
+  /// layout and frames the demo cards the tour points at.
+  void _onTour({bool initial = false}) {
+    final running = appTourRunning;
+    if (running && !_tourWasRunning) {
+      void reset() {
+        _mode = _WallViewMode.wall;
+        _filter = WallFilter.all;
+        _layoutMode = WallLayoutMode.freeform;
+        _showHidden = false;
+        _didSetInitialViewport = false;
+        _frameTourCards = true;
+      }
+
+      if (!initial && mounted) {
+        setState(reset);
+      } else {
+        reset();
+      }
+    }
+    _tourWasRunning = running;
+  }
+
+  /// Opens Add memory; during the guided tour with the tour's demo picture.
+  Future<void> _addMemory() async {
+    if (!appTourRunning) return _pushRoute(RouteNames.addMemory);
+    final photos = await tourPhotos(context.l10n);
+    if (!mounted) return;
+    await _pushRoute(RouteNames.addMemory, extra: photos);
   }
 
   Future<void> _pushRoute(String location, {Object? extra}) async {
@@ -2536,15 +2596,24 @@ class _WallTopBar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          _WallSearchButton(onTap: onSearch),
-          const SizedBox(width: 8),
-          _WallViewButton(
-            selectedMode: selectedMode,
-            hasCustomView: hasCustomView,
-            onTap: onOpenView,
+          CoachTarget(
+            id: TourTargets.search,
+            child: _WallSearchButton(onTap: onSearch),
           ),
           const SizedBox(width: 8),
-          _WallMoreButton(onSelected: onMoreAction),
+          CoachTarget(
+            id: TourTargets.view,
+            child: _WallViewButton(
+              selectedMode: selectedMode,
+              hasCustomView: hasCustomView,
+              onTap: onOpenView,
+            ),
+          ),
+          const SizedBox(width: 8),
+          CoachTarget(
+            id: TourTargets.more,
+            child: _WallMoreButton(onSelected: onMoreAction),
+          ),
         ],
       ),
     );
@@ -2703,22 +2772,24 @@ class _WallMoreButton extends StatelessWidget {
     PopupMenuItem<_MoreAction> item(
       _MoreAction action,
       IconData icon,
-      String label,
-    ) {
+      String label, {
+      String? coachId,
+    }) {
+      final row = Row(
+        children: [
+          Icon(icon, size: 20, color: primary),
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.w800),
+            ),
+          ),
+        ],
+      );
       return PopupMenuItem(
         value: action,
-        child: Row(
-          children: [
-            Icon(icon, size: 20, color: primary),
-            const SizedBox(width: 12),
-            Flexible(
-              child: Text(
-                label,
-                style: const TextStyle(fontWeight: FontWeight.w800),
-              ),
-            ),
-          ],
-        ),
+        child: coachId == null ? row : CoachTarget(id: coachId, child: row),
       );
     }
 
@@ -2741,7 +2812,12 @@ class _WallMoreButton extends StatelessWidget {
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         itemBuilder: (_) => [
-          item(_MoreAction.story, Icons.auto_stories_rounded, l10n.createStory),
+          item(
+            _MoreAction.story,
+            Icons.auto_stories_rounded,
+            l10n.createStory,
+            coachId: TourTargets.moreStory,
+          ),
           item(
             _MoreAction.yearThread,
             Icons.movie_filter_rounded,
@@ -2851,60 +2927,69 @@ class _WallViewSheetState extends State<_WallViewSheet> {
                     ),
                   ),
                 ),
-                TextButton(
-                  key: const ValueKey('wall-view-done'),
-                  onPressed: () => Navigator.of(context).pop(
-                    _ViewChoice(
-                      mode: _mode,
-                      layout: _layout,
-                      filter: _filter,
-                      showHidden: _showHidden,
+                CoachTarget(
+                  id: TourTargets.viewDone,
+                  child: TextButton(
+                    key: const ValueKey('wall-view-done'),
+                    onPressed: () => Navigator.of(context).pop(
+                      _ViewChoice(
+                        mode: _mode,
+                        layout: _layout,
+                        filter: _filter,
+                        showHidden: _showHidden,
+                      ),
                     ),
+                    child: Text(l10n.done),
                   ),
-                  child: Text(l10n.done),
                 ),
               ],
             ),
             _SheetSectionLabel(l10n.wallShowAs),
-            SegmentedButton<_WallViewMode>(
-              key: const ValueKey('wall-mode-segments'),
-              expandedInsets: EdgeInsets.zero,
-              showSelectedIcon: false,
-              style: SegmentedButton.styleFrom(
-                selectedBackgroundColor: scheme.primary,
-                selectedForegroundColor: scheme.onPrimary,
-                foregroundColor: AppColors.muted,
-                side: BorderSide(color: scheme.outline),
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-              ),
-              segments: [
-                for (final mode in _WallViewMode.values)
-                  ButtonSegment(
-                    value: mode,
-                    // Icon above the label: three labels share a phone's
-                    // width even in German and Arabic.
-                    label: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(mode.icon, size: 20),
-                        const SizedBox(height: 3),
-                        Text(
-                          _wallViewModeLabel(context, mode),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ],
-                    ),
+            CoachTarget(
+              id: TourTargets.viewModes,
+              child: SegmentedButton<_WallViewMode>(
+                key: const ValueKey('wall-mode-segments'),
+                expandedInsets: EdgeInsets.zero,
+                showSelectedIcon: false,
+                style: SegmentedButton.styleFrom(
+                  selectedBackgroundColor: scheme.primary,
+                  selectedForegroundColor: scheme.onPrimary,
+                  foregroundColor: AppColors.muted,
+                  side: BorderSide(color: scheme.outline),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 8,
                   ),
-              ],
-              selected: {_mode},
-              onSelectionChanged: (selection) {
-                setState(() => _mode = selection.single);
-              },
+                ),
+                segments: [
+                  for (final mode in _WallViewMode.values)
+                    ButtonSegment(
+                      value: mode,
+                      // Icon above the label: three labels share a phone's
+                      // width even in German and Arabic.
+                      label: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(mode.icon, size: 20),
+                          const SizedBox(height: 3),
+                          Text(
+                            _wallViewModeLabel(context, mode),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+                selected: {_mode},
+                onSelectionChanged: (selection) {
+                  setState(() => _mode = selection.single);
+                },
+              ),
             ),
             if (_mode == _WallViewMode.wall) ...[
               _SheetSectionLabel(l10n.wallArrange),
