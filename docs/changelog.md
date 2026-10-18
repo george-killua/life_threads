@@ -2,7 +2,7 @@
 
 What changed in each TestFlight / Play build. Newest first.
 
-## Next build (not uploaded yet)
+## 1.0.0 (25) – 18 October 2026 (TestFlight, Play closed testing)
 
 **New: "Show me how" guided tour**
 - A 2-minute tour on the real screens with the demo memories and their
