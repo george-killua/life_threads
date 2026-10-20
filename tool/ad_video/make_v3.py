@@ -6,8 +6,8 @@ Needs tool/ad_video/record.sh <lang> first (build/ad_video/<lang>/).
 Output: build/ad_video/<lang>/lifethreads_v3_<lang>.mp4 (1080×1920, voice-over and music).
 
 The voice is macOS `say`, a draft. For the final ad, make the three lines in ElevenLabs (or
-record them), save them as build/ad_video/<lang>/v3/line0.m4a … line2.m4a and run with
-VOICE=files: the picture is timed to whichever lines it gets.
+record them), save them as build/ad_video/<lang>/v3/line0 … line2 (.mp3, .m4a or .wav) and run
+with VOICE=files: the picture is timed to whichever lines it gets.
 """
 import os
 import random
@@ -165,7 +165,11 @@ def main():
     lines = []
     for i, text in enumerate(TEXT['voice']):
         if os.environ.get('VOICE') == 'files':
-            path = os.path.join(WORK, f'line{i}.m4a')
+            found = [os.path.join(WORK, f'line{i}.{ext}') for ext in ('mp3', 'm4a', 'wav')
+                     if os.path.exists(os.path.join(WORK, f'line{i}.{ext}'))]
+            if not found:
+                sys.exit(f'Missing {WORK}/line{i}.mp3 (or .m4a / .wav): "{text}"')
+            path = found[0]
         else:
             path = os.path.join(WORK, f'line{i}.aiff')
             run('say', '-v', TEXT['say'], '-r', '175', '-o', path, text)
