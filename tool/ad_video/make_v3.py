@@ -6,7 +6,7 @@ Needs tool/ad_video/record.sh <lang> first (build/ad_video/<lang>/).
 Output: build/ad_video/<lang>/lifethreads_v3_<lang>.mp4 (1080×1920, voice-over and music).
 
 The voice is macOS `say`, a draft. For the final ad, make the three lines in ElevenLabs (or
-record them), save them as build/ad_video/<lang>/v3/line0 … line2 (.mp3, .m4a or .wav) and run
+record them, or make them in Veo), save them as build/ad_video/<lang>/v3/line0 … line2 (.mp3, .m4a, .wav, or a Veo .mp4 whose sound is used) and run
 with VOICE=files: the picture is timed to whichever lines it gets.
 """
 import os
@@ -165,11 +165,18 @@ def main():
     lines = []
     for i, text in enumerate(TEXT['voice']):
         if os.environ.get('VOICE') == 'files':
-            found = [os.path.join(WORK, f'line{i}.{ext}') for ext in ('mp3', 'm4a', 'wav')
+            found = [os.path.join(WORK, f'line{i}.{ext}') for ext in ('mp3', 'm4a', 'wav', 'mp4')
                      if os.path.exists(os.path.join(WORK, f'line{i}.{ext}'))]
             if not found:
-                sys.exit(f'Missing {WORK}/line{i}.mp3 (or .m4a / .wav): "{text}"')
+                sys.exit(f'Missing {WORK}/line{i}.mp3 (or .m4a / .wav / .mp4): "{text}"')
             path = found[0]
+            if path.endswith('.mp4'):
+                # A Veo clip: keep only its sound, without the silence around the words.
+                voice = os.path.join(WORK, f'line{i}_voice.wav')
+                run('ffmpeg', '-y', '-loglevel', 'error', '-i', path, '-vn', '-af',
+                    'silenceremove=start_periods=1:start_threshold=-40dB,areverse,'
+                    'silenceremove=start_periods=1:start_threshold=-40dB,areverse', voice)
+                path = voice
         else:
             path = os.path.join(WORK, f'line{i}.aiff')
             run('say', '-v', TEXT['say'], '-r', '175', '-o', path, text)
