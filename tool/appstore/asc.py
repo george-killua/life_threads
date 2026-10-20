@@ -138,6 +138,12 @@ LANG_FOLDER = {
 }
 PRIVACY_URL = 'https://gkcoding.dev/lifethreads/privacy/'
 
+
+def privacy_url(lang):
+    """The privacy policy in the listing's language (gkcoding.dev has all 14 app languages)."""
+    folder = LANG_FOLDER[lang]
+    return PRIVACY_URL + ('' if folder == 'en' else folder + '/')
+
 EDITABLE = {'PREPARE_FOR_SUBMISSION', 'DEVELOPER_REJECTED', 'REJECTED',
             'METADATA_REJECTED', 'INVALID_BINARY'}
 
@@ -245,7 +251,7 @@ if __name__ == '__main__':
                         'type': 'appInfoLocalizations',
                         'attributes': {'locale': lang, 'name': t['name'],
                                        'subtitle': t['subtitle'],
-                                       'privacyPolicyUrl': PRIVACY_URL},
+                                       'privacyPolicyUrl': privacy_url(lang)},
                         'relationships': {'appInfo': {'data': {
                             'type': 'appInfos', 'id': info['id']}}}}},
                         fatal=False)['data']['id']
@@ -256,7 +262,8 @@ if __name__ == '__main__':
                 else:
                     call('PATCH', f'/v1/appInfoLocalizations/{info_locs[lang]}', {'data': {
                         'type': 'appInfoLocalizations', 'id': info_locs[lang],
-                        'attributes': {'name': t['name'], 'subtitle': t['subtitle']}}},
+                        'attributes': {'name': t['name'], 'subtitle': t['subtitle'],
+                                       'privacyPolicyUrl': privacy_url(lang)}}},
                         fatal=False)
                 if lang not in version_locs:
                     version_locs[lang] = call('POST', '/v1/appStoreVersionLocalizations', {'data': {
