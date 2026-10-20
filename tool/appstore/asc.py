@@ -5,6 +5,7 @@
     python3 tool/appstore/asc.py status
     python3 tool/appstore/asc.py listing texts.json store_listing_assets/store_screenshots
     python3 tool/appstore/asc.py build 23
+    python3 tool/appstore/asc.py urls
 
 `listing` works on the version that can be edited (Prepare for Submission or
 Developer Rejected): name and subtitle, description, keywords and promotional
@@ -187,6 +188,23 @@ def replace_screenshots(loc_id, lang, root):
         print('  ', lang, display, len(ids))
 
 
+def copy_urls(version_id):
+    """Every language gets the English support and marketing URL: App Store
+    Connect leaves them empty on a language added through the API, and won't
+    start a review without a support URL."""
+    locs = call('GET', f'/v1/appStoreVersions/{version_id}/appStoreVersionLocalizations')['data']
+    english = next(l['attributes'] for l in locs if l['attributes']['locale'] == 'en-US')
+    urls = {k: english[k] for k in ('supportUrl', 'marketingUrl') if english.get(k)}
+    for loc in locs:
+        missing = {k: v for k, v in urls.items() if not loc['attributes'].get(k)}
+        if missing:
+            call('PATCH', f"/v1/appStoreVersionLocalizations/{loc['id']}", {'data': {
+                'type': 'appStoreVersionLocalizations', 'id': loc['id'],
+                'attributes': missing}})
+            print('urls', loc['attributes']['locale'], ', '.join(missing))
+    return urls
+
+
 if __name__ == '__main__':
     if sys.argv[1:] == ['status']:
         aid = app_id()
@@ -199,6 +217,8 @@ if __name__ == '__main__':
         for b in builds:
             a = b['attributes']
             print('build', a['version'], a['processingState'], a['uploadedDate'][:16])
+    elif sys.argv[1:] == ['urls']:
+        print(copy_urls(editable_version(app_id())['id']))
     elif sys.argv[1] == 'listing':
         texts = json.load(open(sys.argv[2]))
         root = sys.argv[3]
@@ -255,6 +275,7 @@ if __name__ == '__main__':
                 continue
             print('texts', lang)
             replace_screenshots(version_locs[lang], lang, root)
+        copy_urls(version['id'])
         if skipped:
             print('not uploaded:', ', '.join(skipped))
     elif sys.argv[1] == 'build':
