@@ -1,0 +1,220 @@
+<title>LifeThreads Shoot Brief</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column like a call sheet; each video is a block with its own shot table. */
+:root {
+  --bg: #f7f2e8; --panel: #fffaf0; --fg: #241a1f; --muted: #6c5d55; --line: #e2d6c3;
+  --gold: #a87a26; --gold-soft: rgba(168, 122, 38, 0.12); --ink-on-gold: #fffaf0;
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --body: "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0a070b; --panel: #161016; --fg: #fff8ea; --muted: #c2b6a8; --line: #3a2c33;
+  --gold: #d2a24a; --gold-soft: rgba(210, 162, 74, 0.14); --ink-on-gold: #0a070b; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0a070b; --panel: #161016; --fg: #fff8ea; --muted: #c2b6a8; --line: #3a2c33;
+  --gold: #d2a24a; --gold-soft: rgba(210, 162, 74, 0.14); --ink-on-gold: #0a070b; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(32px, 6vw, 48px); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: clamp(22px, 4vw, 28px); font-weight: 700; }
+h3 { font-size: 18px; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+ul, ol { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; }
+.kicker { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); }
+.lead { color: var(--muted); font-size: 18px; }
+section { display: grid; gap: 14px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-family: var(--mono); font-size: 12.5px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
+.video { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 4vw, 28px); display: grid; gap: 16px; }
+.video header { display: grid; gap: 6px; }
+.tag { display: inline-block; width: fit-content; font-family: var(--mono); font-size: 12px; background: var(--gold); color: var(--ink-on-gold); padding: 2px 9px; border-radius: 6px; }
+.table { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 14.5px; }
+th, td { text-align: start; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--gold-soft); }
+tr:last-child td { border-bottom: 0; }
+td.t { font-family: var(--mono); font-size: 13px; white-space: nowrap; color: var(--gold); font-variant-numeric: tabular-nums; }
+.vo { font-style: italic; }
+.say { border-inline-start: 3px solid var(--gold); padding: 4px 0 4px 14px; padding-inline-start: 14px; padding-left: 0; color: var(--fg); }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.grid2 > div { min-width: 0; display: grid; gap: 8px; align-content: start; }
+.note { background: var(--gold-soft); border-radius: 14px; padding: 14px 16px; display: grid; gap: 6px; }
+.safe { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.phone { width: 120px; aspect-ratio: 9 / 16; max-width: 100%; border: 2px solid var(--fg); border-radius: 14px; position: relative; overflow: hidden; flex: none; }
+.phone .top, .phone .bot { position: absolute; left: 0; right: 0; background: repeating-linear-gradient(45deg, var(--gold-soft), var(--gold-soft) 4px, transparent 4px, transparent 8px); }
+.phone .top { top: 0; height: 13%; } .phone .bot { bottom: 0; height: 21%; }
+.phone .side { position: absolute; right: 0; top: 13%; bottom: 21%; width: 12%; background: repeating-linear-gradient(45deg, var(--gold-soft), var(--gold-soft) 4px, transparent 4px, transparent 8px); }
+.safe p { flex: 1 1 260px; }
+footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 16px; }
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:14px">
+    <span class="kicker">Video brief · LifeThreads app</span>
+    <h1>Three short videos for TikTok, Reels and Shorts</h1>
+    <p class="lead">LifeThreads turns your photos into a private wall of memories, tied together with gold threads. We need three vertical videos that show real, happy people and the real app. One shoot day, shot on an iPhone, is enough.</p>
+    <div class="meta">
+      <span class="chip">9:16 · 1080×1920</span><span class="chip">25 or 30 fps</span><span class="chip">MP4 (H.264)</span><span class="chip">English + German voice-over</span><span class="chip">1 shoot day</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>The three videos</h2>
+    <div class="grid2">
+      <div><span class="tag">V1 · 20 s</span><h3>The ad</h3><p>Happy moments get photographed and land on the wall. Voice-over, music, captions. Used as a paid ad and as a post.</p></div>
+      <div><span class="tag">V2 · 25–30 s</span><h3>“My whole year on one wall”</h3><p>One person on the sofa talks to the camera like a friend and shows their wall and their year as a film.</p></div>
+      <div><span class="tag">V3 · 15 s</span><h3>Before / after</h3><p>A messy camera roll, then a snap cut to the tidy wall. No talking, text and music only.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Shoot plan</h2>
+    <div class="grid2">
+      <div>
+        <h3>Locations (2)</h3>
+        <ul>
+          <li><strong>Outdoors at golden hour</strong>: a park, lake or beach. Friends and a picnic.</li>
+          <li><strong>A warm home</strong>: living room with a sofa, a dining table, ideally a garden or balcony.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>People (4–6)</h3>
+        <ul>
+          <li>A group of 3–4 friends in their 20s–30s</li>
+          <li>A couple</li>
+          <li>A parent with a child (for the birthday shot)</li>
+          <li>One person for V2 who is comfortable talking to camera</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Props</h3>
+        <ul>
+          <li>Birthday cake with candles, a few balloons</li>
+          <li>Picnic blanket, drinks, fairy lights for the evening</li>
+          <li>Two phones: one iPhone that runs LifeThreads, one for selfies</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Look</h3>
+        <ul>
+          <li>Bright, warm light, real laughter, nothing staged-looking</li>
+          <li>Handheld is fine; keep it steady on the phone screens</li>
+          <li>The app is dark with gold; the people shots are warm and sunny</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <article class="video">
+    <header><span class="tag">V1 · 20 s</span><h2>The ad</h2>
+      <p>Music: upbeat feel-good indie pop, acoustic guitar and hand claps, about 115 BPM. A camera-shutter click on every photo. Voice-over friendly and smiling, like talking to a friend.</p></header>
+    <div class="table"><table>
+      <thead><tr><th>Time</th><th>Picture</th><th>Voice-over</th><th>Caption</th></tr></thead>
+      <tbody>
+        <tr><td class="t">0–2.5 s</td><td>Friends jump and laugh at golden hour; one grabs the phone and takes the photo. <em>Click.</em> Freeze for a split second.</td><td class="vo">“That moment?”</td><td>–</td></tr>
+        <tr><td class="t">2.5–5 s</td><td>Over the shoulder: the photo goes into LifeThreads, a title is typed, saved.</td><td class="vo">“Save it in LifeThreads.”</td><td>Snap it. Save it.</td></tr>
+        <tr><td class="t">5–8 s</td><td>Kid blows out birthday candles, everyone cheers, the parent takes the picture. Cut to the wall with cards swaying on gold threads.</td><td class="vo">“Pin every moment to your wall…”</td><td>Your life on one wall.</td></tr>
+        <tr><td class="t">8–11 s</td><td>The couple dances in the living room under fairy lights, a friend films them. Cut to that memory open in the app.</td><td class="vo">“…with the story behind it.”</td><td>Every photo has a story.</td></tr>
+        <tr><td class="t">11–14 s</td><td>The story film plays on the phone. A friend on the sofa watches, laughs and shows the next friend.</td><td class="vo">“Turn them into a film with music!”</td><td>Make it a film. Share it.</td></tr>
+        <tr><td class="t">14–17 s</td><td>Everyone squeezes in for a group selfie on the balcony or in the garden. <em>Click.</em> Cut to the family wall.</td><td class="vo">“And share one wall with the whole family.”</td><td>One wall. The whole family.</td></tr>
+        <tr><td class="t">17–20 s</td><td>Quick flashes of the faces, then the end card: dark background, app icon, a gold thread drawing across.</td><td class="vo">“LifeThreads. Your life, threaded together. Free on the App Store and Google Play.”</td><td><strong>LifeThreads</strong> · Free on the App Store &amp; Google Play</td></tr>
+      </tbody>
+    </table></div>
+  </article>
+
+  <article class="video">
+    <header><span class="tag">V2 · 25–30 s</span><h2>“My whole year on one wall”</h2>
+      <p>One take on the sofa, natural light, phone in hand. Talking straight to camera, relaxed, not like an ad. Cut in close-ups of the screen.</p></header>
+    <div class="table"><table>
+      <thead><tr><th>Time</th><th>Picture</th><th>Says</th></tr></thead>
+      <tbody>
+        <tr><td class="t">0–3 s</td><td>Holds the phone up to the camera, the wall full of memories.</td><td class="vo">“This is my whole year. On one wall.”</td></tr>
+        <tr><td class="t">3–10 s</td><td>Close-up: finger drags across the wall, opens a memory with a photo and a short story.</td><td class="vo">“Every photo gets a few words, the place and who was there. So I actually remember why it mattered.”</td></tr>
+        <tr><td class="t">10–20 s</td><td>Taps “Thread of the Year”; the film plays full screen with music. Cut back to their smiling face.</td><td class="vo">“And at the end of the year it turns into a little film.”</td></tr>
+        <tr><td class="t">20–28 s</td><td>Looks back at camera.</td><td class="vo">“No account, no ads, it stays on my phone. It’s called LifeThreads, it’s free.”</td></tr>
+      </tbody>
+    </table></div>
+  </article>
+
+  <article class="video">
+    <header><span class="tag">V3 · 15 s</span><h2>Before / after</h2>
+      <p>No voice. Music with a clear beat drop at 6 s. Big, short on-screen text.</p></header>
+    <div class="table"><table>
+      <thead><tr><th>Time</th><th>Picture</th><th>On-screen text</th></tr></thead>
+      <tbody>
+        <tr><td class="t">0–6 s</td><td>A thumb scrolls fast through a huge, messy camera roll: screenshots, duplicates, blurry shots.</td><td>12,000 photos. Zero stories.</td></tr>
+        <tr><td class="t">6–7 s</td><td>Snap transition on the beat drop: a hand flick or a whip pan.</td><td>–</td></tr>
+        <tr><td class="t">7–13 s</td><td>The LifeThreads wall: cards swaying on gold threads, one memory opens.</td><td>Only the moments that matter.</td></tr>
+        <tr><td class="t">13–15 s</td><td>End card with the app icon.</td><td>LifeThreads · Free on the App Store &amp; Google Play</td></tr>
+      </tbody>
+    </table></div>
+  </article>
+
+  <section>
+    <h2>Filming the app</h2>
+    <ul>
+      <li>Always show the <strong>real app</strong>. Never redraw or fake a screen.</li>
+      <li>George sets up the phone with the demo memories and photos before the shoot (⋯ › Tutorial loads them).</li>
+      <li>For crisp screen shots, use the iPhone’s own screen recording (Control Center) and cut it in. Film the phone in a hand for the “real life” feel.</li>
+      <li>Before filming: Do Not Disturb on, battery charged, brightness at maximum, no notifications.</li>
+      <li>V1 and V2 are needed in English and in German: switch the app language in Settings › Language, and record the screens again.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Text safe zone</h2>
+    <div class="safe">
+      <div class="phone" role="img" aria-label="Phone frame with the top 13 percent, bottom 21 percent and right edge hatched as no-text zones"><div class="top"></div><div class="side"></div><div class="bot"></div></div>
+      <p>TikTok and Instagram put their buttons and captions over the video. Keep all captions and the logo out of the hatched areas: the top ~250 px, the bottom ~400 px and the right ~130 px of the 1080×1920 frame.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Rules</h2>
+    <div class="grid2">
+      <div>
+        <h3>Must</h3>
+        <ul>
+          <li>A signed model release from everyone on camera, and from a parent for every child</li>
+          <li>Permission to film at the locations if needed</li>
+          <li>Music licensed for commercial and ad use on social media (for example from a stock music library). Trending TikTok sounds can’t be used in ads.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Avoid</h3>
+        <ul>
+          <li>Other brand logos on clothes, drinks or screens</li>
+          <li>Years or dates in captions</li>
+          <li>Showing real private messages or personal photos of people who didn’t agree</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Delivery</h2>
+    <ul>
+      <li>For each video: a version with captions burned in, and a clean version without text</li>
+      <li>V1 and V2 in English and German, with separate music and voice tracks if possible</li>
+      <li>All raw footage handed over at the end</li>
+      <li>First cut within one week of the shoot, then one round of changes, then final files</li>
+      <li>GK Coding may use all videos and footage without time limit on every channel, including paid ads</li>
+    </ul>
+    <div class="note">
+      <strong>Contact</strong>
+      <p>George Kassih, GK Coding · info@gkcoding.dev</p>
+    </div>
+  </section>
+
+  <footer>LifeThreads is free on the App Store and Google Play · gkcoding.dev/lifethreads</footer>
+</div>
