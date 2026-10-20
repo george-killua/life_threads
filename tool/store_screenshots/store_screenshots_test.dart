@@ -18,6 +18,7 @@ import 'package:life_threads/features/on_this_day/data/on_this_day_providers.dar
 import 'package:life_threads/features/premium/data/premium_entitlement_controller.dart';
 import 'package:life_threads/features/premium/domain/premium_entitlement.dart';
 import 'package:life_threads/features/stories/data/music_catalog.dart';
+import 'package:life_threads/features/stories/presentation/pages/story_style_page.dart';
 import 'package:life_threads/features/stories/data/music_preview.dart';
 import 'package:life_threads/features/year_thread/data/year_thread_providers.dart';
 import 'package:life_threads/l10n/generated/app_localizations.dart';
@@ -71,30 +72,36 @@ typedef _Scene = ({
 final List<_Scene> _scenes = [
   (name: 'wall', caption: 'wall', open: (tester, l10n) => _go(tester, '/wall')),
   (
-    name: 'stories',
-    caption: 'stories',
+    name: 'video',
+    caption: 'video',
     open: (tester, l10n) async {
-      AppRouter.router.go(RouteNames.createStory, extra: 'store-beach-sunset');
-      await _settle(tester, rounds: 8);
-      // A film with a song, as the caption says.
-      final video = find.byKey(const ValueKey('story-video-switch'));
-      await tester.ensureVisible(video);
-      await _settle(tester, rounds: 2);
-      await tester.tap(video);
+      // Four memories as a video: the animations screen, Wall flight playing.
+      await _storyWithMemories(tester, l10n);
+      await tester.tap(find.byKey(const ValueKey('story-video-switch')));
       await _settle(tester);
-      // The page scrolls down; the template row above scrolls sideways.
+      await _tapSetting(tester, 'story-animation-row');
+      await _tapTile(tester, 'story-style-wallFlight');
+    },
+  ),
+  (
+    name: 'picture',
+    caption: 'picture',
+    open: (tester, l10n) async {
+      // Four memories in one picture: Mosaic as a feed post.
+      await _storyWithMemories(tester, l10n);
+      await _tapSetting(tester, 'story-format-post');
+      await _tapSetting(tester, 'story-animation-row');
+      await _tapTile(tester, 'story-style-mosaic');
+      await tester.tap(find.byKey(const ValueKey('story-style-done')));
+      await _settle(tester);
+      // Back to the top: the picture is what the screenshot shows.
       final page = find
-          .byWidgetPredicate(
-            (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+          .descendant(
+            of: find.byKey(const ValueKey('story-settings')),
+            matching: find.byType(Scrollable),
           )
           .first;
-      // Built only once scrolled into view: look for one song by name.
-      final song = find.textContaining(bundledMusicTracks.first.title);
-      await tester.scrollUntilVisible(song, 300, scrollable: page);
-      await tester.tap(song);
-      await _settle(tester);
-      // Back to the top: the story preview is what the screenshot shows.
-      await tester.drag(page, const Offset(0, 3000));
+      tester.state<ScrollableState>(page).position.jumpTo(0);
       await _settle(tester);
     },
   ),
@@ -112,12 +119,17 @@ final List<_Scene> _scenes = [
     open: (tester, l10n) async {
       await _go(tester, RouteNames.yearThreadFor(2025));
       await _settle(tester, rounds: 8);
-      // With a song, as the caption says.
-      await tester.tap(find.text(l10n.yearThreadNoMusic).first);
+      // With a song, as the caption says: chosen on the music screen.
+      final music = find.byKey(const ValueKey('year-thread-music'));
+      await tester.ensureVisible(music);
+      await _settle(tester, rounds: 2);
+      await tester.tap(music);
       await _settle(tester);
       await tester.tap(
-        find.textContaining(bundledMusicTracks.first.title).last,
+        find.byKey(ValueKey('story-music-${bundledMusicTracks.first.id}')),
       );
+      await _settle(tester);
+      await tester.tap(find.byKey(const ValueKey('story-music-done')));
       await _settle(tester);
     },
   ),
@@ -178,6 +190,66 @@ final List<_Scene> _scenes = [
 ];
 
 late String _lang;
+
+/// The story editor with four demo memories picked.
+Future<void> _storyWithMemories(
+  WidgetTester tester,
+  AppLocalizations l10n,
+) async {
+  AppRouter.router.go(RouteNames.createStory);
+  await _settle(tester, rounds: 6);
+  final events = storeMemoryState(_lang).events;
+  for (final event in [events[2], events[1], events[0], events[3]]) {
+    final title = find.text(event.title);
+    await tester.ensureVisible(title.first);
+    await _settle(tester, rounds: 1);
+    await tester.tap(title.first);
+    await _settle(tester, rounds: 1);
+  }
+  await tester.tap(find.byKey(const ValueKey('story-continue')));
+  await _settle(tester, rounds: 6);
+}
+
+/// Scrolls the editor's page until [key] can be tapped, and taps it.
+Future<void> _tapSetting(WidgetTester tester, String key) async {
+  final target = find.byKey(ValueKey(key));
+  final position = tester
+      .state<ScrollableState>(
+        find
+            .descendant(
+              of: find.byKey(const ValueKey('story-settings')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      )
+      .position;
+  while (target.hitTestable().evaluate().isEmpty &&
+      position.pixels < position.maxScrollExtent) {
+    position.jumpTo(position.pixels + 40);
+    await tester.pump();
+  }
+  await tester.tap(target.hitTestable().first);
+  await _settle(tester);
+}
+
+/// Scrolls the animations screen to [key] and picks it.
+Future<void> _tapTile(WidgetTester tester, String key) async {
+  final tile = find.byKey(ValueKey(key));
+  await tester.scrollUntilVisible(
+    tile,
+    200,
+    scrollable: find
+        .descendant(
+          of: find.byType(StoryStylePage),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
+  await tester.ensureVisible(tile);
+  await _settle(tester, rounds: 1);
+  await tester.tap(tile);
+  await _settle(tester);
+}
 
 const _familyId = 'store-family-wall';
 
@@ -297,14 +369,14 @@ Future<void> _capture(WidgetTester tester, StoreSize size, String path) async {
 /// The app theme plus the Arabic fallback iOS adds by itself. Button labels
 /// with their own text style have no family and fall back to the system font
 /// on a phone; flutter_test has none, so they get Avenir here.
-ThemeData _storeTheme(ThemeData theme) {
-  const fallback = ['SF Arabic'];
+ThemeData _storeTheme(ThemeData theme, String lang) {
+  final fallback = storeFontFallback(lang);
   TextStyle? withFont(TextStyle? style) =>
       style?.copyWith(fontFamily: 'Avenir', fontFamilyFallback: fallback);
   ButtonStyle? buttonFont(ButtonStyle? style) => style?.copyWith(
     textStyle: WidgetStatePropertyAll(
       withFont(style.textStyle?.resolve({})) ??
-          const TextStyle(fontFamily: 'Avenir', fontFamilyFallback: fallback),
+          TextStyle(fontFamily: 'Avenir', fontFamilyFallback: fallback),
     ),
   );
   return theme.copyWith(
@@ -335,7 +407,7 @@ ThemeData _storeTheme(ThemeData theme) {
     chipTheme: theme.chipTheme.copyWith(
       labelStyle:
           withFont(theme.chipTheme.labelStyle) ??
-          const TextStyle(fontFamily: 'Avenir', fontFamilyFallback: fallback),
+          TextStyle(fontFamily: 'Avenir', fontFamilyFallback: fallback),
       secondaryLabelStyle: withFont(theme.chipTheme.secondaryLabelStyle),
     ),
   );
@@ -360,7 +432,9 @@ void main() {
   // Map tiles come from the network; flutter_test blocks HTTP by default.
   HttpOverrides.global = null;
 
-  final langs = _listEnv('STORE_LANGS', ['en', 'de', 'ar']);
+  final langs = _listEnv('STORE_LANGS', [
+    for (final locale in AppLocalizations.supportedLocales) locale.languageCode,
+  ]);
   final sizes = _listEnv('STORE_SIZES', [for (final s in storeSizes) s.name]);
   final scenes = _listEnv('STORE_SCENES', [for (final s in _scenes) s.name]);
 
@@ -396,7 +470,7 @@ void main() {
           final l10n = lookupAppLocalizations(Locale(lang));
           final (tag, headline, subtitle) =
               storeCaptions[scene.caption]![lang]!;
-          final storeTheme = _storeTheme(AppTheme.dark);
+          final storeTheme = _storeTheme(AppTheme.dark, lang);
 
           await tester.pumpWidget(
             DefaultAssetBundle(
@@ -408,9 +482,9 @@ void main() {
                   child: Directionality(
                     textDirection: TextDirection.ltr,
                     child: DefaultTextStyle(
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Avenir',
-                        fontFamilyFallback: ['SF Arabic'],
+                        fontFamilyFallback: storeFontFallback(lang),
                       ),
                       child: StoreFrame(
                         size: size,

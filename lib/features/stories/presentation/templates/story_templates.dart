@@ -6,6 +6,8 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../memories/domain/memory_event.dart';
 import '../../../wall/presentation/widgets/metallic_ball_pin.dart';
 import '../../domain/story_template.dart';
+import 'story_templates_modes.dart';
+import 'story_templates_more.dart';
 import 'story_visuals.dart';
 
 /// One story page (360×640 logical, 1080×1920 rendered) for [template].
@@ -19,6 +21,7 @@ class StoryPage extends StatelessWidget {
     required this.memories,
     this.caption = '',
     this.motion = const StoryMotion.still(),
+    this.format = StoryFormat.story,
   });
 
   final StoryTemplate template;
@@ -26,66 +29,112 @@ class StoryPage extends StatelessWidget {
   final String caption;
   final StoryMotion motion;
 
+  /// The picture's shape; films are always [StoryFormat.story].
+  final StoryFormat format;
+
   @override
   Widget build(BuildContext context) {
+    final caption = this.caption.trim();
     final page = switch (template) {
       StoryTemplate.single => _SingleStory(
         memories: memories,
-        caption: caption.trim(),
+        caption: caption,
         motion: motion,
       ),
       StoryTemplate.thread => _ThreadStory(
         memories: memories,
-        caption: caption.trim(),
+        caption: caption,
         motion: motion,
       ),
       StoryTemplate.collage => _CollageStory(
         memories: memories,
-        caption: caption.trim(),
+        caption: caption,
         motion: motion,
       ),
       StoryTemplate.quote => _QuoteStory(
         memories: memories,
-        caption: caption.trim(),
+        caption: caption,
+        motion: motion,
+      ),
+      StoryTemplate.polaroid => PolaroidStory(
+        memories: memories,
+        caption: caption,
+        motion: motion,
+      ),
+      StoryTemplate.album => AlbumStory(
+        memories: memories,
+        caption: caption,
+        motion: motion,
+      ),
+      StoryTemplate.filmstrip => FilmstripStory(
+        memories: memories,
+        caption: caption,
+        motion: motion,
+      ),
+      StoryTemplate.timeline => TimelineStory(
+        memories: memories,
+        caption: caption,
+        motion: motion,
+      ),
+      StoryTemplate.postcard => PostcardStory(
+        memories: memories,
+        caption: caption,
+        motion: motion,
+      ),
+      StoryTemplate.cinema => CinemaStory(
+        memories: memories,
+        caption: caption,
+        motion: motion,
+      ),
+      StoryTemplate.scrapbook => ScrapbookStory(
+        memories: memories,
+        caption: caption,
+        motion: motion,
+      ),
+      StoryTemplate.mosaic => MosaicStory(
+        memories: memories,
+        caption: caption,
+        motion: motion,
+      ),
+      StoryTemplate.contactSheet => ContactSheetStory(
+        memories: memories,
+        caption: caption,
+        motion: motion,
+      ),
+      StoryTemplate.wallFlight => WallFlightStory(
+        memories: memories,
+        caption: caption,
+        motion: motion,
+      ),
+      StoryTemplate.carousel => CarouselStory(
+        memories: memories,
+        caption: caption,
+        motion: motion,
+      ),
+      StoryTemplate.journey => JourneyStory(
+        memories: memories,
+        caption: caption,
         motion: motion,
       ),
     };
-    return SizedBox.fromSize(
-      size: storySize,
-      child: ClipRect(
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            if (memories.isEmpty) const StoryWallBackdrop() else page,
-            if (motion.ending > 0)
-              ColoredBox(
-                color: BrandColors.wallInk.withValues(
-                  alpha: motion.ending * 0.9,
+    return StoryPageSize(
+      size: format.size,
+      child: SizedBox.fromSize(
+        size: format.size,
+        child: ClipRect(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (memories.isEmpty) const StoryWallBackdrop() else page,
+              if (motion.ending > 0)
+                ColoredBox(
+                  color: BrandColors.wallInk.withValues(
+                    alpha: motion.ending * 0.9,
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
-  }
-}
-
-/// Fades a piece in while it rises [rise] pixels into place.
-class _Reveal extends StatelessWidget {
-  const _Reveal({required this.value, required this.child, this.rise = 14});
-
-  final double value;
-  final double rise;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    if (value >= 1) return child;
-    return Opacity(
-      opacity: value.clamp(0.0, 1.0),
-      child: Transform.translate(
-        offset: Offset(0, (1 - value) * rise),
-        child: child,
       ),
     );
   }
@@ -129,16 +178,21 @@ class _SingleStory extends StatelessWidget {
       motion: local(index),
     );
     final fade = index == 0 ? 1.0 : motion.linear(start, _crossFade);
-    if (fade >= 1) return current;
     return Stack(
       fit: StackFit.expand,
       children: [
-        _SingleScene(
-          memory: memories[index - 1],
-          caption: index - 1 == 0 ? caption : '',
-          motion: local(index - 1),
+        if (fade < 1)
+          _SingleScene(
+            memory: memories[index - 1],
+            caption: index - 1 == 0 ? caption : '',
+            motion: local(index - 1),
+          ),
+        if (fade < 1) Opacity(opacity: fade, child: current) else current,
+        PositionedDirectional(
+          top: 30,
+          end: 20,
+          child: StoryPageDots(count: memories.length, index: index),
         ),
-        Opacity(opacity: fade, child: current),
       ],
     );
   }
@@ -228,12 +282,12 @@ class _SingleScene extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _Reveal(
+              StoryReveal(
                 value: motion.appear(1.2),
                 child: StoryFeelingChip(memory: memory),
               ),
               const SizedBox(height: 12),
-              _Reveal(
+              StoryReveal(
                 value: motion.appear(1.8, 1.1),
                 rise: 22,
                 child: Text(
@@ -251,7 +305,7 @@ class _SingleScene extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              _Reveal(
+              StoryReveal(
                 value: motion.appear(2.6),
                 child: Row(
                   children: [
@@ -280,7 +334,7 @@ class _SingleScene extends StatelessWidget {
               ),
               if (caption.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                _Reveal(
+                StoryReveal(
                   value: motion.appear(3.6, 1.4),
                   child: Container(
                     padding: const EdgeInsetsDirectional.only(start: 12),
@@ -329,14 +383,6 @@ class _ThreadStory extends StatelessWidget {
   final StoryMotion motion;
 
   static const _top = 132.0;
-  static const _bottom = 616.0;
-
-  /// When card [index] of [count] lands on the wall.
-  static double cardStart(int index, int count, double total) {
-    if (count <= 1) return 1.0;
-    final gap = math.min(2.4, (total - 7.0) / (count - 1));
-    return 1.0 + index * gap;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -344,11 +390,22 @@ class _ThreadStory extends StatelessWidget {
       ..sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
     final count = ordered.length;
     final rtl = Directionality.of(context) == TextDirection.rtl;
-    final width = const [230.0, 165.0, 160.0, 150.0, 132.0, 128.0][count - 1];
+    final page = StoryPageSize.of(context);
+    final bottom = page.height - 24;
     final compact = count > 3;
+    // Shorter pictures (a post) shrink the cards until cards on the same
+    // side hang clear of each other.
+    var width = const [230.0, 165.0, 160.0, 150.0, 132.0, 128.0][count - 1];
+    double heightOf(double width) =>
+        width * (compact ? 0.58 : 0.66) + (compact ? 58 : 72);
+    while (count > 2 && width > 90) {
+      final step = (bottom - _top - heightOf(width)) / (count - 1);
+      if (2 * step >= heightOf(width) * 0.96) break;
+      width -= 6;
+    }
     final photoHeight = width * (compact ? 0.58 : 0.66);
     // Estimated card height, enough to spread the cards.
-    final cardHeight = photoHeight + (compact ? 58 : 72);
+    final cardHeight = heightOf(width);
     const rotations = [-0.045, 0.04, -0.03, 0.05, -0.035, 0.03];
     const margin = 16.0;
     // Cards hang from a pin near their inner top corner, so the rope runs
@@ -362,13 +419,13 @@ class _ThreadStory extends StatelessWidget {
       final double pinX;
       if (count == 1) {
         x = (storySize.width - width) / 2;
-        y = (_top + _bottom - cardHeight) / 2;
+        y = (_top + bottom - cardHeight) / 2;
         pinX = x + width / 2;
       } else {
         final left = i.isEven;
         final jitter = (i % 3) * 3.0;
         x = left ? margin + jitter : storySize.width - margin - width - jitter;
-        y = _top + i * (_bottom - _top - cardHeight) / (count - 1);
+        y = _top + i * (bottom - _top - cardHeight) / (count - 1);
         pinX = left ? x + width - pinInset : x + pinInset;
       }
       placements.add((
@@ -380,8 +437,8 @@ class _ThreadStory extends StatelessWidget {
     final pins = [for (final placement in placements) placement.pin];
 
     final total = motion.total;
-    final ropeStart = cardStart(0, count, total) + 0.4;
-    final ropeEnd = cardStart(count - 1, count, total) + 0.4;
+    final ropeStart = threadCardStart(0, count, total) + 0.4;
+    final ropeEnd = threadCardStart(count - 1, count, total) + 0.4;
     final ropeProgress = motion.isStill
         ? 1.0
         : motion.linear(ropeStart, math.max(0.1, ropeEnd - ropeStart));
@@ -400,7 +457,7 @@ class _ThreadStory extends StatelessWidget {
           top: 56,
           start: 24,
           end: 24,
-          child: _Reveal(
+          child: StoryReveal(
             value: motion.appear(0.6, 1.1),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -441,8 +498,8 @@ class _ThreadStory extends StatelessWidget {
           Positioned(
             left: placements[i].topLeft.dx,
             top: placements[i].topLeft.dy,
-            child: _Reveal(
-              value: motion.appear(cardStart(i, count, total), 0.8),
+            child: StoryReveal(
+              value: motion.appear(threadCardStart(i, count, total), 0.8),
               rise: -30,
               child: Transform.rotate(
                 angle: placements[i].rotation,
@@ -467,7 +524,7 @@ class _ThreadStory extends StatelessWidget {
             left: pins[i].dx - 12,
             top: pins[i].dy - 8,
             child: Opacity(
-              opacity: motion.appear(cardStart(i, count, total), 0.5),
+              opacity: motion.appear(threadCardStart(i, count, total), 0.5),
               child: const MetallicBallPin(size: 16, showStem: false),
             ),
           ),
@@ -504,6 +561,9 @@ class _CollageStory extends StatelessWidget {
     final rows = _rows[memories.length]!;
     final line = caption.isNotEmpty ? caption : memories.first.title;
     const rotations = [-0.02, 0.018, -0.012, 0.022, -0.018, 0.014];
+    final step = collageStep(motion.total, memories.length);
+    // Shorter pictures (a post, a square) keep less room under the photos.
+    final scale = StoryPageSize.of(context).height / storySize.height;
     final tiles = <Widget>[];
     var index = 0;
     final rowWidgets = <Widget>[];
@@ -511,7 +571,7 @@ class _CollageStory extends StatelessWidget {
       final cells = <Widget>[];
       for (var c = 0; c < columns; c++) {
         final i = index++;
-        final appear = motion.appear(0.6 + i * 0.6, 0.9);
+        final appear = motion.appear(0.6 + i * step, 0.9);
         cells.add(
           Expanded(
             child: Padding(
@@ -540,7 +600,7 @@ class _CollageStory extends StatelessWidget {
       rowWidgets.add(Expanded(child: Row(children: cells)));
     }
     tiles.addAll(rowWidgets);
-    final lastTile = 0.6 + (memories.length - 1) * 0.6;
+    final lastTile = 0.6 + (memories.length - 1) * step;
 
     return Stack(
       fit: StackFit.expand,
@@ -555,14 +615,14 @@ class _CollageStory extends StatelessWidget {
           top: 60,
           left: 17,
           right: 17,
-          bottom: 158,
+          bottom: 158 * scale,
           child: Column(children: tiles),
         ),
         PositionedDirectional(
           start: 26,
           end: 26,
-          bottom: 42,
-          child: _Reveal(
+          bottom: 42 * scale,
+          child: StoryReveal(
             value: motion.appear(lastTile + 0.9, 1.2),
             child: Transform.rotate(
               angle: -0.012,
@@ -651,7 +711,8 @@ class _CollageTile extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 4. Quote: the story text on the wall with a small pinned photo.
+// 4. Words: a memory's own words on the wall with a small pinned photo. A
+//    film types each picked memory's words in turn.
 
 class _QuoteStory extends StatelessWidget {
   const _QuoteStory({
@@ -664,13 +725,76 @@ class _QuoteStory extends StatelessWidget {
   final String caption;
   final StoryMotion motion;
 
+  static const _crossFade = 0.7;
+
   @override
   Widget build(BuildContext context) {
-    final memory = memories.first;
+    if (motion.isStill || memories.length == 1) {
+      return _QuoteScene(
+        memory: memories.first,
+        quote: _quoteFor(0),
+        motion: motion,
+      );
+    }
+    final beat = motion.beatFor(StoryTemplate.quote, memories.length);
+    final index = beat.index;
+    final current = _QuoteScene(
+      memory: memories[index],
+      quote: _quoteFor(index),
+      motion: beat.motion,
+    );
+    final fade = index == 0 ? 1.0 : (beat.local / _crossFade).clamp(0.0, 1.0);
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (fade < 1)
+          _QuoteScene(
+            memory: memories[index - 1],
+            quote: _quoteFor(index - 1),
+            motion: StoryMotion.at(beat.local + beat.span, beat.span),
+          ),
+        if (fade < 1)
+          Opacity(
+            opacity: fade,
+            child: Transform.translate(
+              offset: Offset(0, 24 * (1 - fade)),
+              child: current,
+            ),
+          )
+        else
+          current,
+        PositionedDirectional(
+          top: 30,
+          end: 20,
+          child: StoryPageDots(count: memories.length, index: index),
+        ),
+      ],
+    );
+  }
+
+  /// The caption opens the story; every other memory speaks with its own
+  /// story (or its title when it has none).
+  String _quoteFor(int index) {
+    if (index == 0 && caption.isNotEmpty) return caption;
+    final memory = memories[index];
     final description = truncateStoryText(memory.description, 220);
-    final quote = caption.isNotEmpty
-        ? caption
-        : (description.isNotEmpty ? description : memory.title);
+    return description.isNotEmpty ? description : memory.title;
+  }
+}
+
+class _QuoteScene extends StatelessWidget {
+  const _QuoteScene({
+    required this.memory,
+    required this.quote,
+    required this.motion,
+  });
+
+  final MemoryEvent memory;
+  final String quote;
+  final StoryMotion motion;
+
+  @override
+  Widget build(BuildContext context) {
     final length = quote.length;
     final fontSize = length < 50
         ? 30.0
@@ -679,6 +803,23 @@ class _QuoteStory extends StatelessWidget {
         : length < 170
         ? 20.0
         : 17.5;
+    // The words type themselves in; the rest is laid out already (but
+    // invisible) so lines don't jump while typing.
+    final characters = quote.characters;
+    final typedLength = motion.isStill
+        ? characters.length
+        : (characters.length *
+                  motion.linear(1.0, math.min(4.0, 0.9 + length * 0.035)))
+              .round();
+    final typed = characters.take(typedLength).toString();
+    final rest = characters.skip(typedLength).toString();
+    final style = TextStyle(
+      color: BrandColors.text,
+      fontSize: fontSize,
+      height: 1.32,
+      fontWeight: FontWeight.w800,
+      letterSpacing: -0.2,
+    );
 
     return Stack(
       fit: StackFit.expand,
@@ -696,7 +837,7 @@ class _QuoteStory extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _Reveal(
+              StoryReveal(
                 value: motion.appear(0.5, 1),
                 child: Text(
                   '“',
@@ -708,24 +849,22 @@ class _QuoteStory extends StatelessWidget {
                   ),
                 ),
               ),
-              _Reveal(
-                value: motion.appear(1.1, 1.8),
-                rise: 20,
-                child: Text(
-                  quote,
-                  maxLines: 9,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: BrandColors.text,
-                    fontSize: fontSize,
-                    height: 1.32,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.2,
-                  ),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: typed),
+                    TextSpan(
+                      text: rest,
+                      style: const TextStyle(color: Colors.transparent),
+                    ),
+                  ],
                 ),
+                maxLines: 9,
+                overflow: TextOverflow.ellipsis,
+                style: style,
               ),
               const SizedBox(height: 14),
-              _Reveal(
+              StoryReveal(
                 value: motion.appear(2.2, 1),
                 child: Container(
                   width: 46,
@@ -742,8 +881,8 @@ class _QuoteStory extends StatelessWidget {
         PositionedDirectional(
           end: 30,
           bottom: 46,
-          child: _Reveal(
-            value: motion.appear(3.0, 0.9),
+          child: StoryReveal(
+            value: motion.appear(1.6, 0.9),
             rise: -26,
             child: Transform.rotate(
               angle: 0.05,

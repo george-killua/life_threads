@@ -360,12 +360,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanDisplayQr => 'Scan display QR';
 
   @override
-  String get scannerHintTitle =>
-      'Open lifethreads.gkcoding.dev/display on another screen.';
-
-  @override
-  String get scannerHintBody =>
-      'Scan the QR code from that page. LifeThreads sends a temporary read-only board snapshot to that browser session.';
+  String get scannerHintTitle => 'Where is the QR code?';
 
   @override
   String get addMemoryBeforeDisplay => 'Add a memory before displaying a wall.';
@@ -2488,13 +2483,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storyTemplateSingle => 'Single memory';
 
   @override
-  String get storyTemplateThread => 'Thread';
+  String get storyTemplateThread => 'Thread wall';
 
   @override
   String get storyTemplateCollage => 'Collage';
 
   @override
-  String get storyTemplateQuote => 'Quote';
+  String get storyTemplateQuote => 'Words';
 
   @override
   String get storySwipeHint => 'Swipe for another look';
@@ -2510,7 +2505,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storyVideoBody =>
-      'A short film for Stories and Reels: photos drift, the thread draws itself, titles fade in.';
+      'A short film for Stories and Reels, with motion and music.';
 
   @override
   String get storyMusicTitle => 'Music';
@@ -2520,7 +2515,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storyMusicNoneHint =>
-      'You can add a song from Instagram\'s music library when you post the story.';
+      'You can also add music in Instagram when you post.';
 
   @override
   String get storyMoodWarm => 'Warm';
@@ -2541,7 +2536,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storyMoodEmotional => 'Emotional';
 
   @override
-  String get storyMusicTrimHint => 'Drag to choose which part plays';
+  String get storyMusicTrimHint =>
+      'Drag the gold box to choose the part of the song';
 
   @override
   String get storySearchHint => 'Search memories, places, years';
@@ -3668,7 +3664,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tourShowMeHow => 'Show me how';
 
   @override
-  String get tourShowMeHowSubtitle => 'A 2-minute tour with example memories';
+  String get tourShowMeHowSubtitle => 'A short tour with example memories';
 
   @override
   String get tourWelcomeTitle => 'Welcome to your wall';
@@ -3709,7 +3705,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourAddMemoryBody =>
-      'Choose Memory. Text notes and nails for arranging are here too.';
+      'Choose Memory. You can also pin a note or a nail to group cards.';
 
   @override
   String get tourAddTextTitle => 'A few words are enough';
@@ -3743,7 +3739,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourViewModesBody =>
-      'See your life as a wall, in order of time, or on a map. Categories, arrangements and hidden memories (after Face ID) are here too.';
+      'See your life as a wall, a timeline or on a map. Filter by category here and show hidden memories (with Face ID).';
 
   @override
   String get tourViewDoneTitle => 'Back to the wall';
@@ -3755,34 +3751,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tourSearchTitle => 'Find any memory';
 
   @override
-  String get tourSearchBody => 'Tap the magnifier.';
-
-  @override
-  String get tourSearchPageTitle => 'Search';
-
-  @override
-  String get tourSearchPageBody =>
-      'Type a name, a place, a person or a year. Results appear as you type.';
+  String get tourSearchBody =>
+      'Type a name, place, person or year here. Results appear as you type.';
 
   @override
   String get tourMoreTitle => 'Everything else';
 
   @override
   String get tourMoreBody =>
-      'Stories, your year, looking back, more walls and settings are in this menu. Tap it.';
+      'Stories, your year, look back, more walls and settings are in this menu. Tap it.';
 
   @override
   String get tourStoryTitle => 'Create a story';
 
   @override
   String get tourStoryBody => 'Tap Create story.';
-
-  @override
-  String get tourStoryPageTitle => 'Stories with music';
-
-  @override
-  String get tourStoryPageBody =>
-      'Pick memories and a template, or switch on Video for a short film with music, ready for Instagram, WhatsApp and more. Saving and sharing is part of Premium.';
 
   @override
   String get tourYearTitle => 'Thread of the Year';
@@ -3803,7 +3786,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourWallsBody =>
-      'A wall for each child, a trip or a project: ⋯ › New wall (Premium). The name at the top switches walls.';
+      'A wall for each child, trip or project (Premium). Tap the name at the top to switch walls.';
 
   @override
   String get tourFamilyTitle => 'Family walls';
@@ -3844,4 +3827,264 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourRemovedToast => 'Demo memories removed. Your wall is ready.';
+
+  @override
+  String get storyTemplatePolaroid => 'Polaroid';
+
+  @override
+  String get storyTemplateAlbum => 'Album';
+
+  @override
+  String get storyTemplateFilmstrip => 'Film strip';
+
+  @override
+  String get storyTemplateTimeline => 'Time travel';
+
+  @override
+  String get storyTemplatePostcard => 'Postcard';
+
+  @override
+  String get storyTemplateCinema => 'Cinema';
+
+  @override
+  String get storyTemplateSingleHint =>
+      'Each memory full screen, one after another';
+
+  @override
+  String get storyTemplateThreadHint =>
+      'Cards on the wall, joined by the thread';
+
+  @override
+  String get storyTemplateCollageHint => 'All photos together in a grid';
+
+  @override
+  String get storyTemplateQuoteHint => 'Your words type themselves in';
+
+  @override
+  String get storyTemplatePolaroidHint => 'Instant photos fall onto a pile';
+
+  @override
+  String get storyTemplateAlbumHint => 'Pages turn, one photo per page';
+
+  @override
+  String get storyTemplateFilmstripHint => 'A film runs past and zooms in';
+
+  @override
+  String get storyTemplateTimelineHint => 'The years count up to each memory';
+
+  @override
+  String get storyTemplatePostcardHint => 'Each postcard flips to its story';
+
+  @override
+  String get storyTemplateCinemaHint => 'Title cards, slow zoom and credits';
+
+  @override
+  String get storyAnimationTitle => 'Animation';
+
+  @override
+  String get storyAnimationPageTitle => 'Choose an animation';
+
+  @override
+  String get storyAnimationExamples =>
+      'Shown with example photos. Your story uses your memories.';
+
+  @override
+  String get storyMusicPageTitle => 'Music and length';
+
+  @override
+  String get storyLengthTitle => 'Length';
+
+  @override
+  String get storyLengthAuto => 'Auto';
+
+  @override
+  String storyLengthSeconds(Object seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get storyMusicAll => 'All';
+
+  @override
+  String get storyMusicPlay => 'Play';
+
+  @override
+  String get storyMusicPause => 'Pause';
+
+  @override
+  String storyMusicPlayhead(Object song, Object video) {
+    return 'Song $song ▸ Video $video';
+  }
+
+  @override
+  String get storyMusicSyncHint =>
+      'The white line shows which second of the song plays with the video. The marks are where each memory starts.';
+
+  @override
+  String get storyMusicLengthHint =>
+      'Auto fits the number of memories. Longer films move more slowly.';
+
+  @override
+  String get tourBack => 'Back';
+
+  @override
+  String get tourStoryPickTitle => 'Pick memories';
+
+  @override
+  String get tourStoryPickBody =>
+      'We picked three for you. You can choose up to six. Tap Continue.';
+
+  @override
+  String get tourStoryAnimationTitle => 'Choose how it moves';
+
+  @override
+  String get tourStoryAnimationBody =>
+      'Animations from Polaroid to Cinema. Tap Animation.';
+
+  @override
+  String get tourStoryStyleTitle => 'Try Polaroid';
+
+  @override
+  String get tourStoryStyleBody => 'Every tile plays a preview. Tap Polaroid.';
+
+  @override
+  String get tourStoryMusicTitle => 'Add music';
+
+  @override
+  String get tourStoryMusicBody =>
+      'Choose a song and how long the video runs. Tap Music.';
+
+  @override
+  String get tourStoryTrimTitle => 'Song and video in sync';
+
+  @override
+  String get tourStoryTrimBody =>
+      'Drag the gold box to choose the part of the song. The white line moves with the video, so you see which second plays when.';
+
+  @override
+  String get tourStoryMusicDoneTitle => 'Back to your story';
+
+  @override
+  String get tourStoryMusicDoneBody => 'Tap Done.';
+
+  @override
+  String get tourStoryShareTitle => 'Share or save';
+
+  @override
+  String get tourStoryShareBody =>
+      'Ready for Instagram, WhatsApp and more. Saving and sharing are part of Premium.';
+
+  @override
+  String get tourMoreAgainTitle => 'More in the menu';
+
+  @override
+  String get tourMoreAgainBody => 'Open the menu once more. Tap it.';
+
+  @override
+  String get scannerStep1 =>
+      'On a TV, computer or tablet, open the web browser.';
+
+  @override
+  String scannerStep2(Object url) {
+    return 'Go to $url. A QR code appears there.';
+  }
+
+  @override
+  String get scannerStep3 =>
+      'Hold this phone so the code is inside the gold frame. Your wall then shows there for a while, view only.';
+
+  @override
+  String get scannerShareLink => 'Send link';
+
+  @override
+  String get scannerCopyLink => 'Copy link';
+
+  @override
+  String get scannerLinkCopied => 'Link copied';
+
+  @override
+  String get storyTemplateScrapbook => 'Scrapbook';
+
+  @override
+  String get storyTemplateMosaic => 'Mosaic';
+
+  @override
+  String get storyTemplateContactSheet => 'Contact sheet';
+
+  @override
+  String get storyTemplateWallFlight => 'Wall flight';
+
+  @override
+  String get storyTemplateCarousel => 'Carousel';
+
+  @override
+  String get storyTemplateJourney => 'Journey';
+
+  @override
+  String get storyTemplateScrapbookHint => 'Every photo taped onto a page';
+
+  @override
+  String get storyTemplateMosaicHint => 'One big photo, the others around it';
+
+  @override
+  String get storyTemplateContactSheetHint => 'Every memory a frame on film';
+
+  @override
+  String get storyTemplateWallFlightHint =>
+      'Flies along the thread from card to card';
+
+  @override
+  String get storyTemplateCarouselHint =>
+      'The cards turn, one to the front at a time';
+
+  @override
+  String get storyTemplateJourneyHint =>
+      'A route across the map, a pin at each place';
+
+  @override
+  String get storyModePicture => 'Picture';
+
+  @override
+  String get storyModeVideo => 'Video';
+
+  @override
+  String get storyModePictureHint =>
+      'One image with all your memories, for posts and stories.';
+
+  @override
+  String get storyModeVideoHint => 'A short film with motion and music.';
+
+  @override
+  String get storyLayoutTitle => 'Layout';
+
+  @override
+  String get storyLayoutPageTitle => 'Choose a layout';
+
+  @override
+  String get storyChoosePhoto => 'Choose the photo for the story';
+
+  @override
+  String get wallTidyUp => 'Tidy up the wall';
+
+  @override
+  String get wallTidyUpBody =>
+      'Hang all cards neatly in rows, from the oldest memory to the newest? Notes and nails stay where they are.';
+
+  @override
+  String get wallTidyUpAction => 'Tidy up';
+
+  @override
+  String get wallTidiedToast => 'Your wall is tidy.';
+
+  @override
+  String get storyFormatTitle => 'Size';
+
+  @override
+  String get storyFormatStory => 'Story 9:16';
+
+  @override
+  String get storyFormatPost => 'Post 4:5';
+
+  @override
+  String get storyFormatSquare => 'Square 1:1';
 }

@@ -1,0 +1,6 @@
+/* सिस्टम की अनुमति वाले संदेश, फ़ोन की भाषा में। */
+"NSCameraUsageDescription" = "LifeThreads आपके चाहने पर डिस्प्ले का QR कोड स्कैन करने और यादों के लिए फ़ोटो लेने के लिए कैमरा इस्तेमाल करता है।";
+"NSContactsUsageDescription" = "LifeThreads चुने गए कॉन्टैक्ट की जानकारी को किसी याद में निजी व्यक्ति के रूप में इंपोर्ट कर सकता है।";
+"NSFaceIDUsageDescription" = "ऐप लॉक चालू करने पर LifeThreads आपकी निजी यादों की दीवार अनलॉक करने के लिए Face ID इस्तेमाल करता है।";
+"NSPhotoLibraryAddUsageDescription" = "फ़ोटो में सेव करें चुनने पर LifeThreads आपकी बनाई स्टोरी इमेज और वीडियो आपकी फ़ोटो लाइब्रेरी में सेव करता है।";
+"NSPhotoLibraryUsageDescription" = "LifeThreads आपकी चुनी हुई फ़ोटो से आपकी निजी यादों की दीवार बनाता है।";

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,11 +24,17 @@ abstract interface class MusicPreview {
   });
 
   Future<void> stop();
+
+  /// Where in the song playback is, while it plays (about five times a
+  /// second), so a film preview can run in step with it.
+  Stream<Duration> get position;
 }
 
 class AudioplayersMusicPreview implements MusicPreview {
   AudioPlayer? _player;
   StreamSubscription<Duration>? _loop;
+  final _position = StreamController<Duration>.broadcast();
+  StreamSubscription<Duration>? _positionFeed;
 
   /// Bumped by every play and stop: a play still loading its song when a
   /// newer call came in gives up instead of starting to play after it.
@@ -48,6 +55,12 @@ class AudioplayersMusicPreview implements MusicPreview {
       AudioContextConfig(respectSilence: false).build(),
     );
     await player.setReleaseMode(ReleaseMode.stop);
+    // Positions often enough for the loop's fade to be smooth.
+    player.positionUpdater = TimerPositionUpdater(
+      getPosition: player.getCurrentPosition,
+      interval: const Duration(milliseconds: 50),
+    );
+    _positionFeed = player.onPositionChanged.listen(_position.add);
     return _player = player;
   }
 
@@ -68,6 +81,8 @@ class AudioplayersMusicPreview implements MusicPreview {
     if (call != _call) return;
     if (start > Duration.zero) await player.seek(start);
     if (call != _call) return;
+    // A looped part starts silent and fades in (see below).
+    await player.setVolume(length == null ? 1 : 0);
     await player.resume();
     if (call != _call) {
       // Stopped while starting: it must not keep playing. (A newer play
@@ -77,10 +92,26 @@ class AudioplayersMusicPreview implements MusicPreview {
     }
     if (length == null) return;
     final end = start + length;
+    // The part fades out before its end and in after the jump back, as the
+    // exported video fades out: the loop doesn't cut mid-note.
+    var volume = -1.0;
     _loop = player.onPositionChanged.listen((position) {
-      if (position >= end) unawaited(player.seek(start));
+      if (position >= end) {
+        unawaited(player.seek(start));
+        return;
+      }
+      final fadeIn = (position - start).inMilliseconds / _fadeIn;
+      final fadeOut = (end - position).inMilliseconds / _fadeOut;
+      final next = math.min(fadeIn, fadeOut).clamp(0.0, 1.0);
+      if ((next - volume).abs() >= 0.05 || (next == 1 && volume != 1)) {
+        volume = next;
+        unawaited(player.setVolume(next));
+      }
     });
   }
+
+  static const _fadeIn = 250;
+  static const _fadeOut = 450;
 
   @override
   Future<void> stop() async {
@@ -91,8 +122,13 @@ class AudioplayersMusicPreview implements MusicPreview {
     await _player?.stop();
   }
 
+  @override
+  Stream<Duration> get position => _position.stream;
+
   void dispose() {
     unawaited(_loop?.cancel());
+    unawaited(_positionFeed?.cancel());
+    unawaited(_position.close());
     unawaited(_player?.dispose());
   }
 }

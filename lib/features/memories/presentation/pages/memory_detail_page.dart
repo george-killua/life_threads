@@ -65,8 +65,10 @@ class MemoryDetailPage extends ConsumerWidget {
               : null;
           final galleryPhotos = _galleryPreviewPhotos(photos);
 
+          // The title sits low on the photo: the bar turns solid as soon as
+          // the page scrolls, so the title never slides under the buttons.
           return _ScrolledPast(
-            offset: 320,
+            offset: 24,
             builder: (context, pastPhoto) => Stack(
               children: [
                 CustomScrollView(
@@ -724,14 +726,18 @@ class _MetadataGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return GridView.count(
+    // Tall enough for the icon, label and value at the user's text size.
+    final textScale = MediaQuery.textScalerOf(context).scale(1);
+    return GridView(
       padding: EdgeInsets.zero,
-      crossAxisCount: 2,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      childAspectRatio: 1.55,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        mainAxisExtent: 72 + 36 * textScale,
+      ),
       children: [
         _MetaCard(
           icon: Icons.auto_stories_rounded,

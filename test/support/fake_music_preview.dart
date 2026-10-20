@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:life_threads/features/stories/data/music_preview.dart';
 import 'package:life_threads/features/stories/domain/music_track.dart';
 
@@ -20,4 +22,10 @@ class FakeMusicPreview implements MusicPreview {
 
   @override
   Future<void> stop() async => calls.add('stop');
+
+  /// Push playback positions here to drive the synced previews.
+  final positions = StreamController<Duration>.broadcast();
+
+  @override
+  Stream<Duration> get position => positions.stream;
 }

@@ -1,0 +1,6 @@
+/* Demandes d’autorisation du système, dans la langue du téléphone. */
+"NSCameraUsageDescription" = "LifeThreads utilise l’appareil photo pour scanner le code QR d’un écran et prendre des photos de souvenirs quand tu le souhaites.";
+"NSContactsUsageDescription" = "LifeThreads peut importer les coordonnées que tu choisis comme personne privée dans un souvenir.";
+"NSFaceIDUsageDescription" = "LifeThreads utilise Face ID pour déverrouiller ton mur de souvenirs privé quand tu actives le verrouillage.";
+"NSPhotoLibraryAddUsageDescription" = "LifeThreads enregistre dans ta photothèque les images et vidéos de stories que tu crées quand tu choisis Enregistrer dans Photos.";
+"NSPhotoLibraryUsageDescription" = "LifeThreads utilise les photos que tu choisis pour créer ton mur de souvenirs privé.";

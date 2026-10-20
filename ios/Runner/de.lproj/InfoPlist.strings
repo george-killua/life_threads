@@ -1,0 +1,6 @@
+/* Systemabfragen für Berechtigungen, in der Sprache des Handys. */
+"NSCameraUsageDescription" = "LifeThreads nutzt die Kamera, um den QR-Code einer Wandanzeige zu scannen und Fotos für Erinnerungen aufzunehmen, wenn du das möchtest.";
+"NSContactsUsageDescription" = "LifeThreads kann ausgewählte Kontaktdaten als private Person zu einer Erinnerung übernehmen.";
+"NSFaceIDUsageDescription" = "LifeThreads nutzt Face ID, um deine private Erinnerungswand zu entsperren, wenn du die App-Sperre einschaltest.";
+"NSPhotoLibraryAddUsageDescription" = "LifeThreads speichert die Story-Bilder und -Videos, die du erstellst, in deiner Fotomediathek, wenn du „In Fotos sichern“ wählst.";
+"NSPhotoLibraryUsageDescription" = "LifeThreads nutzt die Fotos, die du auswählst, für deine private Erinnerungswand.";

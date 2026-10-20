@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
@@ -8,6 +9,10 @@ import '../../domain/music_track.dart';
 /// song's waveform with a highlighted window the user drags, like choosing a
 /// song part for an Instagram story. [onChanged] fires while dragging,
 /// [onChangeEnd] when the finger lifts (play the new part then).
+///
+/// With [playhead] a white line follows the song while it plays, and
+/// [marks] (times in the film) show where each memory comes up, so the
+/// user sees which part of the song plays over which memory.
 class MusicTrimmer extends StatefulWidget {
   const MusicTrimmer({
     super.key,
@@ -16,6 +21,8 @@ class MusicTrimmer extends StatefulWidget {
     required this.start,
     required this.onChanged,
     required this.onChangeEnd,
+    this.playhead,
+    this.marks = const [],
   });
 
   final MusicTrack track;
@@ -23,6 +30,10 @@ class MusicTrimmer extends StatefulWidget {
   final Duration start;
   final ValueChanged<Duration> onChanged;
   final ValueChanged<Duration> onChangeEnd;
+
+  /// Where in the song playback is; null while nothing plays.
+  final ValueListenable<Duration?>? playhead;
+  final List<Duration> marks;
 
   /// The latest start that still fits a [window]-long part into [track].
   static Duration maxStart(MusicTrack track, Duration window) {
@@ -160,14 +171,21 @@ class _MusicTrimmerState extends State<MusicTrimmer> {
                       _moveBy(details.delta.dx, width),
                   onHorizontalDragEnd: (_) => widget.onChangeEnd(_start),
                   child: SizedBox(
-                    height: 54,
+                    height: 62,
                     child: CustomPaint(
                       painter: _WaveformPainter(
                         peaks: widget.track.peaks,
                         length: widget.track.length,
                         start: _start,
                         window: _window,
+                        marks: widget.marks,
                       ),
+                      foregroundPainter: widget.playhead == null
+                          ? null
+                          : _PlayheadPainter(
+                              playhead: widget.playhead!,
+                              length: widget.track.length,
+                            ),
                     ),
                   ),
                 );
@@ -192,12 +210,14 @@ class _WaveformPainter extends CustomPainter {
     required this.length,
     required this.start,
     required this.window,
+    required this.marks,
   });
 
   final List<int> peaks;
   final Duration length;
   final Duration start;
   final Duration window;
+  final List<Duration> marks;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -222,17 +242,32 @@ class _WaveformPainter extends CustomPainter {
       Paint()..color = AppColors.gold.withValues(alpha: 0.18),
     );
 
+    // Where each memory comes up: small ticks along the bottom edge.
+    final tick = Paint()
+      ..color = AppColors.amber
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    for (final mark in marks) {
+      final x = size.width * (start + mark).inMicroseconds / lengthUs;
+      if (x < left || x > right) continue;
+      canvas.drawLine(
+        Offset(x, size.height - 9),
+        Offset(x, size.height - 3),
+        tick,
+      );
+    }
+
     final bars = peaks.isEmpty ? List.filled(50, 40) : peaks;
     final slot = size.width / bars.length;
     final barWidth = (slot * 0.55).clamp(1.5, 6.0);
     for (var i = 0; i < bars.length; i++) {
       final x = slot * (i + 0.5);
-      final height = (size.height - 14) * (bars[i].clamp(4, 100) / 100);
+      final height = (size.height - 22) * (bars[i].clamp(4, 100) / 100);
       final inside = x >= left && x <= right;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
           Rect.fromCenter(
-            center: Offset(x, size.height / 2),
+            center: Offset(x, (size.height - 6) / 2),
             width: barWidth,
             height: height,
           ),
@@ -259,5 +294,40 @@ class _WaveformPainter extends CustomPainter {
       old.start != start ||
       old.window != window ||
       old.length != length ||
-      old.peaks != peaks;
+      old.peaks != peaks ||
+      !listEquals(old.marks, marks);
+}
+
+/// The white line at the song's playback position; repaints on its own,
+/// without the waveform.
+class _PlayheadPainter extends CustomPainter {
+  _PlayheadPainter({required this.playhead, required this.length})
+    : super(repaint: playhead);
+
+  final ValueListenable<Duration?> playhead;
+  final Duration length;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final position = playhead.value;
+    final lengthUs = length.inMicroseconds;
+    if (position == null || lengthUs == 0) return;
+    final x = (size.width * position.inMicroseconds / lengthUs).clamp(
+      0.0,
+      size.width,
+    );
+    canvas.drawLine(
+      Offset(x, -3),
+      Offset(x, size.height + 3),
+      Paint()
+        ..color = Colors.white
+        ..strokeWidth = 2.5
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.drawCircle(Offset(x, -3), 4, Paint()..color = Colors.white);
+  }
+
+  @override
+  bool shouldRepaint(_PlayheadPainter old) =>
+      old.playhead != playhead || old.length != length;
 }

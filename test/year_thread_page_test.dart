@@ -75,7 +75,11 @@ class FakeExporter implements StoryExporter {
   }
 
   @override
-  Future<File> exportImage(BuildContext context, Widget page) async {
+  Future<File> exportImage(
+    BuildContext context,
+    Widget page, {
+    Size size = const Size(360, 640),
+  }) async {
     pages.add(page);
     return _file('png');
   }

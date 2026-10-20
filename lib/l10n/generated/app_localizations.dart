@@ -8,6 +8,17 @@ import 'package:intl/intl.dart' as intl;
 import 'app_localizations_ar.dart';
 import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
+import 'app_localizations_fr.dart';
+import 'app_localizations_hi.dart';
+import 'app_localizations_it.dart';
+import 'app_localizations_ja.dart';
+import 'app_localizations_ko.dart';
+import 'app_localizations_pl.dart';
+import 'app_localizations_pt.dart';
+import 'app_localizations_ru.dart';
+import 'app_localizations_tr.dart';
+import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
 
@@ -98,6 +109,17 @@ abstract class AppLocalizations {
     Locale('ar'),
     Locale('de'),
     Locale('en'),
+    Locale('es'),
+    Locale('fr'),
+    Locale('hi'),
+    Locale('it'),
+    Locale('ja'),
+    Locale('ko'),
+    Locale('pl'),
+    Locale('pt'),
+    Locale('ru'),
+    Locale('tr'),
+    Locale('zh'),
   ];
 
   /// No description provided for @appTitle.
@@ -721,14 +743,8 @@ abstract class AppLocalizations {
   /// No description provided for @scannerHintTitle.
   ///
   /// In en, this message translates to:
-  /// **'Open lifethreads.gkcoding.dev/display on another screen.'**
+  /// **'Where is the QR code?'**
   String get scannerHintTitle;
-
-  /// No description provided for @scannerHintBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan the QR code from that page. LifeThreads sends a temporary read-only board snapshot to that browser session.'**
-  String get scannerHintBody;
 
   /// No description provided for @addMemoryBeforeDisplay.
   ///
@@ -4314,7 +4330,7 @@ abstract class AppLocalizations {
   /// No description provided for @storyTemplateThread.
   ///
   /// In en, this message translates to:
-  /// **'Thread'**
+  /// **'Thread wall'**
   String get storyTemplateThread;
 
   /// No description provided for @storyTemplateCollage.
@@ -4326,7 +4342,7 @@ abstract class AppLocalizations {
   /// No description provided for @storyTemplateQuote.
   ///
   /// In en, this message translates to:
-  /// **'Quote'**
+  /// **'Words'**
   String get storyTemplateQuote;
 
   /// No description provided for @storySwipeHint.
@@ -4356,7 +4372,7 @@ abstract class AppLocalizations {
   /// No description provided for @storyVideoBody.
   ///
   /// In en, this message translates to:
-  /// **'A short film for Stories and Reels: photos drift, the thread draws itself, titles fade in.'**
+  /// **'A short film for Stories and Reels, with motion and music.'**
   String get storyVideoBody;
 
   /// No description provided for @storyMusicTitle.
@@ -4374,7 +4390,7 @@ abstract class AppLocalizations {
   /// No description provided for @storyMusicNoneHint.
   ///
   /// In en, this message translates to:
-  /// **'You can add a song from Instagram\'s music library when you post the story.'**
+  /// **'You can also add music in Instagram when you post.'**
   String get storyMusicNoneHint;
 
   /// No description provided for @storyMoodWarm.
@@ -4416,7 +4432,7 @@ abstract class AppLocalizations {
   /// No description provided for @storyMusicTrimHint.
   ///
   /// In en, this message translates to:
-  /// **'Drag to choose which part plays'**
+  /// **'Drag the gold box to choose the part of the song'**
   String get storyMusicTrimHint;
 
   /// No description provided for @storySearchHint.
@@ -6234,7 +6250,7 @@ abstract class AppLocalizations {
   /// No description provided for @tourShowMeHowSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'A 2-minute tour with example memories'**
+  /// **'A short tour with example memories'**
   String get tourShowMeHowSubtitle;
 
   /// No description provided for @tourWelcomeTitle.
@@ -6306,7 +6322,7 @@ abstract class AppLocalizations {
   /// No description provided for @tourAddMemoryBody.
   ///
   /// In en, this message translates to:
-  /// **'Choose Memory. Text notes and nails for arranging are here too.'**
+  /// **'Choose Memory. You can also pin a note or a nail to group cards.'**
   String get tourAddMemoryBody;
 
   /// No description provided for @tourAddTextTitle.
@@ -6366,7 +6382,7 @@ abstract class AppLocalizations {
   /// No description provided for @tourViewModesBody.
   ///
   /// In en, this message translates to:
-  /// **'See your life as a wall, in order of time, or on a map. Categories, arrangements and hidden memories (after Face ID) are here too.'**
+  /// **'See your life as a wall, a timeline or on a map. Filter by category here and show hidden memories (with Face ID).'**
   String get tourViewModesBody;
 
   /// No description provided for @tourViewDoneTitle.
@@ -6390,20 +6406,8 @@ abstract class AppLocalizations {
   /// No description provided for @tourSearchBody.
   ///
   /// In en, this message translates to:
-  /// **'Tap the magnifier.'**
+  /// **'Type a name, place, person or year here. Results appear as you type.'**
   String get tourSearchBody;
-
-  /// No description provided for @tourSearchPageTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Search'**
-  String get tourSearchPageTitle;
-
-  /// No description provided for @tourSearchPageBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Type a name, a place, a person or a year. Results appear as you type.'**
-  String get tourSearchPageBody;
 
   /// No description provided for @tourMoreTitle.
   ///
@@ -6414,7 +6418,7 @@ abstract class AppLocalizations {
   /// No description provided for @tourMoreBody.
   ///
   /// In en, this message translates to:
-  /// **'Stories, your year, looking back, more walls and settings are in this menu. Tap it.'**
+  /// **'Stories, your year, look back, more walls and settings are in this menu. Tap it.'**
   String get tourMoreBody;
 
   /// No description provided for @tourStoryTitle.
@@ -6428,18 +6432,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap Create story.'**
   String get tourStoryBody;
-
-  /// No description provided for @tourStoryPageTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Stories with music'**
-  String get tourStoryPageTitle;
-
-  /// No description provided for @tourStoryPageBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Pick memories and a template, or switch on Video for a short film with music, ready for Instagram, WhatsApp and more. Saving and sharing is part of Premium.'**
-  String get tourStoryPageBody;
 
   /// No description provided for @tourYearTitle.
   ///
@@ -6474,7 +6466,7 @@ abstract class AppLocalizations {
   /// No description provided for @tourWallsBody.
   ///
   /// In en, this message translates to:
-  /// **'A wall for each child, a trip or a project: ⋯ › New wall (Premium). The name at the top switches walls.'**
+  /// **'A wall for each child, trip or project (Premium). Tap the name at the top to switch walls.'**
   String get tourWallsBody;
 
   /// No description provided for @tourFamilyTitle.
@@ -6548,6 +6540,480 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Demo memories removed. Your wall is ready.'**
   String get tourRemovedToast;
+
+  /// No description provided for @storyTemplatePolaroid.
+  ///
+  /// In en, this message translates to:
+  /// **'Polaroid'**
+  String get storyTemplatePolaroid;
+
+  /// No description provided for @storyTemplateAlbum.
+  ///
+  /// In en, this message translates to:
+  /// **'Album'**
+  String get storyTemplateAlbum;
+
+  /// No description provided for @storyTemplateFilmstrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Film strip'**
+  String get storyTemplateFilmstrip;
+
+  /// No description provided for @storyTemplateTimeline.
+  ///
+  /// In en, this message translates to:
+  /// **'Time travel'**
+  String get storyTemplateTimeline;
+
+  /// No description provided for @storyTemplatePostcard.
+  ///
+  /// In en, this message translates to:
+  /// **'Postcard'**
+  String get storyTemplatePostcard;
+
+  /// No description provided for @storyTemplateCinema.
+  ///
+  /// In en, this message translates to:
+  /// **'Cinema'**
+  String get storyTemplateCinema;
+
+  /// No description provided for @storyTemplateSingleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Each memory full screen, one after another'**
+  String get storyTemplateSingleHint;
+
+  /// No description provided for @storyTemplateThreadHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Cards on the wall, joined by the thread'**
+  String get storyTemplateThreadHint;
+
+  /// No description provided for @storyTemplateCollageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'All photos together in a grid'**
+  String get storyTemplateCollageHint;
+
+  /// No description provided for @storyTemplateQuoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your words type themselves in'**
+  String get storyTemplateQuoteHint;
+
+  /// No description provided for @storyTemplatePolaroidHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant photos fall onto a pile'**
+  String get storyTemplatePolaroidHint;
+
+  /// No description provided for @storyTemplateAlbumHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pages turn, one photo per page'**
+  String get storyTemplateAlbumHint;
+
+  /// No description provided for @storyTemplateFilmstripHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A film runs past and zooms in'**
+  String get storyTemplateFilmstripHint;
+
+  /// No description provided for @storyTemplateTimelineHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The years count up to each memory'**
+  String get storyTemplateTimelineHint;
+
+  /// No description provided for @storyTemplatePostcardHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Each postcard flips to its story'**
+  String get storyTemplatePostcardHint;
+
+  /// No description provided for @storyTemplateCinemaHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Title cards, slow zoom and credits'**
+  String get storyTemplateCinemaHint;
+
+  /// No description provided for @storyAnimationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Animation'**
+  String get storyAnimationTitle;
+
+  /// No description provided for @storyAnimationPageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an animation'**
+  String get storyAnimationPageTitle;
+
+  /// No description provided for @storyAnimationExamples.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown with example photos. Your story uses your memories.'**
+  String get storyAnimationExamples;
+
+  /// No description provided for @storyMusicPageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Music and length'**
+  String get storyMusicPageTitle;
+
+  /// No description provided for @storyLengthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Length'**
+  String get storyLengthTitle;
+
+  /// No description provided for @storyLengthAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get storyLengthAuto;
+
+  /// No description provided for @storyLengthSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s'**
+  String storyLengthSeconds(Object seconds);
+
+  /// No description provided for @storyMusicAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get storyMusicAll;
+
+  /// No description provided for @storyMusicPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get storyMusicPlay;
+
+  /// No description provided for @storyMusicPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get storyMusicPause;
+
+  /// No description provided for @storyMusicPlayhead.
+  ///
+  /// In en, this message translates to:
+  /// **'Song {song} ▸ Video {video}'**
+  String storyMusicPlayhead(Object song, Object video);
+
+  /// No description provided for @storyMusicSyncHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The white line shows which second of the song plays with the video. The marks are where each memory starts.'**
+  String get storyMusicSyncHint;
+
+  /// No description provided for @storyMusicLengthHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto fits the number of memories. Longer films move more slowly.'**
+  String get storyMusicLengthHint;
+
+  /// No description provided for @tourBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get tourBack;
+
+  /// No description provided for @tourStoryPickTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick memories'**
+  String get tourStoryPickTitle;
+
+  /// No description provided for @tourStoryPickBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We picked three for you. You can choose up to six. Tap Continue.'**
+  String get tourStoryPickBody;
+
+  /// No description provided for @tourStoryAnimationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how it moves'**
+  String get tourStoryAnimationTitle;
+
+  /// No description provided for @tourStoryAnimationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Animations from Polaroid to Cinema. Tap Animation.'**
+  String get tourStoryAnimationBody;
+
+  /// No description provided for @tourStoryStyleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Polaroid'**
+  String get tourStoryStyleTitle;
+
+  /// No description provided for @tourStoryStyleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every tile plays a preview. Tap Polaroid.'**
+  String get tourStoryStyleBody;
+
+  /// No description provided for @tourStoryMusicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add music'**
+  String get tourStoryMusicTitle;
+
+  /// No description provided for @tourStoryMusicBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a song and how long the video runs. Tap Music.'**
+  String get tourStoryMusicBody;
+
+  /// No description provided for @tourStoryTrimTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Song and video in sync'**
+  String get tourStoryTrimTitle;
+
+  /// No description provided for @tourStoryTrimBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag the gold box to choose the part of the song. The white line moves with the video, so you see which second plays when.'**
+  String get tourStoryTrimBody;
+
+  /// No description provided for @tourStoryMusicDoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to your story'**
+  String get tourStoryMusicDoneTitle;
+
+  /// No description provided for @tourStoryMusicDoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Done.'**
+  String get tourStoryMusicDoneBody;
+
+  /// No description provided for @tourStoryShareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share or save'**
+  String get tourStoryShareTitle;
+
+  /// No description provided for @tourStoryShareBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready for Instagram, WhatsApp and more. Saving and sharing are part of Premium.'**
+  String get tourStoryShareBody;
+
+  /// No description provided for @tourMoreAgainTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'More in the menu'**
+  String get tourMoreAgainTitle;
+
+  /// No description provided for @tourMoreAgainBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the menu once more. Tap it.'**
+  String get tourMoreAgainBody;
+
+  /// No description provided for @scannerStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'On a TV, computer or tablet, open the web browser.'**
+  String get scannerStep1;
+
+  /// No description provided for @scannerStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to {url}. A QR code appears there.'**
+  String scannerStep2(Object url);
+
+  /// No description provided for @scannerStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold this phone so the code is inside the gold frame. Your wall then shows there for a while, view only.'**
+  String get scannerStep3;
+
+  /// No description provided for @scannerShareLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Send link'**
+  String get scannerShareLink;
+
+  /// No description provided for @scannerCopyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get scannerCopyLink;
+
+  /// No description provided for @scannerLinkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied'**
+  String get scannerLinkCopied;
+
+  /// No description provided for @storyTemplateScrapbook.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrapbook'**
+  String get storyTemplateScrapbook;
+
+  /// No description provided for @storyTemplateMosaic.
+  ///
+  /// In en, this message translates to:
+  /// **'Mosaic'**
+  String get storyTemplateMosaic;
+
+  /// No description provided for @storyTemplateContactSheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact sheet'**
+  String get storyTemplateContactSheet;
+
+  /// No description provided for @storyTemplateWallFlight.
+  ///
+  /// In en, this message translates to:
+  /// **'Wall flight'**
+  String get storyTemplateWallFlight;
+
+  /// No description provided for @storyTemplateCarousel.
+  ///
+  /// In en, this message translates to:
+  /// **'Carousel'**
+  String get storyTemplateCarousel;
+
+  /// No description provided for @storyTemplateJourney.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey'**
+  String get storyTemplateJourney;
+
+  /// No description provided for @storyTemplateScrapbookHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Every photo taped onto a page'**
+  String get storyTemplateScrapbookHint;
+
+  /// No description provided for @storyTemplateMosaicHint.
+  ///
+  /// In en, this message translates to:
+  /// **'One big photo, the others around it'**
+  String get storyTemplateMosaicHint;
+
+  /// No description provided for @storyTemplateContactSheetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Every memory a frame on film'**
+  String get storyTemplateContactSheetHint;
+
+  /// No description provided for @storyTemplateWallFlightHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Flies along the thread from card to card'**
+  String get storyTemplateWallFlightHint;
+
+  /// No description provided for @storyTemplateCarouselHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The cards turn, one to the front at a time'**
+  String get storyTemplateCarouselHint;
+
+  /// No description provided for @storyTemplateJourneyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A route across the map, a pin at each place'**
+  String get storyTemplateJourneyHint;
+
+  /// No description provided for @storyModePicture.
+  ///
+  /// In en, this message translates to:
+  /// **'Picture'**
+  String get storyModePicture;
+
+  /// No description provided for @storyModeVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get storyModeVideo;
+
+  /// No description provided for @storyModePictureHint.
+  ///
+  /// In en, this message translates to:
+  /// **'One image with all your memories, for posts and stories.'**
+  String get storyModePictureHint;
+
+  /// No description provided for @storyModeVideoHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A short film with motion and music.'**
+  String get storyModeVideoHint;
+
+  /// No description provided for @storyLayoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Layout'**
+  String get storyLayoutTitle;
+
+  /// No description provided for @storyLayoutPageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a layout'**
+  String get storyLayoutPageTitle;
+
+  /// No description provided for @storyChoosePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the photo for the story'**
+  String get storyChoosePhoto;
+
+  /// No description provided for @wallTidyUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Tidy up the wall'**
+  String get wallTidyUp;
+
+  /// No description provided for @wallTidyUpBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Hang all cards neatly in rows, from the oldest memory to the newest? Notes and nails stay where they are.'**
+  String get wallTidyUpBody;
+
+  /// No description provided for @wallTidyUpAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Tidy up'**
+  String get wallTidyUpAction;
+
+  /// No description provided for @wallTidiedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Your wall is tidy.'**
+  String get wallTidiedToast;
+
+  /// No description provided for @storyFormatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get storyFormatTitle;
+
+  /// No description provided for @storyFormatStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Story 9:16'**
+  String get storyFormatStory;
+
+  /// No description provided for @storyFormatPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Post 4:5'**
+  String get storyFormatPost;
+
+  /// No description provided for @storyFormatSquare.
+  ///
+  /// In en, this message translates to:
+  /// **'Square 1:1'**
+  String get storyFormatSquare;
 }
 
 class _AppLocalizationsDelegate
@@ -6560,8 +7026,22 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['ar', 'de', 'en'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'ar',
+    'de',
+    'en',
+    'es',
+    'fr',
+    'hi',
+    'it',
+    'ja',
+    'ko',
+    'pl',
+    'pt',
+    'ru',
+    'tr',
+    'zh',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -6576,6 +7056,28 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+    case 'fr':
+      return AppLocalizationsFr();
+    case 'hi':
+      return AppLocalizationsHi();
+    case 'it':
+      return AppLocalizationsIt();
+    case 'ja':
+      return AppLocalizationsJa();
+    case 'ko':
+      return AppLocalizationsKo();
+    case 'pl':
+      return AppLocalizationsPl();
+    case 'pt':
+      return AppLocalizationsPt();
+    case 'ru':
+      return AppLocalizationsRu();
+    case 'tr':
+      return AppLocalizationsTr();
+    case 'zh':
+      return AppLocalizationsZh();
   }
 
   throw FlutterError(

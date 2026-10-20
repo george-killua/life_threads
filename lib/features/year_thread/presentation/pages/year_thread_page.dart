@@ -19,6 +19,7 @@ import '../../../wall/data/current_wall.dart';
 import '../../../premium/domain/premium_feature.dart';
 import '../../../premium/presentation/premium_gate.dart';
 import '../../../stories/data/music_preview.dart';
+import '../../../stories/presentation/pages/story_music_page.dart';
 import '../../../stories/data/story_exporter.dart';
 import '../../../stories/domain/music_track.dart';
 import '../../../stories/presentation/widgets/music_trimmer.dart';
@@ -75,20 +76,30 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
     super.dispose();
   }
 
-  /// Picks [track] (or no music) and plays it so the user hears it.
-  void _selectMusic(MusicTrack? track, {Duration? window}) {
-    if (track == null) {
-      setState(() => _music = null);
-      unawaited(_musicPreview.stop());
-      return;
-    }
-    final length = window ?? track.length;
-    final start = MusicTrimmer.suggestedStart(track, length);
+  /// Opens the music screen for [film]: the song and its part, chosen
+  /// while the film plays in step with it.
+  Future<void> _chooseMusic(
+    YearThreadFilm film,
+    List<MusicTrack> tracks,
+  ) async {
+    unawaited(_musicPreview.stop());
+    final chosen = await Navigator.of(context).push<StoryMusicChoice>(
+      MaterialPageRoute(
+        builder: (_) => StoryMusicPage(
+          filmFor: (_) => film,
+          canChangeLength: false,
+          tracks: tracks,
+          track: _music,
+          start: _musicStart,
+          length: null,
+        ),
+      ),
+    );
+    if (chosen == null || !mounted) return;
     setState(() {
-      _music = track;
-      _musicStart = start;
+      _music = chosen.track;
+      _musicStart = chosen.start;
     });
-    unawaited(_musicPreview.play(track, start: start, length: length));
   }
 
   @override
@@ -332,52 +343,38 @@ class _YearThreadPageState extends ConsumerState<YearThreadPage> {
       ),
       const SizedBox(height: 18),
       _Label(l10n.yearThreadMusic),
+      // The music screen: the song, its part, and the film playing in step
+      // with it (the length is the film's own).
       _Panel(
-        child: Row(
-          children: [
-            Icon(Icons.music_note_rounded, color: AppColors.gold),
-            const SizedBox(width: 10),
-            Expanded(
-              child: tracks.isEmpty
-                  ? Text(
-                      l10n.yearThreadNoMusic,
-                      style: const TextStyle(fontWeight: FontWeight.w800),
-                    )
-                  : DropdownButton<MusicTrack?>(
-                      isExpanded: true,
-                      value: tracks.contains(_music) ? _music : null,
-                      underline: const SizedBox.shrink(),
-                      items: [
-                        DropdownMenuItem(
-                          value: null,
-                          child: Text(l10n.yearThreadNoMusic),
-                        ),
-                        for (final track in tracks)
-                          DropdownMenuItem(
-                            value: track,
-                            child: Text('${track.title} · ${track.artist}'),
-                          ),
-                      ],
-                      onChanged: (track) =>
-                          _selectMusic(track, window: film?.duration),
-                    ),
-            ),
-          ],
-        ),
-      ),
-      if (_music case final music? when film != null) ...[
-        const SizedBox(height: 12),
-        MusicTrimmer(
-          key: ValueKey('music-trimmer-${music.id}'),
-          track: music,
-          window: film.duration,
-          start: MusicTrimmer.clampStart(music, film.duration, _musicStart),
-          onChanged: (start) => setState(() => _musicStart = start),
-          onChangeEnd: (start) => unawaited(
-            _musicPreview.play(music, start: start, length: film.duration),
+        child: InkWell(
+          key: const ValueKey('year-thread-music'),
+          borderRadius: BorderRadius.circular(16),
+          onTap: tracks.isEmpty || film == null
+              ? null
+              : () => _chooseMusic(film, tracks),
+          child: Row(
+            children: [
+              Icon(Icons.music_note_rounded, color: AppColors.gold),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  switch ((_music, film)) {
+                    (final MusicTrack music, final YearThreadFilm film) =>
+                      '${music.title} · '
+                          '${_clock(MusicTrimmer.clampStart(music, film.duration, _musicStart))}–'
+                          '${_clock(MusicTrimmer.clampStart(music, film.duration, _musicStart) + film.duration)}',
+                    _ => l10n.yearThreadNoMusic,
+                  },
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded),
+            ],
           ),
         ),
-      ],
+      ),
       const SizedBox(height: 18),
       Row(
         children: [
@@ -1145,3 +1142,6 @@ class _WallChooser extends StatelessWidget {
     );
   }
 }
+
+String _clock(Duration value) =>
+    '${value.inMinutes}:${(value.inSeconds % 60).toString().padLeft(2, '0')}';

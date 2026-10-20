@@ -1,0 +1,6 @@
+/* طلبات أذونات النظام، بلغة الهاتف. */
+"NSCameraUsageDescription" = "يستخدم LifeThreads الكاميرا لمسح رمز QR لعرض الجدار، ولالتقاط صور للذكريات عندما تختار ذلك.";
+"NSContactsUsageDescription" = "يمكن لـ LifeThreads نقل بيانات جهات الاتصال التي تختارها إلى شخص خاص في ذكرى.";
+"NSFaceIDUsageDescription" = "يستخدم LifeThreads بصمة الوجه لفتح جدار ذكرياتك الخاص عندما تفعّل قفل التطبيق.";
+"NSPhotoLibraryAddUsageDescription" = "يحفظ LifeThreads صور القصص ومقاطع الفيديو التي تنشئها في مكتبة الصور عندما تختار «حفظ في الصور».";
+"NSPhotoLibraryUsageDescription" = "يستخدم LifeThreads الصور التي تختارها لبناء جدار ذكرياتك الخاص.";

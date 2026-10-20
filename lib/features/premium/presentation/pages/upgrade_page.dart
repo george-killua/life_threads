@@ -270,13 +270,15 @@ class _LimitMeter extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                isPremium
-                    ? context.l10n.premiumMemories
-                    : context.l10n.freeMemories,
-                style: const TextStyle(fontWeight: FontWeight.w900),
+              Expanded(
+                child: Text(
+                  isPremium
+                      ? context.l10n.premiumMemories
+                      : context.l10n.freeMemories,
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               Text(
                 isPremium
                     ? '$memoryCount / ${context.l10n.unlimited}'

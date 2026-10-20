@@ -86,63 +86,74 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                 ),
               ),
               Expanded(
-                child: PageView(
-                  controller: _pageController,
-                  physics: const NeverScrollableScrollPhysics(),
-                  onPageChanged: (index) {
-                    setState(() => _pageIndex = index);
-                    if (index == 2) {
-                      _nameFocus.requestFocus();
-                    } else {
-                      _nameFocus.unfocus();
-                    }
-                  },
-                  children: [
-                    _WelcomeStep(
-                      headline: l10n.onboardingHeadline,
-                      body: l10n.onboardingBody,
-                    ),
-                    _HowItWorksStep(
-                      title: l10n.howItWorks,
-                      // What the app does, what comes back, and that it
-                      // stays private.
-                      cards: [
-                        (
-                          Icons.photo_library_rounded,
-                          l10n.onboardingHangTitle,
-                          l10n.onboardingHangText,
-                        ),
-                        (
-                          Icons.hub_rounded,
-                          l10n.onboardingConnectTitle,
-                          l10n.onboardingConnectText,
-                        ),
-                        (
-                          Icons.event_repeat_rounded,
-                          l10n.onboardingComeBackTitle,
-                          l10n.onboardingComeBackText,
-                        ),
-                        (
-                          Icons.lock_rounded,
-                          l10n.storyPrivacyTitle,
-                          l10n.onboardingPrivateText,
-                        ),
-                      ],
-                    ),
-                    _NameStep(
-                      controller: _nameController,
-                      focusNode: _nameFocus,
-                      title: l10n.onboardingNameTitle,
-                      hint: l10n.onboardingNameHint,
-                      preview: _trimmedName.isEmpty
-                          ? null
-                          : l10n.onboardingNiceToMeetYou(_trimmedName),
-                    ),
-                    _GetStartedStep(
-                      title: l10n.onboardingGetStartedTitle,
-                      body: l10n.onboardingGetStartedBody,
-                    ),
-                  ],
+                // On short phones a page scrolls: its bottom edge fades out
+                // instead of slicing a line in half at the dots.
+                child: ShaderMask(
+                  blendMode: BlendMode.dstIn,
+                  shaderCallback: (bounds) => const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.white, Colors.white, Colors.transparent],
+                    stops: [0, 0.94, 1],
+                  ).createShader(bounds),
+                  child: PageView(
+                    controller: _pageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    onPageChanged: (index) {
+                      setState(() => _pageIndex = index);
+                      if (index == 2) {
+                        _nameFocus.requestFocus();
+                      } else {
+                        _nameFocus.unfocus();
+                      }
+                    },
+                    children: [
+                      _WelcomeStep(
+                        headline: l10n.onboardingHeadline,
+                        body: l10n.onboardingBody,
+                      ),
+                      _HowItWorksStep(
+                        title: l10n.howItWorks,
+                        // What the app does, what comes back, and that it
+                        // stays private.
+                        cards: [
+                          (
+                            Icons.photo_library_rounded,
+                            l10n.onboardingHangTitle,
+                            l10n.onboardingHangText,
+                          ),
+                          (
+                            Icons.hub_rounded,
+                            l10n.onboardingConnectTitle,
+                            l10n.onboardingConnectText,
+                          ),
+                          (
+                            Icons.event_repeat_rounded,
+                            l10n.onboardingComeBackTitle,
+                            l10n.onboardingComeBackText,
+                          ),
+                          (
+                            Icons.lock_rounded,
+                            l10n.storyPrivacyTitle,
+                            l10n.onboardingPrivateText,
+                          ),
+                        ],
+                      ),
+                      _NameStep(
+                        controller: _nameController,
+                        focusNode: _nameFocus,
+                        title: l10n.onboardingNameTitle,
+                        hint: l10n.onboardingNameHint,
+                        preview: _trimmedName.isEmpty
+                            ? null
+                            : l10n.onboardingNiceToMeetYou(_trimmedName),
+                      ),
+                      _GetStartedStep(
+                        title: l10n.onboardingGetStartedTitle,
+                        body: l10n.onboardingGetStartedBody,
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Padding(

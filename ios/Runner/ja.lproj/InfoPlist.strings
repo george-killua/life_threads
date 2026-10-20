@@ -1,0 +1,6 @@
+/* システムの許可ダイアログ(端末の言語で表示)。 */
+"NSCameraUsageDescription" = "LifeThreadsは、表示用QRコードの読み取りや、思い出の写真を撮るときにカメラを使います。";
+"NSContactsUsageDescription" = "LifeThreadsは、選んだ連絡先の情報を思い出の中の非公開の人物として読み込めます。";
+"NSFaceIDUsageDescription" = "LifeThreadsは、アプリロックをオンにしたとき、Face IDでプライベートな思い出のウォールを解除します。";
+"NSPhotoLibraryAddUsageDescription" = "LifeThreadsは、「写真に保存」を選んだとき、作成したストーリーの画像や動画を写真ライブラリに保存します。";
+"NSPhotoLibraryUsageDescription" = "LifeThreadsは、選んだ写真を使ってプライベートな思い出のウォールを作ります。";

@@ -78,9 +78,13 @@ void main() {
           );
           expect(image.width, 1080);
           expect(image.height, 1920);
-          // Dark wall in the bottom corner, like the app.
-          final corner = image.getPixel(8, 1910);
-          expect(corner.r + corner.g + corner.b, lessThan(150));
+          // Dark wall in the bottom corner, like the app (the paper looks
+          // are light on purpose).
+          if (template != StoryTemplate.scrapbook &&
+              template != StoryTemplate.journey) {
+            final corner = image.getPixel(8, 1910);
+            expect(corner.r + corner.g + corner.b, lessThan(150));
+          }
         });
       }
     }
@@ -132,22 +136,132 @@ void main() {
     expect(frames[0], isNot(equals(frames[2])));
   });
 
-  test('films last 15–20 s at 30 fps for every template and count', () {
+  for (final locale in const [Locale('en'), Locale('ar')]) {
+    testWidgets('every film draws its start, middle and end frames '
+        '(${locale.languageCode})', (tester) async {
+      for (final template in StoryTemplate.values) {
+        for (final count in [1, 6]) {
+          final film = StoryTemplateFilm(
+            template: template,
+            memories: storyMemories(
+              dir,
+              count,
+              arabic: locale.languageCode == 'ar',
+            ),
+            caption: 'Our year',
+          );
+          final frames = await tester.runAsync(() async {
+            final canvas = StoryCanvas(
+              logicalSize: const Size(360, 640),
+              pixelRatio: 1,
+              locale: locale,
+              theme: _theme,
+            );
+            try {
+              return [
+                for (final fraction in [0.0, 0.3, 0.5, 0.75, 0.99])
+                  await canvas.renderRgba(
+                    Builder(
+                      builder: (context) =>
+                          film.buildFrame(context, film.duration * fraction),
+                    ),
+                  ),
+              ];
+            } finally {
+              canvas.dispose();
+            }
+          });
+          expect(tester.takeException(), isNull, reason: template.name);
+          expect(frames, hasLength(5));
+          // A video look moves: the middle differs from the start.
+          if (template.forVideo) {
+            expect(
+              frames![1],
+              isNot(equals(frames[3])),
+              reason: '${template.name} x$count',
+            );
+          }
+        }
+      }
+    });
+  }
+
+  for (final format in [StoryFormat.post, StoryFormat.square]) {
+    testWidgets('every picture layout fits a ${format.name} picture', (
+      tester,
+    ) async {
+      for (final template in StoryTemplate.forMode(video: false)) {
+        if (!template.fits(format)) continue;
+        for (final count in [1, 3, 6]) {
+          final errors = <String>[];
+          final previous = FlutterError.onError;
+          FlutterError.onError = (details) =>
+              errors.add(details.exceptionAsString());
+          final png = await tester.runAsync(() async {
+            final canvas = StoryCanvas(logicalSize: format.size, theme: _theme);
+            try {
+              return await canvas.renderPng(
+                StoryPage(
+                  template: template,
+                  memories: storyMemories(dir, count),
+                  caption: 'Our year',
+                  format: format,
+                ),
+              );
+            } finally {
+              canvas.dispose();
+            }
+          });
+          FlutterError.onError = previous;
+          expect(errors, isEmpty, reason: '${template.name} x$count');
+          final image = img.decodePng(png!)!;
+          expect(image.width, 1080);
+          expect(image.height, (format.size.height * 3).round());
+        }
+      }
+    });
+  }
+
+  test('films last 8–30 s at 30 fps for every template and count', () {
     final memories = storyMemories(dir, 6);
     for (final template in StoryTemplate.values) {
+      var previous = 0;
       for (var count = 1; count <= 6; count++) {
         final film = StoryTemplateFilm(
           template: template,
           memories: memories.take(count).toList(),
         );
+        final ms = film.duration.inMilliseconds;
         expect(film.fps, 30);
-        expect(film.duration.inMilliseconds, inInclusiveRange(15000, 20000));
+        expect(ms, inInclusiveRange(8000, 30000));
+        // More memories never make a shorter film.
+        expect(ms, greaterThanOrEqualTo(previous), reason: template.name);
+        previous = ms;
         expect(
           film.frameCount,
           (film.duration.inMicroseconds * 30 / 1000000).round(),
         );
         expect(film.images, hasLength(count));
+        // Every memory comes up, in order, before the film ends.
+        final starts = film.memoryStarts;
+        expect(starts, hasLength(count));
+        for (var i = 1; i < starts.length; i++) {
+          expect(starts[i], greaterThan(starts[i - 1]), reason: template.name);
+        }
+        expect(starts.last, lessThan(film.duration), reason: template.name);
       }
     }
+  });
+
+  test('a chosen length wins, kept between 8 and 30 s', () {
+    final memories = storyMemories(dir, 3);
+    StoryTemplateFilm film(Duration length) => StoryTemplateFilm(
+      template: StoryTemplate.polaroid,
+      memories: memories,
+      length: length,
+    );
+    expect(film(const Duration(seconds: 12)).duration.inSeconds, 12);
+    expect(film(const Duration(seconds: 3)).duration.inSeconds, 8);
+    expect(film(const Duration(minutes: 2)).duration.inSeconds, 30);
   });
 }

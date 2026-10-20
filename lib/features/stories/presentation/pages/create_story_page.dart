@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -8,13 +9,16 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations_x.dart';
-import '../../../../core/logging/app_logger.dart';
 import '../../../../l10n/generated/app_localizations.dart';
+import '../../../../core/logging/app_logger.dart';
 import '../../../memories/data/memory_repository.dart';
+import '../../../memories/data/memory_seed_data.dart';
 import '../../../memories/domain/memory_event.dart';
+import '../../../memories/domain/memory_photo.dart';
 import '../../../premium/domain/premium_feature.dart';
 import '../../../premium/presentation/premium_gate.dart';
-import '../../data/music_catalog.dart';
+import '../../../tour/app_tour.dart';
+import '../../../tour/coach.dart';
 import '../../data/music_preview.dart';
 import '../../data/story_exporter.dart';
 import '../../domain/music_track.dart';
@@ -22,7 +26,12 @@ import '../../domain/story_template.dart';
 import '../story_template_film.dart';
 import '../templates/story_templates.dart';
 import '../templates/story_visuals.dart';
+import '../story_template_l10n.dart';
 import '../widgets/music_trimmer.dart';
+import '../widgets/story_film_preview.dart';
+import '../widgets/story_playback.dart';
+import 'story_music_page.dart';
+import 'story_style_page.dart';
 import '../widgets/story_export_progress_dialog.dart';
 import '../widgets/story_memory_strip.dart';
 import '../widgets/story_search_field.dart';
@@ -41,20 +50,60 @@ class CreateStoryPage extends ConsumerStatefulWidget {
   ConsumerState<CreateStoryPage> createState() => _CreateStoryPageState();
 }
 
-class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
+class _CreateStoryPageState extends ConsumerState<CreateStoryPage>
+    with SingleTickerProviderStateMixin {
   late StorySelection _selection;
   late bool _editing;
   final _caption = TextEditingController();
   var _captionEdited = false;
   var _captionReady = false;
-  var _template = StoryTemplate.single;
-  final _pages = PageController();
-  var _video = false;
+
+  /// Picture (one image with every memory) or video (a film with music).
+  /// The tour makes a video: it shows the music too.
+  var _video = appTourRunning;
+  late var _template = StoryTemplate.defaultFor(video: _video);
+
+  /// A picture's shape: story, feed post or square.
+  var _format = StoryFormat.story;
   MusicTrack? _music;
+
+  /// The film length the user chose; null for the animation's own.
+  Duration? _length;
+
+  /// The tour picked its example memories already.
+  var _tourPicked = false;
 
   /// Where the chosen song starts in the film (see [MusicTrimmer]).
   var _musicStart = Duration.zero;
   late final MusicPreview _preview;
+
+  /// The chosen song, playing in step with the preview (as in the video).
+  late final StoryPlayback _playback;
+
+  /// The user turned the sound off on the preview.
+  var _soundOn = true;
+
+  /// The photo chosen for a memory with several (memory id → photo path).
+  final _photoChoice = <String, String>{};
+  List<MemoryPhoto> Function(String id) _photosFor = (_) => const [];
+
+  Future<void> _choosePhoto(MemoryEvent memory) async {
+    final photos = _photosFor(memory.id);
+    if (photos.length < 2) return;
+    final chosen = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: AppColors.wallInk,
+      builder: (context) => _PhotoChoiceSheet(
+        title: memory.title,
+        photos: photos,
+        selected: _photoChoice[memory.id] ?? memory.coverPhotoPath,
+      ),
+    );
+    if (chosen == null || !mounted) return;
+    setState(() => _photoChoice[memory.id] = chosen);
+  }
+
   var _busy = false;
   final _shareButtonKey = GlobalKey();
 
@@ -70,31 +119,112 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
         : StorySelection([initial]);
     _editing = initial != null;
     _preview = ref.read(musicPreviewProvider);
-  }
-
-  /// Picks [track] (or no music) and plays the part the film would use:
-  /// [window] long, from its loudest part.
-  void _selectMusic(MusicTrack? track, {Duration? window}) {
-    if (track == null) {
-      setState(() => _music = null);
-      unawaited(_preview.stop());
-      return;
-    }
-    final length = window ?? track.length;
-    final start = MusicTrimmer.suggestedStart(track, length);
-    setState(() {
-      _music = track;
-      _musicStart = start;
-    });
-    unawaited(_preview.play(track, start: start, length: length));
+    _playback = StoryPlayback(preview: _preview, vsync: this);
   }
 
   /// The film length for [memories] as the story looks now.
-  Duration _filmLength(List<MemoryEvent> memories) => StoryTemplateFilm(
-    template: _template,
-    memories: memories,
-    caption: _caption.text,
-  ).duration;
+  Duration _filmLength(List<MemoryEvent> memories) => _film(memories).duration;
+
+  StoryTemplateFilm _film(List<MemoryEvent> memories, {String? caption}) =>
+      StoryTemplateFilm(
+        template: _template,
+        memories: memories,
+        caption: caption ?? _caption.text,
+        length: _length,
+      );
+
+  /// Keeps the playing song in step with the story as it is now: another
+  /// length or song part starts it over; no video or no song stops it.
+  void _syncPlayback(List<MemoryEvent> memories) {
+    if (!mounted) return;
+    final music = _video ? _music : null;
+    final changed = _playback.configure(
+      track: music,
+      start: _musicStart,
+      length: _filmLength(memories),
+    );
+    if (changed && music != null && _playback.playing) {
+      unawaited(_playback.play());
+    }
+  }
+
+  /// Plays the song with the preview, unless the user turned the sound off.
+  void _resumeMusic(List<MemoryEvent> memories) {
+    if (!mounted || !_video || _music == null || !_soundOn) return;
+    _syncPlayback(memories);
+    unawaited(_playback.play());
+  }
+
+  /// Picture or video; a look the other mode doesn't offer changes to
+  /// that mode's first one.
+  void _setMode(bool video, List<MemoryEvent> memories) {
+    if (video == _video) return;
+    setState(() {
+      _video = video;
+      final offered = video ? _template.forVideo : _template.forPicture;
+      if (!offered) _template = StoryTemplate.defaultFor(video: video);
+    });
+    if (video) {
+      _resumeMusic(memories);
+    } else {
+      _syncPlayback(memories);
+    }
+  }
+
+  void _changeMemories() {
+    unawaited(_playback.pause());
+    setState(() => _editing = false);
+  }
+
+  Future<void> _chooseAnimation(List<MemoryEvent> memories) async {
+    unawaited(_playback.pause());
+    final chosen = await Navigator.of(context).push<StoryTemplate>(
+      MaterialPageRoute(
+        builder: (_) => StoryStylePage(
+          selected: _template,
+          memories: memories,
+          video: _video,
+          format: _format,
+        ),
+      ),
+    );
+    if (!mounted) return;
+    if (chosen != null) setState(() => _template = chosen);
+    _resumeMusic(memories);
+  }
+
+  /// Music and length; choosing either makes the story a video.
+  Future<void> _chooseMusic(List<MemoryEvent> memories) async {
+    // The music screen plays the song itself.
+    unawaited(_playback.pause());
+    final chosen = await Navigator.of(context).push<StoryMusicChoice>(
+      MaterialPageRoute(
+        builder: (_) => StoryMusicPage(
+          filmFor: (length) => StoryTemplateFilm(
+            template: _template,
+            memories: memories,
+            caption: _caption.text,
+            length: length,
+          ),
+          track: _music,
+          start: _musicStart,
+          length: _length,
+        ),
+      ),
+    );
+    if (!mounted) return;
+    if (chosen != null) {
+      setState(() {
+        _music = chosen.track;
+        _musicStart = chosen.start;
+        _length = chosen.length;
+        if (chosen.track != null || chosen.length != null) _video = true;
+        if (chosen.track != null) _soundOn = true;
+      });
+    }
+    // Back on the story: the song plays on with the preview.
+    _resumeMusic(memories);
+  }
 
   /// Applies a change to the memories in the story from the editor. The
   /// caption follows the first memory until the user edits it.
@@ -126,9 +256,9 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
 
   @override
   void dispose() {
+    _playback.dispose();
     unawaited(_preview.stop());
     _caption.dispose();
-    _pages.dispose();
     super.dispose();
   }
 
@@ -141,11 +271,19 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
       appBar: AppBar(
         title: Text(_editing ? l10n.storyEditorTitle : l10n.storyPickTitle),
         actions: [
-          if (_editing)
+          // On narrow phones (or with large text) only the icon fits next
+          // to the title.
+          if (_editing && MediaQuery.sizeOf(context).width >= 400)
             TextButton.icon(
-              onPressed: _busy ? null : () => setState(() => _editing = false),
+              onPressed: _busy ? null : _changeMemories,
               icon: const Icon(Icons.photo_library_rounded),
               label: Text(l10n.storyChangeMemories),
+            )
+          else if (_editing)
+            IconButton(
+              tooltip: l10n.storyChangeMemories,
+              onPressed: _busy ? null : _changeMemories,
+              icon: const Icon(Icons.photo_library_rounded),
             ),
         ],
       ),
@@ -162,7 +300,24 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
             ...state.visibleEvents,
             if (initial != null && initial.hidden) initial,
           ];
-          final memories = _selection.resolve(events);
+          // The tour starts the story with three example memories.
+          if (appTourRunning && !_tourPicked && _selection.isEmpty) {
+            _tourPicked = true;
+            final examples = [
+              for (final event in events)
+                if (MemorySeedData.isDemoEventId(event.id)) event.id,
+            ];
+            _selection = StorySelection(examples.take(3).toList());
+          }
+          // The photo the user chose for a memory stands in for its cover.
+          final memories = [
+            for (final memory in _selection.resolve(events))
+              if (_photoChoice[memory.id] case final path?)
+                memory.copyWith(coverPhotoPath: path)
+              else
+                memory,
+          ];
+          _photosFor = state.photosForEvent;
           if (_editing && memories.isNotEmpty) {
             // Started from a memory: its story is the first caption. Set
             // before the caption field exists, so no listener fires.
@@ -196,189 +351,245 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
   ) {
     final l10n = context.l10n;
     final isPremium = ref.watch(premiumActiveProvider);
-    final caption = _caption.text;
     final filmLength = _filmLength(memories);
+    // A new song part, length or set of memories restarts the song with the
+    // film (after this frame: it notifies the sound button).
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _syncPlayback(memories),
+    );
     final music = _music;
+    final preview = AspectRatio(
+      aspectRatio: _video ? 9 / 16 : _format.aspectRatio,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          StoryFilmPreview(
+            key: ValueKey('story-preview-${_template.name}'),
+            film: _film(memories),
+            animate: _video,
+            format: _format,
+            // With a song the film follows it, as in the video.
+            time: _video && _music != null ? _playback.filmTime : null,
+          ),
+          if (_video && _music != null)
+            PositionedDirectional(
+              end: 8,
+              bottom: 8,
+              child: ListenableBuilder(
+                listenable: _playback,
+                builder: (context, _) => IconButton.filled(
+                  key: const ValueKey('story-preview-sound'),
+                  tooltip: _playback.playing
+                      ? l10n.storyMusicPause
+                      : l10n.storyMusicPlay,
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.black.withValues(alpha: 0.55),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    if (_playback.playing) {
+                      _soundOn = false;
+                      unawaited(_playback.pause());
+                    } else {
+                      _soundOn = true;
+                      _resumeMusic(memories);
+                    }
+                  },
+                  icon: Icon(
+                    _playback.playing
+                        ? Icons.volume_up_rounded
+                        : Icons.volume_off_rounded,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
     return SafeArea(
       top: false,
       child: Column(
         children: [
+          // Preview, memories and settings scroll as one page: the preview
+          // shrinks to a small pinned one, so small phones show the settings.
           Expanded(
-            flex: 11,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 6, 0, 8),
-              child: PageView.builder(
-                controller: _pages,
-                itemCount: StoryTemplate.values.length,
-                onPageChanged: (index) =>
-                    setState(() => _template = StoryTemplate.values[index]),
-                itemBuilder: (context, index) {
-                  final template = StoryTemplate.values[index];
-                  return Center(
-                    child: AspectRatio(
-                      aspectRatio: 9 / 16,
-                      child: _StoryPreview(
-                        key: ValueKey('story-preview-${template.name}'),
-                        template: template,
-                        memories: memories,
-                        caption: caption,
-                        animate: _video && template == _template,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final maxPreview = (constraints.maxHeight * 0.5).clamp(
+                  150.0,
+                  560.0,
+                );
+                return CustomScrollView(
+                  key: const ValueKey('story-settings'),
+                  slivers: [
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _PreviewHeader(
+                        min: math.min(maxPreview, 132),
+                        max: maxPreview,
+                        child: preview,
                       ),
                     ),
-                  );
-                },
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 40,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                for (final template in StoryTemplate.values)
-                  Padding(
-                    padding: const EdgeInsetsDirectional.only(end: 8),
-                    child: ChoiceChip(
-                      label: Text(storyTemplateLabel(l10n, template)),
-                      selected: template == _template,
-                      onSelected: (_) => _pages.animateToPage(
-                        template.index,
-                        duration: const Duration(milliseconds: 280),
-                        curve: Curves.easeOutCubic,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          StoryMemoryStrip(
-            memories: memories,
-            canAdd: !_selection.isFull && memories.length < events.length,
-            onReorder: (from, to) =>
-                _changeSelection(_selection.move(from, to), events),
-            onRemove: (id) => _changeSelection(_selection.remove(id), events),
-            onAdd: () => _addMemory(events),
-          ),
-          Expanded(
-            flex: 7,
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
-              children: [
-                TextField(
-                  key: const ValueKey('story-caption'),
-                  controller: _caption,
-                  maxLength: 160,
-                  maxLines: 2,
-                  minLines: 1,
-                  decoration: InputDecoration(
-                    labelText: l10n.storyCaptionLabel,
-                    hintText: l10n.storyCaptionHint,
-                  ),
-                  onChanged: (_) => setState(() => _captionEdited = true),
-                ),
-                SwitchListTile.adaptive(
-                  key: const ValueKey('story-video-switch'),
-                  contentPadding: EdgeInsets.zero,
-                  value: _video,
-                  onChanged: _busy
-                      ? null
-                      : (value) {
-                          setState(() => _video = value);
-                          if (!value) _selectMusic(null);
-                        },
-                  title: Text(
-                    l10n.storyVideoSwitch,
-                    style: const TextStyle(fontWeight: FontWeight.w900),
-                  ),
-                  subtitle: Text(
-                    l10n.storyVideoBody,
-                    style: TextStyle(color: AppColors.muted),
-                  ),
-                ),
-                if (_video) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    l10n.storyMusicTitle,
-                    style: const TextStyle(fontWeight: FontWeight.w900),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      ChoiceChip(
-                        label: Text(l10n.storyMusicNone),
-                        selected: _music == null,
-                        onSelected: (_) => _selectMusic(null),
-                      ),
-                      for (final track in bundledMusicTracks)
-                        ChoiceChip(
-                          avatar: const Icon(Icons.music_note_rounded),
-                          label: Text(
-                            '${track.title} · '
-                            '${musicMoodLabel(l10n, track.mood)}',
+                    SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 8),
+                          StoryMemoryStrip(
+                            memories: memories,
+                            canAdd:
+                                !_selection.isFull &&
+                                memories.length < events.length,
+                            onReorder: (from, to) => _changeSelection(
+                              _selection.move(from, to),
+                              events,
+                            ),
+                            onRemove: (id) =>
+                                _changeSelection(_selection.remove(id), events),
+                            onAdd: () => _addMemory(events),
+                            photoCounts: {
+                              for (final memory in memories)
+                                memory.id: _photosFor(memory.id).length,
+                            },
+                            onChoosePhoto: _busy
+                                ? null
+                                : (id) => _choosePhoto(
+                                    memories.firstWhere(
+                                      (memory) => memory.id == id,
+                                    ),
+                                  ),
                           ),
-                          selected: _music?.id == track.id,
-                          onSelected: (_) =>
-                              _selectMusic(track, window: filmLength),
-                        ),
-                    ],
-                  ),
-                  if (music != null) ...[
-                    const SizedBox(height: 14),
-                    MusicTrimmer(
-                      key: ValueKey('music-trimmer-${music.id}'),
-                      track: music,
-                      window: filmLength,
-                      start: MusicTrimmer.clampStart(
-                        music,
-                        filmLength,
-                        _musicStart,
+                          const SizedBox(height: 10),
+                          Divider(height: 1, color: AppColors.line),
+                        ],
                       ),
-                      onChanged: (start) => setState(() => _musicStart = start),
-                      onChangeEnd: (start) => unawaited(
-                        _preview.play(music, start: start, length: filmLength),
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
+                      sliver: SliverList.list(
+                        children: [
+                          _ModeChooser(
+                            video: _video,
+                            onChanged: _busy
+                                ? null
+                                : (video) => _setMode(video, memories),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            _video
+                                ? l10n.storyModeVideoHint
+                                : l10n.storyModePictureHint,
+                            style: TextStyle(
+                              color: AppColors.muted,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                          if (!_video) ...[
+                            const SizedBox(height: 10),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 6,
+                              children: [
+                                for (final format in StoryFormat.values)
+                                  ChoiceChip(
+                                    key: ValueKey(
+                                      'story-format-${format.name}',
+                                    ),
+                                    label: Text(_formatLabel(l10n, format)),
+                                    selected: format == _format,
+                                    onSelected: _busy
+                                        ? null
+                                        : (_) => setState(() {
+                                            _format = format;
+                                            if (!_template.fits(format)) {
+                                              _template =
+                                                  StoryTemplate.defaultFor(
+                                                    video: false,
+                                                  );
+                                            }
+                                          }),
+                                  ),
+                              ],
+                            ),
+                          ],
+                          const SizedBox(height: 14),
+                          TextField(
+                            key: const ValueKey('story-caption'),
+                            controller: _caption,
+                            maxLength: 160,
+                            maxLines: 2,
+                            minLines: 1,
+                            decoration: InputDecoration(
+                              labelText: l10n.storyCaptionLabel,
+                              hintText: l10n.storyCaptionHint,
+                              // The limit still holds; the counter only took room.
+                              counterText: '',
+                            ),
+                            onChanged: (_) =>
+                                setState(() => _captionEdited = true),
+                          ),
+                          CoachTarget(
+                            id: TourTargets.storyAnimation,
+                            child: _EditorRow(
+                              key: const ValueKey('story-animation-row'),
+                              icon: storyTemplateIcon(_template),
+                              title: _video
+                                  ? l10n.storyAnimationTitle
+                                  : l10n.storyLayoutTitle,
+                              value: storyTemplateLabel(l10n, _template),
+                              onTap: _busy
+                                  ? null
+                                  : () => _chooseAnimation(memories),
+                            ),
+                          ),
+                          if (_video)
+                            CoachTarget(
+                              id: TourTargets.storyMusic,
+                              child: _EditorRow(
+                                key: const ValueKey('story-music-row'),
+                                icon: Icons.music_note_rounded,
+                                title: l10n.storyMusicTitle,
+                                value: music == null
+                                    ? l10n.storyMusicNone
+                                    : '${music.title} · '
+                                          '${_range(MusicTrimmer.clampStart(music, filmLength, _musicStart), filmLength)}',
+                                trailing: l10n.storyLengthSeconds(
+                                  '${(filmLength.inMilliseconds / 1000).round()}',
+                                ),
+                                onTap: _busy
+                                    ? null
+                                    : () => _chooseMusic(memories),
+                              ),
+                            ),
+                          if (!isPremium) ...[
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.workspace_premium_rounded,
+                                  color: AppColors.gold,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    l10n.storyPreviewFree,
+                                    style: TextStyle(
+                                      color: AppColors.muted,
+                                      fontSize: 12.5,
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                   ],
-                  if (_music == null) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.storyMusicNoneHint,
-                      style: TextStyle(
-                        color: AppColors.muted,
-                        fontSize: 12.5,
-                        height: 1.35,
-                      ),
-                    ),
-                  ],
-                ],
-                if (!isPremium) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.workspace_premium_rounded,
-                        color: AppColors.gold,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          l10n.storyPreviewFree,
-                          style: TextStyle(
-                            color: AppColors.muted,
-                            fontSize: 12.5,
-                            height: 1.35,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
+                );
+              },
             ),
           ),
           Padding(
@@ -390,10 +601,11 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
                     key: const ValueKey('story-save'),
                     onPressed: _busy ? null : () => _save(memories),
                     icon: const Icon(Icons.download_rounded),
-                    label: Text(
-                      l10n.storySaveToPhotos,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    // One line in every language: a long label shrinks a
+                    // little instead of breaking a word.
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(l10n.storySaveToPhotos, maxLines: 1),
                     ),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.amber,
@@ -404,16 +616,22 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: FilledButton.icon(
-                    key: _shareButtonKey,
-                    onPressed: _busy ? null : () => _share(memories),
-                    icon: _busy
-                        ? const SizedBox.square(
-                            dimension: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.ios_share_rounded),
-                    label: Text(l10n.storyShare),
+                  child: CoachTarget(
+                    id: TourTargets.storyShare,
+                    child: FilledButton.icon(
+                      key: _shareButtonKey,
+                      onPressed: _busy ? null : () => _share(memories),
+                      icon: _busy
+                          ? const SizedBox.square(
+                              dimension: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.ios_share_rounded),
+                      label: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(l10n.storyShare, maxLines: 1),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -429,7 +647,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
 
   Future<void> _share(List<MemoryEvent> memories) async {
     // The paywall or the export comes next: the preview song stops either way.
-    unawaited(_preview.stop());
+    unawaited(_playback.pause());
     if (!await requirePremium(context, _feature)) return;
     if (!mounted) return;
     final file = await _export(memories);
@@ -445,7 +663,7 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
   }
 
   Future<void> _save(List<MemoryEvent> memories) async {
-    unawaited(_preview.stop());
+    unawaited(_playback.pause());
     if (!await requirePremium(context, _feature)) return;
     if (!mounted) return;
     final file = await _export(memories);
@@ -471,6 +689,8 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
       _video,
       _music?.id,
       _musicStart,
+      _length,
+      _format,
       caption,
       for (final memory in memories) memory.id,
     ].join('|');
@@ -482,16 +702,12 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
     }
     if (!mounted) return null;
     final exporter = ref.read(storyExporterProvider);
-    unawaited(_preview.stop());
+    unawaited(_playback.pause());
     setState(() => _busy = true);
     try {
       final File? file;
       if (_video) {
-        final film = StoryTemplateFilm(
-          template: _template,
-          memories: memories,
-          caption: caption,
-        );
+        final film = _film(memories, caption: caption);
         file = await runStoryVideoExport(
           context,
           (context, onProgress, cancel) => exporter.exportVideo(
@@ -508,7 +724,13 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
       } else {
         file = await exporter.exportImage(
           context,
-          StoryPage(template: _template, memories: memories, caption: caption),
+          StoryPage(
+            template: _template,
+            memories: memories,
+            caption: caption,
+            format: _format,
+          ),
+          size: _format.size,
         );
       }
       if (file != null) _exported = (signature: signature, file: file);
@@ -527,123 +749,6 @@ class _CreateStoryPageState extends ConsumerState<CreateStoryPage> {
     ScaffoldMessenger.of(context).showToast(
       context.l10n.storyExportFailed('$error'),
       kind: ToastKind.error,
-    );
-  }
-}
-
-String storyTemplateLabel(AppLocalizations l10n, StoryTemplate template) {
-  return switch (template) {
-    StoryTemplate.single => l10n.storyTemplateSingle,
-    StoryTemplate.thread => l10n.storyTemplateThread,
-    StoryTemplate.collage => l10n.storyTemplateCollage,
-    StoryTemplate.quote => l10n.storyTemplateQuote,
-  };
-}
-
-String musicMoodLabel(AppLocalizations l10n, MusicMood mood) {
-  return switch (mood) {
-    MusicMood.warm => l10n.storyMoodWarm,
-    MusicMood.joyful => l10n.storyMoodJoyful,
-    MusicMood.calm => l10n.storyMoodCalm,
-    MusicMood.nostalgic => l10n.storyMoodNostalgic,
-    MusicMood.epic => l10n.storyMoodEpic,
-    MusicMood.emotional => l10n.storyMoodEmotional,
-  };
-}
-
-/// A story page scaled into its box: the still image, or the film playing
-/// in a loop when [animate] is on.
-class _StoryPreview extends StatelessWidget {
-  const _StoryPreview({
-    super.key,
-    required this.template,
-    required this.memories,
-    required this.caption,
-    required this.animate,
-  });
-
-  final StoryTemplate template;
-  final List<MemoryEvent> memories;
-  final String caption;
-  final bool animate;
-
-  @override
-  Widget build(BuildContext context) {
-    final Widget page = animate
-        ? _FilmPreview(
-            film: StoryTemplateFilm(
-              template: template,
-              memories: memories,
-              caption: caption,
-            ),
-          )
-        : StoryPage(template: template, memories: memories, caption: caption);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: FittedBox(
-          child: MediaQuery(
-            data: MediaQuery.of(
-              context,
-            ).copyWith(textScaler: TextScaler.noScaling),
-            child: SizedBox.fromSize(size: storySize, child: page),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FilmPreview extends StatefulWidget {
-  const _FilmPreview({required this.film});
-
-  final StoryTemplateFilm film;
-
-  @override
-  State<_FilmPreview> createState() => _FilmPreviewState();
-}
-
-class _FilmPreviewState extends State<_FilmPreview>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: widget.film.duration,
-  )..repeat();
-
-  @override
-  void didUpdateWidget(covariant _FilmPreview oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.film.duration != widget.film.duration) {
-      _controller
-        ..duration = widget.film.duration
-        ..repeat();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, _) => widget.film.buildFrame(
-        context,
-        widget.film.duration * _controller.value,
-      ),
     );
   }
 }
@@ -773,10 +878,13 @@ class _StoryMemoryPickerState extends State<_StoryMemoryPicker> {
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
             child: SizedBox(
               width: double.infinity,
-              child: FilledButton(
-                key: const ValueKey('story-continue'),
-                onPressed: selection.isEmpty ? null : widget.onContinue,
-                child: Text(l10n.storyPickContinue),
+              child: CoachTarget(
+                id: TourTargets.storyPickContinue,
+                child: FilledButton(
+                  key: const ValueKey('story-continue'),
+                  onPressed: selection.isEmpty ? null : widget.onContinue,
+                  child: Text(l10n.storyPickContinue),
+                ),
               ),
             ),
           ),
@@ -985,3 +1093,263 @@ class _PickerTile extends StatelessWidget {
     );
   }
 }
+
+/// "0:42–1:02": the part of the song a [window]-long film uses.
+String _range(Duration start, Duration window) {
+  String clock(Duration value) =>
+      '${value.inMinutes}:${(value.inSeconds % 60).toString().padLeft(2, '0')}';
+  return '${clock(start)}–${clock(start + window)}';
+}
+
+/// A setting of the story that opens its own screen: Animation, Music.
+class _EditorRow extends StatelessWidget {
+  const _EditorRow({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.onTap,
+    this.trailing,
+  });
+
+  final IconData icon;
+  final String title;
+  final String value;
+  final String? trailing;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      visualDensity: VisualDensity.compact,
+      onTap: onTap,
+      leading: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: AppColors.gold.withValues(alpha: 0.16),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, color: AppColors.gold),
+      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
+      subtitle: Text(
+        value,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(color: AppColors.amber, fontWeight: FontWeight.w700),
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (trailing != null)
+            Text(trailing!, style: TextStyle(color: AppColors.muted)),
+          const Icon(Icons.chevron_right_rounded),
+        ],
+      ),
+    );
+  }
+}
+
+/// Picture or video, as two large segments.
+class _ModeChooser extends StatelessWidget {
+  const _ModeChooser({required this.video, required this.onChanged});
+
+  final bool video;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    Widget segment(bool isVideo, IconData icon, String label, Key key) {
+      final selected = isVideo == video;
+      return Expanded(
+        child: Semantics(
+          button: true,
+          selected: selected,
+          child: InkWell(
+            key: key,
+            borderRadius: BorderRadius.circular(14),
+            onTap: onChanged == null ? null : () => onChanged!(isVideo),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(vertical: 11),
+              decoration: BoxDecoration(
+                color: selected ? AppColors.gold : Colors.transparent,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    size: 18,
+                    color: selected ? AppColors.wallInk : AppColors.muted,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      label,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        color: selected ? AppColors.wallInk : AppColors.muted,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: AppColors.panel.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: [
+          segment(
+            false,
+            Icons.image_rounded,
+            l10n.storyModePicture,
+            const ValueKey('story-mode-picture'),
+          ),
+          const SizedBox(width: 4),
+          segment(
+            true,
+            Icons.movie_rounded,
+            l10n.storyModeVideo,
+            // Kept from the old switch, so tests and the tour find it.
+            const ValueKey('story-video-switch'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The story preview at the top of the editor: full size, shrinking to
+/// [min] as the page scrolls.
+class _PreviewHeader extends SliverPersistentHeaderDelegate {
+  _PreviewHeader({required this.min, required this.max, required this.child});
+
+  final double min;
+  final double max;
+  final Widget child;
+
+  @override
+  double get minExtent => min;
+
+  @override
+  double get maxExtent => max;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlaps) {
+    return ColoredBox(
+      color: AppColors.wallInk,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 6, 0, 6),
+        child: Center(child: child),
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(_PreviewHeader old) =>
+      old.child != child || old.min != min || old.max != max;
+}
+
+/// The photos of one memory: tap one to use it in the story.
+class _PhotoChoiceSheet extends StatelessWidget {
+  const _PhotoChoiceSheet({
+    required this.title,
+    required this.photos,
+    required this.selected,
+  });
+
+  final String title;
+  final List<MemoryPhoto> photos;
+  final String? selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.storyChoosePhoto,
+              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
+            ),
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: AppColors.muted),
+            ),
+            const SizedBox(height: 14),
+            Flexible(
+              child: GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 3,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                children: [
+                  for (final photo in photos)
+                    GestureDetector(
+                      key: ValueKey('story-photo-${photo.id}'),
+                      onTap: () => Navigator.of(context).pop(photo.localPath),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: photo.localPath == selected
+                                ? AppColors.gold
+                                : Colors.transparent,
+                            width: 3,
+                          ),
+                        ),
+                        padding: const EdgeInsets.all(2),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(9),
+                          child: Image(
+                            image: ResizeImage(
+                              photo.localPath.startsWith('assets/')
+                                  ? AssetImage(photo.localPath)
+                                  : FileImage(File(photo.localPath))
+                                        as ImageProvider,
+                              width: 300,
+                            ),
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) =>
+                                ColoredBox(color: AppColors.panel),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+String _formatLabel(AppLocalizations l10n, StoryFormat format) =>
+    switch (format) {
+      StoryFormat.story => l10n.storyFormatStory,
+      StoryFormat.post => l10n.storyFormatPost,
+      StoryFormat.square => l10n.storyFormatSquare,
+    };

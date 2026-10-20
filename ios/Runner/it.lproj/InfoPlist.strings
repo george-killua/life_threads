@@ -1,0 +1,6 @@
+/* Richieste di autorizzazione del sistema, nella lingua del telefono. */
+"NSCameraUsageDescription" = "LifeThreads usa la fotocamera per scansionare il codice QR di uno schermo e scattare foto dei ricordi quando lo scegli tu.";
+"NSContactsUsageDescription" = "LifeThreads può importare i dati dei contatti che scegli come persona privata in un ricordo.";
+"NSFaceIDUsageDescription" = "LifeThreads usa Face ID per sbloccare la tua bacheca privata dei ricordi quando attivi il blocco app.";
+"NSPhotoLibraryAddUsageDescription" = "LifeThreads salva nella tua libreria foto le immagini e i video delle storie che crei quando scegli Salva in Foto.";
+"NSPhotoLibraryUsageDescription" = "LifeThreads usa le foto che scegli per creare la tua bacheca privata dei ricordi.";

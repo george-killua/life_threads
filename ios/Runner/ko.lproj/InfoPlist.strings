@@ -1,0 +1,6 @@
+/* 시스템 권한 요청, 휴대폰 언어로 표시. */
+"NSCameraUsageDescription" = "LifeThreads는 원할 때 화면용 QR 코드를 스캔하고 추억 사진을 찍기 위해 카메라를 사용해요.";
+"NSContactsUsageDescription" = "LifeThreads는 선택한 연락처 정보를 추억 속 비공개 인물로 가져올 수 있어요.";
+"NSFaceIDUsageDescription" = "LifeThreads는 앱 잠금을 켜면 Face ID로 나만의 추억 벽을 잠금 해제해요.";
+"NSPhotoLibraryAddUsageDescription" = "LifeThreads는 사진에 저장을 선택하면 만든 스토리 이미지와 영상을 사진 보관함에 저장해요.";
+"NSPhotoLibraryUsageDescription" = "LifeThreads는 선택한 사진으로 나만의 추억 벽을 만들어요.";

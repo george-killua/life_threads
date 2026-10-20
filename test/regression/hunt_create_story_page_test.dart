@@ -109,13 +109,22 @@ void main() {
       initialMemoryId: 'm1',
     );
     await tester.tap(find.byKey(const ValueKey('story-video-switch')));
-    await tester.pump();
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    await tester.ensureVisible(find.byKey(const ValueKey('story-music-row')));
+    await tester.tap(find.byKey(const ValueKey('story-music-row')));
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
     final track = bundledMusicTracks.first;
-    await tester.ensureVisible(find.textContaining(track.title));
+    await tester.tap(find.byKey(ValueKey('story-music-${track.id}')));
     await tester.pump();
-    await tester.tap(find.textContaining(track.title));
-    await tester.pump();
-    expect(preview.calls, ['play:${track.id}']);
+    expect(preview.calls.last, 'play:${track.id}');
+    await tester.tap(find.byKey(const ValueKey('story-music-done')));
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     await tester.tap(find.byKey(const ValueKey('story-save')));
     for (var i = 0; i < 10; i++) {

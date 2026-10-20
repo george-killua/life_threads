@@ -161,10 +161,14 @@ void main() {
       state: sampleYear(),
       tracks: const [_track],
     );
-    await tester.tap(find.text('No music'));
+    // Music has its own screen: pick the song there and come back.
+    await tester.tap(find.byKey(const ValueKey('year-thread-music')));
     await settle(tester);
-    await tester.tap(find.text('Song · Artist').last);
+    await tester.tap(find.byKey(const ValueKey('story-music-song')));
     await settle(tester);
+    await tester.tap(find.byKey(const ValueKey('story-music-done')));
+    await settle(tester);
+    expect(find.textContaining('Song ·'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('year-thread-preview')));
     await settle(tester);
     music.calls.clear();

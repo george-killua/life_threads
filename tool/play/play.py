@@ -19,6 +19,7 @@ import glob
 import json
 import os
 import socket
+import re
 import sys
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -50,7 +51,8 @@ elif sys.argv[1] == 'upload':
             chunksize=16 * 1024 * 1024)).execute(num_retries=5)
     vc = bundle['versionCode']
     print('uploaded versionCode', vc)
-    release = {'versionCodes': [str(vc)], 'status': status, 'name': f'1.0.0 ({vc})'}
+    version = re.search(r'^version: ([0-9.]+)', open('pubspec.yaml').read(), re.M).group(1)
+    release = {'versionCodes': [str(vc)], 'status': status, 'name': f'{version} ({vc})'}
     if notes:
         release['releaseNotes'] = [{'language': 'en-US', 'text': notes}]
     edits.tracks().update(packageName=PKG, editId=eid, track=track,
@@ -61,7 +63,10 @@ elif sys.argv[1] == 'listing':
     texts = json.load(open(sys.argv[2]))
     shots = sys.argv[3]
     # Play's language codes -> the screenshot folders' languages.
-    folder = {'en-US': 'en', 'en-GB': 'en', 'de-DE': 'de', 'ar': 'ar'}
+    folder = {'en-US': 'en', 'en-GB': 'en', 'de-DE': 'de', 'ar': 'ar',
+              'es-ES': 'es', 'es-419': 'es', 'fr-FR': 'fr', 'it-IT': 'it',
+              'pt-BR': 'pt', 'tr-TR': 'tr', 'pl-PL': 'pl', 'ru-RU': 'ru',
+              'hi-IN': 'hi', 'ja-JP': 'ja', 'ko-KR': 'ko', 'zh-CN': 'zh'}
     assets = os.path.join(os.path.dirname(os.path.abspath(shots)))
     icon = os.path.join(assets, 'lifethreads_app_icon_512.png')
     slots = {'phoneScreenshots': 'play-phone',

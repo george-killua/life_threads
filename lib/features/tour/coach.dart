@@ -71,6 +71,18 @@ class Coach extends ChangeNotifier {
     step?.onEnter?.call();
   }
 
+  /// Back to the step before, when that one didn't need a tap on the
+  /// screen (going back across a tap would leave the wrong screen open).
+  bool get canGoBack =>
+      active && _index > 0 && !_steps[_index - 1].tapToContinue;
+
+  void back() {
+    if (!canGoBack) return;
+    _index--;
+    notifyListeners();
+    step?.onEnter?.call();
+  }
+
   /// Ends the tour; [onDone] runs only when it ran to the end.
   void finish() {
     final done = _onDone;
@@ -164,13 +176,26 @@ class CoachLayer extends StatefulWidget {
 
   final Widget child;
 
+  /// The window the current step cuts around its target, for tests.
+  @visibleForTesting
+  static Rect? debugHole;
+
   @override
   State<CoachLayer> createState() => _CoachLayerState();
 }
 
-class _CoachLayerState extends State<CoachLayer> {
+class _CoachLayerState extends State<CoachLayer>
+    with SingleTickerProviderStateMixin {
   final coach = Coach.instance;
   Rect? _hole;
+
+  /// The ring breathes softly a few times when a step comes up, so the eye
+  /// finds it (then holds still, so it doesn't nag).
+  late final AnimationController _pulse = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1400),
+  );
+  int? _pulsedIndex;
   int _shownIndex = -1;
   bool _tracking = false;
 
@@ -183,11 +208,21 @@ class _CoachLayerState extends State<CoachLayer> {
   @override
   void dispose() {
     coach.removeListener(_changed);
+    _pulse.dispose();
     super.dispose();
   }
 
   void _changed() {
     if (!mounted) return;
+    if (!coach.active) {
+      _pulsedIndex = null;
+      _pulse.reset();
+    } else if (coach.index != _pulsedIndex) {
+      _pulsedIndex = coach.index;
+      _pulse
+        ..reset()
+        ..repeat(count: 3);
+    }
     setState(() {});
     if (!_tracking) _track();
   }
@@ -221,6 +256,7 @@ class _CoachLayerState extends State<CoachLayer> {
       // Until it has scrolled in, a target off the screen gets no hint yet.
       final screen = Offset.zero & MediaQuery.sizeOf(context);
       final visible = hole != null && screen.overlaps(hole) ? hole : null;
+      CoachLayer.debugHole = visible;
       if (visible != _hole) setState(() => _hole = visible);
       _track();
     });
@@ -243,8 +279,13 @@ class _CoachLayerState extends State<CoachLayer> {
         layer is! RenderBox) {
       return null;
     }
-    final topLeft = box.localToGlobal(Offset.zero, ancestor: layer);
-    return (topLeft & box.size).inflate(6);
+    // Through the whole transform, so a target on the zoomed-out wall gets
+    // a ring its drawn size, not its unscaled layout size.
+    final rect = MatrixUtils.transformRect(
+      box.getTransformTo(layer),
+      Offset.zero & box.size,
+    );
+    return rect.inflate(6);
   }
 
   @override
@@ -257,7 +298,7 @@ class _CoachLayerState extends State<CoachLayer> {
         widget.child,
         if (step != null && !waitingForTarget)
           Positioned.fill(
-            child: _Hint(step: step, hole: _hole),
+            child: _Hint(step: step, hole: _hole, pulse: _pulse),
           ),
         // While the target's page isn't open yet, a way out stays on screen.
         if (waitingForTarget)
@@ -293,10 +334,11 @@ class _CoachLayerState extends State<CoachLayer> {
 }
 
 class _Hint extends StatelessWidget {
-  const _Hint({required this.step, required this.hole});
+  const _Hint({required this.step, required this.hole, required this.pulse});
 
   final CoachStep step;
   final Rect? hole;
+  final Animation<double> pulse;
 
   @override
   Widget build(BuildContext context) {
@@ -321,6 +363,27 @@ class _Hint extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
+              padding: const EdgeInsetsDirectional.only(end: 8, bottom: 10),
+              child: Semantics(
+                label: '${coach.index + 1}/${coach.length}',
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(end: (coach.index + 1) / coach.length),
+                    duration: const Duration(milliseconds: 350),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, _) => LinearProgressIndicator(
+                      key: const ValueKey('tour-progress'),
+                      value: value,
+                      minHeight: 4,
+                      color: ink,
+                      backgroundColor: ink.withValues(alpha: 0.15),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
               padding: const EdgeInsetsDirectional.only(end: 8),
               child: Text(
                 step.title,
@@ -344,11 +407,21 @@ class _Hint extends StatelessWidget {
             const SizedBox(height: 4),
             Row(
               children: [
-                Text(
-                  '${coach.index + 1}/${coach.length}',
-                  style: theme.textTheme.labelMedium?.copyWith(color: ink),
-                ),
-                const SizedBox(width: 8),
+                // The layer sits above the app's Navigator: no Overlay, so
+                // no tooltip; the label is for screen readers.
+                if (coach.canGoBack)
+                  Semantics(
+                    button: true,
+                    label: l10n.tourBack,
+                    excludeSemantics: true,
+                    child: IconButton(
+                      key: const ValueKey('tour-back'),
+                      visualDensity: VisualDensity.compact,
+                      color: ink,
+                      onPressed: coach.back,
+                      icon: const Icon(Icons.arrow_back_rounded, size: 20),
+                    ),
+                  ),
                 // Long labels (German, Arabic) wrap instead of overflowing.
                 Expanded(
                   child: Wrap(
@@ -412,18 +485,45 @@ class _Hint extends StatelessWidget {
       ),
     );
 
-    // The bubble never runs off a short screen.
-    final bubbleBox = ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 520, maxHeight: size.height * 0.5),
-      child: SingleChildScrollView(child: bubble),
+    // The bubble never runs off a short screen; a new step's bubble fades
+    // and slides in.
+    final bubbleBox = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 260),
+      switchInCurve: Curves.easeOutCubic,
+      transitionBuilder: (child, animation) => FadeTransition(
+        opacity: animation,
+        child: SlideTransition(
+          position: Tween(
+            begin: Offset(0, below ? -0.06 : 0.06),
+            end: Offset.zero,
+          ).animate(animation),
+          child: child,
+        ),
+      ),
+      child: ConstrainedBox(
+        key: ValueKey(coach.index),
+        constraints: BoxConstraints(
+          maxWidth: 520,
+          maxHeight: size.height * 0.5,
+        ),
+        child: SingleChildScrollView(child: bubble),
+      ),
     );
 
     return Stack(
       children: [
         // The dim layer, with a rounded window over the target.
+        // The window glides from the last target to this one.
         Positioned.fill(
           child: IgnorePointer(
-            child: CustomPaint(painter: _ScrimPainter(hole)),
+            child: TweenAnimationBuilder<Rect?>(
+              tween: RectTween(end: hole ?? Rect.zero),
+              duration: const Duration(milliseconds: 320),
+              curve: Curves.easeOutCubic,
+              builder: (context, rect, _) => CustomPaint(
+                painter: _ScrimPainter(hole == null ? null : rect, pulse),
+              ),
+            ),
           ),
         ),
         // Taps outside the window are blocked; inside it they reach the
@@ -507,9 +607,10 @@ class _Hint extends StatelessWidget {
 }
 
 class _ScrimPainter extends CustomPainter {
-  _ScrimPainter(this.hole);
+  _ScrimPainter(this.hole, this.pulse) : super(repaint: pulse);
 
   final Rect? hole;
+  final Animation<double> pulse;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -536,9 +637,21 @@ class _ScrimPainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeWidth = 3,
       );
+      final beat = Curves.easeOut.transform(pulse.value);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          hole.inflate(2 + beat * 9),
+          Radius.circular(20 + beat * 9),
+        ),
+        Paint()
+          ..color = AppColors.gold.withValues(alpha: 0.55 * (1 - beat))
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5,
+      );
     }
   }
 
   @override
-  bool shouldRepaint(_ScrimPainter old) => old.hole != hole;
+  bool shouldRepaint(_ScrimPainter old) =>
+      old.hole != hole || old.pulse != pulse;
 }

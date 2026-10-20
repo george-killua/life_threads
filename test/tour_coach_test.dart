@@ -30,6 +30,32 @@ void main() {
     ),
   );
 
+  testWidgets('the ring fits a target drawn smaller, like a card on the '
+      'zoomed-out wall', (tester) async {
+    await tester.pumpWidget(
+      app(
+        body: Center(
+          child: Transform.scale(
+            scale: 0.5,
+            child: const CoachTarget(
+              id: 'card',
+              child: SizedBox(width: 200, height: 240),
+            ),
+          ),
+        ),
+      ),
+    );
+    Coach.instance.start('test', const [
+      CoachStep(target: 'card', title: 'Card', body: 'Tap'),
+    ]);
+    await tester.pumpAndSettle();
+    final hole = CoachLayer.debugHole!;
+    // Drawn 100×120, plus the ring's 6 px on each side.
+    expect(hole.width, closeTo(112, 0.5));
+    expect(hole.height, closeTo(132, 0.5));
+    expect(hole.center, tester.getCenter(find.byType(Scaffold)));
+  });
+
   testWidgets('tapping the ringed button moves on; Next and Skip work', (
     tester,
   ) async {
@@ -100,7 +126,7 @@ void main() {
     expect(Coach.instance.active, isFalse);
   });
 
-  for (final locale in const [Locale('en'), Locale('de'), Locale('ar')]) {
+  for (final locale in AppLocalizations.supportedLocales) {
     testWidgets('every bubble fits a small phone in ${locale.languageCode}', (
       tester,
     ) async {

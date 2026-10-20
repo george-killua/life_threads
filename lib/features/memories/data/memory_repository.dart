@@ -1,3 +1,4 @@
+import '../../wall/domain/wall_placement.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -488,9 +489,16 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
         occurredAt: draft.occurredAt,
         createdAt: DateTime.now(),
         coverColor: _colors[index % _colors.length],
+        // The first free spot of the wall's hanging pattern: never on top
+        // of a card already there.
         wallPosition:
             draft.wallPosition ??
-            Offset(150 + (index % 3) * 260, 180 + (index ~/ 3) * 210),
+            WallPlacement.freeSpot([
+              for (final other in current.events)
+                if (other.wallId == draft.wallId) other.wallPosition,
+              for (final item in current.wallItems)
+                if (item.wallId == draft.wallId) item.wallPosition,
+            ]),
         rotation: index.isEven ? -0.035 : 0.04,
         locationLabel: draft.locationLabel,
         latitude: draft.latitude,
@@ -1159,6 +1167,68 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
     );
   }
 
+  /// Rehangs every memory card on [wallId] (null: My wall) in the wall's
+  /// hanging pattern, oldest first, from where the wall's cards start.
+  /// Returns the old positions, so [moveMemories] can undo it.
+  Future<Map<String, Offset>> tidyWall(String? wallId) async {
+    final current = state.value;
+    if (current == null) return const {};
+    final cards = [
+      for (final event in current.events)
+        if (event.wallId == wallId) event,
+    ]..sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
+    if (cards.isEmpty) return const {};
+    var minX = cards.first.wallPosition.dx;
+    var minY = cards.first.wallPosition.dy;
+    for (final card in cards) {
+      if (card.wallPosition.dx < minX) minX = card.wallPosition.dx;
+      if (card.wallPosition.dy < minY) minY = card.wallPosition.dy;
+    }
+    final origin = Offset(minX, minY + 10);
+    final before = {for (final card in cards) card.id: card.wallPosition};
+    await moveMemories({
+      for (var i = 0; i < cards.length; i++)
+        cards[i].id: origin + WallPlacement.slot(i),
+    });
+    return before;
+  }
+
+  /// Moves several memory cards at once (one save, one redraw).
+  Future<void> moveMemories(Map<String, Offset> positions) async {
+    if (positions.isEmpty) return;
+    final current = state.value;
+    if (current != null) {
+      state = AsyncData(
+        MemoryState(
+          events: [
+            for (final event in current.events)
+              if (positions[event.id] case final position?)
+                event.copyWith(wallPosition: position)
+              else
+                event,
+          ],
+          connections: current.connections,
+          photos: current.photos,
+          people: current.people,
+          wallItems: current.wallItems,
+          walls: current.walls,
+        ),
+      );
+    }
+    await _database.transaction(() async {
+      for (final entry in positions.entries) {
+        await (_database.update(
+          _database.memoryEvents,
+        )..where((row) => row.id.equals(entry.key))).write(
+          db.MemoryEventsCompanion(
+            wallX: Value(entry.value.dx),
+            wallY: Value(entry.value.dy),
+          ),
+        );
+      }
+    });
+  }
+
   /// Gives memories whose place is only coordinates (saved offline, or
   /// before place names existed) their place name. A few per call, and it
   /// stops at the first miss: the phone's geocoder limits how often it may
@@ -1631,9 +1701,7 @@ class MemoryRepository extends AsyncNotifier<MemoryState> {
       for (final row in rows)
         if (row.wallId == null) row.wallY,
     ];
-    final below = own.isEmpty
-        ? 0.0
-        : own.reduce((a, b) => a > b ? a : b) + 420;
+    final below = own.isEmpty ? 0.0 : own.reduce((a, b) => a > b ? a : b) + 420;
     await _database.transaction(() => _insertDemoRows(offsetY: below));
     state = await AsyncValue.guard(_loadState);
     return true;

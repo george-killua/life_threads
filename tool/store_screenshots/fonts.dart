@@ -16,7 +16,39 @@ Future<void> loadStoreFonts() async {
   await _load('SF Arabic', [
     File('/System/Library/Fonts/SFArabic.ttf').readAsBytesSync(),
   ]);
+  // The fonts iOS falls back to for the other scripts of the app.
+  await _load('SF Pro', [
+    File('/System/Library/Fonts/SFNS.ttf').readAsBytesSync(),
+  ]);
+  await _load('Hiragino Sans', [
+    for (final weight in ['W3', 'W6'])
+      ..._faces('/System/Library/Fonts/ヒラギノ角ゴシック $weight.ttc').take(1),
+  ]);
+  await _load(
+    'Hiragino Sans GB',
+    _faces('/System/Library/Fonts/Hiragino Sans GB.ttc'),
+  );
+  await _load(
+    'Apple SD Gothic Neo',
+    _faces('/System/Library/Fonts/AppleSDGothicNeo.ttc'),
+  );
+  await _load(
+    'Kohinoor Devanagari',
+    _faces('/System/Library/Fonts/Kohinoor.ttc'),
+  );
 }
+
+/// The fallback fonts after Avenir for [lang], as an iPhone picks them:
+/// Chinese and Japanese share characters, so each gets its own font first.
+List<String> storeFontFallback(String lang) => [
+  'SF Arabic',
+  'SF Pro',
+  if (lang == 'zh') 'Hiragino Sans GB',
+  'Hiragino Sans',
+  'Apple SD Gothic Neo',
+  'Hiragino Sans GB',
+  'Kohinoor Devanagari',
+];
 
 Future<void> _load(String family, List<Uint8List> fonts) async {
   final loader = FontLoader(family);

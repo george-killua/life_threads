@@ -1,0 +1,650 @@
+{
+  "wall": {
+    "en": [
+      "Your memory wall",
+      "Your life, pinned to one wall",
+      "Photos, places and stories, connected by the threads of your life."
+    ],
+    "de": [
+      "Deine Erinnerungswand",
+      "Dein Leben an einer Wand",
+      "Fotos, Orte und Geschichten – verbunden durch die Fäden deines Lebens."
+    ],
+    "ar": [
+      "جدار ذكرياتك",
+      "حياتك على جدار واحد",
+      "صور وأماكن وقصص تربطها خيوط حياتك."
+    ],
+    "es": [
+      "Tu muro de recuerdos",
+      "Tu vida, en un solo muro",
+      "Fotos, lugares e historias, unidos por los hilos de tu vida."
+    ],
+    "fr": [
+      "Ton mur de souvenirs",
+      "Ta vie, sur un seul mur",
+      "Photos, lieux et histoires, reliés par les fils de ta vie."
+    ],
+    "it": [
+      "La tua parete dei ricordi",
+      "La tua vita su una sola parete",
+      "Foto, luoghi e storie, uniti dai fili della tua vita."
+    ],
+    "pt": [
+      "Seu mural de memórias",
+      "Sua vida em um só mural",
+      "Fotos, lugares e histórias, ligados pelos fios da sua vida."
+    ],
+    "tr": [
+      "Anı duvarın",
+      "Hayatın tek bir duvarda",
+      "Fotoğraflar, yerler ve hikâyeler, hayatının iplikleriyle bağlı."
+    ],
+    "pl": [
+      "Twoja ściana wspomnień",
+      "Twoje życie na jednej ścianie",
+      "Zdjęcia, miejsca i historie połączone nićmi twojego życia."
+    ],
+    "ru": [
+      "Твоя стена воспоминаний",
+      "Вся жизнь на одной стене",
+      "Фото, места и истории, связанные нитями твоей жизни."
+    ],
+    "hi": [
+      "आपकी यादों की दीवार",
+      "आपकी ज़िंदगी, एक दीवार पर",
+      "फ़ोटो, जगहें और कहानियाँ, ज़िंदगी के धागों से जुड़ी।"
+    ],
+    "ja": [
+      "思い出のウォール",
+      "人生をひとつの壁に",
+      "写真、場所、物語を、人生の糸でつなぐ。"
+    ],
+    "ko": [
+      "추억의 벽",
+      "인생을 하나의 벽에",
+      "사진, 장소, 이야기를 인생의 실로 이어요."
+    ],
+    "zh": [
+      "你的回忆墙",
+      "把人生挂在一面墙上",
+      "照片、地点与故事，由人生的丝线相连。"
+    ]
+  },
+  "video": {
+    "en": [
+      "Videos with music",
+      "13 animations, one tap",
+      "Polaroid, cinema, a journey on the map – your memories as a short film."
+    ],
+    "de": [
+      "Videos mit Musik",
+      "13 Animationen, ein Tipp",
+      "Polaroid, Kino, eine Reise auf der Karte – deine Erinnerungen als kurzer Film."
+    ],
+    "ar": [
+      "فيديوهات مع موسيقى",
+      "13 حركة بلمسة واحدة",
+      "بولارويد وسينما ورحلة على الخريطة – ذكرياتك كفيلم قصير."
+    ],
+    "es": [
+      "Vídeos con música",
+      "13 animaciones, un toque",
+      "Polaroid, cine, una ruta en el mapa: tus recuerdos como un corto."
+    ],
+    "fr": [
+      "Vidéos en musique",
+      "13 animations, un geste",
+      "Polaroid, cinéma, un itinéraire sur la carte : tes souvenirs en court film."
+    ],
+    "it": [
+      "Video con musica",
+      "13 animazioni, un tocco",
+      "Polaroid, cinema, un itinerario sulla mappa: i tuoi ricordi in un corto."
+    ],
+    "pt": [
+      "Vídeos com música",
+      "13 animações, um toque",
+      "Polaroid, cinema, um roteiro no mapa: suas memórias em um curta."
+    ],
+    "tr": [
+      "Müzikli videolar",
+      "13 animasyon, tek dokunuş",
+      "Polaroid, sinema, haritada bir yolculuk: anıların kısa bir film olarak."
+    ],
+    "pl": [
+      "Filmy z muzyką",
+      "13 animacji, jedno dotknięcie",
+      "Polaroid, kino, podróż po mapie: twoje wspomnienia jako krótki film."
+    ],
+    "ru": [
+      "Видео с музыкой",
+      "13 анимаций в одно касание",
+      "Полароид, кино, путешествие по карте: воспоминания как короткий фильм."
+    ],
+    "hi": [
+      "म्यूज़िक वाले वीडियो",
+      "13 एनिमेशन, एक टैप में",
+      "पोलरॉइड, सिनेमा, नक्शे पर सफ़र: आपकी यादें एक छोटी फ़िल्म में।"
+    ],
+    "ja": [
+      "音楽つきの動画",
+      "13のアニメーション",
+      "ポラロイド、シネマ、地図をたどる旅路。思い出をショートフィルムに。"
+    ],
+    "ko": [
+      "음악이 있는 영상",
+      "탭 한 번으로 13가지 애니메이션",
+      "폴라로이드, 시네마, 지도 위 여정. 추억을 짧은 영화로."
+    ],
+    "zh": [
+      "配乐视频",
+      "13 种动画，一键生成",
+      "拍立得、电影、地图上的旅程，把回忆变成短片。"
+    ]
+  },
+  "picture": {
+    "en": [
+      "Picture layouts",
+      "All your memories in one picture",
+      "Scrapbook, mosaic or contact sheet – for stories, posts or squares."
+    ],
+    "de": [
+      "Bild-Layouts",
+      "Alle Erinnerungen in einem Bild",
+      "Sammelalbum, Mosaik oder Kontaktabzug – für Storys, Beiträge oder Quadrate."
+    ],
+    "ar": [
+      "تصاميم الصور",
+      "كل ذكرياتك في صورة واحدة",
+      "ألبوم قصاصات أو فسيفساء أو ورقة أفلام – للقصص والمنشورات والمربعات."
+    ],
+    "es": [
+      "Diseños de imagen",
+      "Todos tus recuerdos en una imagen",
+      "Álbum de recortes, mosaico u hoja de contactos: para historias, posts o cuadrados."
+    ],
+    "fr": [
+      "Mises en page",
+      "Tous tes souvenirs en une image",
+      "Scrapbook, mosaïque ou planche contact : pour stories, posts ou carrés."
+    ],
+    "it": [
+      "Layout per immagini",
+      "Tutti i ricordi in un’immagine",
+      "Scrapbook, mosaico o provino: per storie, post o quadrati."
+    ],
+    "pt": [
+      "Layouts de imagem",
+      "Todas as memórias em uma imagem",
+      "Scrapbook, mosaico ou folha de contato: para stories, posts ou quadrados."
+    ],
+    "tr": [
+      "Görsel düzenleri",
+      "Tüm anıların tek görselde",
+      "Karalama defteri, mozaik ya da kontakt baskı: hikâye, gönderi ya da kare."
+    ],
+    "pl": [
+      "Układy zdjęć",
+      "Wszystkie wspomnienia na jednym obrazie",
+      "Scrapbook, mozaika lub stykówka: do relacji, postów i kwadratów."
+    ],
+    "ru": [
+      "Макеты картинок",
+      "Все воспоминания на одной картинке",
+      "Скрапбук, мозаика или контактный лист: для историй, постов и квадратов."
+    ],
+    "hi": [
+      "इमेज लेआउट",
+      "सारी यादें एक इमेज में",
+      "स्क्रैपबुक, मोज़ेक या कॉन्टैक्ट शीट: स्टोरी, पोस्ट या स्क्वेयर के लिए।"
+    ],
+    "ja": [
+      "画像レイアウト",
+      "思い出を1枚に",
+      "スクラップブック、モザイク、コンタクトシート。ストーリーにも投稿にも。"
+    ],
+    "ko": [
+      "이미지 레이아웃",
+      "모든 추억을 한 장에",
+      "스크랩북, 모자이크, 밀착 인화. 스토리, 게시물, 정사각형까지."
+    ],
+    "zh": [
+      "图片版式",
+      "所有回忆汇成一张图",
+      "手账、马赛克或印样，适合快拍、帖子和方图。"
+    ]
+  },
+  "family": {
+    "en": [
+      "Family walls",
+      "One wall for the whole family",
+      "End-to-end encrypted. Family members join free."
+    ],
+    "de": [
+      "Familienwände",
+      "Eine Wand für die ganze Familie",
+      "Ende-zu-Ende-verschlüsselt. Familienmitglieder treten kostenlos bei."
+    ],
+    "ar": [
+      "جدران العائلة",
+      "جدار واحد للعائلة كلها",
+      "مشفّر من طرف إلى طرف. ينضم أفراد العائلة مجاناً."
+    ],
+    "es": [
+      "Muros familiares",
+      "Un muro para toda la familia",
+      "Cifrado de extremo a extremo. Tu familia se une gratis."
+    ],
+    "fr": [
+      "Murs de famille",
+      "Un mur pour toute la famille",
+      "Chiffré de bout en bout. La famille rejoint gratuitement."
+    ],
+    "it": [
+      "Bacheche di famiglia",
+      "Una parete per tutta la famiglia",
+      "Crittografia end-to-end. La famiglia entra gratis."
+    ],
+    "pt": [
+      "Murais de família",
+      "Um mural para a família toda",
+      "Criptografia de ponta a ponta. A família entra grátis."
+    ],
+    "tr": [
+      "Aile duvarları",
+      "Tüm aile için tek duvar",
+      "Uçtan uca şifreli. Aile üyeleri ücretsiz katılır."
+    ],
+    "pl": [
+      "Ściany rodzinne",
+      "Jedna ściana dla całej rodziny",
+      "Szyfrowanie end-to-end. Rodzina dołącza za darmo."
+    ],
+    "ru": [
+      "Семейные стены",
+      "Одна стена для всей семьи",
+      "Сквозное шифрование. Семья присоединяется бесплатно."
+    ],
+    "hi": [
+      "परिवार की दीवारें",
+      "पूरे परिवार के लिए एक दीवार",
+      "एंड-टू-एंड एन्क्रिप्टेड। परिवार मुफ़्त जुड़ता है।"
+    ],
+    "ja": [
+      "家族ウォール",
+      "家族でひとつのウォール",
+      "エンドツーエンド暗号化。家族は無料で参加できます。"
+    ],
+    "ko": [
+      "가족 벽",
+      "온 가족을 위한 하나의 벽",
+      "종단간 암호화. 가족은 무료로 참여해요."
+    ],
+    "zh": [
+      "家庭墙",
+      "全家共享一面墙",
+      "端到端加密。家人免费加入。"
+    ]
+  },
+  "year": {
+    "en": [
+      "Thread of the Year",
+      "Your year as a short film",
+      "The moments that mattered, in order, with music."
+    ],
+    "de": [
+      "Faden des Jahres",
+      "Dein Jahr als kurzer Film",
+      "Die Momente, die gezählt haben, der Reihe nach, mit Musik."
+    ],
+    "ar": [
+      "خيط السنة",
+      "سنتك كفيلم قصير",
+      "اللحظات التي صنعت الفرق، بالترتيب، مع موسيقى."
+    ],
+    "es": [
+      "Hilo del año",
+      "Tu año como un corto",
+      "Los momentos que importaron, en orden y con música."
+    ],
+    "fr": [
+      "Fil de l'année",
+      "Ton année en court film",
+      "Les moments qui ont compté, dans l’ordre, en musique."
+    ],
+    "it": [
+      "Filo dell'anno",
+      "Il tuo anno in un corto",
+      "I momenti che contano, in ordine, con la musica."
+    ],
+    "pt": [
+      "Fio do Ano",
+      "Seu ano em um curta",
+      "Os momentos que importaram, em ordem, com música."
+    ],
+    "tr": [
+      "Yılın İpliği",
+      "Yılın kısa bir film olarak",
+      "Önemli anlar, sırasıyla ve müzikle."
+    ],
+    "pl": [
+      "Nić roku",
+      "Twój rok jako krótki film",
+      "Ważne chwile po kolei, z muzyką."
+    ],
+    "ru": [
+      "Нить года",
+      "Твой год как короткий фильм",
+      "Важные моменты по порядку, под музыку."
+    ],
+    "hi": [
+      "साल का धागा",
+      "आपका साल एक छोटी फ़िल्म में",
+      "अहम पल, क्रम से, म्यूज़िक के साथ।"
+    ],
+    "ja": [
+      "一年の糸",
+      "一年を短編映画に",
+      "大切な瞬間を、順番に、音楽とともに。"
+    ],
+    "ko": [
+      "한 해의 실",
+      "한 해를 짧은 영화로",
+      "소중한 순간을 순서대로, 음악과 함께."
+    ],
+    "zh": [
+      "年度时光线",
+      "把一年剪成短片",
+      "重要的时刻，按顺序，配上音乐。"
+    ]
+  },
+  "detail": {
+    "en": [
+      "Every chapter",
+      "Relive every moment",
+      "Open a memory and step right back into it."
+    ],
+    "de": [
+      "Jedes Kapitel",
+      "Erlebe jeden Moment noch einmal",
+      "Öffne eine Erinnerung und sei wieder mittendrin."
+    ],
+    "ar": [
+      "كل فصل",
+      "عِش كل لحظة من جديد",
+      "افتح ذكرى وعُد إليها كأنها الآن."
+    ],
+    "es": [
+      "Cada capítulo",
+      "Revive cada momento",
+      "Abre un recuerdo y vuelve a estar ahí."
+    ],
+    "fr": [
+      "Chaque chapitre",
+      "Revis chaque moment",
+      "Ouvre un souvenir et replonges-y."
+    ],
+    "it": [
+      "Ogni capitolo",
+      "Rivivi ogni momento",
+      "Apri un ricordo e tornaci dentro."
+    ],
+    "pt": [
+      "Cada capítulo",
+      "Reviva cada momento",
+      "Abra uma memória e volte para dentro dela."
+    ],
+    "tr": [
+      "Her bölüm",
+      "Her anı yeniden yaşa",
+      "Bir anıyı aç ve yeniden içine gir."
+    ],
+    "pl": [
+      "Każdy rozdział",
+      "Przeżyj każdą chwilę od nowa",
+      "Otwórz wspomnienie i wróć do niego."
+    ],
+    "ru": [
+      "Каждая глава",
+      "Проживи каждый момент снова",
+      "Открой воспоминание и вернись в него."
+    ],
+    "hi": [
+      "हर अध्याय",
+      "हर पल फिर से जिएँ",
+      "कोई याद खोलें और उसमें लौट जाएँ।"
+    ],
+    "ja": [
+      "すべての章",
+      "あの瞬間をもう一度",
+      "思い出を開けば、あの日に戻れる。"
+    ],
+    "ko": [
+      "모든 장면",
+      "모든 순간을 다시",
+      "추억을 열면 그날로 돌아가요."
+    ],
+    "zh": [
+      "每个篇章",
+      "重温每个瞬间",
+      "打开一段回忆，重回那一刻。"
+    ]
+  },
+  "story": {
+    "en": [
+      "The whole story",
+      "Keep the story behind the photo",
+      "What happened, who was there and how it felt."
+    ],
+    "de": [
+      "Die ganze Geschichte",
+      "Die Geschichte hinter dem Foto",
+      "Was passiert ist, wer dabei war und wie es sich angefühlt hat."
+    ],
+    "ar": [
+      "القصة كاملة",
+      "احفظ القصة وراء الصورة",
+      "ماذا حدث، ومن كان هناك، وكيف كان الشعور."
+    ],
+    "es": [
+      "Toda la historia",
+      "La historia detrás de la foto",
+      "Qué pasó, quién estaba y cómo se sintió."
+    ],
+    "fr": [
+      "Toute l'histoire",
+      "L’histoire derrière la photo",
+      "Ce qui s’est passé, qui était là et ce que tu as ressenti."
+    ],
+    "it": [
+      "Tutta la storia",
+      "La storia dietro la foto",
+      "Cosa è successo, chi c’era e cosa hai provato."
+    ],
+    "pt": [
+      "A história toda",
+      "A história por trás da foto",
+      "O que aconteceu, quem estava lá e como foi."
+    ],
+    "tr": [
+      "Hikâyenin tamamı",
+      "Fotoğrafın ardındaki hikâye",
+      "Ne oldu, kim vardı ve nasıl hissettirdi."
+    ],
+    "pl": [
+      "Cała historia",
+      "Historia za zdjęciem",
+      "Co się wydarzyło, kto tam był i jak to było."
+    ],
+    "ru": [
+      "Вся история",
+      "История за фотографией",
+      "Что случилось, кто был рядом и что ты чувствовал."
+    ],
+    "hi": [
+      "पूरी कहानी",
+      "फ़ोटो के पीछे की कहानी",
+      "क्या हुआ, कौन था और कैसा लगा।"
+    ],
+    "ja": [
+      "物語のすべて",
+      "写真の向こうの物語",
+      "何があって、誰がいて、どう感じたか。"
+    ],
+    "ko": [
+      "이야기 전체",
+      "사진 뒤의 이야기",
+      "무슨 일이 있었고, 누가 있었고, 어떤 기분이었는지."
+    ],
+    "zh": [
+      "完整的故事",
+      "照片背后的故事",
+      "发生了什么、谁在场、当时的感受。"
+    ]
+  },
+  "timeline": {
+    "en": [
+      "Private by design",
+      "Your life, year by year",
+      "Stays on your phone: no account, no ads, no tracking."
+    ],
+    "de": [
+      "Privat von Anfang an",
+      "Dein Leben, Jahr für Jahr",
+      "Bleibt auf deinem Handy: kein Konto, keine Werbung, kein Tracking."
+    ],
+    "ar": [
+      "الخصوصية أولاً",
+      "حياتك سنةً بعد سنة",
+      "تبقى على هاتفك: لا حساب، لا إعلانات، لا تتبّع."
+    ],
+    "es": [
+      "Privado por diseño",
+      "Tu vida, año tras año",
+      "Se queda en tu móvil: sin cuenta, sin anuncios, sin rastreo."
+    ],
+    "fr": [
+      "Privé par nature",
+      "Ta vie, année après année",
+      "Reste sur ton téléphone : sans compte, sans pub, sans pistage."
+    ],
+    "it": [
+      "Privato per scelta",
+      "La tua vita, anno dopo anno",
+      "Resta sul tuo telefono: niente account, pubblicità o tracciamento."
+    ],
+    "pt": [
+      "Privado por natureza",
+      "Sua vida, ano a ano",
+      "Fica no seu celular: sem conta, sem anúncios, sem rastreamento."
+    ],
+    "tr": [
+      "Gizlilik esastır",
+      "Hayatın, yıl yıl",
+      "Telefonunda kalır: hesap yok, reklam yok, takip yok."
+    ],
+    "pl": [
+      "Prywatność od podstaw",
+      "Twoje życie, rok po roku",
+      "Zostaje w telefonie: bez konta, reklam i śledzenia."
+    ],
+    "ru": [
+      "Приватность прежде всего",
+      "Твоя жизнь год за годом",
+      "Остаётся на телефоне: без аккаунта, рекламы и слежки."
+    ],
+    "hi": [
+      "पूरी तरह निजी",
+      "आपकी ज़िंदगी, साल दर साल",
+      "आपके फ़ोन पर रहती है: न अकाउंट, न विज्ञापन, न ट्रैकिंग।"
+    ],
+    "ja": [
+      "プライバシー優先",
+      "人生を、一年ずつ",
+      "データは端末に。アカウント不要、広告なし、追跡なし。"
+    ],
+    "ko": [
+      "처음부터 프라이버시",
+      "한 해 한 해의 인생",
+      "폰에만 저장돼요. 계정, 광고, 추적 없음."
+    ],
+    "zh": [
+      "隐私至上",
+      "一年一年的人生",
+      "数据留在手机里：无需账号、无广告、无追踪。"
+    ]
+  },
+  "add": {
+    "en": [
+      "Capture",
+      "Save a moment in seconds",
+      "Add photos, a date, a place and the feeling – before it fades."
+    ],
+    "de": [
+      "Festhalten",
+      "Halte einen Moment in Sekunden fest",
+      "Fotos, Datum, Ort und Gefühl – bevor es verblasst."
+    ],
+    "ar": [
+      "احفظ",
+      "احفظ لحظتك في ثوانٍ",
+      "أضف الصور والتاريخ والمكان والشعور قبل أن يبهت."
+    ],
+    "es": [
+      "Guardar",
+      "Guarda un momento en segundos",
+      "Fotos, fecha, lugar y sentimiento, antes de que se desvanezca."
+    ],
+    "fr": [
+      "Capturer",
+      "Garde un moment en quelques secondes",
+      "Photos, date, lieu et émotion, avant que tout s’efface."
+    ],
+    "it": [
+      "Cattura",
+      "Salva un momento in pochi secondi",
+      "Foto, data, luogo e sensazione, prima che svanisca."
+    ],
+    "pt": [
+      "Guardar",
+      "Guarde um momento em segundos",
+      "Fotos, data, lugar e sentimento, antes que se apague."
+    ],
+    "tr": [
+      "Yakala",
+      "Bir anı saniyeler içinde kaydet",
+      "Fotoğraf, tarih, yer ve his, solmadan önce."
+    ],
+    "pl": [
+      "Zachowaj",
+      "Zapisz chwilę w kilka sekund",
+      "Zdjęcia, data, miejsce i uczucia, zanim wyblakną."
+    ],
+    "ru": [
+      "Сохрани",
+      "Сохрани момент за секунды",
+      "Фото, дата, место и чувство, пока они не забылись."
+    ],
+    "hi": [
+      "सहेजें",
+      "पल को सेकंडों में सहेजें",
+      "फ़ोटो, तारीख़, जगह और एहसास, धुंधला होने से पहले।"
+    ],
+    "ja": [
+      "残す",
+      "数秒で瞬間を保存",
+      "写真、日付、場所、そして気持ちを、色あせる前に。"
+    ],
+    "ko": [
+      "기록하기",
+      "몇 초 만에 순간을 저장",
+      "사진, 날짜, 장소, 그리고 그때의 감정까지."
+    ],
+    "zh": [
+      "记录",
+      "几秒保存一个瞬间",
+      "照片、日期、地点和心情，在淡忘之前留住。"
+    ]
+  }
+}

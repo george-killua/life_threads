@@ -1,0 +1,6 @@
+/* Sistem izin istekleri, telefonun dilinde. */
+"NSCameraUsageDescription" = "LifeThreads, sen istediğinde bir ekranın QR kodunu taramak ve anılar için fotoğraf çekmek üzere kamerayı kullanır.";
+"NSContactsUsageDescription" = "LifeThreads, seçtiğin kişi bilgilerini bir anıya özel kişi olarak aktarabilir.";
+"NSFaceIDUsageDescription" = "LifeThreads, uygulama kilidini açtığında özel anı duvarının kilidini açmak için Face ID kullanır.";
+"NSPhotoLibraryAddUsageDescription" = "LifeThreads, Fotoğraflar'a kaydet'i seçtiğinde oluşturduğun hikaye görsellerini ve videolarını fotoğraf arşivine kaydeder.";
+"NSPhotoLibraryUsageDescription" = "LifeThreads, özel anı duvarını oluşturmak için seçtiğin fotoğrafları kullanır.";

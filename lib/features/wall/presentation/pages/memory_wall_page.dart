@@ -52,6 +52,7 @@ import '../widgets/rope_painter.dart';
 import '../widgets/wall_background.dart';
 import '../widgets/wall_empty_state.dart';
 import '../widgets/wall_filter.dart';
+import '../../domain/wall_placement.dart';
 import '../widgets/wall_nail.dart';
 import '../widgets/wall_pan_surface.dart';
 import '../widgets/wall_text_note.dart';
@@ -196,8 +197,82 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     );
   }
 
+  /// The cards shown last time, and on which wall and view: a single new
+  /// one (just saved) is brought into view if it hangs off the screen.
+  Set<String>? _knownCardIds;
+  String? _knownCardsView;
+  AnimationController? _revealController;
+
+  void _noticeNewCard(String? wallId, List<MemoryEvent> boardEvents) {
+    final ids = {for (final event in boardEvents) event.id};
+    final view =
+        '$wallId|${_filter.name}|${_layoutMode.name}|$_showHidden|'
+        '${_mode.name}';
+    final known = _knownCardIds;
+    final sameView = _knownCardsView == view;
+    _knownCardIds = ids;
+    _knownCardsView = view;
+    // A tour keeps the wall where it framed it; imports add many at once.
+    if (known == null ||
+        !sameView ||
+        appTourRunning ||
+        _mode != _WallViewMode.wall) {
+      return;
+    }
+    final added = [
+      for (final event in boardEvents)
+        if (!known.contains(event.id)) event,
+    ];
+    if (added.length != 1) return;
+    final position = added.single.wallPosition;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _revealCard(position));
+  }
+
+  /// Glides the wall so the card at [boardPosition] is on the screen, at the
+  /// same zoom; a card already in view stays where it is.
+  void _revealCard(Offset boardPosition) {
+    if (!mounted) return;
+    final size = MediaQuery.sizeOf(context);
+    final padding = MediaQuery.paddingOf(context);
+    final from = _wallController.value.clone();
+    final card = MatrixUtils.transformRect(
+      from,
+      boardPosition & MemoryCard.visualSize,
+    );
+    // Between the top buttons and the bottom bar.
+    final view = Rect.fromLTRB(
+      0,
+      padding.top + 70,
+      size.width,
+      size.height - padding.bottom - 100,
+    );
+    if (view.contains(card.topLeft) && view.contains(card.bottomRight)) return;
+    final shift = view.center - card.center;
+    final to = Matrix4.translationValues(shift.dx, shift.dy, 0) * from;
+    final tween = Matrix4Tween(begin: from, end: to);
+    final controller = _revealController ??= AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 650),
+    );
+    final curve = CurvedAnimation(
+      parent: controller,
+      curve: Curves.easeInOutCubic,
+    );
+    void move() => _wallController.value = tween.evaluate(curve);
+    controller
+      ..stop()
+      ..reset();
+    curve.addListener(move);
+    controller.forward().whenCompleteOrCancel(() {
+      curve
+        ..removeListener(move)
+        ..dispose();
+    });
+  }
+
   @override
   void dispose() {
+    _revealController?.dispose();
     Coach.instance.removeListener(_onTour);
     _windController.dispose();
     _viewTransition.dispose();
@@ -270,6 +345,7 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
               final boardEvents = filteredEvents
                   .map(_toBoardLocalMemory)
                   .toList();
+              _noticeNewCard(wallId, boardEvents);
               final boardWallItems = displayWallItems
                   .map(_toBoardLocalWallItem)
                   .toList();
@@ -626,7 +702,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          if (state.isDemoOnly)
+                          // The tour explains the demo memories itself and
+                          // asks about them at the end.
+                          if (state.isDemoOnly && !appTourRunning)
                             _DemoWallBanner(
                               onClear: () =>
                                   _clearDemoWall(context, repository),
@@ -644,8 +722,11 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
                                   .read(backupReminderProvider.notifier)
                                   .snooze(),
                             ),
+                          // The tour says the same in its bubble; the hint
+                          // would sit inside the ring around the first card.
                           if (hasWallContent &&
                               _mode == _WallViewMode.wall &&
+                              !appTourRunning &&
                               ref.watch(wallHintSeenProvider).asData?.value ==
                                   false)
                             const Padding(
@@ -952,6 +1033,57 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
     );
     if (choice == null || !mounted) return;
     _applyView(choice);
+    if (choice.tidy) await _tidyUp();
+  }
+
+  /// Asks, then rehangs every card of this wall neatly (oldest first); the
+  /// cards glide to their new places, and Undo puts them back.
+  Future<void> _tidyUp() async {
+    final l10n = context.l10n;
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.wallTidyUp),
+        content: Text(l10n.wallTidyUpBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            key: const ValueKey('wall-tidy-up-confirm'),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.wallTidyUpAction),
+          ),
+        ],
+      ),
+    );
+    if (sure != true || !mounted) return;
+    final repository = ref.read(memoryRepositoryProvider.notifier);
+    final messenger = ScaffoldMessenger.of(context);
+    void glide() {
+      if (MediaQuery.disableAnimationsOf(context)) return;
+      setState(() {
+        _transitionFrom = Map.of(_shownPositions);
+        _transitionFilter = null;
+        _viewTransition.forward(from: 0);
+      });
+    }
+
+    glide();
+    final before = await repository.tidyWall(activeWallId(ref));
+    if (!mounted || before.isEmpty) return;
+    messenger.showToast(
+      l10n.wallTidiedToast,
+      kind: ToastKind.success,
+      action: ToastAction(
+        label: l10n.undo,
+        onPressed: () {
+          if (mounted) glide();
+          unawaited(repository.moveMemories(before));
+        },
+      ),
+    );
   }
 
   /// Applies the View sheet's choice. On the wall, a new arrangement moves
@@ -1070,7 +1202,17 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       Offset(size.width * 0.58, size.height * 0.58),
     );
     // Convert board-local scene coords back to free wall coordinates.
-    return local + _boardOrigin - const Offset(90, 70);
+    final near = local + _boardOrigin - const Offset(90, 70);
+    // Starts in a free spot near the middle of the screen, not on a card.
+    final wall = activeWallId(ref);
+    final state = ref.read(memoryRepositoryProvider).asData?.value;
+    if (state == null) return near;
+    return WallPlacement.freeSpotNear([
+      for (final event in state.events)
+        if (event.wallId == wall) event.wallPosition,
+      for (final item in state.wallItems)
+        if (item.wallId == wall) item.wallPosition,
+    ], near);
   }
 
   /// When the guided tour starts, the wall shows every card in its own
@@ -1092,6 +1234,9 @@ class _MemoryWallPageState extends ConsumerState<MemoryWallPage>
       } else {
         reset();
       }
+    } else if (!running && _tourWasRunning && mounted) {
+      // The wall hint comes back after the tour.
+      setState(() {});
     }
     _tourWasRunning = running;
   }
@@ -2822,21 +2967,25 @@ class _WallMoreButton extends StatelessWidget {
             _MoreAction.yearThread,
             Icons.movie_filter_rounded,
             l10n.yearThreadTitle,
+            coachId: TourTargets.moreYear,
           ),
           item(
             _MoreAction.lookBack,
             Icons.calendar_month_rounded,
             l10n.lookBackMenu,
+            coachId: TourTargets.moreLookBack,
           ),
           item(
             _MoreAction.newWall,
             Icons.dashboard_customize_rounded,
             l10n.newWall,
+            coachId: TourTargets.moreNewWall,
           ),
           item(
             _MoreAction.familyWalls,
             Icons.diversity_1_rounded,
             l10n.familyWallsTitle,
+            coachId: TourTargets.moreFamily,
           ),
           item(
             _MoreAction.display,
@@ -2852,6 +3001,7 @@ class _WallMoreButton extends StatelessWidget {
             _MoreAction.settings,
             Icons.settings_rounded,
             l10n.settingsTooltip,
+            coachId: TourTargets.moreSettings,
           ),
         ],
       ),
@@ -2868,12 +3018,16 @@ class _ViewChoice {
     required this.layout,
     required this.filter,
     required this.showHidden,
+    this.tidy = false,
   });
 
   final _WallViewMode mode;
   final WallLayoutMode layout;
   final WallFilter filter;
   final bool showHidden;
+
+  /// Rehang the cards neatly (Wand aufräumen).
+  final bool tidy;
 }
 
 class _WallViewSheet extends StatefulWidget {
@@ -3007,6 +3161,26 @@ class _WallViewSheetState extends State<_WallViewSheet> {
                     ),
                 ],
               ),
+              // Free arrangement: cards that ended up on top of each other
+              // can be hung neatly again.
+              if (_layout == WallLayoutMode.freeform)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: OutlinedButton.icon(
+                    key: const ValueKey('wall-tidy-up'),
+                    onPressed: () => Navigator.of(context).pop(
+                      _ViewChoice(
+                        mode: _mode,
+                        layout: _layout,
+                        filter: _filter,
+                        showHidden: _showHidden,
+                        tidy: true,
+                      ),
+                    ),
+                    icon: const Icon(Icons.auto_fix_high_rounded, size: 18),
+                    label: Text(l10n.wallTidyUp),
+                  ),
+                ),
             ],
             _SheetSectionLabel(l10n.wallShowOnly),
             _ChoiceGrid(
@@ -3374,17 +3548,26 @@ class _WallInteractionHint extends StatelessWidget {
       child: Align(
         alignment: AlignmentDirectional.centerStart,
         child: DecoratedBox(
+          // It floats over the cards (on small phones right on them), so
+          // it is solid enough that card text never shows through.
           decoration: BoxDecoration(
-            color: AppColors.wallInk.withValues(alpha: 0.52),
+            color: AppColors.wallInk.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: AppColors.gold.withValues(alpha: 0.12)),
+            border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.35),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Text(
               context.l10n.tapToOpenDrag,
               style: TextStyle(
-                color: AppColors.muted,
+                color: AppColors.text,
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
               ),

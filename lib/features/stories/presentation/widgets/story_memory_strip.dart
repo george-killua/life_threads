@@ -8,7 +8,9 @@ import '../../../memories/domain/memory_event.dart';
 import '../templates/story_visuals.dart';
 
 /// The memories in the story being edited, in story order: hold and drag to
-/// reorder, × to remove (the last one stays), + to add another.
+/// reorder, × to remove (the last one stays), + to add another. A memory
+/// with several photos shows how many; tap it to choose the one the story
+/// uses.
 class StoryMemoryStrip extends StatelessWidget {
   const StoryMemoryStrip({
     super.key,
@@ -17,7 +19,13 @@ class StoryMemoryStrip extends StatelessWidget {
     required this.onReorder,
     required this.onRemove,
     required this.onAdd,
+    this.photoCounts = const {},
+    this.onChoosePhoto,
   });
+
+  /// How many photos each memory has (by id).
+  final Map<String, int> photoCounts;
+  final ValueChanged<String>? onChoosePhoto;
 
   final List<MemoryEvent> memories;
   final bool canAdd;
@@ -38,9 +46,13 @@ class StoryMemoryStrip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             children: [
-              Text(
-                l10n.storyMemoriesInStory,
-                style: const TextStyle(fontWeight: FontWeight.w900),
+              Flexible(
+                child: Text(
+                  l10n.storyMemoriesInStory,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -76,6 +88,10 @@ class StoryMemoryStrip extends StatelessWidget {
                 child: _MemoryThumb(
                   memory: memory,
                   order: index + 1,
+                  photoCount: photoCounts[memory.id] ?? 0,
+                  onChoosePhoto: onChoosePhoto == null
+                      ? null
+                      : () => onChoosePhoto!(memory.id),
                   onRemove: canRemove ? () => onRemove(memory.id) : null,
                   removeLabel: l10n.storyRemoveMemory(memory.title),
                 ),
@@ -94,10 +110,14 @@ class _MemoryThumb extends StatelessWidget {
     required this.order,
     required this.onRemove,
     required this.removeLabel,
+    this.photoCount = 0,
+    this.onChoosePhoto,
   });
 
   final MemoryEvent memory;
   final int order;
+  final int photoCount;
+  final VoidCallback? onChoosePhoto;
   final VoidCallback? onRemove;
   final String removeLabel;
 
@@ -122,20 +142,62 @@ class _MemoryThumb extends StatelessWidget {
             Positioned.fill(
               child: Semantics(
                 label: '$order. ${memory.title}',
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.gold, width: 1.5),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12.5),
-                    child: image == null
-                        ? StoryPhotoPlaceholder(color: memory.coverColor)
-                        : Image(image: image, fit: BoxFit.cover),
+                button: photoCount > 1 && onChoosePhoto != null,
+                child: GestureDetector(
+                  key: ValueKey('story-strip-photo-${memory.id}'),
+                  onTap: photoCount > 1 ? onChoosePhoto : null,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.gold, width: 1.5),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12.5),
+                      child: image == null
+                          ? StoryPhotoPlaceholder(color: memory.coverColor)
+                          : Image(image: image, fit: BoxFit.cover),
+                    ),
                   ),
                 ),
               ),
             ),
+            // Several photos: the story can use another one.
+            if (photoCount > 1)
+              PositionedDirectional(
+                end: 4,
+                bottom: 4,
+                child: ExcludeSemantics(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 5,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.62),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.photo_library_rounded,
+                          size: 11,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          '$photoCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             PositionedDirectional(
               start: 4,
               bottom: 4,

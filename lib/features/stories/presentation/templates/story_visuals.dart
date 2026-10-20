@@ -10,10 +10,27 @@ import '../../../../core/localization/app_localizations_x.dart';
 import '../../../memories/domain/memory_event.dart';
 import '../../../memories/presentation/memory_l10n.dart';
 import '../../../wall/domain/wall_theme.dart';
+import '../../domain/story_template.dart';
 import '../../../wall/presentation/widgets/metallic_ball_pin.dart';
 
 /// Story pages are laid out at 360×640 logical pixels (1080×1920 at 3×).
 const storySize = Size(360, 640);
+
+/// The size of the story page being drawn: [storySize] for stories and
+/// films, shorter for a feed post or a square picture. Layouts read it to
+/// fit their content.
+class StoryPageSize extends InheritedWidget {
+  const StoryPageSize({super.key, required this.size, required super.child});
+
+  final Size size;
+
+  static Size of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<StoryPageSize>()?.size ??
+      storySize;
+
+  @override
+  bool updateShouldNotify(StoryPageSize old) => old.size != size;
+}
 
 /// The photo of [memory] at a size that is sharp in a 1080×1920 story but
 /// never decodes a full camera image (a 12 MP photo would take ~48 MB).
@@ -76,6 +93,67 @@ class StoryMotion {
     if (now == null) return 0;
     return ((now - (total - 0.6)) / 0.6).clamp(0.0, 1.0);
   }
+
+  /// [beat] with the intro and outro [template] uses ([storyTurns]).
+  StoryBeat beatFor(StoryTemplate template, int count) {
+    final turns = storyTurns(template, total);
+    return beat(count, intro: turns.intro, outro: turns.outro);
+  }
+
+  /// For films that show [count] memories one after another, between an
+  /// [intro] and an [outro] (seconds): which memory is on screen and how far
+  /// into its turn the film is. A still image shows the first memory,
+  /// finished.
+  StoryBeat beat(int count, {double intro = 0.3, double outro = 0.9}) {
+    final n = math.max(1, count);
+    final span = math.max(0.5, (total - intro - outro) / n);
+    final now = seconds;
+    if (now == null) {
+      return StoryBeat(index: 0, local: span, span: span, still: true);
+    }
+    final index = ((now - intro) / span).floor().clamp(0, n - 1);
+    return StoryBeat(
+      index: index,
+      local: now - intro - index * span,
+      span: span,
+    );
+  }
+}
+
+/// One memory's turn in a film (see [StoryMotion.beat]).
+class StoryBeat {
+  const StoryBeat({
+    required this.index,
+    required this.local,
+    required this.span,
+    this.still = false,
+  });
+
+  /// The memory on screen.
+  final int index;
+
+  /// Seconds since its turn began (negative before the first turn, past
+  /// [span] in the outro).
+  final double local;
+
+  /// Seconds each memory gets.
+  final double span;
+
+  /// A still image (the turn is shown finished).
+  final bool still;
+
+  /// 0 → 1 through the turn.
+  double get t => (local / span).clamp(0.0, 1.0);
+
+  /// 0 → 1 (eased) between fractions [from] and [to] of the turn.
+  double phase(double from, double to) {
+    final value = ((t - from) / (to - from)).clamp(0.0, 1.0);
+    return Curves.easeInOutCubic.transform(value);
+  }
+
+  /// The turn as its own film, for scenes built on [StoryMotion.appear].
+  StoryMotion get motion =>
+      still ? const StoryMotion.still() : StoryMotion.at(local, span);
 }
 
 /// The dark memory-room wall behind story pages (the free "Warm memory
@@ -436,6 +514,62 @@ String storyDateRange(BuildContext context, List<MemoryEvent> memories) {
   final start = format.format(first);
   final end = format.format(last);
   return start == end ? start : '$start – $end';
+}
+
+/// Fades a piece in while it rises [rise] pixels into place.
+class StoryReveal extends StatelessWidget {
+  const StoryReveal({
+    super.key,
+    required this.value,
+    required this.child,
+    this.rise = 14,
+  });
+
+  final double value;
+  final double rise;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (value >= 1) return child;
+    return Opacity(
+      opacity: value.clamp(0.0, 1.0),
+      child: Transform.translate(
+        offset: Offset(0, (1 - value) * rise),
+        child: child,
+      ),
+    );
+  }
+}
+
+/// Small dots telling which of [count] memories the film is showing.
+class StoryPageDots extends StatelessWidget {
+  const StoryPageDots({super.key, required this.count, required this.index});
+
+  final int count;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    if (count <= 1) return const SizedBox.shrink();
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < count; i++)
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 2.5),
+            width: i == index ? 16 : 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: i == index
+                  ? BrandColors.amber
+                  : BrandColors.text.withValues(alpha: 0.35),
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+      ],
+    );
+  }
 }
 
 /// The memory's feeling as a small glowing chip.

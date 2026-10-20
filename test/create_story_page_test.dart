@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:life_threads/app/router/route_names.dart';
 import 'package:life_threads/features/memories/data/memory_repository.dart';
+import 'package:life_threads/features/memories/domain/memory_photo.dart';
 import 'package:life_threads/features/premium/data/premium_entitlement_controller.dart';
 import 'package:life_threads/features/premium/domain/premium_feature.dart';
 import 'package:life_threads/features/stories/data/music_catalog.dart';
@@ -15,6 +16,7 @@ import 'package:life_threads/features/stories/domain/music_track.dart';
 import 'package:life_threads/features/stories/domain/story_film.dart';
 import 'package:life_threads/features/stories/domain/story_template.dart';
 import 'package:life_threads/features/stories/presentation/pages/create_story_page.dart';
+import 'package:life_threads/features/stories/presentation/pages/story_style_page.dart';
 import 'package:life_threads/features/stories/presentation/templates/story_templates.dart';
 import 'package:life_threads/features/stories/presentation/widgets/music_trimmer.dart';
 import 'package:life_threads/l10n/generated/app_localizations.dart';
@@ -25,10 +27,18 @@ import 'support/on_this_day_fakes.dart';
 class _FakeExporter implements StoryExporter {
   final calls = <String>[];
   Duration? musicStart;
+  Size? imageSize;
+  StoryPage? page;
 
   @override
-  Future<File> exportImage(BuildContext context, Widget page) async {
+  Future<File> exportImage(
+    BuildContext context,
+    Widget page, {
+    Size size = const Size(360, 640),
+  }) async {
     calls.add('image:${(page as StoryPage).template.name}');
+    imageSize = size;
+    this.page = page;
     return File('${Directory.systemTemp.path}/fake_story.png');
   }
 
@@ -75,6 +85,7 @@ void main() {
     WidgetTester tester, {
     required bool isPremium,
     String? initialMemoryId,
+    List<MemoryPhoto> photos = const [],
   }) async {
     preview = FakeMusicPreview();
     tester.view.physicalSize = const Size(1080, 2400);
@@ -101,7 +112,7 @@ void main() {
       ProviderScope(
         overrides: [
           memoryRepositoryProvider.overrideWith(
-            () => FakeMemoryRepository(memories),
+            () => FakeMemoryRepository(memories, photos: photos),
           ),
           premiumEntitlementProvider.overrideWith(
             () => FakePremium(isPremium: isPremium),
@@ -303,7 +314,8 @@ void main() {
     await tester.tap(find.text(l10n.storyShare));
     await tester.pumpAndSettle();
 
-    expect(exporter.calls, ['image:single', 'share:png']);
+    // A new story is a picture, on Collage.
+    expect(exporter.calls, ['image:collage', 'share:png']);
   });
 
   testWidgets('with Premium, a video with music is exported and saved', (
@@ -314,47 +326,23 @@ void main() {
       isPremium: true,
       initialMemoryId: 'm1',
     );
+    // Music is part of video mode, on its own screen; the film there runs
+    // with the song, so no pumpAndSettle while it is open.
     await tester.tap(find.byKey(const ValueKey('story-video-switch')));
-    await tester.pump();
-    // The song list is long; bring the hint below it into view.
-    await tester.scrollUntilVisible(
-      find.text(l10n.storyMusicNoneHint),
-      200,
-      scrollable: find
-          .byWidgetPredicate(
-            (widget) =>
-                widget is Scrollable &&
-                widget.axisDirection == AxisDirection.down,
-          )
-          .first,
-    );
-    expect(find.text(l10n.storyMusicNoneHint), findsOneWidget);
-    await tester.ensureVisible(
-      find.textContaining(bundledMusicTracks.first.title),
-    );
-    await tester.pump();
-    await tester.tap(find.textContaining(bundledMusicTracks.first.title));
+    await _pumpFor(tester);
+    await tester.ensureVisible(find.byKey(const ValueKey('story-music-row')));
+    await tester.tap(find.byKey(const ValueKey('story-music-row')));
+    await _pumpFor(tester);
+    final track = bundledMusicTracks.first;
+    await tester.tap(find.byKey(ValueKey('story-music-${track.id}')));
     await tester.pump();
     // Picking a song plays the part the film would use, from its loudest
     // part.
-    final track = bundledMusicTracks.first;
-    expect(preview.calls, ['play:${track.id}']);
-    final film = preview.parts.single;
+    expect(preview.calls.last, 'play:${track.id}');
+    final film = preview.parts.last;
     expect(film.start, MusicTrimmer.suggestedStart(track, film.length!));
 
     // Dragging the window to the start picks the beginning of the song.
-    await tester.scrollUntilVisible(
-      find.byKey(const ValueKey('music-trimmer')),
-      200,
-      scrollable: find
-          .byWidgetPredicate(
-            (widget) =>
-                widget is Scrollable &&
-                widget.axisDirection == AxisDirection.down,
-          )
-          .first,
-    );
-    await tester.pump();
     await tester.drag(
       find.byKey(const ValueKey('music-trimmer')),
       const Offset(-2000, 0),
@@ -363,20 +351,202 @@ void main() {
     expect(preview.parts.last.start, Duration.zero);
     expect(find.text('0:00 – ${_clock(film.length!)}'), findsOneWidget);
 
-    await tester.tap(find.byKey(const ValueKey('story-save')));
-    for (var i = 0; i < 10; i++) {
-      await tester.pump(const Duration(milliseconds: 100));
-    }
+    // The playhead follows the song: 3 s into the part is 3 s into the film.
+    preview.positions.add(const Duration(seconds: 3));
+    await tester.pump();
+    expect(find.text(l10n.storyMusicPlayhead('0:03', '0:03')), findsOneWidget);
 
-    expect(exporter.calls, [
-      'video:${bundledMusicTracks.first.id}',
-      'save:mp4',
-    ]);
+    await tester.tap(find.byKey(const ValueKey('story-music-done')));
+    await _pumpFor(tester);
+    // Choosing music makes the story a video, and back on the story the
+    // song plays on with the preview, from the chosen part.
+    expect(preview.calls.last, 'play:${track.id}');
+    expect(preview.parts.last.start, Duration.zero);
+    expect(find.textContaining(track.title), findsOneWidget);
+    expect(find.byKey(const ValueKey('story-preview-sound')), findsOneWidget);
+
+    // The sound button turns it off (and on again).
+    await tester.tap(find.byKey(const ValueKey('story-preview-sound')));
+    await tester.pump();
+    expect(preview.calls.last, 'stop');
+    await tester.tap(find.byKey(const ValueKey('story-preview-sound')));
+    await tester.pump();
+    expect(preview.calls.last, 'play:${track.id}');
+
+    await tester.tap(find.byKey(const ValueKey('story-save')));
+    await _pumpFor(tester);
+
+    expect(exporter.calls, ['video:${track.id}', 'save:mp4']);
     expect(exporter.musicStart, Duration.zero);
     expect(find.text(l10n.storySaved), findsOneWidget);
-    // The preview stops when the export starts.
+    // The song stopped for the export.
     expect(preview.calls.last, 'stop');
   });
+
+  testWidgets('the music page sets the film length', (tester) async {
+    await pumpPage(tester, isPremium: true, initialMemoryId: 'm1');
+    await tester.tap(find.byKey(const ValueKey('story-video-switch')));
+    await _pumpFor(tester);
+    await tester.ensureVisible(find.byKey(const ValueKey('story-music-row')));
+    await tester.tap(find.byKey(const ValueKey('story-music-row')));
+    await _pumpFor(tester);
+    // Collage stays when the story becomes a video.
+    final auto = StoryTemplate.collage.autoSeconds(1).round();
+    expect(find.text(l10n.storyLengthSeconds('$auto')), findsWidgets);
+
+    // Dragging the slider to its end picks the longest film.
+    await tester.drag(
+      find.byKey(const ValueKey('story-length-slider')),
+      const Offset(2000, 0),
+    );
+    await tester.pump();
+    expect(
+      find.text(l10n.storyLengthSeconds('$storyMaxSeconds')),
+      findsWidgets,
+    );
+    await tester.tap(find.byKey(const ValueKey('story-music-done')));
+    await _pumpFor(tester);
+    expect(
+      find.text(l10n.storyLengthSeconds('$storyMaxSeconds')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('a picture offers layouts with every memory; the choice '
+      'comes back', (tester) async {
+    final exporter = await pumpPage(
+      tester,
+      isPremium: true,
+      initialMemoryId: 'm1',
+    );
+    await tester.tap(find.byKey(const ValueKey('story-animation-row')));
+    await _pumpFor(tester);
+    expect(find.text(l10n.storyLayoutPageTitle), findsOneWidget);
+    // One memory: the previews use example memories, and say so.
+    expect(find.text(l10n.storyAnimationExamples), findsOneWidget);
+    // Looks that show one memory at a time are for videos.
+    expect(find.byKey(const ValueKey('story-style-postcard')), findsNothing);
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('story-style-mosaic')),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(StoryStylePage),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('story-style-mosaic')),
+    );
+    await _pumpFor(tester);
+    await tester.tap(find.byKey(const ValueKey('story-style-mosaic')));
+    await _pumpFor(tester);
+    await tester.tap(find.byKey(const ValueKey('story-style-done')));
+    await _pumpFor(tester);
+    expect(find.text(l10n.storyTemplateMosaic), findsOneWidget);
+
+    await tester.tap(find.text(l10n.storyShare));
+    await tester.pumpAndSettle();
+    expect(exporter.calls, ['image:mosaic', 'share:png']);
+  });
+
+  testWidgets('a video offers the animations; switching back keeps a '
+      'picture layout', (tester) async {
+    await pumpPage(tester, isPremium: true, initialMemoryId: 'm1');
+    await tester.tap(find.byKey(const ValueKey('story-video-switch')));
+    await _pumpFor(tester);
+    await tester.tap(find.byKey(const ValueKey('story-animation-row')));
+    await _pumpFor(tester);
+    expect(find.text(l10n.storyAnimationPageTitle), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('story-style-journey')),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(StoryStylePage),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('story-style-journey')),
+    );
+    await _pumpFor(tester);
+    await tester.tap(find.byKey(const ValueKey('story-style-journey')));
+    await _pumpFor(tester);
+    await tester.tap(find.byKey(const ValueKey('story-style-done')));
+    await _pumpFor(tester);
+    expect(find.text(l10n.storyTemplateJourney), findsOneWidget);
+    // Journey shows one place at a time: a picture starts on Collage.
+    await tester.tap(find.byKey(const ValueKey('story-mode-picture')));
+    await _pumpFor(tester);
+    expect(find.text(l10n.storyTemplateCollage), findsOneWidget);
+    expect(find.byKey(const ValueKey('story-music-row')), findsNothing);
+  });
+
+  testWidgets('a picture can be a post or a square, exported at that size', (
+    tester,
+  ) async {
+    final exporter = await pumpPage(
+      tester,
+      isPremium: true,
+      initialMemoryId: 'm1',
+    );
+    await tester.tap(find.byKey(const ValueKey('story-format-post')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.storyShare));
+    await tester.pumpAndSettle();
+    expect(exporter.imageSize, StoryFormat.post.size);
+    expect(exporter.page!.format, StoryFormat.post);
+
+    // A square has no room for the tall layouts: they aren't offered.
+    await tester.tap(find.byKey(const ValueKey('story-format-square')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('story-animation-row')));
+    await _pumpFor(tester);
+    expect(find.byKey(const ValueKey('story-style-thread')), findsNothing);
+    expect(find.byKey(const ValueKey('story-style-collage')), findsOneWidget);
+  });
+
+  testWidgets('a memory with several photos: the story uses the one chosen', (
+    tester,
+  ) async {
+    const first = 'assets/demo_moments/first_dance.jpg';
+    const second = 'assets/demo_moments/beach_sunset.jpg';
+    final exporter = await pumpPage(
+      tester,
+      isPremium: true,
+      initialMemoryId: 'm1',
+      photos: [
+        for (final (i, path) in [first, second].indexed)
+          MemoryPhoto(
+            id: 'p$i',
+            eventId: 'm1',
+            localPath: path,
+            capturedAt: DateTime(2021),
+            width: 1200,
+            height: 900,
+          ),
+      ],
+    );
+    await tester.tap(find.byKey(const ValueKey('story-strip-photo-m1')));
+    await tester.pumpAndSettle();
+    expect(find.text(l10n.storyChoosePhoto), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('story-photo-p1')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(l10n.storyShare));
+    await tester.pumpAndSettle();
+    expect(exporter.page!.memories.single.coverPhotoPath, second);
+  });
+}
+
+/// A second of frames: pages with a running film never settle.
+Future<void> _pumpFor(WidgetTester tester) async {
+  for (var i = 0; i < 10; i++) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
 }
 
 String _clock(Duration value) =>

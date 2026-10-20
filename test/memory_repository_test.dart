@@ -14,6 +14,7 @@ import 'package:life_threads/l10n/generated/app_localizations.dart';
 import 'package:life_threads/features/memories/domain/memory_category.dart';
 import 'package:life_threads/features/memories/domain/memory_feeling.dart';
 import 'package:life_threads/features/memories/domain/memory_type.dart';
+import 'package:life_threads/features/wall/domain/wall_placement.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late Directory docs;
@@ -99,6 +100,49 @@ void main() {
 
   tearDown(() async {
     if (await docs.exists()) await docs.delete(recursive: true);
+  });
+
+  test('new memories never land on another card, and tidying up rehangs '
+      'the wall in order with undo', () async {
+    SharedPreferences.setMockInitialValues({});
+    final container = _container();
+    addTearDown(container.dispose);
+    await container.read(memoryRepositoryProvider.future);
+    final repository = container.read(memoryRepositoryProvider.notifier);
+    for (var i = 0; i < 5; i++) {
+      await repository.addMemory(_draft('m$i'));
+    }
+    var events = container.read(memoryRepositoryProvider).requireValue.events;
+    Rect card(Offset at) => at & WallPlacement.card;
+    for (var i = 0; i < events.length; i++) {
+      for (var j = i + 1; j < events.length; j++) {
+        expect(
+          card(events[i].wallPosition).overlaps(card(events[j].wallPosition)),
+          isFalse,
+        );
+      }
+    }
+
+    // Someone drags two cards on top of each other; tidying up fixes it.
+    await repository.moveMemory(events[1].id, events[0].wallPosition);
+    final before = await repository.tidyWall(null);
+    events = container.read(memoryRepositoryProvider).requireValue.events;
+    final positions = {for (final e in events) e.wallPosition};
+    expect(positions, hasLength(events.length));
+    for (var i = 0; i < events.length; i++) {
+      for (var j = i + 1; j < events.length; j++) {
+        expect(
+          card(events[i].wallPosition).overlaps(card(events[j].wallPosition)),
+          isFalse,
+        );
+      }
+    }
+    // Undo puts every card back.
+    await repository.moveMemories(before);
+    events = container.read(memoryRepositoryProvider).requireValue.events;
+    for (final event in events) {
+      expect(event.wallPosition, before[event.id]);
+    }
   });
 
   test('fast connect toggles never leave a duplicate pair behind', () async {

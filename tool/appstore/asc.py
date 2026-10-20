@@ -8,9 +8,11 @@
 
 `listing` works on the version that can be edited (Prepare for Submission or
 Developer Rejected): name and subtitle, description, keywords and promotional
-text per language (JSON {"en-US": {"name", "subtitle", "description",
-"keywords", "promotionalText"}, ...}), and replaces the screenshots of each
-display type with the PNGs from the matching folder, in file-name order.
+text and What's New per language (JSON {"en-US": {"name", "subtitle",
+"description", "keywords", "promotionalText", "whatsNew"}, ...}); languages
+the listing doesn't have yet are added (one App Store Connect refuses is
+skipped and named). It replaces the screenshots of each display type with
+the PNGs from the matching folder, in file-name order.
 `build` selects that build for the version. Nothing is submitted for review.
 
 The token is an ES256 JWT signed with openssl, valid for 15 minutes. The key
@@ -76,7 +78,32 @@ def token():
     return (signing_input + b'.' + _b64(_der_to_raw(der))).decode()
 
 
-def call(method, path, body=None):
+class ApiError(Exception):
+    pass
+
+
+def call(method, path, body=None, fatal=True):
+    # Apple's API sometimes answers 500 or 503 for a moment: try again.
+    for attempt in range(4):
+        try:
+            return _call(method, path, body)
+        except _Retry:
+            time.sleep(5 * (attempt + 1))
+        except ApiError as error:
+            if fatal:
+                sys.exit(str(error))
+            raise
+    message = f'{method} {path} -> server error after retries'
+    if fatal:
+        sys.exit(message)
+    raise ApiError(message)
+
+
+class _Retry(Exception):
+    pass
+
+
+def _call(method, path, body=None):
     request = urllib.request.Request(
         API + path, method=method,
         data=None if body is None else json.dumps(body).encode(),
@@ -87,7 +114,9 @@ def call(method, path, body=None):
             raw = response.read()
             return json.loads(raw) if raw else {}
     except urllib.error.HTTPError as error:
-        sys.exit(f'{method} {path} -> {error.code}: {error.read().decode()[:600]}')
+        if error.code >= 500:
+            raise _Retry()
+        raise ApiError(f'{method} {path} -> {error.code}: {error.read().decode()[:1200]}')
 
 
 def app_id():
@@ -101,7 +130,13 @@ SCREENSHOT_FOLDERS = {
     'APP_IPHONE_61': 'ios-6.3',
     'APP_IPAD_PRO_3GEN_129': 'ios-ipad-13',
 }
-LANG_FOLDER = {'en-US': 'en', 'de-DE': 'de', 'ar-SA': 'ar'}
+LANG_FOLDER = {
+    'en-US': 'en', 'de-DE': 'de', 'ar-SA': 'ar', 'es-ES': 'es', 'es-MX': 'es',
+    'fr-FR': 'fr', 'it': 'it', 'pt-BR': 'pt', 'tr': 'tr', 'pl': 'pl', 'ru': 'ru',
+    'hi': 'hi', 'ja': 'ja', 'ko': 'ko', 'zh-Hans': 'zh',
+}
+PRIVACY_URL = 'https://gkcoding.dev/lifethreads/privacy/'
+
 EDITABLE = {'PREPARE_FOR_SUBMISSION', 'DEVELOPER_REJECTED', 'REJECTED',
             'METADATA_REJECTED', 'INVALID_BINARY'}
 
@@ -177,16 +212,51 @@ if __name__ == '__main__':
                      call('GET', f"/v1/appInfos/{info['id']}/appInfoLocalizations")['data']}
         version_locs = {l['attributes']['locale']: l['id'] for l in call(
             'GET', f"/v1/appStoreVersions/{version['id']}/appStoreVersionLocalizations")['data']}
+        skipped = []
         for lang, t in texts.items():
-            call('PATCH', f'/v1/appInfoLocalizations/{info_locs[lang]}', {'data': {
-                'type': 'appInfoLocalizations', 'id': info_locs[lang],
-                'attributes': {'name': t['name'], 'subtitle': t['subtitle']}}})
-            call('PATCH', f'/v1/appStoreVersionLocalizations/{version_locs[lang]}', {'data': {
-                'type': 'appStoreVersionLocalizations', 'id': version_locs[lang],
-                'attributes': {'description': t['description'], 'keywords': t['keywords'],
-                               'promotionalText': t['promotionalText']}}})
+            version_texts = {'description': t['description'], 'keywords': t['keywords'],
+                             'promotionalText': t['promotionalText']}
+            if t.get('whatsNew'):
+                version_texts['whatsNew'] = t['whatsNew']
+            try:
+                # A language the listing doesn't have yet is added.
+                if lang not in info_locs:
+                    info_locs[lang] = call('POST', '/v1/appInfoLocalizations', {'data': {
+                        'type': 'appInfoLocalizations',
+                        'attributes': {'locale': lang, 'name': t['name'],
+                                       'subtitle': t['subtitle'],
+                                       'privacyPolicyUrl': PRIVACY_URL},
+                        'relationships': {'appInfo': {'data': {
+                            'type': 'appInfos', 'id': info['id']}}}}},
+                        fatal=False)['data']['id']
+                    # App Store Connect adds the language to the version by
+                    # itself: look again before adding it there.
+                    version_locs = {l['attributes']['locale']: l['id'] for l in call(
+                        'GET', f"/v1/appStoreVersions/{version['id']}/appStoreVersionLocalizations")['data']}
+                else:
+                    call('PATCH', f'/v1/appInfoLocalizations/{info_locs[lang]}', {'data': {
+                        'type': 'appInfoLocalizations', 'id': info_locs[lang],
+                        'attributes': {'name': t['name'], 'subtitle': t['subtitle']}}},
+                        fatal=False)
+                if lang not in version_locs:
+                    version_locs[lang] = call('POST', '/v1/appStoreVersionLocalizations', {'data': {
+                        'type': 'appStoreVersionLocalizations',
+                        'attributes': {'locale': lang, **version_texts},
+                        'relationships': {'appStoreVersion': {'data': {
+                            'type': 'appStoreVersions', 'id': version['id']}}}}},
+                        fatal=False)['data']['id']
+                else:
+                    call('PATCH', f'/v1/appStoreVersionLocalizations/{version_locs[lang]}', {'data': {
+                        'type': 'appStoreVersionLocalizations', 'id': version_locs[lang],
+                        'attributes': version_texts}}, fatal=False)
+            except ApiError as error:
+                print('skipped', lang, '-', error)
+                skipped.append(lang)
+                continue
             print('texts', lang)
             replace_screenshots(version_locs[lang], lang, root)
+        if skipped:
+            print('not uploaded:', ', '.join(skipped))
     elif sys.argv[1] == 'build':
         aid = app_id()
         version = editable_version(aid)

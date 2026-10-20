@@ -14,8 +14,14 @@ final storyExporterProvider = Provider<StoryExporter>(
 );
 
 abstract interface class StoryExporter {
-  /// Renders [page] as a 1080×1920 PNG in the temporary directory.
-  Future<File> exportImage(BuildContext context, Widget page);
+  /// Renders [page] as a PNG in the temporary directory: [size] logical
+  /// pixels at 3× (1080×1920 for a story, 1080×1350 for a post, 1080×1080
+  /// for a square).
+  Future<File> exportImage(
+    BuildContext context,
+    Widget page, {
+    Size size = const Size(360, 640),
+  });
 
   /// Renders [film] as a 1080×1920 MP4 in the temporary directory, with
   /// [music] played from [musicStart], trimmed to the film and faded out.

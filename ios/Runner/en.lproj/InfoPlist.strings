@@ -1,0 +1,6 @@
+/* System permission prompts, in the phone's language. */
+"NSCameraUsageDescription" = "LifeThreads uses the camera to scan a wall display QR code and take memory photos when you choose.";
+"NSContactsUsageDescription" = "LifeThreads can import selected contact details into a private memory person entry.";
+"NSFaceIDUsageDescription" = "LifeThreads uses Face ID to unlock your private memory wall when you turn on the app lock.";
+"NSPhotoLibraryAddUsageDescription" = "LifeThreads saves the story images and videos you create to your photo library when you choose Save to Photos.";
+"NSPhotoLibraryUsageDescription" = "LifeThreads uses selected photos to build your private memory wall.";

@@ -969,13 +969,28 @@ Locale _effectiveLocale(Locale? locale) {
   return supported ? Locale(phone.languageCode) : const Locale('en');
 }
 
+/// Every language of the app, by its own name (as people look for it).
+const _nativeLanguageNames = {
+  'en': 'English',
+  'de': 'Deutsch',
+  'ar': 'العربية',
+  'es': 'Español',
+  'fr': 'Français',
+  'it': 'Italiano',
+  'pt': 'Português (Brasil)',
+  'tr': 'Türkçe',
+  'pl': 'Polski',
+  'ru': 'Русский',
+  'hi': 'हिन्दी',
+  'ja': '日本語',
+  'ko': '한국어',
+  'zh': '简体中文',
+};
+
 String _languageLabel(AppLocalizations l10n, Locale? locale) {
-  return switch (locale?.languageCode) {
-    null => l10n.systemLanguage,
-    'de' => l10n.germanLanguage,
-    'ar' => l10n.arabicLanguage,
-    _ => l10n.englishLanguage,
-  };
+  final code = locale?.languageCode;
+  if (code == null) return l10n.systemLanguage;
+  return _nativeLanguageNames[code] ?? l10n.englishLanguage;
 }
 
 Future<void> _openExternalUrl(
@@ -1414,24 +1429,16 @@ class _LanguageSelector extends StatelessWidget {
         label: l10n.systemLanguage,
         icon: Icons.phone_iphone_rounded,
       ),
-      _LanguageChoice(
-        code: 'en',
-        locale: const Locale('en'),
-        label: l10n.englishLanguage,
-        icon: Icons.language_rounded,
-      ),
-      _LanguageChoice(
-        code: 'de',
-        locale: const Locale('de'),
-        label: l10n.germanLanguage,
-        icon: Icons.translate_rounded,
-      ),
-      _LanguageChoice(
-        code: 'ar',
-        locale: const Locale('ar'),
-        label: l10n.arabicLanguage,
-        icon: Icons.format_textdirection_r_to_l_rounded,
-      ),
+      for (final MapEntry(key: code, value: name)
+          in _nativeLanguageNames.entries)
+        _LanguageChoice(
+          code: code,
+          locale: Locale(code),
+          label: name,
+          icon: code == 'ar'
+              ? Icons.format_textdirection_r_to_l_rounded
+              : Icons.translate_rounded,
+        ),
     ];
 
     return Column(

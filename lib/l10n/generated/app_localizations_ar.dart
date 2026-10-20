@@ -359,12 +359,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get scanDisplayQr => 'مسح QR للعرض';
 
   @override
-  String get scannerHintTitle =>
-      'افتح lifethreads.gkcoding.dev/display على شاشة أخرى.';
-
-  @override
-  String get scannerHintBody =>
-      'امسح رمز QR من تلك الصفحة. يرسل LifeThreads لقطة مؤقتة للوحة للقراءة فقط إلى جلسة المتصفح هذه.';
+  String get scannerHintTitle => 'أين أجد رمز QR؟';
 
   @override
   String get addMemoryBeforeDisplay => 'أضف ذكرى قبل عرض الجدار.';
@@ -2521,13 +2516,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get storyTemplateSingle => 'ذكرى واحدة';
 
   @override
-  String get storyTemplateThread => 'خيط';
+  String get storyTemplateThread => 'جدار الخيط';
 
   @override
   String get storyTemplateCollage => 'مجموعة صور';
 
   @override
-  String get storyTemplateQuote => 'اقتباس';
+  String get storyTemplateQuote => 'كلمات';
 
   @override
   String get storySwipeHint => 'اسحب لشكل آخر';
@@ -2542,8 +2537,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get storyVideoSwitch => 'فيديو';
 
   @override
-  String get storyVideoBody =>
-      'فيلم قصير للقصص والريلز: تنساب الصور، ويُرسم الخيط، وتظهر العناوين تدريجيًا.';
+  String get storyVideoBody => 'فيلم قصير للقصص والريلز، مع حركة وموسيقى.';
 
   @override
   String get storyMusicTitle => 'الموسيقى';
@@ -2553,7 +2547,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get storyMusicNoneHint =>
-      'يمكنك إضافة أغنية من مكتبة موسيقى Instagram عند نشر القصة.';
+      'يمكنك أيضاً إضافة موسيقى في Instagram عند النشر.';
 
   @override
   String get storyMoodWarm => 'دافئة';
@@ -2574,7 +2568,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get storyMoodEmotional => 'مؤثرة';
 
   @override
-  String get storyMusicTrimHint => 'اسحب لاختيار الجزء الذي يُعزف';
+  String get storyMusicTrimHint => 'اسحب المربع الذهبي لاختيار جزء الأغنية';
 
   @override
   String get storySearchHint => 'ابحث في الذكريات والأماكن والسنوات';
@@ -3723,7 +3717,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tourShowMeHow => 'أرني كيف';
 
   @override
-  String get tourShowMeHowSubtitle => 'جولة دقيقتين مع ذكريات تجريبية';
+  String get tourShowMeHowSubtitle => 'جولة قصيرة مع ذكريات تجريبية';
 
   @override
   String get tourWelcomeTitle => 'مرحباً بك في جدارك';
@@ -3764,7 +3758,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tourAddMemoryBody =>
-      'اختر «ذكرى». هنا أيضاً الملاحظات والمسامير للترتيب.';
+      'اختر «ذكرى». يمكنك هنا أيضاً تعليق ملاحظة أو مسمار على الجدار لتجميع البطاقات.';
 
   @override
   String get tourAddTextTitle => 'تكفي بضع كلمات';
@@ -3798,7 +3792,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tourViewModesBody =>
-      'شاهد حياتك كجدار أو بترتيب زمني أو على خريطة. هنا أيضاً الفئات وطرق الترتيب والذكريات المخفية (بعد بصمة الوجه).';
+      'شاهد حياتك كجدار أو كخط زمني أو على الخريطة. يمكنك هنا أيضاً التصفية حسب الفئة وإظهار الذكريات المخفية (ببصمة الوجه).';
 
   @override
   String get tourViewDoneTitle => 'العودة إلى الجدار';
@@ -3810,14 +3804,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tourSearchTitle => 'ابحث عن أي ذكرى';
 
   @override
-  String get tourSearchBody => 'اضغط على العدسة.';
-
-  @override
-  String get tourSearchPageTitle => 'البحث';
-
-  @override
-  String get tourSearchPageBody =>
-      'اكتب اسماً أو مكاناً أو شخصاً أو سنة، وتظهر النتائج أثناء الكتابة.';
+  String get tourSearchBody =>
+      'اكتب هنا اسماً أو مكاناً أو شخصاً أو سنة، وتظهر النتائج أثناء الكتابة.';
 
   @override
   String get tourMoreTitle => 'كل ما تبقى';
@@ -3831,13 +3819,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tourStoryBody => 'اضغط «إنشاء قصة».';
-
-  @override
-  String get tourStoryPageTitle => 'قصص مع موسيقى';
-
-  @override
-  String get tourStoryPageBody =>
-      'اختر ذكريات وقالباً، أو فعّل الفيديو لفيلم قصير مع موسيقى لإنستغرام وواتساب وغيرها. الحفظ والمشاركة ضمن Premium.';
 
   @override
   String get tourYearTitle => 'خيط السنة';
@@ -3858,7 +3839,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tourWallsBody =>
-      'جدار لكل طفل أو رحلة أو مشروع: ⋯ › جدار جديد (Premium). ومن الأعلى تنتقل بين الجدران.';
+      'جدار لكل طفل أو رحلة أو مشروع (Premium). اضغط على الاسم في الأعلى للتنقل بين الجدران.';
 
   @override
   String get tourFamilyTitle => 'جدران العائلة';
@@ -3898,4 +3879,260 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tourRemovedToast => 'حُذفت الذكريات التجريبية. جدارك جاهز.';
+
+  @override
+  String get storyTemplatePolaroid => 'بولارويد';
+
+  @override
+  String get storyTemplateAlbum => 'ألبوم';
+
+  @override
+  String get storyTemplateFilmstrip => 'شريط فيلم';
+
+  @override
+  String get storyTemplateTimeline => 'رحلة عبر الزمن';
+
+  @override
+  String get storyTemplatePostcard => 'بطاقة بريدية';
+
+  @override
+  String get storyTemplateCinema => 'سينما';
+
+  @override
+  String get storyTemplateSingleHint => 'كل ذكرى بملء الشاشة، واحدة تلو الأخرى';
+
+  @override
+  String get storyTemplateThreadHint => 'بطاقات على الجدار يربطها الخيط';
+
+  @override
+  String get storyTemplateCollageHint => 'كل الصور معاً في شبكة';
+
+  @override
+  String get storyTemplateQuoteHint => 'كلماتك تُكتب من تلقاء نفسها';
+
+  @override
+  String get storyTemplatePolaroidHint => 'صور فورية تتساقط فوق بعضها';
+
+  @override
+  String get storyTemplateAlbumHint => 'صفحات تُقلب، صورة في كل صفحة';
+
+  @override
+  String get storyTemplateFilmstripHint => 'شريط فيلم يمر ثم يقترب';
+
+  @override
+  String get storyTemplateTimelineHint => 'السنوات تعدّ حتى كل ذكرى';
+
+  @override
+  String get storyTemplatePostcardHint => 'كل بطاقة تنقلب لتكشف قصتها';
+
+  @override
+  String get storyTemplateCinemaHint => 'عناوين وتقريب بطيء وشارة النهاية';
+
+  @override
+  String get storyAnimationTitle => 'الحركة';
+
+  @override
+  String get storyAnimationPageTitle => 'اختر الحركة';
+
+  @override
+  String get storyAnimationExamples =>
+      'معروضة بصور تجريبية. قصتك تستخدم ذكرياتك.';
+
+  @override
+  String get storyMusicPageTitle => 'الموسيقى والمدة';
+
+  @override
+  String get storyLengthTitle => 'المدة';
+
+  @override
+  String get storyLengthAuto => 'تلقائي';
+
+  @override
+  String storyLengthSeconds(Object seconds) {
+    return '$seconds ث';
+  }
+
+  @override
+  String get storyMusicAll => 'الكل';
+
+  @override
+  String get storyMusicPlay => 'تشغيل';
+
+  @override
+  String get storyMusicPause => 'إيقاف مؤقت';
+
+  @override
+  String storyMusicPlayhead(Object song, Object video) {
+    return 'الأغنية $song ◂ الفيديو $video';
+  }
+
+  @override
+  String get storyMusicSyncHint =>
+      'يُظهر الخط الأبيض أي ثانية من الأغنية تُعزف مع الفيديو. والعلامات تبيّن أين تبدأ كل ذكرى.';
+
+  @override
+  String get storyMusicLengthHint =>
+      'التلقائي يناسب عدد الذكريات. الأفلام الأطول تتحرك ببطء أكبر.';
+
+  @override
+  String get tourBack => 'رجوع';
+
+  @override
+  String get tourStoryPickTitle => 'اختر الذكريات';
+
+  @override
+  String get tourStoryPickBody =>
+      'اخترنا لك ثلاثاً، ويمكنك اختيار حتى ست. اضغط «متابعة».';
+
+  @override
+  String get tourStoryAnimationTitle => 'اختر طريقة الحركة';
+
+  @override
+  String get tourStoryAnimationBody =>
+      'حركات من بولارويد إلى سينما. اضغط «الحركة».';
+
+  @override
+  String get tourStoryStyleTitle => 'جرّب بولارويد';
+
+  @override
+  String get tourStoryStyleBody => 'كل مربع يعرض معاينة. اضغط «بولارويد».';
+
+  @override
+  String get tourStoryMusicTitle => 'أضف موسيقى';
+
+  @override
+  String get tourStoryMusicBody => 'اختر أغنية ومدة الفيديو. اضغط «الموسيقى».';
+
+  @override
+  String get tourStoryTrimTitle => 'الأغنية والفيديو معاً';
+
+  @override
+  String get tourStoryTrimBody =>
+      'اسحب المربع الذهبي لاختيار الجزء. يتحرك الخط الأبيض مع الفيديو، فترى أي ثانية تُعزف ومتى.';
+
+  @override
+  String get tourStoryMusicDoneTitle => 'العودة إلى قصتك';
+
+  @override
+  String get tourStoryMusicDoneBody => 'اضغط «تم».';
+
+  @override
+  String get tourStoryShareTitle => 'شارك أو احفظ';
+
+  @override
+  String get tourStoryShareBody =>
+      'جاهزة لإنستغرام وواتساب وغيرها. الحفظ والمشاركة ضمن Premium.';
+
+  @override
+  String get tourMoreAgainTitle => 'المزيد في القائمة';
+
+  @override
+  String get tourMoreAgainBody => 'افتح القائمة مرة أخرى. اضغط عليها.';
+
+  @override
+  String get scannerStep1 =>
+      'افتح متصفح الإنترنت على تلفاز أو حاسوب أو جهاز لوحي.';
+
+  @override
+  String scannerStep2(Object url) {
+    return 'انتقل إلى $url. سيظهر هناك رمز QR.';
+  }
+
+  @override
+  String get scannerStep3 =>
+      'وجّه هذا الهاتف نحو الرمز ليكون داخل الإطار الذهبي. سيظهر جدارك هناك لفترة، للعرض فقط.';
+
+  @override
+  String get scannerShareLink => 'إرسال الرابط';
+
+  @override
+  String get scannerCopyLink => 'نسخ الرابط';
+
+  @override
+  String get scannerLinkCopied => 'تم نسخ الرابط';
+
+  @override
+  String get storyTemplateScrapbook => 'ألبوم قصاصات';
+
+  @override
+  String get storyTemplateMosaic => 'فسيفساء';
+
+  @override
+  String get storyTemplateContactSheet => 'ورقة الأفلام';
+
+  @override
+  String get storyTemplateWallFlight => 'جولة على الجدار';
+
+  @override
+  String get storyTemplateCarousel => 'دوّارة';
+
+  @override
+  String get storyTemplateJourney => 'رحلة';
+
+  @override
+  String get storyTemplateScrapbookHint => 'كل صورة ملصقة على صفحة';
+
+  @override
+  String get storyTemplateMosaicHint => 'صورة كبيرة والبقية حولها';
+
+  @override
+  String get storyTemplateContactSheetHint => 'كل ذكرى إطار على الفيلم';
+
+  @override
+  String get storyTemplateWallFlightHint =>
+      'تنتقل على الخيط من بطاقة إلى بطاقة';
+
+  @override
+  String get storyTemplateCarouselHint =>
+      'تدور البطاقات، واحدة تلو الأخرى إلى الأمام';
+
+  @override
+  String get storyTemplateJourneyHint => 'مسار على الخريطة ودبوس في كل مكان';
+
+  @override
+  String get storyModePicture => 'صورة';
+
+  @override
+  String get storyModeVideo => 'فيديو';
+
+  @override
+  String get storyModePictureHint =>
+      'صورة واحدة تضم كل ذكرياتك، للمنشورات والقصص.';
+
+  @override
+  String get storyModeVideoHint => 'فيلم قصير مع حركة وموسيقى.';
+
+  @override
+  String get storyLayoutTitle => 'التصميم';
+
+  @override
+  String get storyLayoutPageTitle => 'اختر التصميم';
+
+  @override
+  String get storyChoosePhoto => 'اختر صورة القصة';
+
+  @override
+  String get wallTidyUp => 'رتّب الجدار';
+
+  @override
+  String get wallTidyUpBody =>
+      'هل تريد تعليق كل البطاقات بترتيب في صفوف، من أقدم ذكرى إلى أحدثها؟ تبقى الملاحظات والمسامير في مكانها.';
+
+  @override
+  String get wallTidyUpAction => 'ترتيب';
+
+  @override
+  String get wallTidiedToast => 'تم ترتيب جدارك.';
+
+  @override
+  String get storyFormatTitle => 'المقاس';
+
+  @override
+  String get storyFormatStory => 'قصة 9:16';
+
+  @override
+  String get storyFormatPost => 'منشور 4:5';
+
+  @override
+  String get storyFormatSquare => 'مربع 1:1';
 }

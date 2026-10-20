@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:life_threads/features/memories/domain/memory_photo.dart';
 import 'package:life_threads/features/memories/data/memory_repository.dart';
 import 'package:life_threads/features/memories/domain/memory_category.dart';
 import 'package:life_threads/features/memories/domain/memory_event.dart';
@@ -25,21 +26,25 @@ MemoryEvent memory(String id, DateTime occurredAt) => MemoryEvent(
   locationLabel: '',
 );
 
-MemoryState stateWith(List<MemoryEvent> events) => MemoryState(
+MemoryState stateWith(
+  List<MemoryEvent> events, {
+  List<MemoryPhoto> photos = const [],
+}) => MemoryState(
   events: events,
   connections: const [],
-  photos: const [],
+  photos: photos,
   people: const [],
   wallItems: const [],
 );
 
 class FakeMemoryRepository extends MemoryRepository {
-  FakeMemoryRepository(this.initial);
+  FakeMemoryRepository(this.initial, {this.photos = const []});
 
   final List<MemoryEvent> initial;
+  final List<MemoryPhoto> photos;
 
   @override
-  Future<MemoryState> build() async => stateWith(initial);
+  Future<MemoryState> build() async => stateWith(initial, photos: photos);
 
   void replaceEvents(List<MemoryEvent> events) {
     state = AsyncData(stateWith(events));

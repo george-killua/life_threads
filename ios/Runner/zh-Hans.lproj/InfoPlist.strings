@@ -1,0 +1,6 @@
+/* 系统权限提示，使用手机的语言显示。 */
+"NSCameraUsageDescription" = "LifeThreads 会在你需要时使用相机扫描投屏二维码，并为回忆拍照。";
+"NSContactsUsageDescription" = "LifeThreads 可以把你选择的联系人信息导入为回忆中的私密人物。";
+"NSFaceIDUsageDescription" = "LifeThreads 会在你开启 App 锁后，使用面容 ID 解锁你的私密回忆墙。";
+"NSPhotoLibraryAddUsageDescription" = "当你选择“存到相册”时，LifeThreads 会把你制作的故事图片和视频保存到照片图库。";
+"NSPhotoLibraryUsageDescription" = "LifeThreads 使用你选择的照片来打造你的私密回忆墙。";

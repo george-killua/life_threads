@@ -39,6 +39,19 @@ abstract final class TourTargets {
   static const search = 'tour-search';
   static const more = 'tour-more';
   static const moreStory = 'tour-more-story';
+  static const moreYear = 'tour-more-year';
+  static const moreLookBack = 'tour-more-look-back';
+  static const moreNewWall = 'tour-more-new-wall';
+  static const moreFamily = 'tour-more-family';
+  static const moreSettings = 'tour-more-settings';
+  static const storyPickContinue = 'tour-story-continue';
+  static const storyAnimation = 'tour-story-animation';
+  static const storyStyleTile = 'tour-story-style-tile';
+  static const storyStyleDone = 'tour-story-style-done';
+  static const storyMusic = 'tour-story-music';
+  static const storyMusicTrimmer = 'tour-story-music-trimmer';
+  static const storyMusicDone = 'tour-story-music-done';
+  static const storyShare = 'tour-story-share';
 }
 
 /// The demo memory the tour opens.
@@ -72,6 +85,10 @@ Future<void> startAppTour(BuildContext context) async {
 /// Back to the wall by closing the screens on top, like pressing back:
 /// screens waiting for the one they opened to close (the wall does) hear it.
 void _home() {
+  // An open menu (the ⋯ menu the tour points into) closes first.
+  AppRouter.rootNavigatorKey.currentState?.popUntil(
+    (route) => route is! PopupRoute,
+  );
   final router = AppRouter.router;
   while (router.canPop()) {
     router.pop();
@@ -84,10 +101,6 @@ void _home() {
 /// The tour's steps, in the app's language.
 List<CoachStep> appTourSteps(AppLocalizations l10n) {
   const home = _home;
-  void open(String route) {
-    home();
-    AppRouter.router.push(route);
-  }
 
   return [
     CoachStep(title: l10n.tourWelcomeTitle, body: l10n.tourWelcomeBody),
@@ -155,9 +168,7 @@ List<CoachStep> appTourSteps(AppLocalizations l10n) {
       target: TourTargets.search,
       title: l10n.tourSearchTitle,
       body: l10n.tourSearchBody,
-      tapToContinue: true,
     ),
-    CoachStep(title: l10n.tourSearchPageTitle, body: l10n.tourSearchPageBody),
     CoachStep(
       target: TourTargets.more,
       title: l10n.tourMoreTitle,
@@ -171,32 +182,85 @@ List<CoachStep> appTourSteps(AppLocalizations l10n) {
       body: l10n.tourStoryBody,
       tapToContinue: true,
     ),
-    CoachStep(title: l10n.tourStoryPageTitle, body: l10n.tourStoryPageBody),
+    // Making a story, hands-on: the example memories are picked already.
     CoachStep(
-      title: l10n.tourYearTitle,
-      body: l10n.tourYearBody,
-      onEnter: () => open(RouteNames.yearThread),
+      target: TourTargets.storyPickContinue,
+      title: l10n.tourStoryPickTitle,
+      body: l10n.tourStoryPickBody,
+      tapToContinue: true,
     ),
     CoachStep(
-      title: l10n.tourLookBackTitle,
-      body: l10n.tourLookBackBody,
-      onEnter: () => open(RouteNames.lookBack),
+      target: TourTargets.storyAnimation,
+      title: l10n.tourStoryAnimationTitle,
+      body: l10n.tourStoryAnimationBody,
+      tapToContinue: true,
     ),
+    CoachStep(
+      target: TourTargets.storyStyleTile,
+      title: l10n.tourStoryStyleTitle,
+      body: l10n.tourStoryStyleBody,
+      tapToContinue: true,
+    ),
+    CoachStep(
+      target: TourTargets.storyStyleDone,
+      title: l10n.tourStoryMusicDoneTitle,
+      body: l10n.tourStoryMusicDoneBody,
+      tapToContinue: true,
+    ),
+    CoachStep(
+      target: TourTargets.storyMusic,
+      title: l10n.tourStoryMusicTitle,
+      body: l10n.tourStoryMusicBody,
+      tapToContinue: true,
+    ),
+    CoachStep(
+      target: TourTargets.storyMusicTrimmer,
+      title: l10n.tourStoryTrimTitle,
+      body: l10n.tourStoryTrimBody,
+    ),
+    CoachStep(
+      target: TourTargets.storyMusicDone,
+      title: l10n.tourStoryMusicDoneTitle,
+      body: l10n.tourStoryMusicDoneBody,
+      tapToContinue: true,
+    ),
+    CoachStep(
+      target: TourTargets.storyShare,
+      title: l10n.tourStoryShareTitle,
+      body: l10n.tourStoryShareBody,
+    ),
+    // The rest of the menu, each entry ringed where it is.
     CoachStep(
       target: TourTargets.more,
-      title: l10n.tourWallsTitle,
-      body: l10n.tourWallsBody,
+      title: l10n.tourMoreAgainTitle,
+      body: l10n.tourMoreAgainBody,
+      tapToContinue: true,
       onEnter: home,
     ),
     CoachStep(
-      title: l10n.tourFamilyTitle,
-      body: l10n.tourFamilyBody,
-      onEnter: () => open(RouteNames.familyWalls),
+      target: TourTargets.moreYear,
+      title: l10n.tourYearTitle,
+      body: l10n.tourYearBody,
     ),
     CoachStep(
+      target: TourTargets.moreLookBack,
+      title: l10n.tourLookBackTitle,
+      body: l10n.tourLookBackBody,
+    ),
+    CoachStep(
+      target: TourTargets.moreNewWall,
+      title: l10n.tourWallsTitle,
+      body: l10n.tourWallsBody,
+    ),
+    CoachStep(
+      target: TourTargets.moreFamily,
+      title: l10n.tourFamilyTitle,
+      body: l10n.tourFamilyBody,
+    ),
+    CoachStep(
+      target: TourTargets.moreSettings,
       title: l10n.tourSettingsTitle,
       body: l10n.tourSettingsBody,
-      onEnter: () => open(RouteNames.settings),
     ),
     CoachStep(
       title: l10n.tourFinishTitle,

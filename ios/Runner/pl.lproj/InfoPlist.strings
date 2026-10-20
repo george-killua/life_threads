@@ -1,0 +1,6 @@
+/* Systemowe prośby o uprawnienia, w języku telefonu. */
+"NSCameraUsageDescription" = "LifeThreads używa aparatu, by skanować kod QR ekranu i robić zdjęcia do wspomnień, kiedy chcesz.";
+"NSContactsUsageDescription" = "LifeThreads może zaimportować wybrane dane kontaktu jako prywatną osobę we wspomnieniu.";
+"NSFaceIDUsageDescription" = "LifeThreads używa Face ID, by odblokować twoją prywatną ścianę wspomnień, gdy włączysz blokadę aplikacji.";
+"NSPhotoLibraryAddUsageDescription" = "LifeThreads zapisuje utworzone przez ciebie obrazy i filmy historii w bibliotece zdjęć, gdy wybierzesz Zapisz w Zdjęciach.";
+"NSPhotoLibraryUsageDescription" = "LifeThreads używa wybranych przez ciebie zdjęć, by zbudować twoją prywatną ścianę wspomnień.";

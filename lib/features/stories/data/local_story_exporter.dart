@@ -54,8 +54,12 @@ class LocalStoryExporter implements StoryExporter {
   static const musicFadeOut = Duration(milliseconds: 1500);
 
   @override
-  Future<File> exportImage(BuildContext context, Widget page) async {
-    final canvas = StoryCanvas.fromContext(context);
+  Future<File> exportImage(
+    BuildContext context,
+    Widget page, {
+    Size size = const Size(360, 640),
+  }) async {
+    final canvas = StoryCanvas.fromContext(context, logicalSize: size);
     try {
       await _deleteStaleExports();
       final png = await canvas.renderPng(page);
