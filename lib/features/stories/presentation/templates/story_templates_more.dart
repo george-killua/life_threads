@@ -89,12 +89,12 @@ class PolaroidStory extends StatelessWidget {
         PositionedDirectional(
           start: 30,
           end: 30,
-          bottom: shortPage ? 18 : 52,
+          bottom: shortPage ? 18 : 40,
           child: StoryReveal(
             value: motion.appear(last + 0.9, 1),
             child: Text(
               line,
-              maxLines: shortPage ? 1 : 3,
+              maxLines: shortPage ? 1 : 2,
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               style: _handwriting.copyWith(
@@ -113,12 +113,14 @@ class PolaroidStory extends StatelessWidget {
   /// columns, a little overlap and tilt, like photos spread on a table.
   Widget _fanned(int i, int count, double pageHeight) {
     final tall = pageHeight >= storySize.height;
-    // Short pictures (a post, a square) put 5–6 photos in three columns.
-    final columns = count == 1 ? 1 : (!tall && count >= 5 ? 3 : 2);
+    // Short pictures (a post, a square) put 3 or 5–6 photos in three columns.
+    final columns = count == 1
+        ? 1
+        : (!tall && (count >= 5 || count == 3) ? 3 : 2);
     final rows = (count / columns).ceil();
     const top = 96.0;
     // Room for the caption under the photos.
-    final bottom = pageHeight - (tall ? 100 : 64);
+    final bottom = pageHeight - (tall ? 132 : 64);
     // As large as fits: the rows share the height (on a story a little
     // overlap, like photos on a table; on shorter pictures none, so every
     // title shows).

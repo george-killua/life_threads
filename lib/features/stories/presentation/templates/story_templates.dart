@@ -393,6 +393,7 @@ class _ThreadStory extends StatelessWidget {
     final page = StoryPageSize.of(context);
     final bottom = page.height - 24;
     final compact = count > 3;
+    const margin = 16.0;
     // Shorter pictures (a post) shrink the cards until cards on the same
     // side hang clear of each other.
     var width = const [230.0, 165.0, 160.0, 150.0, 132.0, 128.0][count - 1];
@@ -403,11 +404,21 @@ class _ThreadStory extends StatelessWidget {
       if (2 * step >= heightOf(width) * 0.96) break;
       width -= 6;
     }
+    // A post has no room for three cards above each other: more than three
+    // hang in two rows instead.
+    final grid = count > 3 && page.height < 600;
+    final columns = (count + 1) ~/ 2;
+    if (grid) {
+      final cell = (storySize.width - 2 * margin) / columns;
+      width = cell - 12;
+      while (heightOf(width) > (bottom - _top) / 2 - 8 && width > 80) {
+        width -= 4;
+      }
+    }
     final photoHeight = width * (compact ? 0.58 : 0.66);
     // Estimated card height, enough to spread the cards.
     final cardHeight = heightOf(width);
     const rotations = [-0.045, 0.04, -0.03, 0.05, -0.035, 0.03];
-    const margin = 16.0;
     // Cards hang from a pin near their inner top corner, so the rope runs
     // down the middle of the story from card to card.
     const pinInset = 22.0;
@@ -420,6 +431,14 @@ class _ThreadStory extends StatelessWidget {
       if (count == 1) {
         x = (storySize.width - width) / 2;
         y = (_top + bottom - cardHeight) / 2;
+        pinX = x + width / 2;
+      } else if (grid) {
+        // Two rows, the rope snaking left to right and back.
+        final row = i ~/ columns;
+        final column = row.isEven ? i % columns : columns - 1 - i % columns;
+        final cell = (storySize.width - 2 * margin) / columns;
+        x = margin + column * cell + (cell - width) / 2;
+        y = _top + row * (bottom - _top - cardHeight);
         pinX = x + width / 2;
       } else {
         final left = i.isEven;
@@ -556,14 +575,25 @@ class _CollageStory extends StatelessWidget {
     6: [2, 2, 2],
   };
 
+  static const _shortRows = {
+    1: [1],
+    2: [2],
+    3: [3],
+    4: [2, 2],
+    5: [2, 3],
+    6: [3, 3],
+  };
+
   @override
   Widget build(BuildContext context) {
-    final rows = _rows[memories.length]!;
+    // Shorter pictures (a post, a square) put more photos in a row, so the
+    // photos stay close to their shape instead of thin strips.
+    final scale = StoryPageSize.of(context).height / storySize.height;
+    final short = scale < 0.8;
+    final rows = (short ? _shortRows : _rows)[memories.length]!;
     final line = caption.isNotEmpty ? caption : memories.first.title;
     const rotations = [-0.02, 0.018, -0.012, 0.022, -0.018, 0.014];
     final step = collageStep(motion.total, memories.length);
-    // Shorter pictures (a post, a square) keep less room under the photos.
-    final scale = StoryPageSize.of(context).height / storySize.height;
     final tiles = <Widget>[];
     var index = 0;
     final rowWidgets = <Widget>[];
@@ -611,64 +641,72 @@ class _CollageStory extends StatelessWidget {
           start: 18,
           child: StoryMark(opacity: motion.appear(0.3)),
         ),
+        // The photos take the room the paper strip leaves, so the strip
+        // never covers them, whatever the picture's shape.
         Positioned(
-          top: 60,
+          top: short ? 56 : 60,
           left: 17,
           right: 17,
-          bottom: 158 * scale,
-          child: Column(children: tiles),
-        ),
-        PositionedDirectional(
-          start: 26,
-          end: 26,
           bottom: 42 * scale,
-          child: StoryReveal(
-            value: motion.appear(lastTile + 0.9, 1.2),
-            child: Transform.rotate(
-              angle: -0.012,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFFFF7E7), BrandColors.card],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: Column(children: tiles)),
+              SizedBox(height: short ? 10 : 18),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 9),
+                child: StoryReveal(
+                  value: motion.appear(lastTile + 0.9, 1.2),
+                  child: Transform.rotate(
+                    angle: -0.012,
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFFF7E7), BrandColors.card],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.4),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            line,
+                            maxLines: short ? 1 : 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: BrandColors.paperInk,
+                              fontSize: short ? 15 : 16.5,
+                              height: 1.3,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            storyDateRange(context, memories),
+                            style: TextStyle(
+                              color: BrandColors.paperInk.withValues(
+                                alpha: 0.58,
+                              ),
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.4),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      line,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: BrandColors.paperInk,
-                        fontSize: 16.5,
-                        height: 1.3,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      storyDateRange(context, memories),
-                      style: TextStyle(
-                        color: BrandColors.paperInk.withValues(alpha: 0.58),
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ],

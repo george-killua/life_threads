@@ -696,25 +696,36 @@ Future<void> _chooseLanguage(
   final chosen = await showModalBottomSheet<({Locale? locale})>(
     context: context,
     showDragHandle: true,
+    // 15 choices are taller than most phones: the list scrolls inside a
+    // sheet of at most 85% of the screen.
+    isScrollControlled: true,
+    constraints: BoxConstraints(
+      maxHeight: MediaQuery.sizeOf(context).height * 0.85,
+    ),
     builder: (sheetContext) => SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
+            child: Text(
               sheetContext.l10n.languageTitle,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
             ),
-            const SizedBox(height: 14),
-            _LanguageSelector(
-              selectedLocale: selectedLocale,
-              onSelect: (locale) =>
-                  Navigator.of(sheetContext).pop((locale: locale)),
+          ),
+          Flexible(
+            child: SingleChildScrollView(
+              key: const ValueKey('language-list'),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+              child: _LanguageSelector(
+                selectedLocale: selectedLocale,
+                onSelect: (locale) =>
+                    Navigator.of(sheetContext).pop((locale: locale)),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     ),
   );
