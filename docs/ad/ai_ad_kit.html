@@ -77,28 +77,21 @@ footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line)
   </section>
 
   <section>
-    <h2>V1 · Shot prompts with photos (20 s ad)</h2>
-    <p>Each shot starts from one of the app’s own demo photos, so the scene comes alive and then the ad cuts to the same photo hanging on the wall in the app. The photos are in <span class="label">store_listing_assets/social/ads/veo_photos/</span>.</p>
+    <h2>V1 · “The moment becomes a memory” (about 22 s)</h2>
+    <p>A real moment, filmed like a movie. A guest takes the photo, the shutter freezes that exact frame, and the photo flies into LifeThreads as a memory with its story. Then it happens again, faster, and every photo ends up on one wall.</p>
     <div class="note">
-      <strong>How to use a photo in Veo (Google Flow)</strong>
-      <p>Choose <strong>Ingredients to Video</strong>, upload the photo, set the format to <strong>9:16</strong> and paste the prompt. Veo keeps the people and the place from the photo. If you’d rather keep the photo exactly, use <strong>Frames to Video</strong> with the photo as the last frame and 16:9, then crop to 9:16 in CapCut.</p>
+      <strong>The trick: every Veo scene ends on the photo that is in the app</strong>
+      <p>In Google Flow choose <strong>Frames to Video</strong>, format <strong>9:16</strong>, and upload the photo as the <strong>last frame</strong> (leave the first frame empty). The vertical photos are ready in <span class="label">store_listing_assets/social/ads/veo_photos/lastframe_9x16_*.jpg</span>. Because the clip lands exactly on the app’s photo, the edit can freeze it and fly it into the app without a visible jump.</p>
     </div>
-    <p>Add this line to every prompt so the shots match:</p>
-    <div class="block"><header><span class="label">Style line for every shot</span><button class="copy" type="button">Copy</button></header>
-      <p class="text">Vertical 9:16 video, photorealistic, same people, clothes and place as the reference photo, warm natural light, handheld phone-camera look, gentle camera movement, real candid laughter, no text, no logos, no music, only natural ambient sound.</p></div>
     <div class="grid2">
-      <div class="block"><header><span class="label">Shot 1 · 0–2.5 s · photo shot1_beach_sunset.jpg</span><button class="copy" type="button">Copy</button></header>
-        <p class="text">A young family walks barefoot along the beach at sunset, the little girl laughing on her father’s shoulders, the mother swinging her sandals and smiling back at them. Waves wash over their feet. The camera follows them slowly, then stops as they look at each other and laugh. 6 seconds.</p></div>
-      <div class="block"><header><span class="label">Shot 2 · 5–6.5 s · photo shot2_first_bike.jpg</span><button class="copy" type="button">Copy</button></header>
-        <p class="text">On a leafy autumn path, a little boy in a blue helmet rides his bike alone for the very first time, wobbling and then steady. His father runs behind him, lets go and throws his arms up, cheering with joy. Golden leaves on the ground. 6 seconds.</p></div>
-      <div class="block"><header><span class="label">Shot 3 · 8–9.5 s · photo shot3_first_dance.jpg</span><button class="copy" type="button">Copy</button></header>
-        <p class="text">At a wedding in a barn full of warm string lights, the bride and groom share their first dance, foreheads close, laughing. Guests stand around them clapping, some filming with their phones turned away from the camera. Slow camera move around the couple. 6 seconds.</p></div>
-      <div class="block"><header><span class="label">Shot 4 · 12–13 s · photo shot4_first_home.jpg</span><button class="copy" type="button">Copy</button></header>
-        <p class="text">A young couple sits on the floor of their new, empty apartment between moving boxes, eating pizza. The woman holds up the new house keys and jingles them, both burst out laughing. Bright daylight from tall windows. 6 seconds.</p></div>
-      <div class="block"><header><span class="label">Shot 5 · 14–15.5 s · photo shot5_garden_dinner.jpg</span><button class="copy" type="button">Copy</button></header>
-        <p class="text">A big family dinner at a long table in a garden at dusk under string lights, three generations together. The grandfather raises his glass for a toast, everyone raises theirs and cheers, the kids laugh. Candlelight on the faces. 6 seconds.</p></div>
+      <div class="block"><header><span class="label">Scene A · first dance · last frame: lastframe_9x16_first_dance.jpg</span><button class="copy" type="button">Copy</button></header>
+        <p class="text">Cinematic wedding scene in a rustic wooden barn glowing with thousands of warm string lights, soft haze in the air. Shot on 35 mm film look, 24 fps, slow motion, shallow depth of field, gentle anamorphic lens flares. The bride and groom dance their first dance in the middle of the room while the guests form a circle around them, clapping and swaying, golden confetti drifting slowly through the light. The camera glides in a slow arc around the couple. The bride laughs and leans her head against the groom. At the end the camera comes to rest in front of them and the movement slows to stillness, landing exactly on the final frame. Sound: soft crowd murmur, laughter, rustle of the dress, and one crisp phone camera shutter click on the very last frame. No music, no text, no logos.</p></div>
+      <div class="block"><header><span class="label">Scene B · first bike · last frame: lastframe_9x16_first_bike.jpg</span><button class="copy" type="button">Copy</button></header>
+        <p class="text">Cinematic autumn forest path at golden hour, warm sun rays through orange and red leaves, 35 mm film look, slow motion, shallow depth of field. A little boy in a blue helmet pedals his small blue bike on his own for the very first time, wobbling and then finding his balance. His father runs behind him, lets go and throws his arms wide, laughing and cheering. Leaves swirl up behind the wheels. The camera tracks backwards in front of them, then slows to a stop, landing exactly on the final frame. Sound: crunching leaves, the boy’s delighted laugh, the father cheering, one phone camera shutter click on the very last frame. No music, no text, no logos.</p></div>
+      <div class="block"><header><span class="label">Scene C · garden dinner · last frame: lastframe_9x16_garden_dinner.jpg</span><button class="copy" type="button">Copy</button></header>
+        <p class="text">Cinematic summer evening in a garden, a long wooden table under string lights and glowing lanterns, three generations of one family at dinner, candles and wine glasses. 35 mm film look, shallow depth of field, warm dusk light. Slow dolly shot along the table past laughing faces and passing hands; at the far end the grandfather raises his glass and everyone toasts him. The camera settles and the moment slows to stillness, landing exactly on the final frame. Sound: clinking glasses, laughter, a few words of a toast, one phone camera shutter click on the very last frame. No music, no text, no logos.</p></div>
     </div>
-    <p>Veo makes 6–8 second clips; in the edit you use only the best 1.5–3 seconds of each, as the edit list shows.</p>
+    <p>If a clip doesn’t land cleanly on the photo, generate it again; that last frame is what makes the transition work. Watch hands and faces in slow motion closely.</p>
   </section>
 
   <section>
@@ -106,34 +99,33 @@ footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line)
     <div class="table"><table>
       <thead><tr><th>Time</th><th>Picture</th><th>Voice-over (EN)</th><th>Voice-over (DE)</th></tr></thead>
       <tbody>
-        <tr><td class="t">0–2.5 s</td><td>Shot 1</td><td>That moment?</td><td>Dieser Moment?</td></tr>
-        <tr><td class="t">2.5–5 s</td><td>App: adding a memory (scene “add”)</td><td>Save it in LifeThreads.</td><td>Halt ihn fest – in LifeThreads.</td></tr>
-        <tr><td class="t">5–8 s</td><td>Shot 2 (first bike), then app: the wall (scene “wall”)</td><td>Pin every moment to your wall…</td><td>Pinne jeden Moment an deine Wand …</td></tr>
-        <tr><td class="t">8–11 s</td><td>Shot 3 (first dance), then app: the same memory, “Our first dance” (scene “memory”)</td><td>…with the story behind it.</td><td>… mit der Geschichte dahinter.</td></tr>
-        <tr><td class="t">11–14 s</td><td>App: story film (scene “story”), then Shot 4</td><td>Turn them into a film with music!</td><td>Mach daraus einen Film mit Musik!</td></tr>
-        <tr><td class="t">14–17 s</td><td>Shot 5 (garden dinner), then app: family wall (scene “family”)</td><td>And share one wall with the whole family.</td><td>Und teile eine Wand mit der ganzen Familie.</td></tr>
-        <tr><td class="t">17–20 s</td><td>End card: app icon on dark background</td><td>LifeThreads. Your life, threaded together. Free on the App Store and Google Play.</td><td>LifeThreads. Dein Leben, verbunden. Gratis im App Store und bei Google Play.</td></tr>
+        <tr><td class="t">0–6 s</td><td>Scene A, the first dance, in slow motion</td><td>Some moments only happen once.</td><td>Manche Momente gibt es nur einmal.</td></tr>
+        <tr><td class="t">6–7 s</td><td>Shutter click: the last frame freezes, a short white flash</td><td>–</td><td>–</td></tr>
+        <tr><td class="t">7–11 s</td><td>The frozen photo shrinks into the app and becomes the top of the “Our first dance” memory; title and story appear around it (scene “memory”)</td><td>LifeThreads keeps them. The photo… and the story behind it.</td><td>LifeThreads hält sie fest. Das Foto … und die Geschichte dahinter.</td></tr>
+        <tr><td class="t">11–14 s</td><td>Scene B, the first bike, fast; shutter; the photo drops onto the wall as a card (scene “wall”)</td><td>His first ride.</td><td>Seine erste Fahrt.</td></tr>
+        <tr><td class="t">14–17 s</td><td>Scene C, the garden dinner, fast; shutter; the family wall (scene “family”)</td><td>Grandpa’s eightieth. Your whole life, on one wall.</td><td>Opas Achtzigster. Dein ganzes Leben, an einer Wand.</td></tr>
+        <tr><td class="t">17–22 s</td><td>The story film plays (scene “story”), then the end card with the app icon</td><td>LifeThreads. Free on the App Store and Google Play.</td><td>LifeThreads. Gratis im App Store und bei Google Play.</td></tr>
       </tbody>
     </table></div>
-    <p>The file <span class="label">scenes.txt</span> next to each recording lists the second each app scene starts.</p>
+    <p>Music: one warm, cinematic track for the whole film, soft piano and strings that lift at the first shutter click. The app’s own CC0 tracks “Seasons Change” or “We Used to Dance” by HoliznaCC0 fit.</p>
   </section>
 
   <section>
     <h2>Voice-over scripts</h2>
     <p>Voice: warm, friendly, smiling, like talking to a friend. Not like a radio ad. In ElevenLabs set Stability about 40 % and Style about 30 %.</p>
     <div class="grid2">
-      <div class="block"><header><span class="label">V1 · English · ~18 s</span><button class="copy" type="button">Copy</button></header>
-        <p class="text">That moment? Save it in LifeThreads.
-Pin every moment to your wall… with the story behind it.
-Turn them into a film with music!
-And share one wall with the whole family.
-LifeThreads. Your life, threaded together. Free on the App Store and Google Play.</p></div>
-      <div class="block"><header><span class="label">V1 · Deutsch · ~18 s</span><button class="copy" type="button">Copy</button></header>
-        <p class="text">Dieser Moment? Halt ihn fest – in LifeThreads.
-Pinne jeden Moment an deine Wand … mit der Geschichte dahinter.
-Mach daraus einen Film mit Musik!
-Und teile eine Wand mit der ganzen Familie.
-LifeThreads. Dein Leben, verbunden. Gratis im App Store und bei Google Play.</p></div>
+      <div class="block"><header><span class="label">V1 · English · calm, warm, cinematic</span><button class="copy" type="button">Copy</button></header>
+        <p class="text">Some moments only happen once.
+LifeThreads keeps them. The photo… and the story behind it.
+His first ride.
+Grandpa’s eightieth. Your whole life, on one wall.
+LifeThreads. Free on the App Store and Google Play.</p></div>
+      <div class="block"><header><span class="label">V1 · Deutsch · ruhig, warm, filmisch</span><button class="copy" type="button">Copy</button></header>
+        <p class="text">Manche Momente gibt es nur einmal.
+LifeThreads hält sie fest. Das Foto … und die Geschichte dahinter.
+Seine erste Fahrt.
+Opas Achtzigster. Dein ganzes Leben, an einer Wand.
+LifeThreads. Gratis im App Store und bei Google Play.</p></div>
       <div class="block"><header><span class="label">V2 · English · ~25 s · AI presenter</span><button class="copy" type="button">Copy</button></header>
         <p class="text">This is my whole year. On one wall.
 Every photo gets a few words, the place, and who was there. So I actually remember why it mattered.
