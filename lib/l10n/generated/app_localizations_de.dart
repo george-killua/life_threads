@@ -1842,6 +1842,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der Kauf hat nicht geklappt. Bitte versuch es nochmal.';
 
   @override
+  String premiumMessageStoreConnection(String store) {
+    return '$store war nicht erreichbar, daher wurde der Kauf nicht geöffnet. Prüfe, ob WLAN oder mobile Daten an sind, und versuch es dann nochmal.';
+  }
+
+  @override
   String get premiumMessageCanceled => 'Kauf abgebrochen.';
 
   @override

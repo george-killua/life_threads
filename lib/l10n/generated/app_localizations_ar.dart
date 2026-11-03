@@ -1824,6 +1824,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'لم تكتمل عملية الشراء. حاول مرة أخرى.';
 
   @override
+  String premiumMessageStoreConnection(String store) {
+    return 'تعذّر الوصول إلى $store، لذلك لم تُفتح صفحة الشراء. تأكّد من تشغيل Wi-Fi أو بيانات الجوّال، ثم حاول مرة أخرى.';
+  }
+
+  @override
   String get premiumMessageCanceled => 'تم إلغاء الشراء.';
 
   @override

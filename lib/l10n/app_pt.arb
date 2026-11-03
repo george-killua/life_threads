@@ -532,6 +532,7 @@
   "premiumMessageNoSubscriptionFound": "Nenhuma assinatura Premium ativa encontrada.",
   "premiumMessagePending": "Sua compra está pendente. O Premium é liberado assim que for aprovada.",
   "premiumMessagePurchaseFailed": "A compra não foi concluída. Tente de novo.",
+  "premiumMessageStoreConnection": "Não foi possível acessar a {store}, por isso o pagamento não abriu. Verifique se o Wi-Fi ou os dados móveis estão ligados e tente de novo.",
   "premiumMessageCanceled": "Compra cancelada.",
   "premiumMessageRestored": "Sua assinatura Premium foi restaurada.",
   "premiumMessageActive": "Sua assinatura Premium está ativa.",

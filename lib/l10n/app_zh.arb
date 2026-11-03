@@ -532,6 +532,7 @@
   "premiumMessageNoSubscriptionFound": "没有找到有效的 Premium 订阅。",
   "premiumMessagePending": "你的购买正在处理中。批准后即可解锁 Premium。",
   "premiumMessagePurchaseFailed": "购买没有完成。请再试一次。",
+  "premiumMessageStoreConnection": "无法连接 {store}，因此付款页面没有打开。请确认 Wi-Fi 或移动数据已开启，然后再试一次。",
   "premiumMessageCanceled": "已取消购买。",
   "premiumMessageRestored": "你的 Premium 订阅已恢复。",
   "premiumMessageActive": "你的 Premium 订阅已生效。",

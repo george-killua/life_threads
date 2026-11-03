@@ -9,6 +9,7 @@ import 'package:life_threads/features/on_this_day/data/on_this_day_settings.dart
 import 'package:life_threads/features/premium/data/premium_entitlement_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
 
 import 'support/on_this_day_fakes.dart';
 
@@ -35,8 +36,11 @@ ProviderContainer startScheduler({
         () => FakePremium(isPremium: isPremium),
       ),
       onThisDayNotificationsProvider.overrideWithValue(notifications),
+      // 7:30 in the fake's time zone (Berlin), whatever zone the machine
+      // running the tests is in: CI runners are on UTC.
       onThisDayClockProvider.overrideWithValue(
-        () => DateTime(2026, 10, 12, 7, 30),
+        () =>
+            tz.TZDateTime(tz.getLocation('Europe/Berlin'), 2026, 10, 12, 7, 30),
       ),
     ],
   );

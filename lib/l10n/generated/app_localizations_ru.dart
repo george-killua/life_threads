@@ -1844,6 +1844,11 @@ class AppLocalizationsRu extends AppLocalizations {
       'Покупка не прошла. Попробуй ещё раз.';
 
   @override
+  String premiumMessageStoreConnection(String store) {
+    return 'Не удалось связаться с $store, поэтому оплата не открылась. Проверь, включены ли Wi-Fi или мобильные данные, и попробуй ещё раз.';
+  }
+
+  @override
   String get premiumMessageCanceled => 'Покупка отменена.';
 
   @override

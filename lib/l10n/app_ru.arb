@@ -532,6 +532,7 @@
   "premiumMessageNoSubscriptionFound": "Активная подписка Premium не найдена.",
   "premiumMessagePending": "Покупка ожидает подтверждения. Premium откроется после одобрения.",
   "premiumMessagePurchaseFailed": "Покупка не прошла. Попробуй ещё раз.",
+  "premiumMessageStoreConnection": "Не удалось связаться с {store}, поэтому оплата не открылась. Проверь, включены ли Wi-Fi или мобильные данные, и попробуй ещё раз.",
   "premiumMessageCanceled": "Покупка отменена.",
   "premiumMessageRestored": "Подписка Premium восстановлена.",
   "premiumMessageActive": "Подписка Premium активна.",

@@ -538,6 +538,7 @@
   "premiumMessageNoSubscriptionFound": "Kein aktives Premium-Abo gefunden.",
   "premiumMessagePending": "Dein Kauf wartet auf Bestätigung. Premium wird danach freigeschaltet.",
   "premiumMessagePurchaseFailed": "Der Kauf hat nicht geklappt. Bitte versuch es nochmal.",
+  "premiumMessageStoreConnection": "{store} war nicht erreichbar, daher wurde der Kauf nicht geöffnet. Prüfe, ob WLAN oder mobile Daten an sind, und versuch es dann nochmal.",
   "premiumMessageCanceled": "Kauf abgebrochen.",
   "premiumMessageRestored": "Dein Premium-Abo wurde wiederhergestellt.",
   "premiumMessageActive": "Dein Premium-Abo ist aktiv.",

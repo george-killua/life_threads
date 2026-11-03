@@ -708,6 +708,16 @@
   "premiumMessageNoSubscriptionFound": "No active Premium subscription was found.",
   "premiumMessagePending": "Your purchase is pending. Premium unlocks once it is approved.",
   "premiumMessagePurchaseFailed": "The purchase did not go through. Please try again.",
+  "premiumMessageStoreConnection": "{store} could not be reached, so the checkout did not open. Check that Wi-Fi or mobile data is on, then try again.",
+  "@premiumMessageStoreConnection": {
+    "description": "Shown when the store could not be reached while opening the checkout (e.g. no internet).",
+    "placeholders": {
+      "store": {
+        "type": "String",
+        "example": "Google Play"
+      }
+    }
+  },
   "premiumMessageCanceled": "Purchase canceled.",
   "premiumMessageRestored": "Your Premium subscription is restored.",
   "premiumMessageActive": "Your Premium subscription is active.",

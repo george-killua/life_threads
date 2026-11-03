@@ -532,6 +532,7 @@
   "premiumMessageNoSubscriptionFound": "कोई चालू Premium सब्सक्रिप्शन नहीं मिला।",
   "premiumMessagePending": "आपकी ख़रीदारी पेंडिंग है। मंज़ूरी मिलते ही Premium खुल जाएगा।",
   "premiumMessagePurchaseFailed": "ख़रीदारी पूरी नहीं हुई। कृपया फिर कोशिश करें।",
+  "premiumMessageStoreConnection": "{store} से कनेक्ट नहीं हो सका, इसलिए पेमेंट नहीं खुला। जाँचें कि Wi-Fi या मोबाइल डेटा चालू है, फिर दोबारा कोशिश करें।",
   "premiumMessageCanceled": "ख़रीदारी रद्द हुई।",
   "premiumMessageRestored": "आपका Premium सब्सक्रिप्शन रिस्टोर हो गया।",
   "premiumMessageActive": "आपका Premium सब्सक्रिप्शन चालू है।",

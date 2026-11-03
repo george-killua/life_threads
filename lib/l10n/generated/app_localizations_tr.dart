@@ -1824,6 +1824,11 @@ class AppLocalizationsTr extends AppLocalizations {
       'Satın alma tamamlanmadı. Lütfen tekrar dene.';
 
   @override
+  String premiumMessageStoreConnection(String store) {
+    return '$store ile bağlantı kurulamadı, bu yüzden ödeme açılmadı. Wi-Fi veya mobil verinin açık olduğundan emin ol, sonra tekrar dene.';
+  }
+
+  @override
   String get premiumMessageCanceled => 'Satın alma iptal edildi.';
 
   @override

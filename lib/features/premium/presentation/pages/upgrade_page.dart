@@ -463,7 +463,8 @@ class _SubscriptionOfferCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final price = purchaseState.price ?? '€4.99';
+    // Only the store's own price is shown; there is no made-up fallback.
+    final price = purchaseState.price;
     final canBuy = purchaseState.canBuy && !purchaseState.isBusy;
     // The offer could not be loaded: the main button loads it again.
     final canRetry =
@@ -520,8 +521,8 @@ class _SubscriptionOfferCard extends StatelessWidget {
               price: price,
               purchaseState: purchaseState,
               yearly:
-                  plans.selected == PremiumPlan.yearly &&
-                  plans.yearlyPrice != null,
+                  purchaseState.productId ==
+                  PremiumProductIds.yearlySubscription,
             ),
           ],
           const SizedBox(height: 18),
@@ -589,7 +590,7 @@ class _SubscriptionOfferCard extends StatelessWidget {
           ],
           const SizedBox(height: 10),
           Text(
-            plans.selected == PremiumPlan.yearly && plans.yearlyPrice != null
+            purchaseState.productId == PremiumProductIds.yearlySubscription
                 ? context.l10n.purchasesHandledYearly(_storeName)
                 : context.l10n.purchasesHandledByGooglePlay(_storeName),
             style: TextStyle(
@@ -655,7 +656,7 @@ class _PricePill extends StatelessWidget {
     this.yearly = false,
   });
 
-  final String price;
+  final String? price;
   final PremiumPurchaseState purchaseState;
   final bool yearly;
 
@@ -678,11 +679,7 @@ class _PricePill extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              purchaseState.status == PremiumPurchaseStatus.ready
-                  ? yearly
-                        ? context.l10n.premiumYearlyWithPrice(price)
-                        : context.l10n.lifetimeUnlockWithPrice(price)
-                  : _statusLabel(context, purchaseState.status),
+              _label(context),
               style: TextStyle(
                 color: AppColors.paperInk,
                 fontWeight: FontWeight.w900,
@@ -694,7 +691,21 @@ class _PricePill extends StatelessWidget {
     );
   }
 
-  String _statusLabel(BuildContext context, PremiumPurchaseStatus status) {
+  /// The price exactly as the store sent it, labelled with the plan's period.
+  String _withPrice(BuildContext context, String? price) => price == null
+      ? context.l10n.loadingPlayStoreProduct
+      : yearly
+      ? context.l10n.premiumYearlyWithPrice(price)
+      : context.l10n.lifetimeUnlockWithPrice(price);
+
+  String _label(BuildContext context) {
+    final status = purchaseState.status;
+    // A failed or canceled checkout keeps the plan on offer: show its price
+    // again rather than a bare "Purchase failed".
+    if (status == PremiumPurchaseStatus.ready ||
+        (status == PremiumPurchaseStatus.failed && purchaseState.canBuy)) {
+      return _withPrice(context, price);
+    }
     return switch (status) {
       PremiumPurchaseStatus.loading => context.l10n.loadingPlayStoreProduct,
       PremiumPurchaseStatus.storeUnavailable =>
@@ -706,9 +717,7 @@ class _PricePill extends StatelessWidget {
       PremiumPurchaseStatus.restored => context.l10n.restored,
       PremiumPurchaseStatus.failed => context.l10n.purchaseFailed,
       PremiumPurchaseStatus.idle => context.l10n.preparingCheckout,
-      PremiumPurchaseStatus.ready => context.l10n.lifetimeUnlockWithPrice(
-        price,
-      ),
+      PremiumPurchaseStatus.ready => _withPrice(context, price),
     };
   }
 }
@@ -742,6 +751,8 @@ class _PurchaseMessage extends StatelessWidget {
       PremiumPurchaseMessage.pending => l10n.premiumMessagePending,
       PremiumPurchaseMessage.purchaseFailed =>
         l10n.premiumMessagePurchaseFailed,
+      PremiumPurchaseMessage.storeConnection =>
+        l10n.premiumMessageStoreConnection(_storeName),
       PremiumPurchaseMessage.canceled => l10n.premiumMessageCanceled,
       PremiumPurchaseMessage.restored => l10n.premiumMessageRestored,
       PremiumPurchaseMessage.active => l10n.premiumMessageActive,

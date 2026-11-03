@@ -538,6 +538,7 @@
   "premiumMessageNoSubscriptionFound": "لم يتم العثور على اشتراك Premium فعّال.",
   "premiumMessagePending": "عملية الشراء قيد الانتظار. سيتم تفعيل Premium بعد الموافقة.",
   "premiumMessagePurchaseFailed": "لم تكتمل عملية الشراء. حاول مرة أخرى.",
+  "premiumMessageStoreConnection": "تعذّر الوصول إلى {store}، لذلك لم تُفتح صفحة الشراء. تأكّد من تشغيل Wi-Fi أو بيانات الجوّال، ثم حاول مرة أخرى.",
   "premiumMessageCanceled": "تم إلغاء الشراء.",
   "premiumMessageRestored": "تمت استعادة اشتراك Premium.",
   "premiumMessageActive": "اشتراك Premium مفعّل.",

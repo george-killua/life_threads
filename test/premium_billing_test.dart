@@ -156,6 +156,53 @@ void main() {
   );
 
   test(
+    'a checkout that fails because Play is unreachable says so, and can be retried',
+    () async {
+      container.read(premiumBillingProvider);
+      await _settle(1200);
+      store.controller.add([
+        _purchase(PremiumProductIds.monthlySubscription, PurchaseStatus.error)
+          ..error = IAPError(
+            source: 'google_play',
+            code: 'purchase_error',
+            message: 'BillingResponse.networkError',
+          ),
+      ]);
+      await _settle();
+      final s = container.read(premiumBillingProvider);
+      expect(s.status, PremiumPurchaseStatus.failed);
+      expect(s.message, PremiumPurchaseMessage.storeConnection);
+      // The store's price stays on offer; the user can tap Subscribe again.
+      expect(s.canBuy, isTrue);
+      expect(s.price, '€2.99');
+    },
+  );
+
+  test('a declined payment is not reported as a connection problem', () {
+    expect(
+      PremiumBillingController.isConnectionError(
+        IAPError(
+          source: 'google_play',
+          code: 'purchase_error',
+          message: 'BillingResponse.itemUnavailable',
+        ),
+      ),
+      isFalse,
+    );
+    expect(
+      PremiumBillingController.isConnectionError(
+        IAPError(
+          source: 'google_play',
+          code: 'purchase_error',
+          message: 'BillingResponse.serviceUnavailable',
+        ),
+      ),
+      isTrue,
+    );
+    expect(PremiumBillingController.isConnectionError(null), isFalse);
+  });
+
+  test(
     'completePurchase is called for a purchase of an unknown productID',
     () async {
       container.read(premiumBillingProvider);

@@ -532,6 +532,7 @@
   "premiumMessageNoSubscriptionFound": "有効なPremiumサブスクリプションが見つかりませんでした。",
   "premiumMessagePending": "購入は保留中です。承認されるとPremiumが使えるようになります。",
   "premiumMessagePurchaseFailed": "購入が完了しませんでした。もう一度お試しください。",
+  "premiumMessageStoreConnection": "{store}に接続できなかったため、お支払い画面を開けませんでした。Wi-Fiまたはモバイルデータがオンになっているか確認して、もう一度お試しください。",
   "premiumMessageCanceled": "購入をキャンセルしました。",
   "premiumMessageRestored": "Premiumサブスクリプションを復元しました。",
   "premiumMessageActive": "Premiumサブスクリプションは有効です。",

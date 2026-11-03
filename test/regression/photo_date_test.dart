@@ -15,6 +15,16 @@ class FakePaths extends PathProviderPlatform with MockPlatformInterfaceMixin {
   Future<String?> getApplicationDocumentsPath() async => dir;
 }
 
+/// Hands over [source] directly: photo_manager only reads files on iOS,
+/// macOS and Android, and the tests also run on Linux (CI).
+class FakeAsset extends AssetEntity {
+  FakeAsset(this.source)
+    : super(id: '1', typeInt: 1, width: 100, height: 100);
+  final File source;
+  @override
+  Future<File?> get file async => source;
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -31,7 +41,7 @@ void main() {
             (call) async => call.method == 'getFullFile' ? src.path : null,
           );
 
-      final asset = AssetEntity(id: '1', typeInt: 1, width: 100, height: 100);
+      final asset = FakeAsset(src);
       final photo = await const PhotoLibraryService().copyAssetToAppStorage(
         asset,
       );

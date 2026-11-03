@@ -532,6 +532,7 @@
   "premiumMessageNoSubscriptionFound": "Nie znaleziono aktywnej subskrypcji Premium.",
   "premiumMessagePending": "Zakup czeka na zatwierdzenie. Premium odblokuje się po akceptacji.",
   "premiumMessagePurchaseFailed": "Zakup się nie udał. Spróbuj ponownie.",
+  "premiumMessageStoreConnection": "Nie udało się połączyć z {store}, więc płatność się nie otworzyła. Sprawdź, czy Wi-Fi lub dane mobilne są włączone, i spróbuj ponownie.",
   "premiumMessageCanceled": "Zakup anulowany.",
   "premiumMessageRestored": "Twoja subskrypcja Premium została przywrócona.",
   "premiumMessageActive": "Twoja subskrypcja Premium jest aktywna.",
