@@ -1751,6 +1751,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get premiumMessagePurchaseFailed => '购买没有完成。请再试一次。';
 
   @override
+  String premiumMessageStoreConnection(String store) {
+    return '无法连接 $store，因此付款页面没有打开。请确认 Wi-Fi 或移动数据已开启，然后再试一次。';
+  }
+
+  @override
   String get premiumMessageCanceled => '已取消购买。';
 
   @override

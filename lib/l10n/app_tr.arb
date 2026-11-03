@@ -532,6 +532,7 @@
   "premiumMessageNoSubscriptionFound": "Etkin bir Premium aboneliği bulunamadı.",
   "premiumMessagePending": "Satın alman beklemede. Onaylanınca Premium açılır.",
   "premiumMessagePurchaseFailed": "Satın alma tamamlanmadı. Lütfen tekrar dene.",
+  "premiumMessageStoreConnection": "{store} ile bağlantı kurulamadı, bu yüzden ödeme açılmadı. Wi-Fi veya mobil verinin açık olduğundan emin ol, sonra tekrar dene.",
   "premiumMessageCanceled": "Satın alma iptal edildi.",
   "premiumMessageRestored": "Premium aboneliğin geri yüklendi.",
   "premiumMessageActive": "Premium aboneliğin etkin.",

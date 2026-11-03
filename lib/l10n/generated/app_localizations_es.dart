@@ -1837,6 +1837,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'La compra no se completó. Inténtalo de nuevo.';
 
   @override
+  String premiumMessageStoreConnection(String store) {
+    return 'No se pudo conectar con $store, así que el pago no se abrió. Comprueba que el Wi-Fi o los datos móviles estén activados e inténtalo de nuevo.';
+  }
+
+  @override
   String get premiumMessageCanceled => 'Compra cancelada.';
 
   @override

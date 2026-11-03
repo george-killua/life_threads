@@ -11,6 +11,7 @@ enum PremiumPurchaseMessage {
   noSubscriptionFound,
   pending,
   purchaseFailed,
+  storeConnection,
   canceled,
   restored,
   active,

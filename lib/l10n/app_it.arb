@@ -532,6 +532,7 @@
   "premiumMessageNoSubscriptionFound": "Nessun abbonamento Premium attivo trovato.",
   "premiumMessagePending": "Il tuo acquisto è in sospeso. Premium si sblocca appena viene approvato.",
   "premiumMessagePurchaseFailed": "L'acquisto non è andato a buon fine. Riprova.",
+  "premiumMessageStoreConnection": "Impossibile raggiungere {store}, quindi il pagamento non si è aperto. Controlla che Wi-Fi o dati mobili siano attivi, poi riprova.",
   "premiumMessageCanceled": "Acquisto annullato.",
   "premiumMessageRestored": "Il tuo abbonamento Premium è stato ripristinato.",
   "premiumMessageActive": "Il tuo abbonamento Premium è attivo.",

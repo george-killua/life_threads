@@ -345,7 +345,9 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
           productId: _subscriptionProduct?.id,
           price: _subscriptionProduct?.price,
           canBuy: _subscriptionProduct != null,
-          message: PremiumPurchaseMessage.purchaseFailed,
+          message: isConnectionError(purchase.error)
+              ? PremiumPurchaseMessage.storeConnection
+              : PremiumPurchaseMessage.purchaseFailed,
         );
       case PurchaseStatus.canceled:
         state = PremiumPurchaseState(
@@ -356,6 +358,27 @@ class PremiumBillingController extends Notifier<PremiumPurchaseState> {
           message: PremiumPurchaseMessage.canceled,
         );
     }
+  }
+
+  /// Whether the store could not be reached (no network, Play Billing
+  /// disconnected or busy), as opposed to a declined payment. Play reports
+  /// these as `BillingResponse.networkError`, `serviceUnavailable`,
+  /// `serviceDisconnected` or `serviceTimeout` in the error message.
+  @visibleForTesting
+  static bool isConnectionError(IAPError? error) {
+    if (error == null) return false;
+    final text = '${error.code} ${error.message} ${error.details ?? ''}'
+        .toLowerCase();
+    return const [
+      'networkerror',
+      'network_error',
+      'serviceunavailable',
+      'service_unavailable',
+      'servicedisconnected',
+      'service_disconnected',
+      'servicetimeout',
+      'service_timeout',
+    ].any(text.contains);
   }
 
   /// An App Store transaction that was refunded or whose period is over,

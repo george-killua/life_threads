@@ -1823,6 +1823,11 @@ class AppLocalizationsHi extends AppLocalizations {
       'ख़रीदारी पूरी नहीं हुई। कृपया फिर कोशिश करें।';
 
   @override
+  String premiumMessageStoreConnection(String store) {
+    return '$store से कनेक्ट नहीं हो सका, इसलिए पेमेंट नहीं खुला। जाँचें कि Wi-Fi या मोबाइल डेटा चालू है, फिर दोबारा कोशिश करें।';
+  }
+
+  @override
   String get premiumMessageCanceled => 'ख़रीदारी रद्द हुई।';
 
   @override

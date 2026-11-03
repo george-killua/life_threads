@@ -1767,6 +1767,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get premiumMessagePurchaseFailed => '購入が完了しませんでした。もう一度お試しください。';
 
   @override
+  String premiumMessageStoreConnection(String store) {
+    return '$storeに接続できなかったため、お支払い画面を開けませんでした。Wi-Fiまたはモバイルデータがオンになっているか確認して、もう一度お試しください。';
+  }
+
+  @override
   String get premiumMessageCanceled => '購入をキャンセルしました。';
 
   @override

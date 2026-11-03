@@ -3319,6 +3319,12 @@ abstract class AppLocalizations {
   /// **'The purchase did not go through. Please try again.'**
   String get premiumMessagePurchaseFailed;
 
+  /// Shown when the store could not be reached while opening the checkout (e.g. no internet).
+  ///
+  /// In en, this message translates to:
+  /// **'{store} could not be reached, so the checkout did not open. Check that Wi-Fi or mobile data is on, then try again.'**
+  String premiumMessageStoreConnection(String store);
+
   /// No description provided for @premiumMessageCanceled.
   ///
   /// In en, this message translates to:

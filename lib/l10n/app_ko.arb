@@ -532,6 +532,7 @@
   "premiumMessageNoSubscriptionFound": "활성화된 Premium 구독을 찾지 못했어요.",
   "premiumMessagePending": "구매가 대기 중이에요. 승인되면 Premium이 열려요.",
   "premiumMessagePurchaseFailed": "구매가 완료되지 않았어요. 다시 시도해 주세요.",
+  "premiumMessageStoreConnection": "{store}에 연결할 수 없어 결제 화면이 열리지 않았어요. Wi-Fi나 모바일 데이터가 켜져 있는지 확인한 뒤 다시 시도해 주세요.",
   "premiumMessageCanceled": "구매를 취소했어요.",
   "premiumMessageRestored": "Premium 구독을 복원했어요.",
   "premiumMessageActive": "Premium 구독이 활성화되어 있어요.",

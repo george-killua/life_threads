@@ -1836,6 +1836,11 @@ class AppLocalizationsIt extends AppLocalizations {
       'L\'acquisto non è andato a buon fine. Riprova.';
 
   @override
+  String premiumMessageStoreConnection(String store) {
+    return 'Impossibile raggiungere $store, quindi il pagamento non si è aperto. Controlla che Wi-Fi o dati mobili siano attivi, poi riprova.';
+  }
+
+  @override
   String get premiumMessageCanceled => 'Acquisto annullato.';
 
   @override

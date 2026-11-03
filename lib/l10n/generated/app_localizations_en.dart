@@ -1823,6 +1823,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'The purchase did not go through. Please try again.';
 
   @override
+  String premiumMessageStoreConnection(String store) {
+    return '$store could not be reached, so the checkout did not open. Check that Wi-Fi or mobile data is on, then try again.';
+  }
+
+  @override
   String get premiumMessageCanceled => 'Purchase canceled.';
 
   @override

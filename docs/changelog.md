@@ -2,6 +2,20 @@
 
 What changed in each TestFlight / Play build. Newest first.
 
+## 1.0.1 (29) – 3 November 2026 (fix for Google Play rejection of build 28)
+
+Play rejected build 28 under "Broken Functionality – incorrect placeholder
+content". Their screenshot shows the Premium page, then Google Play's own
+"No internet connection" dialog after tapping Subscribe.
+- The Premium page no longer has a made-up fallback price (€4.99); it only
+  ever shows the price Google Play / the App Store sends.
+- The price line names the period of the plan actually being bought
+  (/year or /month), also when the store only offers one plan.
+- When the checkout fails because Play can't be reached (no network, Play
+  Billing disconnected or busy), the page says so in the app's language
+  and keeps the plan and its price on offer, so Subscribe can be tapped
+  again; before, the line under the plans just said "Purchase failed".
+
 ## 1.0.0 (25) – 18 October 2026 (TestFlight, Play closed testing)
 
 **New: "Show me how" guided tour**
